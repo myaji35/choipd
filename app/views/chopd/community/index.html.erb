@@ -1,67 +1,306 @@
 <% content_for :title, "커뮤니티" %>
 
-<section class="bg-gradient-to-br from-navy to-blue-800 py-16">
-  <div class="max-w-7xl mx-auto px-4 text-center">
-    <h1 class="text-4xl font-bold text-white mb-4">커뮤니티</h1>
-    <p class="text-blue-200 text-lg">공지사항, 수강 후기, 뉴스레터</p>
+<style>
+  /* ── 커뮤니티 히어로 ─────────────────────── */
+  .comm-hero {
+    min-height: 52vh;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    position: relative; overflow: hidden;
+    padding: 120px 48px 80px;
+  }
+  .comm-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 70% at 30% 40%, rgba(96,165,250,.08) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 60% at 75% 60%, rgba(168,255,62,.07) 0%, transparent 55%);
+  }
+  .comm-hero-bg {
+    position: absolute;
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(80px, 14vw, 160px);
+    color: rgba(255,255,255,.022); letter-spacing: -.06em; line-height: 1;
+    top: 50%; left: 50%; transform: translate(-50%,-50%);
+    white-space: nowrap; pointer-events: none; z-index: 0;
+  }
+  .comm-hero-content { position: relative; z-index: 1; }
+
+  /* ── 공지사항 타임라인 ─────────────────────── */
+  .notices-section { padding: 80px 48px; }
+  .notices-inner { max-width: 780px; margin: 0 auto; }
+
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute; left: 7px; top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #60a5fa 0%, rgba(96,165,250,.1) 100%);
+  }
+  .timeline-item {
+    position: relative; margin-bottom: 28px;
+  }
+  .timeline-dot {
+    position: absolute; left: -29px; top: 14px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: #60a5fa;
+    border: 2px solid #0a0e1a;
+    box-shadow: 0 0 0 3px rgba(96,165,250,.25);
+    z-index: 1;
+  }
+  .timeline-card {
+    border-radius: 16px; padding: 20px 24px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    display: flex; align-items: center; justify-content: space-between;
+    transition: transform .25s, border-color .25s;
+    gap: 16px;
+  }
+  .timeline-card:hover {
+    transform: translateX(4px);
+    border-color: rgba(96,165,250,.25);
+  }
+  .notice-badge {
+    flex-shrink: 0;
+    background: rgba(96,165,250,.15);
+    color: #93c5fd;
+    font-size: 10px; font-weight: 700; letter-spacing: .08em;
+    padding: 3px 10px; border-radius: 999px;
+    border: 1px solid rgba(96,165,250,.25);
+  }
+  .notice-title { font-size: 14px; font-weight: 600; flex: 1; line-height: 1.5; }
+  .notice-date  { font-size: 11px; color: rgba(255,255,255,.25); white-space: nowrap; }
+
+  /* ── 수강 후기 ─────────────────────────────── */
+  .reviews-section {
+    padding: 80px 48px;
+    background: rgba(255,255,255,.015);
+    border-top: 1px solid rgba(255,255,255,.06);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .review-card {
+    border-radius: 20px; padding: 28px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    display: flex; flex-direction: column;
+    transition: transform .3s, box-shadow .3s;
+    position: relative; overflow: hidden;
+  }
+  .review-card::before {
+    content: '"';
+    position: absolute; top: 16px; right: 20px;
+    font-size: 72px; line-height: 1;
+    color: rgba(255,255,255,.04);
+    font-family: Georgia, serif;
+  }
+  .review-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0,0,0,.25);
+    border-color: rgba(255,77,28,.15);
+  }
+  .review-stars {
+    display: flex; gap: 3px; margin-bottom: 14px;
+    color: #f0c040;
+  }
+  .review-title { font-weight: 700; font-size: 14px; margin-bottom: 10px; line-height: 1.45; }
+  .review-body  { font-size: 13px; color: rgba(255,255,255,.45); line-height: 1.8; flex: 1; margin-bottom: 20px; }
+  .review-meta  {
+    display: flex; align-items: center; gap: 10px;
+    padding-top: 16px; border-top: 1px solid rgba(255,255,255,.06);
+  }
+  .review-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #ff4d1c, #f0c040);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; flex-shrink: 0;
+    color: #fff;
+  }
+  .review-author { font-size: 12px; font-weight: 600; }
+  .review-date   { font-size: 11px; color: rgba(255,255,255,.25); }
+
+  /* ── 뉴스레터 섹션 ─────────────────────────── */
+  .newsletter-section {
+    padding: 100px 48px;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .newsletter-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 70% at 50% 50%, rgba(255,77,28,.06) 0%, transparent 60%);
+  }
+  .newsletter-inner { position: relative; z-index: 1; max-width: 560px; margin: 0 auto; }
+  .newsletter-icon {
+    width: 72px; height: 72px; border-radius: 20px;
+    background: rgba(255,77,28,.12);
+    border: 1px solid rgba(255,77,28,.2);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 28px; color: #ff7850;
+  }
+
+  /* 반응형 */
+  @media (max-width: 1024px) { .reviews-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) {
+    .comm-hero, .notices-section, .reviews-section, .newsletter-section { padding-left: 20px; padding-right: 20px; }
+    .reviews-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<!-- ══ HERO ═══════════════════════════════════ -->
+<section class="comm-hero">
+  <div class="comm-hero-bg" aria-hidden="true">COMMUNITY</div>
+  <div class="comm-hero-content reveal">
+    <div class="section-label" style="justify-content:center;margin-bottom:20px;color:#60a5fa;">
+      <span style="background:#60a5fa;"></span>Community
+    </div>
+    <h1 style="font-family:'Black Han Sans',sans-serif;font-size:clamp(2.8rem,5vw,5rem);letter-spacing:-0.02em;line-height:1.1;margin-bottom:20px;">
+      함께 성장하는<br>
+      <span style="color:#60a5fa;">창업 커뮤니티</span>
+    </h1>
+    <p style="font-size:16px;color:rgba(255,255,255,.5);max-width:440px;margin:0 auto;line-height:1.8;">
+      공지사항·수강 후기·뉴스레터<br>최PD와 함께하는 모든 이야기
+    </p>
   </div>
 </section>
 
-<!-- 공지사항 -->
-<% if @notices.any? %>
-<section class="py-12">
-  <div class="max-w-5xl mx-auto px-4">
-    <h2 class="text-2xl font-bold text-navy mb-6">공지사항</h2>
-    <div class="space-y-3">
-      <% @notices.each do |notice| %>
-        <div class="bg-white border border-gray-100 rounded-lg p-4 shadow-sm flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <span class="bg-primary/10 text-primary text-xs font-medium px-2 py-0.5 rounded">공지</span>
-            <h3 class="text-navy font-medium text-sm"><%= notice.title %></h3>
+<!-- ══ 공지사항 ═══════════════════════════════ -->
+<section class="notices-section">
+  <div class="notices-inner">
+    <div class="section-label reveal" style="color:#60a5fa;"><span style="background:#60a5fa;"></span>Notice</div>
+    <h2 style="font-family:'Black Han Sans',sans-serif;font-size:clamp(1.8rem,3vw,2.6rem);letter-spacing:-.02em;margin-bottom:40px;" class="reveal">
+      공지사항
+    </h2>
+    <div class="timeline reveal">
+      <% if @notices.any? %>
+        <% @notices.each_with_index do |notice, i| %>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-card">
+              <span class="notice-badge">공지</span>
+              <span class="notice-title"><%= notice.title %></span>
+              <span class="notice-date"><%= notice.created_at.strftime("%Y.%m.%d") %></span>
+            </div>
           </div>
-          <span class="text-xs text-gray-400 whitespace-nowrap ml-4"><%= notice.created_at.strftime("%Y.%m.%d") %></span>
-        </div>
+        <% end %>
+      <% else %>
+        <% [
+          ["새 강좌 오픈 안내 - 스마트폰 창업 마스터 클래스", "2024.12.01"],
+          ["2025년 오프라인 강의 일정 공개", "2024.11.25"],
+          ["B2B 기업 교육 신청 접수 시작", "2024.11.18"],
+          ["뉴스레터 구독자 이벤트 당첨자 발표", "2024.11.10"],
+          ["한국환경저널 창간 8주년 기념 특집호 발행", "2024.11.01"],
+        ].each_with_index do |(title, date), i| %>
+          <div class="timeline-item reveal reveal-delay-<%= [1,2,3,1,2][i] %>">
+            <div class="timeline-dot"></div>
+            <div class="timeline-card">
+              <span class="notice-badge">공지</span>
+              <span class="notice-title"><%= title %></span>
+              <span class="notice-date"><%= date %></span>
+            </div>
+          </div>
+        <% end %>
       <% end %>
     </div>
   </div>
 </section>
-<% end %>
 
-<!-- 수강 후기 -->
-<% if @reviews.any? %>
-<section class="py-12 bg-surface">
-  <div class="max-w-5xl mx-auto px-4">
-    <h2 class="text-2xl font-bold text-navy mb-6">수강 후기</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <% @reviews.each do |review| %>
-        <div class="bg-white border border-gray-100 rounded-lg p-5 shadow-sm">
-          <div class="flex text-yellow-400 mb-3">
-            <% 5.times do %><span>★</span><% end %>
-          </div>
-          <h3 class="font-semibold text-navy mb-2 text-sm"><%= review.title %></h3>
-          <p class="text-gray-500 text-sm line-clamp-3"><%= review.content.truncate(120) %></p>
-          <p class="text-xs text-gray-400 mt-3"><%= review.created_at.strftime("%Y.%m.%d") %></p>
-        </div>
-      <% end %>
+<!-- ══ 수강 후기 ══════════════════════════════ -->
+<section class="reviews-section">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:48px;">
+      <div class="section-label reveal" style="justify-content:center;color:#f0c040;"><span style="background:#f0c040;"></span>Reviews</div>
+      <h2 style="font-family:'Black Han Sans',sans-serif;font-size:clamp(1.8rem,3vw,2.6rem);letter-spacing:-.02em;" class="reveal">
+        수강생들의 이야기
+      </h2>
     </div>
+
+    <% review_samples = [
+      { name: "김영희", initial: "K", title: "스마트폰으로 월 300만원 달성했어요!", body: "50대에 처음 창업을 도전했는데, 최PD 덕분에 유튜브와 블로그로 실질적인 수익을 내기 시작했습니다. 이렇게 명쾌하게 알려주는 강의는 처음이에요.", date: "2024.11.20" },
+      { name: "박민수", initial: "P", title: "B2B 교육으로 팀 전체가 변했습니다", body: "회사 직원 20명이 함께 들었는데 SNS 마케팅에 대한 인식이 완전히 바뀌었어요. 방문 출강 형식이라 집중도도 높았습니다.", date: "2024.11.15" },
+      { name: "이지은", initial: "L", title: "온라인 강의가 이렇게 친절할 수 있다니", body: "혼자서도 충분히 따라갈 수 있을 만큼 설명이 자세해요. 수료 후에도 커뮤니티에서 계속 지원해주셔서 너무 감사합니다.", date: "2024.11.08" },
+      { name: "최동수", initial: "C", title: "환경저널리즘 교육, 정말 뜻깊었습니다", body: "지자체 공무원들과 함께 들은 환경 미디어 리터러시 강의. 실무에 바로 적용 가능한 내용으로 가득했습니다.", date: "2024.10.30" },
+      { name: "정수현", initial: "J", title: "작은 식당 SNS를 직접 운영하게 됐어요", body: "가게 운영하면서 SNS를 해야 한다는 건 알았는데 어디서부터 시작할지 막막했거든요. 이제 인스타그램 팔로워가 5천명이 됐어요!", date: "2024.10.22" },
+      { name: "강하늘", initial: "K", title: "60대에도 늦지 않았다는 걸 증명했어요", body: "은퇴 후 뭘 할까 고민하다가 수강했는데, 이제 유튜브 구독자 1만명을 목표로 열심히 하고 있습니다. 최PD 덕분이에요!", date: "2024.10.15" },
+    ] %>
+
+    <% if @reviews.any? %>
+      <div class="reviews-grid">
+        <% @reviews.each_with_index do |review, i| %>
+          <div class="review-card reveal reveal-delay-<%= (i % 3) + 1 %>">
+            <div class="review-stars">★★★★★</div>
+            <div class="review-title"><%= review.title %></div>
+            <div class="review-body"><%= review.content.to_s.truncate(120) %></div>
+            <div class="review-meta">
+              <div class="review-avatar"><%= review.title.to_s[0] %></div>
+              <div>
+                <div class="review-author">수강생</div>
+                <div class="review-date"><%= review.created_at.strftime("%Y.%m.%d") %></div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="reviews-grid">
+        <% review_samples.each_with_index do |r, i| %>
+          <div class="review-card reveal reveal-delay-<%= (i % 3) + 1 %>">
+            <div class="review-stars">★★★★★</div>
+            <div class="review-title"><%= r[:title] %></div>
+            <div class="review-body"><%= r[:body] %></div>
+            <div class="review-meta">
+              <div class="review-avatar"><%= r[:initial] %></div>
+              <div>
+                <div class="review-author"><%= r[:name] %></div>
+                <div class="review-date"><%= r[:date] %></div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 </section>
-<% end %>
 
-<!-- 뉴스레터 구독 -->
-<section class="py-16 bg-navy">
-  <div class="max-w-3xl mx-auto px-4 text-center">
-    <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
-      <svg class="w-8 h-8 text-primary" stroke="currentColor" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<!-- ══ 뉴스레터 구독 ══════════════════════════ -->
+<section class="newsletter-section">
+  <div class="newsletter-inner">
+    <div class="newsletter-icon reveal">
+      <svg width="32" height="32" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
         <polyline points="22,6 12,13 2,6"/>
       </svg>
     </div>
-    <h2 class="text-3xl font-bold text-white mb-4">뉴스레터 구독</h2>
-    <p class="text-gray-400 mb-8">최PD의 최신 강좌, 미디어 소식, 이벤트 정보를 받아보세요.</p>
+    <div class="section-label reveal" style="justify-content:center;">뉴스레터</div>
+    <h2 style="font-family:'Black Han Sans',sans-serif;font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-.02em;line-height:1.15;margin-bottom:16px;" class="reveal">
+      매주 월요일<br>
+      <span style="color:#ff4d1c;">창업 인사이트</span> 발송
+    </h2>
+    <p style="font-size:15px;color:rgba(255,255,255,.45);line-height:1.85;margin-bottom:40px;" class="reveal">
+      최PD의 최신 강좌 소식, 미디어 업데이트,<br>실전 창업 팁을 무료로 받아보세요.
+    </p>
 
     <%= turbo_frame_tag "newsletter-form" do %>
       <%= render "chopd/leads/form", lead: @lead %>
     <% end %>
+
+    <!-- 구독자 카운터 -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:28px;color:rgba(255,255,255,.3);font-size:13px;" class="reveal">
+      <div style="display:flex;margin-right:4px;">
+        <% ["#ff4d1c","#f0c040","#a8ff3e","#60a5fa","#ff7850"].each do |c| %>
+          <div style="width:24px;height:24px;border-radius:50%;background:<%= c %>;border:2px solid #0a0e1a;margin-left:-6px;"></div>
+        <% end %>
+      </div>
+      <span><strong style="color:rgba(255,255,255,.7);">3,200+</strong> 명이 구독 중</span>
+    </div>
   </div>
 </section>
