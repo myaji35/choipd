@@ -3,8 +3,12 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= content_for?(:title) ? yield(:title) + " | 최PD" : "최PD의 스마트폰 연구소" %></title>
+    <title><%= content_for?(:title) ? yield(:title) + " | 최PD" : "최PD — 스마트폰으로 인생 2막을" %></title>
     <meta name="description" content="<%= content_for?(:description) ? yield(:description) : '최범희 PD의 통합 브랜드 허브 - 교육, 미디어, 작품' %>">
+
+    <!-- Google Fonts: Black Han Sans + Noto Sans KR -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,43 +17,113 @@
         theme: {
           extend: {
             colors: {
-              primary: '#00A1E0',
-              'primary-dark': '#0078A8',
-              navy: '#16325C',
-              surface: '#F3F2F2',
+              dark:    '#0a0e1a',
+              navy:    '#111827',
+              coral:   '#ff4d1c',
+              'coral-light': '#ff7850',
+              gold:    '#f0c040',
+              lime:    '#a8ff3e',
+            },
+            fontFamily: {
+              display: ['"Black Han Sans"', 'sans-serif'],
+              sans:    ['"Noto Sans KR"', 'sans-serif'],
             }
           }
         }
       }
     </script>
 
+    <style>
+      :root {
+        --c-dark:  #0a0e1a;
+        --c-coral: #ff4d1c;
+        --c-gold:  #f0c040;
+        --c-lime:  #a8ff3e;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body { background: var(--c-dark); color: #f5f4f0; overflow-x: hidden; }
+
+      /* 스크롤 진행바 */
+      #scroll-prog {
+        position: fixed; top: 0; left: 0; height: 3px; z-index: 10000;
+        background: linear-gradient(90deg, var(--c-coral), var(--c-gold), var(--c-lime));
+        width: 0%; transition: width .08s ease;
+      }
+
+      /* 섹션 등장 애니메이션 */
+      .reveal {
+        opacity: 0;
+        transform: translateY(32px);
+        transition: opacity .7s ease, transform .7s ease;
+      }
+      .reveal.visible { opacity: 1; transform: translateY(0); }
+      .reveal-delay-1 { transition-delay: .1s; }
+      .reveal-delay-2 { transition-delay: .2s; }
+      .reveal-delay-3 { transition-delay: .3s; }
+
+      /* 마퀴 */
+      @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+      .marquee-track { animation: marquee 25s linear infinite; display: flex; width: max-content; }
+
+      /* 섹션 레이블 */
+      .section-label {
+        display: inline-flex; align-items: center; gap: 8px;
+        font-size: 11px; font-weight: 700; letter-spacing: .12em;
+        text-transform: uppercase; color: var(--c-coral); margin-bottom: 16px;
+      }
+      .section-label::before { content: ''; display: block; width: 28px; height: 2px; background: var(--c-coral); }
+
+      /* 태그 */
+      .tag {
+        display: inline-block; padding: 4px 12px; border-radius: 999px;
+        font-size: 12px; font-weight: 500; border: 1px solid rgba(255,255,255,.15);
+        color: rgba(255,255,255,.65); background: rgba(255,255,255,.05);
+      }
+
+      /* 플래시 */
+      .flash-notice { background: rgba(168,255,62,.1); border-left: 3px solid var(--c-lime); color: #a8ff3e; padding: 12px 20px; font-size: 13px; }
+      .flash-alert  { background: rgba(255,77,28,.1);  border-left: 3px solid var(--c-coral); color: #ff7850; padding: 12px 20px; font-size: 13px; }
+    </style>
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
-  <body class="bg-white font-sans antialiased">
-    <!-- 플래시 메시지 -->
+  <body class="font-sans antialiased">
+    <div id="scroll-prog"></div>
+
     <% if flash[:notice] %>
-      <div id="flash-notice" class="bg-green-50 border-l-4 border-green-500 text-green-800 px-4 py-3 text-sm" role="alert">
-        <%= flash[:notice] %>
-      </div>
+      <div class="flash-notice"><%= flash[:notice] %></div>
     <% end %>
     <% if flash[:alert] %>
-      <div id="flash-alert" class="bg-red-50 border-l-4 border-red-500 text-red-800 px-4 py-3 text-sm" role="alert">
-        <%= flash[:alert] %>
-      </div>
+      <div class="flash-alert"><%= flash[:alert] %></div>
     <% end %>
 
-    <!-- 헤더 -->
     <%= render "layouts/chopd_header" %>
 
-    <!-- 메인 콘텐츠 -->
     <main>
       <%= yield %>
     </main>
 
-    <!-- 푸터 -->
     <%= render "layouts/chopd_footer" %>
+
+    <script>
+      // 스크롤 진행바
+      window.addEventListener('scroll', () => {
+        const prog = document.getElementById('scroll-prog');
+        if (!prog) return;
+        const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+        prog.style.width = Math.min(pct, 100) + '%';
+      });
+
+      // Scroll reveal
+      const revealEls = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+      }, { threshold: 0.12 });
+      revealEls.forEach(el => observer.observe(el));
+    </script>
   </body>
 </html>
