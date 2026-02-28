@@ -1,0 +1,35 @@
+<%= form_with model: [:admin, resource], url: resource.persisted? ? admin_resource_path(resource) : admin_resources_path, class: "space-y-4" do |f| %>
+  <% if resource.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <% resource.errors.full_messages.each do |msg| %>
+        <p class="text-red-600 text-sm"><%= msg %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :title, "제목", class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= f.text_field :title, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" %>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= f.label :category, "카테고리", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.select :category, DistributorResource::CATEGORIES.map { |c| [c, c] }, { include_blank: "선택하세요" }, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" %>
+    </div>
+    <div>
+      <%= f.label :required_plan, "필수 플랜", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.select :required_plan, [["없음 (모든 유통사)", nil], ["Basic", "basic"], ["Standard", "standard"], ["Premium", "premium"]], {}, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :file_url, "파일 URL", class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= f.url_field :file_url, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" %>
+  </div>
+
+  <div class="flex space-x-3">
+    <%= f.submit resource.persisted? ? "수정" : "등록", class: "bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors cursor-pointer" %>
+    <%= link_to "취소", admin_resources_path, class: "bg-gray-100 text-gray-700 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors" %>
+  </div>
+<% end %>

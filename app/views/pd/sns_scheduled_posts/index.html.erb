@@ -1,0 +1,45 @@
+<% content_for :title, "예약 발행" %>
+
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-xl font-bold text-navy">예약 발행</h1>
+  <%= link_to "새 예약", new_pd_scheduled_post_path, class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors" %>
+</div>
+
+<div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-gray-50 border-b">
+      <tr>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">메시지</th>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">플랫폼</th>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">예약 시간</th>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">상태</th>
+        <th class="px-4 py-3"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y">
+      <% @scheduled_posts.each do |post| %>
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 text-navy max-w-xs truncate"><%= post.message.truncate(60) %></td>
+          <td class="px-4 py-3 text-gray-500 uppercase"><%= post.platform %></td>
+          <td class="px-4 py-3 text-gray-500"><%= post.scheduled_at.strftime("%Y.%m.%d %H:%M") %></td>
+          <td class="px-4 py-3">
+            <% status_map = { 'pending' => ['bg-yellow-100 text-yellow-700', '예약됨'], 'published' => ['bg-green-100 text-green-700', '발행됨'], 'failed' => ['bg-red-100 text-red-700', '실패'] } %>
+            <% cls, label = status_map[post.status] || ['bg-gray-100 text-gray-500', post.status] %>
+            <span class="<%= cls %> text-xs px-2 py-0.5 rounded-full"><%= label %></span>
+          </td>
+          <td class="px-4 py-3 text-right">
+            <% if post.pending? %>
+              <%= link_to "수정", edit_pd_scheduled_post_path(post), class: "text-primary text-xs hover:text-blue-700 mr-2" %>
+              <%= button_to "삭제", pd_scheduled_post_path(post), method: :delete,
+                  class: "text-red-500 text-xs hover:text-red-700",
+                  data: { turbo_confirm: "삭제하시겠습니까?" } %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+      <% if @scheduled_posts.empty? %>
+        <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">예약된 발행이 없습니다.</td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

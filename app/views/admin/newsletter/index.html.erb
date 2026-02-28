@@ -1,0 +1,30 @@
+<% content_for :title, "뉴스레터 구독자" %>
+
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-xl font-bold text-navy">뉴스레터 구독자</h1>
+    <p class="text-sm text-gray-400 mt-1">총 <%= @leads.count %>명</p>
+  </div>
+</div>
+
+<div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-gray-50 border-b">
+      <tr>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">이메일</th>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">구독일</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y">
+      <% @leads.each do |lead| %>
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 text-navy"><%= lead.email %></td>
+          <td class="px-4 py-3 text-gray-400"><%= lead.subscribed_at&.strftime("%Y.%m.%d") || lead.created_at.strftime("%Y.%m.%d") %></td>
+        </tr>
+      <% end %>
+      <% if @leads.empty? %>
+        <tr><td colspan="2" class="px-4 py-8 text-center text-gray-400">구독자가 없습니다.</td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

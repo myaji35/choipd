@@ -1,0 +1,45 @@
+<% content_for :title, "문의 관리" %>
+
+<div class="mb-6">
+  <h1 class="text-xl font-bold text-navy">문의 관리</h1>
+</div>
+
+<div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-gray-50 border-b">
+      <tr>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">이름</th>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">이메일</th>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">유형</th>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">상태</th>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">등록일</th>
+        <th class="px-4 py-3"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y">
+      <% @inquiries.each do |inquiry| %>
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 font-medium text-navy"><%= inquiry.name %></td>
+          <td class="px-4 py-3 text-gray-500"><%= inquiry.email %></td>
+          <td class="px-4 py-3 text-gray-500">
+            <%= inquiry.b2b? ? 'B2B/B2G' : '일반' %>
+          </td>
+          <td class="px-4 py-3">
+            <% status_cls = { 'pending' => 'bg-yellow-100 text-yellow-700', 'replied' => 'bg-green-100 text-green-700', 'closed' => 'bg-gray-100 text-gray-500' } %>
+            <% labels = { 'pending' => '미처리', 'replied' => '답변완료', 'closed' => '종료' } %>
+            <span class="<%= status_cls[inquiry.status] || 'bg-gray-100' %> text-xs px-2 py-0.5 rounded-full">
+              <%= labels[inquiry.status] || inquiry.status %>
+            </span>
+          </td>
+          <td class="px-4 py-3 text-gray-400"><%= inquiry.created_at.strftime("%Y.%m.%d") %></td>
+          <td class="px-4 py-3 text-right">
+            <%= link_to "보기", admin_inquiry_path(inquiry), class: "text-primary text-xs hover:text-blue-700" %>
+          </td>
+        </tr>
+      <% end %>
+      <% if @inquiries.empty? %>
+        <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">문의가 없습니다.</td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

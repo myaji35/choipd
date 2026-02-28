@@ -1,0 +1,59 @@
+# imPD Rails - Kamal Deploy Config
+# 서버: Vultr ICN (158.247.235.31)
+# 접속: https://choipd.158.247.235.31.nip.io
+# 업데이트: 2026-02-28
+
+service: choipd
+image: ghcr.io/myaji35/choipd
+
+# ── 서버 설정 ──────────────────────────────
+servers:
+  web:
+    - 158.247.235.31
+
+# ── SSH 설정 ──────────────────────────────
+ssh:
+  user: root
+
+# ── Proxy 설정 (kamal-proxy via nip.io) ───
+proxy:
+  host: choipd.158.247.235.31.nip.io
+  app_port: 3000
+
+# ── 레지스트리 (GitHub Container Registry) ──
+registry:
+  server: ghcr.io
+  username: myaji35
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+# ── 환경변수 ──────────────────────────────
+env:
+  secret:
+    - RAILS_MASTER_KEY
+  clear:
+    SOLID_QUEUE_IN_PUMA: true
+    RAILS_ENV: production
+    PORT: "3000"
+    WEB_CONCURRENCY: "1"
+    RAILS_SERVE_STATIC_FILES: "true"
+
+# ── 볼륨 ──────────────────────────────────
+volumes:
+  - "choipd_storage:/rails/storage"
+
+# ── 에셋 브릿지 ───────────────────────────
+asset_path: /rails/public/assets
+
+# ── 빌더 (Mac 로컬 amd64 크로스컴파일) ──
+builder:
+  arch: amd64
+
+# ── 별칭 ──────────────────────────────────
+aliases:
+  console: app exec --interactive --reuse "bin/rails console"
+  shell: app exec --interactive --reuse "bash"
+  logs: app logs -f
+  dbc: app exec --interactive --reuse "bin/rails dbconsole --include-password"
+  seed: app exec --reuse "bin/rails db:seed"
+  migrate: app exec --reuse "bin/rails db:migrate"

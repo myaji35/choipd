@@ -1,0 +1,37 @@
+<% content_for :title, "결제 내역" %>
+
+<div class="mb-6">
+  <h1 class="text-xl font-bold text-navy">결제 내역</h1>
+</div>
+
+<div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-gray-50 border-b">
+      <tr>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">유통사</th>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">금액</th>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">방법</th>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">상태</th>
+        <th class="text-left text-xs text-gray-400 uppercase tracking-wider px-4 py-3">날짜</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y">
+      <% @payments.each do |payment| %>
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 text-navy"><%= payment.distributor&.name || '-' %></td>
+          <td class="px-4 py-3 font-semibold text-navy">₩<%= number_with_delimiter(payment.amount.to_i) %></td>
+          <td class="px-4 py-3 text-gray-500"><%= payment.payment_method || '-' %></td>
+          <td class="px-4 py-3">
+            <% status_map = { 'pending' => ['bg-yellow-100 text-yellow-700', '대기'], 'completed' => ['bg-green-100 text-green-700', '완료'], 'failed' => ['bg-red-100 text-red-700', '실패'], 'refunded' => ['bg-gray-100 text-gray-600', '환불'] } %>
+            <% cls, label = status_map[payment.status] || ['bg-gray-100 text-gray-500', payment.status] %>
+            <span class="<%= cls %> text-xs px-2 py-0.5 rounded-full"><%= label %></span>
+          </td>
+          <td class="px-4 py-3 text-gray-400"><%= payment.created_at.strftime("%Y.%m.%d") %></td>
+        </tr>
+      <% end %>
+      <% if @payments.empty? %>
+        <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">결제 내역이 없습니다.</td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

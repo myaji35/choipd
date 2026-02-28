@@ -1,0 +1,10 @@
+<% content_for :title, "문의하기" %>
+
+<section class="py-16">
+  <div class="max-w-2xl mx-auto px-4">
+    <h1 class="text-3xl font-bold text-navy mb-8 text-center">문의하기</h1>
+    <%= turbo_frame_tag "inquiry-form" do %>
+      <%= render "form", inquiry: @inquiry %>
+    <% end %>
+  </div>
+</section>

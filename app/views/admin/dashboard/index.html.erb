@@ -1,0 +1,76 @@
+<% content_for :title, "대시보드" %>
+
+<!-- KPI 카드 -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+  <div class="bg-white rounded-lg border border-gray-100 p-5 shadow-sm">
+    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">전체 유통사</p>
+    <p class="text-3xl font-bold text-navy"><%= @total_distributors %></p>
+  </div>
+  <div class="bg-white rounded-lg border border-gray-100 p-5 shadow-sm">
+    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">승인 대기</p>
+    <p class="text-3xl font-bold text-yellow-500"><%= @pending_distributors %></p>
+  </div>
+  <div class="bg-white rounded-lg border border-gray-100 p-5 shadow-sm">
+    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">승인 완료</p>
+    <p class="text-3xl font-bold text-green-500"><%= @approved_distributors %></p>
+  </div>
+  <div class="bg-white rounded-lg border border-gray-100 p-5 shadow-sm">
+    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">총 매출</p>
+    <p class="text-3xl font-bold text-primary">₩<%= number_with_delimiter(@total_revenue.to_i) %></p>
+  </div>
+</div>
+
+<!-- 최근 유통사 + 문의 -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- 최근 유통사 -->
+  <div class="bg-white rounded-lg border border-gray-100 shadow-sm">
+    <div class="flex items-center justify-between p-5 border-b">
+      <h2 class="font-semibold text-navy">최근 유통사</h2>
+      <%= link_to "전체 보기", admin_distributors_path, class: "text-primary text-xs hover:text-primary-dark" %>
+    </div>
+    <div class="divide-y">
+      <% @recent_distributors.each do |d| %>
+        <div class="flex items-center justify-between p-4">
+          <div>
+            <p class="text-sm font-medium text-navy"><%= d.name %></p>
+            <p class="text-xs text-gray-400"><%= d.email %></p>
+          </div>
+          <span class="text-xs px-2 py-0.5 rounded-full font-medium
+            <%= d.status == 'approved' ? 'bg-green-100 text-green-700' :
+                d.status == 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                'bg-red-100 text-red-700' %>">
+            <%= d.status == 'approved' ? '승인' : d.status == 'pending' ? '대기' : '거부' %>
+          </span>
+        </div>
+      <% end %>
+      <% if @recent_distributors.empty? %>
+        <p class="text-center text-gray-400 text-sm py-8">등록된 유통사가 없습니다.</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- 최근 문의 -->
+  <div class="bg-white rounded-lg border border-gray-100 shadow-sm">
+    <div class="flex items-center justify-between p-5 border-b">
+      <h2 class="font-semibold text-navy">최근 문의</h2>
+      <%= link_to "전체 보기", admin_inquiries_path, class: "text-primary text-xs hover:text-primary-dark" %>
+    </div>
+    <div class="divide-y">
+      <% @recent_inquiries.each do |inquiry| %>
+        <div class="p-4">
+          <div class="flex items-center justify-between mb-1">
+            <p class="text-sm font-medium text-navy"><%= inquiry.name %></p>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+              <%= inquiry.inquiry_type == 'b2b' ? 'B2B' : '일반' %>
+            </span>
+          </div>
+          <p class="text-xs text-gray-500 line-clamp-1"><%= inquiry.message %></p>
+          <p class="text-xs text-gray-400 mt-1"><%= inquiry.created_at.strftime("%Y.%m.%d %H:%M") %></p>
+        </div>
+      <% end %>
+      <% if @recent_inquiries.empty? %>
+        <p class="text-center text-gray-400 text-sm py-8">접수된 문의가 없습니다.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

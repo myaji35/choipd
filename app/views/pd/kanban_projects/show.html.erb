@@ -1,0 +1,63 @@
+<% content_for :title, @project.title %>
+
+<div class="flex items-center justify-between mb-6">
+  <div class="flex items-center space-x-3">
+    <%= link_to "← 프로젝트 목록", pd_kanban_projects_path, class: "text-primary text-sm hover:text-primary-dark" %>
+    <div class="flex items-center space-x-2 ml-4">
+      <div class="w-4 h-4 rounded-full" style="background-color: <%= @project.color || '#00A1E0' %>"></div>
+      <h1 class="text-xl font-bold text-navy"><%= @project.title %></h1>
+    </div>
+  </div>
+  <div class="flex space-x-2">
+    <%= link_to "컬럼 추가", new_pd_kanban_project_kanban_column_path(@project), class: "bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors" %>
+    <%= link_to "수정", edit_pd_kanban_project_path(@project), class: "bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 transition-colors" %>
+    <%= button_to "삭제", pd_kanban_project_path(@project), method: :delete,
+        class: "bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm hover:bg-red-100 transition-colors",
+        data: { turbo_confirm: "프로젝트를 삭제하시겠습니까?" } %>
+  </div>
+</div>
+
+<!-- 칸반 보드 -->
+<div class="flex space-x-4 overflow-x-auto pb-4">
+  <% @columns.each do |column| %>
+    <div class="flex-shrink-0 w-72 bg-gray-50 rounded-lg">
+      <div class="flex items-center justify-between p-3 border-b border-gray-200">
+        <h3 class="font-semibold text-navy text-sm"><%= column.title %></h3>
+        <div class="flex items-center space-x-2">
+          <span class="text-xs text-gray-400"><%= column.kanban_tasks.count %></span>
+          <%= link_to "+", new_pd_kanban_project_kanban_column_kanban_task_path(@project, column),
+              class: "text-primary text-lg font-light hover:text-blue-700 leading-none" %>
+        </div>
+      </div>
+      <div class="p-2 space-y-2 min-h-24">
+        <% column.kanban_tasks.order(:position).each do |task| %>
+          <div class="bg-white rounded-lg border border-gray-100 p-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow">
+            <% priority_cls = { 'low' => 'text-gray-400', 'medium' => 'text-yellow-500', 'high' => 'text-orange-500', 'urgent' => 'text-red-500' } %>
+            <div class="flex items-start justify-between mb-1">
+              <p class="text-sm font-medium text-navy line-clamp-2"><%= task.title %></p>
+              <svg class="w-3 h-3 flex-shrink-0 ml-1 mt-0.5 <%= priority_cls[task.priority] || 'text-gray-400' %>" fill="currentColor" viewBox="0 0 8 8">
+                <circle cx="4" cy="4" r="4"/>
+              </svg>
+            </div>
+            <% if task.due_date.present? %>
+              <p class="text-xs text-gray-400 mt-1">
+                <% if task.due_date < Date.today %>
+                  <span class="text-red-500"><%= task.due_date.strftime("%m/%d") %> 마감</span>
+                <% else %>
+                  <%= task.due_date.strftime("%m/%d") %> 마감
+                <% end %>
+              </p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @columns.empty? %>
+    <div class="flex-1 py-12 text-center text-gray-400">
+      <p>컬럼을 추가하여 칸반 보드를 시작하세요.</p>
+      <%= link_to "컬럼 추가", new_pd_kanban_project_kanban_column_path(@project), class: "text-primary text-sm mt-2 inline-block hover:text-blue-700" %>
+    </div>
+  <% end %>
+</div>

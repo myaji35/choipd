@@ -1,0 +1,42 @@
+<% content_for :title, "문의 상세" %>
+
+<div class="mb-6 flex items-center justify-between">
+  <div>
+    <%= link_to "← 문의 목록", admin_inquiries_path, class: "text-primary text-sm hover:text-primary-dark" %>
+    <h1 class="text-xl font-bold text-navy mt-2"><%= @inquiry.name %>님의 문의</h1>
+  </div>
+  <div class="flex space-x-2">
+    <%= button_to "답변완료", admin_inquiry_path(@inquiry), method: :patch,
+        params: { inquiry: { status: "replied" } },
+        class: "bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600 transition-colors" %>
+    <%= button_to "종료", admin_inquiry_path(@inquiry), method: :patch,
+        params: { inquiry: { status: "closed" } },
+        class: "bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors" %>
+  </div>
+</div>
+
+<div class="bg-white rounded-lg border border-gray-100 shadow-sm p-6 space-y-4">
+  <dl class="grid grid-cols-2 gap-4 text-sm">
+    <div>
+      <dt class="text-gray-400 text-xs uppercase tracking-wider mb-1">이름</dt>
+      <dd class="text-navy font-medium"><%= @inquiry.name %></dd>
+    </div>
+    <div>
+      <dt class="text-gray-400 text-xs uppercase tracking-wider mb-1">이메일</dt>
+      <dd class="text-navy"><%= @inquiry.email %></dd>
+    </div>
+    <div>
+      <dt class="text-gray-400 text-xs uppercase tracking-wider mb-1">연락처</dt>
+      <dd class="text-navy"><%= @inquiry.phone.present? ? @inquiry.phone : '-' %></dd>
+    </div>
+    <div>
+      <dt class="text-gray-400 text-xs uppercase tracking-wider mb-1">유형</dt>
+      <dd class="text-navy"><%= @inquiry.b2b? ? 'B2B/B2G' : '일반 문의' %></dd>
+    </div>
+  </dl>
+  <div>
+    <dt class="text-gray-400 text-xs uppercase tracking-wider mb-2">문의 내용</dt>
+    <dd class="text-navy bg-gray-50 rounded-lg p-4 text-sm leading-relaxed"><%= @inquiry.message %></dd>
+  </div>
+  <p class="text-xs text-gray-400">등록일: <%= @inquiry.created_at.strftime("%Y.%m.%d %H:%M") %></p>
+</div>

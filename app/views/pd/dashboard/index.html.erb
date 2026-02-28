@@ -1,0 +1,96 @@
+<% content_for :title, "PD 대시보드" %>
+
+<!-- 환영 메시지 -->
+<div class="mb-8">
+  <h1 class="text-2xl font-bold text-navy">안녕하세요, 최PD님!</h1>
+  <p class="text-gray-500 text-sm mt-1"><%= Date.today.strftime("%Y년 %m월 %d일") %></p>
+</div>
+
+<!-- 빠른 통계 -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+  <div class="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
+    <p class="text-xs text-gray-400 mb-1">뉴스레터 구독자</p>
+    <p class="text-2xl font-bold text-navy"><%= @total_leads %></p>
+  </div>
+  <div class="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
+    <p class="text-xs text-gray-400 mb-1">미처리 문의</p>
+    <p class="text-2xl font-bold text-yellow-500"><%= @recent_inquiries.count { |i| i.status == 'pending' } %></p>
+  </div>
+  <div class="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
+    <p class="text-xs text-gray-400 mb-1">예약 발행</p>
+    <p class="text-2xl font-bold text-primary"><%= @upcoming_posts.count %></p>
+  </div>
+  <div class="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
+    <p class="text-xs text-gray-400 mb-1">칸반 프로젝트</p>
+    <p class="text-2xl font-bold text-navy"><%= @active_projects.count %></p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- 예약 발행 -->
+  <div class="bg-white rounded-lg border border-gray-100 shadow-sm">
+    <div class="flex items-center justify-between p-4 border-b">
+      <h2 class="font-semibold text-navy text-sm">예정 발행</h2>
+      <%= link_to "전체 보기", pd_scheduled_posts_path, class: "text-primary text-xs hover:text-primary-dark" %>
+    </div>
+    <div class="divide-y">
+      <% @upcoming_posts.each do |post| %>
+        <div class="p-3">
+          <div class="flex items-start justify-between">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-navy truncate"><%= post.message.truncate(50) %></p>
+              <p class="text-xs text-gray-400 mt-0.5"><%= post.platform %> · <%= post.scheduled_at.strftime("%m/%d %H:%M") %></p>
+            </div>
+            <span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded ml-2 whitespace-nowrap">예약됨</span>
+          </div>
+        </div>
+      <% end %>
+      <% if @upcoming_posts.empty? %>
+        <p class="text-center text-gray-400 text-sm py-6">예약된 발행이 없습니다.</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- 최근 문의 -->
+  <div class="bg-white rounded-lg border border-gray-100 shadow-sm">
+    <div class="flex items-center justify-between p-4 border-b">
+      <h2 class="font-semibold text-navy text-sm">최근 문의</h2>
+      <%= link_to "전체 보기", admin_inquiries_path, class: "text-primary text-xs hover:text-primary-dark" %>
+    </div>
+    <div class="divide-y">
+      <% @recent_inquiries.each do |inquiry| %>
+        <div class="p-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-navy"><%= inquiry.name %></span>
+            <span class="text-xs text-gray-400"><%= inquiry.created_at.strftime("%m/%d") %></span>
+          </div>
+          <p class="text-xs text-gray-500 mt-0.5 truncate"><%= inquiry.message %></p>
+        </div>
+      <% end %>
+      <% if @recent_inquiries.empty? %>
+        <p class="text-center text-gray-400 text-sm py-6">문의가 없습니다.</p>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- 칸반 프로젝트 -->
+<% if @active_projects.any? %>
+<div class="mt-6">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="font-semibold text-navy">진행 중인 프로젝트</h2>
+    <%= link_to "전체 보기", pd_kanban_projects_path, class: "text-primary text-xs hover:text-primary-dark" %>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <% @active_projects.each do |project| %>
+      <%= link_to pd_kanban_project_path(project), class: "bg-white border border-gray-100 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow" do %>
+        <div class="flex items-center space-x-2 mb-2">
+          <div class="w-3 h-3 rounded-full" style="background-color: <%= project.color || '#00A1E0' %>"></div>
+          <h3 class="font-medium text-navy text-sm"><%= project.title %></h3>
+        </div>
+        <p class="text-xs text-gray-400"><%= project.kanban_tasks.count %>개의 태스크</p>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+<% end %>

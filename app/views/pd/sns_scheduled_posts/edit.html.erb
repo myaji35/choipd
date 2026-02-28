@@ -1,0 +1,10 @@
+<% content_for :title, "예약 발행 수정" %>
+<div class="max-w-lg">
+  <div class="mb-6">
+    <%= link_to "← 예약 발행", pd_scheduled_posts_path, class: "text-primary text-sm hover:text-primary-dark" %>
+    <h1 class="text-xl font-bold text-navy mt-2">예약 발행 수정</h1>
+  </div>
+  <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-6">
+    <%= render "form", scheduled_post: @scheduled_post %>
+  </div>
+</div>

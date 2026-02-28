@@ -1,0 +1,43 @@
+<footer class="bg-navy text-white mt-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- 브랜드 -->
+      <div>
+        <div class="flex items-center space-x-2 mb-4">
+          <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+            <span class="text-white font-bold text-sm">최</span>
+          </div>
+          <span class="font-bold text-lg">최PD의 스마트폰 연구소</span>
+        </div>
+        <p class="text-gray-400 text-sm leading-relaxed">
+          스마트폰 창업 전략가 최범희 PD의 통합 브랜드 허브.<br>
+          교육, 미디어, 작품을 통해 가치를 나눕니다.
+        </p>
+      </div>
+
+      <!-- 링크 -->
+      <div>
+        <h3 class="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">서비스</h3>
+        <ul class="space-y-2">
+          <li><%= link_to "교육 과정", education_path, class: "text-gray-400 hover:text-white text-sm transition-colors" %></li>
+          <li><%= link_to "한국환경저널", media_path, class: "text-gray-400 hover:text-white text-sm transition-colors" %></li>
+          <li><%= link_to "작품 갤러리", works_path, class: "text-gray-400 hover:text-white text-sm transition-colors" %></li>
+          <li><%= link_to "커뮤니티", community_path, class: "text-gray-400 hover:text-white text-sm transition-colors" %></li>
+        </ul>
+      </div>
+
+      <!-- 연락처 -->
+      <div>
+        <h3 class="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">연락처</h3>
+        <ul class="space-y-2 text-sm text-gray-400">
+          <li>B2B/B2G 문의: <%= link_to "문의하기", new_inquiry_path, class: "text-primary hover:text-blue-300 transition-colors" %></li>
+          <li>뉴스레터: <%= link_to "구독하기", community_path, class: "text-primary hover:text-blue-300 transition-colors" %></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-500">
+      <p>&copy; <%= Date.today.year %> 최PD의 스마트폰 연구소. All rights reserved.</p>
+    </div>
+  </div>
+</footer>

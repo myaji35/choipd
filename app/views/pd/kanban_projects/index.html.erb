@@ -1,0 +1,26 @@
+<% content_for :title, "칸반 프로젝트" %>
+
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-xl font-bold text-navy">칸반 프로젝트</h1>
+  <%= link_to "새 프로젝트", new_pd_kanban_project_path, class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors" %>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  <% @kanban_projects.each do |project| %>
+    <%= link_to pd_kanban_project_path(project), class: "bg-white rounded-lg border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow block" do %>
+      <div class="flex items-center space-x-3 mb-3">
+        <div class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: <%= project.color || '#00A1E0' %>"></div>
+        <h3 class="font-semibold text-navy"><%= project.title %></h3>
+      </div>
+      <% if project.description.present? %>
+        <p class="text-xs text-gray-400 mb-3 line-clamp-2"><%= project.description %></p>
+      <% end %>
+      <p class="text-xs text-gray-400"><%= project.kanban_tasks.count %>개의 태스크</p>
+    <% end %>
+  <% end %>
+  <% if @kanban_projects.empty? %>
+    <div class="col-span-3 py-12 text-center text-gray-400 bg-white rounded-lg border border-gray-100">
+      프로젝트가 없습니다.
+    </div>
+  <% end %>
+</div>

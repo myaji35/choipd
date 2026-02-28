@@ -1,0 +1,48 @@
+<header class="bg-white shadow-sm sticky top-0 z-50" data-controller="mobile-menu">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <!-- 로고 -->
+      <div class="flex items-center">
+        <%= link_to root_path, class: "flex items-center space-x-2" do %>
+          <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+            <span class="text-white font-bold text-sm">최</span>
+          </div>
+          <span class="font-bold text-navy text-lg">최PD</span>
+        <% end %>
+      </div>
+
+      <!-- 데스크탑 네비게이션 -->
+      <nav class="hidden md:flex items-center space-x-8">
+        <%= link_to "교육", education_path, class: "text-gray-600 hover:text-primary transition-colors text-sm font-medium" %>
+        <%= link_to "미디어", media_path, class: "text-gray-600 hover:text-primary transition-colors text-sm font-medium" %>
+        <%= link_to "작품", works_path, class: "text-gray-600 hover:text-primary transition-colors text-sm font-medium" %>
+        <%= link_to "커뮤니티", community_path, class: "text-gray-600 hover:text-primary transition-colors text-sm font-medium" %>
+      </nav>
+
+      <!-- CTA 버튼 -->
+      <div class="hidden md:flex items-center space-x-3">
+        <%= link_to "문의하기", new_inquiry_path, class: "bg-primary text-white px-4 py-2 rounded text-sm font-medium hover:bg-primary-dark transition-colors" %>
+      </div>
+
+      <!-- 모바일 메뉴 버튼 -->
+      <button class="md:hidden p-2" data-action="click->mobile-menu#toggle" aria-label="메뉴">
+        <svg class="w-6 h-6 text-gray-600" stroke="currentColor" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 모바일 네비게이션 -->
+    <div class="md:hidden hidden pb-4" data-mobile-menu-target="menu">
+      <nav class="flex flex-col space-y-2">
+        <%= link_to "교육", education_path, class: "text-gray-600 hover:text-primary py-2 text-sm font-medium" %>
+        <%= link_to "미디어", media_path, class: "text-gray-600 hover:text-primary py-2 text-sm font-medium" %>
+        <%= link_to "작품", works_path, class: "text-gray-600 hover:text-primary py-2 text-sm font-medium" %>
+        <%= link_to "커뮤니티", community_path, class: "text-gray-600 hover:text-primary py-2 text-sm font-medium" %>
+        <%= link_to "문의하기", new_inquiry_path, class: "bg-primary text-white px-4 py-2 rounded text-sm font-medium text-center mt-2" %>
+      </nav>
+    </div>
+  </div>
+</header>

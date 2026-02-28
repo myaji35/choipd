@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= content_for?(:title) ? yield(:title) + " | 최PD" : "최PD의 스마트폰 연구소" %></title>
+    <meta name="description" content="<%= content_for?(:description) ? yield(:description) : '최범희 PD의 통합 브랜드 허브 - 교육, 미디어, 작품' %>">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#00A1E0',
+              'primary-dark': '#0078A8',
+              navy: '#16325C',
+              surface: '#F3F2F2',
+            }
+          }
+        }
+      }
+    </script>
+
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="bg-white font-sans antialiased">
+    <!-- 플래시 메시지 -->
+    <% if flash[:notice] %>
+      <div id="flash-notice" class="bg-green-50 border-l-4 border-green-500 text-green-800 px-4 py-3 text-sm" role="alert">
+        <%= flash[:notice] %>
+      </div>
+    <% end %>
+    <% if flash[:alert] %>
+      <div id="flash-alert" class="bg-red-50 border-l-4 border-red-500 text-red-800 px-4 py-3 text-sm" role="alert">
+        <%= flash[:alert] %>
+      </div>
+    <% end %>
+
+    <!-- 헤더 -->
+    <%= render "layouts/chopd_header" %>
+
+    <!-- 메인 콘텐츠 -->
+    <main>
+      <%= yield %>
+    </main>
+
+    <!-- 푸터 -->
+    <%= render "layouts/chopd_footer" %>
+  </body>
+</html>

@@ -1,0 +1,46 @@
+<%= form_with model: [:admin, distributor], class: "space-y-5" do |f| %>
+  <% if distributor.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <% distributor.errors.full_messages.each do |msg| %>
+        <p class="text-red-600 text-sm"><%= msg %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div>
+      <%= f.label :name, "유통사명", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :name, class: "w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" %>
+    </div>
+    <div>
+      <%= f.label :email, "이메일", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.email_field :email, class: "w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" %>
+    </div>
+    <div>
+      <%= f.label :business_type, "업종", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :business_type, placeholder: "소매업, 교육업 등", class: "w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" %>
+    </div>
+    <div>
+      <%= f.label :region, "지역", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :region, placeholder: "서울, 경기 등", class: "w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" %>
+    </div>
+    <div>
+      <%= f.label :subscription_plan, "구독 플랜", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.select :subscription_plan, [["선택", ""], ["Basic", "basic"], ["Standard", "standard"], ["Premium", "premium"]],
+          {},
+          class: "w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" %>
+    </div>
+    <div>
+      <%= f.label :status, "상태", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.select :status, [["대기", "pending"], ["승인", "approved"], ["거부", "rejected"], ["정지", "suspended"]],
+          {},
+          class: "w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" %>
+    </div>
+  </div>
+
+  <div class="flex space-x-3">
+    <%= f.submit distributor.new_record? ? "유통사 등록" : "정보 수정",
+        class: "bg-primary text-white px-6 py-2.5 rounded-lg font-medium hover:bg-primary-dark transition-colors cursor-pointer" %>
+    <%= link_to "취소", admin_distributors_path, class: "text-gray-500 px-6 py-2.5 rounded-lg font-medium hover:text-gray-700 transition-colors" %>
+  </div>
+<% end %>

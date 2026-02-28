@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= content_for?(:title) ? yield(:title) + " | Admin" : "imPD Admin" %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#00A1E0',
+              'primary-dark': '#0078A8',
+              navy: '#16325C',
+              surface: '#F3F2F2',
+            }
+          }
+        }
+      }
+    </script>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="bg-surface min-h-screen flex">
+    <!-- 사이드바 -->
+    <aside class="w-60 bg-navy text-white flex-shrink-0 fixed top-0 left-0 h-full overflow-y-auto z-40">
+      <div class="p-4 border-b border-white/10">
+        <a href="<%= admin_root_path %>" class="flex items-center space-x-2">
+          <div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+            <span class="text-white font-bold text-xs">iA</span>
+          </div>
+          <span class="font-bold text-sm">imPD Admin</span>
+        </a>
+      </div>
+
+      <nav class="p-3 space-y-1">
+        <%= render "layouts/admin_nav_item", icon: "home", label: "대시보드", path: admin_root_path %>
+        <%= render "layouts/admin_nav_item", icon: "users", label: "유통사 관리", path: admin_distributors_path %>
+        <%= render "layouts/admin_nav_item", icon: "book", label: "강좌 관리", path: admin_courses_path %>
+        <%= render "layouts/admin_nav_item", icon: "file-text", label: "게시글 관리", path: admin_posts_path %>
+        <%= render "layouts/admin_nav_item", icon: "image", label: "히어로 이미지", path: admin_hero_images_path %>
+        <%= render "layouts/admin_nav_item", icon: "folder", label: "유통사 자료", path: admin_resources_path %>
+        <%= render "layouts/admin_nav_item", icon: "mail", label: "뉴스레터", path: admin_newsletter_index_path %>
+        <%= render "layouts/admin_nav_item", icon: "message-square", label: "문의 관리", path: admin_inquiries_path %>
+        <%= render "layouts/admin_nav_item", icon: "credit-card", label: "결제 내역", path: admin_payments_path %>
+
+        <div class="pt-4 mt-4 border-t border-white/10">
+          <%= link_to destroy_admin_user_session_path, method: :delete, data: { turbo_method: :delete },
+              class: "flex items-center space-x-2 px-3 py-2 rounded text-sm text-gray-400 hover:text-white hover:bg-white/10 transition-colors" do %>
+            <svg class="w-4 h-4" stroke="currentColor" fill="none" viewBox="0 0 24 24" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            <span>로그아웃</span>
+          <% end %>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- 메인 영역 -->
+    <div class="ml-60 flex-1 flex flex-col min-h-screen">
+      <!-- 상단 바 -->
+      <header class="bg-white border-b px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+        <h1 class="text-sm font-semibold text-gray-700"><%= content_for?(:title) ? yield(:title) : "대시보드" %></h1>
+        <div class="flex items-center space-x-3">
+          <%= link_to root_path, target: "_blank", class: "text-xs text-gray-500 hover:text-primary flex items-center space-x-1" do %>
+            <svg class="w-3.5 h-3.5" stroke="currentColor" fill="none" viewBox="0 0 24 24" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+            <span>사이트 보기</span>
+          <% end %>
+          <span class="text-xs text-gray-500"><%= current_admin_user&.email %></span>
+        </div>
+      </header>
+
+      <!-- 플래시 메시지 -->
+      <% if flash[:notice] %>
+        <div class="bg-green-50 border-l-4 border-green-500 text-green-800 px-6 py-3 text-sm">
+          <%= flash[:notice] %>
+        </div>
+      <% end %>
+      <% if flash[:alert] %>
+        <div class="bg-red-50 border-l-4 border-red-500 text-red-800 px-6 py-3 text-sm">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
+
+      <main class="flex-1 p-6">
+        <%= yield %>
+      </main>
+    </div>
+  </body>
+</html>

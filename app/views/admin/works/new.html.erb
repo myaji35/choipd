@@ -1,0 +1,10 @@
+<% content_for :title, "작품 등록" %>
+<div class="max-w-2xl">
+  <div class="mb-6">
+    <%= link_to "← 작품 목록", admin_works_path, class: "text-primary text-sm hover:text-primary-dark" %>
+    <h1 class="text-xl font-bold text-navy mt-2">작품 등록</h1>
+  </div>
+  <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-6">
+    <%= render "form", work: @work %>
+  </div>
+</div>

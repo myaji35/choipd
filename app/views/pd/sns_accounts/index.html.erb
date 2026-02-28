@@ -1,0 +1,43 @@
+<% content_for :title, "SNS 계정 관리" %>
+
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-xl font-bold text-navy">SNS 계정 관리</h1>
+  <%= link_to "계정 추가", new_pd_sns_account_path, class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors" %>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <% @sns_accounts.each do |account| %>
+    <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-5">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <svg class="w-5 h-5 text-primary" stroke="currentColor" fill="none" viewBox="0 0 24 24" stroke-width="2">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold text-navy text-sm"><%= account.platform.upcase %></p>
+            <p class="text-xs text-gray-400">@<%= account.account_name %></p>
+          </div>
+        </div>
+        <% if account.is_active? %>
+          <span class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">활성</span>
+        <% else %>
+          <span class="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">비활성</span>
+        <% end %>
+      </div>
+      <div class="flex space-x-2">
+        <%= link_to "수정", edit_pd_sns_account_path(account), class: "text-primary text-xs hover:text-blue-700" %>
+        <%= button_to "삭제", pd_sns_account_path(account), method: :delete,
+            class: "text-red-500 text-xs hover:text-red-700",
+            data: { turbo_confirm: "삭제하시겠습니까?" } %>
+      </div>
+    </div>
+  <% end %>
+  <% if @sns_accounts.empty? %>
+    <div class="col-span-2 py-12 text-center text-gray-400 bg-white rounded-lg border border-gray-100">
+      <p>연결된 SNS 계정이 없습니다.</p>
+      <%= link_to "계정 추가", new_pd_sns_account_path, class: "text-primary text-sm mt-2 inline-block hover:text-blue-700" %>
+    </div>
+  <% end %>
+</div>

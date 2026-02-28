@@ -1,0 +1,67 @@
+<% content_for :title, "커뮤니티" %>
+
+<section class="bg-gradient-to-br from-navy to-blue-800 py-16">
+  <div class="max-w-7xl mx-auto px-4 text-center">
+    <h1 class="text-4xl font-bold text-white mb-4">커뮤니티</h1>
+    <p class="text-blue-200 text-lg">공지사항, 수강 후기, 뉴스레터</p>
+  </div>
+</section>
+
+<!-- 공지사항 -->
+<% if @notices.any? %>
+<section class="py-12">
+  <div class="max-w-5xl mx-auto px-4">
+    <h2 class="text-2xl font-bold text-navy mb-6">공지사항</h2>
+    <div class="space-y-3">
+      <% @notices.each do |notice| %>
+        <div class="bg-white border border-gray-100 rounded-lg p-4 shadow-sm flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <span class="bg-primary/10 text-primary text-xs font-medium px-2 py-0.5 rounded">공지</span>
+            <h3 class="text-navy font-medium text-sm"><%= notice.title %></h3>
+          </div>
+          <span class="text-xs text-gray-400 whitespace-nowrap ml-4"><%= notice.created_at.strftime("%Y.%m.%d") %></span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
+<% end %>
+
+<!-- 수강 후기 -->
+<% if @reviews.any? %>
+<section class="py-12 bg-surface">
+  <div class="max-w-5xl mx-auto px-4">
+    <h2 class="text-2xl font-bold text-navy mb-6">수강 후기</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <% @reviews.each do |review| %>
+        <div class="bg-white border border-gray-100 rounded-lg p-5 shadow-sm">
+          <div class="flex text-yellow-400 mb-3">
+            <% 5.times do %><span>★</span><% end %>
+          </div>
+          <h3 class="font-semibold text-navy mb-2 text-sm"><%= review.title %></h3>
+          <p class="text-gray-500 text-sm line-clamp-3"><%= review.content.truncate(120) %></p>
+          <p class="text-xs text-gray-400 mt-3"><%= review.created_at.strftime("%Y.%m.%d") %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
+<% end %>
+
+<!-- 뉴스레터 구독 -->
+<section class="py-16 bg-navy">
+  <div class="max-w-3xl mx-auto px-4 text-center">
+    <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+      <svg class="w-8 h-8 text-primary" stroke="currentColor" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+    </div>
+    <h2 class="text-3xl font-bold text-white mb-4">뉴스레터 구독</h2>
+    <p class="text-gray-400 mb-8">최PD의 최신 강좌, 미디어 소식, 이벤트 정보를 받아보세요.</p>
+
+    <%= turbo_frame_tag "newsletter-form" do %>
+      <%= render "chopd/leads/form", lead: @lead %>
+    <% end %>
+  </div>
+</section>
