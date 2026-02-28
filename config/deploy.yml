@@ -4,7 +4,7 @@
 # 업데이트: 2026-02-28
 
 service: choipd
-image: ghcr.io/myaji35/choipd
+image: myaji35/choipd
 
 # ── 서버 설정 ──────────────────────────────
 servers:
