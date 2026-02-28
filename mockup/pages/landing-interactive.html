@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>최PD — 스마트폰으로 인생 2막을</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* ====================================================
+       최PD 퍼스널 브랜딩 랜딩페이지
+       컨셉: "스마트폰을 든 선생님 — 역동적·열정적·친근함"
+       핵심 트렌드:
+         ① Split Hero (반반 레이아웃)
+         ② Kinetic Typography (움직이는 글자)
+         ③ Liquid/Blob 배경
+         ④ Noise Texture 오버레이
+         ⑤ Horizontal Scroll 섹션
+         ⑥ Staggered Card Reveal
+         ⑦ Custom Cursor (ring + dot)
+         ⑧ Variable Font Weight 인터랙션
+    ==================================================== */
+
+    :root {
+      --c-dark:   #0a0e1a;
+      --c-navy:   #111827;
+      --c-coral:  #ff4d1c;
+      --c-gold:   #f0c040;
+      --c-lime:   #a8ff3e;
+      --c-white:  #f5f4f0;
+      --c-gray:   #9ca3af;
+      --ff-display: 'Black Han Sans', 'Noto Sans KR', sans-serif;
+      --ff-sans:    'Noto Sans KR', sans-serif;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--ff-sans);
+      background: var(--c-dark);
+      color: var(--c-white);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    img, svg { display:block; max-width:100%; }
+    a { color:inherit; text-decoration:none; }
+    ul { list-style:none; }
+
+    /* ── 커스텀 커서 ─────────────────────────────── */
+    #cursor {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      top: 0; left: 0;
+      mix-blend-mode: difference;
+    }
+    #cursor-dot {
+      position: absolute;
+      width: 8px; height: 8px;
+      background: #fff;
+      border-radius: 50%;
+      transform: translate(-50%,-50%);
+      transition: width .2s, height .2s;
+    }
+    #cursor-ring {
+      position: absolute;
+      width: 40px; height: 40px;
+      border: 1.5px solid rgba(255,255,255,0.6);
+      border-radius: 50%;
+      transform: translate(-50%,-50%);
+      transition: all .12s ease;
+    }
+    body:has(a:hover) #cursor-dot,
+    body:has(button:hover) #cursor-dot { width:16px; height:16px; background:var(--c-coral); }
+    body:has(a:hover) #cursor-ring,
+    body:has(button:hover) #cursor-ring { width:60px; height:60px; border-color:var(--c-coral); }
+
+    /* ── 스크롤 진행바 ────────────────────────────── */
+    #prog {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--c-coral), var(--c-gold), var(--c-lime));
+      z-index: 10000;
+      width: 0%;
+      transition: width .08s ease;
+    }
+
+    /* ══════════════════════════════════════════════
+       NAV
+    ══════════════════════════════════════════════ */
+    #nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 48px;
+      transition: all .3s;
+    }
+    #nav.scrolled {
+      background: rgba(10,14,26,0.88);
+      backdrop-filter: blur(20px);
+      padding: 16px 48px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-logo {
+      font-family: var(--ff-display);
+      font-size: 26px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+    .nav-logo .accent { color: var(--c-coral); }
+    .nav-links { display:flex; gap:36px; }
+    .nav-link {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.55);
+      transition: color .2s;
+      position: relative;
+    }
+    .nav-link::after {
+      content:'';
+      position:absolute;
+      bottom:-4px; left:0; right:0;
+      height:1px;
+      background:var(--c-coral);
+      transform:scaleX(0);
+      transition:transform .25s;
+    }
+    .nav-link:hover { color:#fff; }
+    .nav-link:hover::after { transform:scaleX(1); }
+    .nav-cta {
+      padding: 10px 24px;
+      border-radius: 100px;
+      background: var(--c-coral);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      transition: all .25s;
+      cursor: none;
+    }
+    .nav-cta:hover { background: #ff7040; box-shadow: 0 8px 24px rgba(255,77,28,.4); transform: translateY(-2px); }
+
+    /* ══════════════════════════════════════════════
+       HERO — Split Layout
+    ══════════════════════════════════════════════ */
+    #hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 왼쪽: 텍스트 패널 */
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 56px 80px 80px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Noise texture */
+    .hero-left::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.04;
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--c-coral);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp .7s ease .2s both;
+    }
+    .hero-tag-line {
+      width: 32px; height: 2px;
+      background: var(--c-coral);
+    }
+
+    /* 키네틱 타이포 */
+    .hero-big-text {
+      font-family: var(--ff-display);
+      font-size: clamp(3rem, 5.5vw, 5.5rem);
+      font-weight: 400;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp .9s ease .35s both;
+    }
+    .hero-big-text .word-swap {
+      position: relative;
+      display: inline-block;
+      color: var(--c-coral);
+      min-width: 3.2ch;
+    }
+    /* 밑줄 그라디언트 */
+    .underline-draw {
+      position: relative;
+      display: inline-block;
+    }
+    .underline-draw::after {
+      content: '';
+      position: absolute;
+      bottom: 2px; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--c-coral), var(--c-gold));
+      border-radius: 2px;
+      transform-origin: left;
+      transform: scaleX(0);
+      animation: lineIn 1s ease 1.2s both;
+    }
+    @keyframes lineIn { to { transform: scaleX(1); } }
+
+    .hero-sub {
+      font-size: 16px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.9;
+      max-width: 420px;
+      margin-bottom: 44px;
+      opacity: 0;
+      animation: fadeUp .8s ease .55s both;
+    }
+    .hero-sub strong { color: rgba(255,255,255,0.85); font-weight: 600; }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp .8s ease .7s both;
+    }
+    .btn-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 40px;
+      border-radius: 100px;
+      background: var(--c-coral);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: none;
+      border: none;
+      transition: all .3s cubic-bezier(.34,1.56,.64,1);
+      box-shadow: 0 8px 32px rgba(255,77,28,.35);
+    }
+    .btn-main:hover { transform: scale(1.05) translateY(-3px); box-shadow: 0 14px 40px rgba(255,77,28,.5); }
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 17px 36px;
+      border-radius: 100px;
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,.8);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: none;
+      transition: all .25s;
+    }
+    .btn-ghost:hover { border-color:rgba(255,255,255,.6); color:#fff; background:rgba(255,255,255,.05); }
+
+    /* 왼쪽 하단 통계 */
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 56px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      opacity: 0;
+      animation: fadeUp .8s ease .85s both;
+    }
+    .hero-stat-num {
+      font-family: var(--ff-display);
+      font-size: 2.4rem;
+      font-weight: 400;
+      line-height: 1;
+      background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,.5));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-stat-label { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 4px; }
+
+    /* 오른쪽: 비주얼 패널 */
+    .hero-right {
+      position: relative;
+      overflow: hidden;
+    }
+    /* 배경 그라디언트 블롭 */
+    .hero-right::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 80% at 60% 40%, rgba(255,77,28,.22) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 60% at 30% 70%, rgba(240,192,64,.10) 0%, transparent 55%),
+        rgba(17,24,39,1);
+      z-index: 0;
+    }
+
+    /* 큰 타이포 배경 */
+    .hero-bg-text {
+      position: absolute;
+      font-family: var(--ff-display);
+      font-size: clamp(120px, 18vw, 200px);
+      font-weight: 400;
+      color: rgba(255,255,255,0.03);
+      letter-spacing: -0.06em;
+      line-height: 1;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* 중앙 프로필 카드 */
+    .profile-stack {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .profile-card {
+      width: 300px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(32px);
+      border-radius: 28px;
+      padding: 36px;
+      transform: rotate(-3deg);
+      transition: transform .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    .profile-card:hover { transform: rotate(0deg) scale(1.02); }
+    .profile-avatar {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--c-coral), #ff8050);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      box-shadow: 0 12px 32px rgba(255,77,28,.4);
+      font-family: var(--ff-display);
+      font-size: 32px;
+      font-weight: 400;
+      color: #fff;
+    }
+    .profile-name { font-family: var(--ff-display); font-size: 22px; font-weight: 400; margin-bottom: 4px; }
+    .profile-role { font-size: 12px; color: rgba(255,255,255,.45); margin-bottom: 24px; line-height: 1.6; }
+
+    /* 태그 클라우드 */
+    .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag {
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid;
+      transition: all .25s;
+      cursor: none;
+    }
+    .tag:hover { transform: scale(1.08); }
+    .tag-coral   { color: var(--c-coral); border-color: rgba(255,77,28,.3); background: rgba(255,77,28,.08); }
+    .tag-gold    { color: var(--c-gold);  border-color: rgba(240,192,64,.3); background: rgba(240,192,64,.08); }
+    .tag-lime    { color: var(--c-lime);  border-color: rgba(168,255,62,.3); background: rgba(168,255,62,.08); }
+    .tag-white   { color: rgba(255,255,255,.7); border-color: rgba(255,255,255,.15); background: rgba(255,255,255,.04); }
+
+    /* 플로팅 요소들 */
+    .float-el {
+      position: absolute;
+      z-index: 3;
+      animation: floatY 4s ease-in-out infinite;
+    }
+    .float-badge {
+      background: rgba(255,255,255,.95);
+      border-radius: 16px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--c-dark);
+      font-weight: 700;
+      font-size: 13px;
+      box-shadow: 0 16px 48px rgba(0,0,0,.3);
+      cursor: none;
+      transition: transform .3s;
+    }
+    .float-badge:hover { transform: scale(1.05) translateY(-4px) !important; }
+    .float-badge-emoji { font-size: 22px; }
+
+    @keyframes floatY {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-12px); }
+    }
+
+    /* ══════════════════════════════════════════════
+       MARQUEE TICKER
+    ══════════════════════════════════════════════ */
+    .ticker {
+      background: var(--c-coral);
+      padding: 14px 0;
+      overflow: hidden;
+    }
+    .ticker-track {
+      display: flex;
+      width: max-content;
+      animation: tick 18s linear infinite;
+    }
+    @keyframes tick { to { transform: translateX(-50%); } }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 20px;
+      padding: 0 32px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .ticker-star { color: rgba(255,255,255,.5); font-size: 8px; }
+
+    /* ══════════════════════════════════════════════
+       IDENTITY SECTION (3 페르소나)
+    ══════════════════════════════════════════════ */
+    #identity {
+      padding: 120px 80px;
+      position: relative;
+    }
+
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--c-coral);
+      margin-bottom: 20px;
+    }
+    .section-label::before {
+      content: '';
+      width: 28px; height: 2px;
+      background: var(--c-coral);
+    }
+
+    .section-title {
+      font-family: var(--ff-display);
+      font-size: clamp(2.2rem, 4vw, 3.8rem);
+      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .section-desc {
+      font-size: 16px;
+      color: rgba(255,255,255,.5);
+      line-height: 1.85;
+      max-width: 480px;
+    }
+
+    .identity-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 64px;
+    }
+    .identity-card {
+      border-radius: 24px;
+      padding: 40px 36px;
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+      transition: transform .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    .identity-card:hover { transform: translateY(-8px) rotate(-1deg); }
+    .identity-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.05;
+      pointer-events: none;
+    }
+    .ic-education { background: linear-gradient(135deg, #1a0f2e 0%, #2d1852 100%); border: 1px solid rgba(168,255,62,.15); }
+    .ic-media     { background: linear-gradient(135deg, #0f2014 0%, #1a4020 100%); border: 1px solid rgba(74,222,128,.15); }
+    .ic-works     { background: linear-gradient(135deg, #1a0a0a 0%, #3d1010 100%); border: 1px solid rgba(255,77,28,.2); }
+
+    .ic-number {
+      font-family: var(--ff-display);
+      font-size: 80px;
+      font-weight: 400;
+      line-height: 1;
+      opacity: .08;
+      position: absolute;
+      top: 20px;
+      right: 24px;
+    }
+    .ic-icon {
+      width: 56px; height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+    .ic-title {
+      font-family: var(--ff-display);
+      font-size: 22px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+    .ic-desc {
+      font-size: 14px;
+      color: rgba(255,255,255,.5);
+      line-height: 1.8;
+      margin-bottom: 28px;
+    }
+    .ic-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      transition: gap .2s;
+    }
+    .ic-link:hover { gap: 10px; }
+
+    /* ══════════════════════════════════════════════
+       STATS (다이나믹 카운터)
+    ══════════════════════════════════════════════ */
+    #stats {
+      padding: 100px 80px;
+      background: var(--c-navy);
+      position: relative;
+      overflow: hidden;
+    }
+    #stats::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,77,28,.08) 0%, transparent 70%);
+      top: -200px; right: -100px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 24px;
+      overflow: hidden;
+    }
+    .stat-box {
+      padding: 48px 36px;
+      background: rgba(255,255,255,.025);
+      text-align: center;
+      border-right: 1px solid rgba(255,255,255,.06);
+      transition: background .3s;
+    }
+    .stat-box:last-child { border-right: none; }
+    .stat-box:hover { background: rgba(255,255,255,.06); }
+    .stat-num {
+      font-family: var(--ff-display);
+      font-size: clamp(3rem, 5vw, 5rem);
+      font-weight: 400;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-unit { font-size: .6em; }
+    .stat-label { font-size: 13px; color: rgba(255,255,255,.4); }
+
+    /* ══════════════════════════════════════════════
+       COURSES — Horizontal scroll feel
+    ══════════════════════════════════════════════ */
+    #courses { padding: 120px 0; overflow: hidden; }
+    .courses-header { padding: 0 80px; margin-bottom: 56px; display:flex; align-items:flex-end; justify-content:space-between; }
+    .courses-scroll {
+      display: flex;
+      gap: 24px;
+      padding: 16px 80px 40px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .courses-scroll::-webkit-scrollbar { display: none; }
+    .course-card {
+      min-width: 300px;
+      max-width: 300px;
+      border-radius: 24px;
+      overflow: hidden;
+      background: var(--c-navy);
+      border: 1px solid rgba(255,255,255,.06);
+      scroll-snap-align: start;
+      cursor: none;
+      transition: transform .4s cubic-bezier(.34,1.56,.64,1), box-shadow .4s;
+      flex-shrink: 0;
+    }
+    .course-card:hover { transform: translateY(-8px); box-shadow: 0 24px 64px rgba(0,0,0,.4); }
+    .course-thumb {
+      height: 180px;
+      position: relative;
+      overflow: hidden;
+    }
+    .course-thumb-bg {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+    }
+    .course-body { padding: 24px; }
+    .course-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .course-title { font-weight: 700; font-size: 15px; margin-bottom: 8px; line-height: 1.4; }
+    .course-desc { font-size: 13px; color:rgba(255,255,255,.45); line-height:1.7; margin-bottom:20px; }
+    .course-footer { display:flex; align-items:center; justify-content:space-between; }
+    .course-price { font-size:16px; font-weight:800; }
+    .course-btn {
+      padding: 8px 18px;
+      border-radius: 100px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.1);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: none;
+      transition: all .25s;
+    }
+    .course-btn:hover { background: var(--c-coral); border-color:transparent; }
+
+    /* ══════════════════════════════════════════════
+       STORY / TIMELINE
+    ══════════════════════════════════════════════ */
+    #story {
+      padding: 120px 80px;
+      background: var(--c-navy);
+      position: relative;
+    }
+    .story-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 80px; align-items: start; }
+    .story-sticky { position: sticky; top: 120px; }
+
+    .timeline { position: relative; padding-left: 32px; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 8px; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--c-coral), rgba(255,77,28,.0));
+    }
+    .tl-item {
+      position: relative;
+      padding-bottom: 48px;
+      opacity: 0;
+      transform: translateX(30px);
+      transition: all .6s ease;
+    }
+    .tl-item.visible { opacity: 1; transform: translateX(0); }
+    .tl-dot {
+      position: absolute;
+      left: -36px;
+      top: 6px;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--c-coral);
+      box-shadow: 0 0 0 3px rgba(255,77,28,.2), 0 0 0 6px rgba(255,77,28,.08);
+    }
+    .tl-year {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--c-coral);
+      letter-spacing: .1em;
+      margin-bottom: 8px;
+    }
+    .tl-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .tl-desc { font-size: 14px; color: rgba(255,255,255,.45); line-height: 1.8; }
+
+    /* ══════════════════════════════════════════════
+       CTA / NEWSLETTER
+    ══════════════════════════════════════════════ */
+    #cta {
+      padding: 120px 80px;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    .cta-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 100% at 50% 80%, rgba(255,77,28,.18) 0%, transparent 60%),
+        var(--c-dark);
+    }
+    .cta-content { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
+    .cta-title {
+      font-family: var(--ff-display);
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+    }
+    .cta-title .line2 { color: var(--c-coral); }
+    .cta-desc { font-size:16px; color:rgba(255,255,255,.5); line-height:1.8; margin-bottom:48px; }
+
+    .nl-form {
+      display: flex;
+      max-width: 500px;
+      margin: 0 auto;
+      border-radius: 100px;
+      overflow: hidden;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.12);
+      transition: border-color .25s;
+    }
+    .nl-form:focus-within { border-color: rgba(255,77,28,.6); }
+    .nl-input {
+      flex: 1;
+      padding: 18px 28px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+    }
+    .nl-input::placeholder { color: rgba(255,255,255,.3); }
+    .nl-btn {
+      padding: 14px 28px;
+      background: var(--c-coral);
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: none;
+      font-family: inherit;
+      border-radius: 100px;
+      margin: 6px;
+      transition: all .25s;
+    }
+    .nl-btn:hover { background: #ff7040; transform: scale(1.02); }
+    .nl-count { font-size: 12px; color: rgba(255,255,255,.3); margin-top: 16px; }
+
+    /* ══════════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════════ */
+    footer {
+      padding: 48px 80px;
+      border-top: 1px solid rgba(255,255,255,.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-copy { font-size: 12px; color: rgba(255,255,255,.25); }
+
+    /* ══════════════════════════════════════════════
+       ANIMATIONS
+    ══════════════════════════════════════════════ */
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(28px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all .75s cubic-bezier(.4,0,.2,1);
+    }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+    .reveal-left  { transform: translateX(-50px) !important; }
+    .reveal-left.visible  { transform: translateX(0) !important; }
+    .reveal-right { transform: translateX(50px) !important; }
+    .reveal-right.visible { transform: translateX(0) !important; }
+
+    /* stagger children */
+    .stagger > * {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all .6s ease;
+    }
+    .stagger.visible > *:nth-child(1) { opacity:1; transform:none; transition-delay:0s; }
+    .stagger.visible > *:nth-child(2) { opacity:1; transform:none; transition-delay:.12s; }
+    .stagger.visible > *:nth-child(3) { opacity:1; transform:none; transition-delay:.24s; }
+    .stagger.visible > *:nth-child(4) { opacity:1; transform:none; transition-delay:.36s; }
+
+    /* ══════════════════════════════════════════════
+       반응형
+    ══════════════════════════════════════════════ */
+    @media (max-width: 960px) {
+      #hero { grid-template-columns: 1fr; }
+      .hero-right { min-height: 60vh; }
+      .hero-left { padding: 120px 32px 60px; }
+      .identity-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+      .story-grid { grid-template-columns: 1fr; }
+      .story-sticky { position: static; }
+      #identity, #stats, #story, #cta, footer { padding-left:32px; padding-right:32px; }
+      .courses-header { padding: 0 32px; }
+      .courses-scroll { padding: 16px 32px 40px; }
+      .nav-links { display:none; }
+      #nav { padding: 20px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 커스텀 커서 -->
+<div id="cursor"><div id="cursor-dot"></div><div id="cursor-ring"></div></div>
+
+<!-- 스크롤 진행바 -->
+<div id="prog"></div>
+
+<!-- ═══════════════ NAV ═══════════════════════════════ -->
+<nav id="nav">
+  <a href="#" class="nav-logo">최<span class="accent">PD</span></a>
+  <ul class="nav-links">
+    <li><a href="#identity" class="nav-link">소개</a></li>
+    <li><a href="#courses"  class="nav-link">강좌</a></li>
+    <li><a href="#story"    class="nav-link">스토리</a></li>
+    <li><a href="#cta"      class="nav-link">뉴스레터</a></li>
+  </ul>
+  <a href="education.html" class="nav-cta">강좌 보기</a>
+</nav>
+
+<!-- ═══════════════ HERO ══════════════════════════════ -->
+<section id="hero">
+
+  <!-- 왼쪽 텍스트 -->
+  <div class="hero-left">
+    <div class="hero-tag">
+      <div class="hero-tag-line"></div>
+      Personal Brand · Since 2017
+    </div>
+
+    <h1 class="hero-big-text">
+      스마트폰<br>
+      하나로<br>
+      <span class="underline-draw"><span id="word-swap" class="word-swap">창업</span>하다</span>
+    </h1>
+
+    <p class="hero-sub">
+      <strong>최범희 PD</strong>와 함께라면 기술 몰라도 괜찮습니다.<br>
+      8년, 2,400명의 인생 2막을 함께 열었습니다.<br>
+      지금 당신 차례입니다.
+    </p>
+
+    <div class="hero-actions">
+      <button class="btn-main" onclick="location.href='education.html'">
+        <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/></svg>
+        강좌 시작하기
+      </button>
+      <button class="btn-ghost" onclick="document.getElementById('story').scrollIntoView({behavior:'smooth'})">
+        스토리 보기
+        <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-num">2,400<span style="font-size:.45em;opacity:.6">+</span></div>
+        <div class="hero-stat-label">누적 수강생</div>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,.08)"></div>
+      <div>
+        <div class="hero-stat-num">8<span style="font-size:.45em;opacity:.6">년</span></div>
+        <div class="hero-stat-label">강의 경력</div>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,.08)"></div>
+      <div>
+        <div class="hero-stat-num">98<span style="font-size:.45em;opacity:.6">%</span></div>
+        <div class="hero-stat-label">수강생 만족도</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 오른쪽 비주얼 -->
+  <div class="hero-right">
+    <div class="hero-bg-text">PD</div>
+
+    <div class="profile-stack">
+      <div class="profile-card" id="tilt">
+        <div class="profile-avatar">최</div>
+        <div class="profile-name">최범희 PD</div>
+        <div class="profile-role">스마트폰 창업 전략가<br>한국환경저널 발행인 · 작가</div>
+        <div class="tag-cloud">
+          <span class="tag tag-coral">유튜브</span>
+          <span class="tag tag-gold">SNS 마케팅</span>
+          <span class="tag tag-lime">창업 전략</span>
+          <span class="tag tag-white">환경저널</span>
+          <span class="tag tag-white">저자</span>
+          <span class="tag tag-coral">B2B 강연</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 플로팅 배지 -->
+    <div class="float-el" style="top:14%;right:8%;animation-delay:.5s">
+      <div class="float-badge">
+        <span class="float-badge-emoji">🎯</span>
+        <div>
+          <div style="font-size:11px;color:#666">수강생 만족도</div>
+          <div style="font-size:18px;font-weight:900;color:var(--c-coral)">98%</div>
+        </div>
+      </div>
+    </div>
+    <div class="float-el" style="bottom:18%;left:5%;animation-delay:1.2s;animation-direction:alternate-reverse">
+      <div class="float-badge" style="font-size:12px">
+        <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite"></div>
+        <span>지금 수강 신청 가능</span>
+      </div>
+    </div>
+    <div class="float-el" style="bottom:35%;right:6%;animation-delay:2s">
+      <div class="float-badge">
+        <span class="float-badge-emoji">📚</span>
+        <div>
+          <div style="font-size:11px;color:#666">출간 저서</div>
+          <div style="font-size:18px;font-weight:900;color:var(--c-dark)">5권</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 스크롤 힌트 -->
+    <div style="position:absolute;bottom:32px;right:48px;z-index:4;display:flex;align-items:center;gap:8px;font-size:11px;color:rgba(255,255,255,.25);letter-spacing:.1em">
+      SCROLL
+      <svg width="32" height="12" viewBox="0 0 32 12"><path d="M0 6h28M22 1l6 5-6 5" stroke="rgba(255,255,255,.25)" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ TICKER ════════════════════════════ -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ticker-item">스마트폰 창업<span class="ticker-star">★</span></span>
+    <span class="ticker-item">유튜브 채널 운영<span class="ticker-star">★</span></span>
+    <span class="ticker-item">SNS 마케팅 전략<span class="ticker-star">★</span></span>
+    <span class="ticker-item">한국환경저널<span class="ticker-star">★</span></span>
+    <span class="ticker-item">B2B 기업 교육<span class="ticker-star">★</span></span>
+    <span class="ticker-item">스마트폰 스케치<span class="ticker-star">★</span></span>
+    <span class="ticker-item">2,400명 배출<span class="ticker-star">★</span></span>
+    <!-- dup -->
+    <span class="ticker-item">스마트폰 창업<span class="ticker-star">★</span></span>
+    <span class="ticker-item">유튜브 채널 운영<span class="ticker-star">★</span></span>
+    <span class="ticker-item">SNS 마케팅 전략<span class="ticker-star">★</span></span>
+    <span class="ticker-item">한국환경저널<span class="ticker-star">★</span></span>
+    <span class="ticker-item">B2B 기업 교육<span class="ticker-star">★</span></span>
+    <span class="ticker-item">스마트폰 스케치<span class="ticker-star">★</span></span>
+    <span class="ticker-item">2,400명 배출<span class="ticker-star">★</span></span>
+  </div>
+</div>
+
+<!-- ═══════════════ IDENTITY ══════════════════════════ -->
+<section id="identity">
+  <div class="reveal">
+    <div class="section-label">Identity</div>
+    <h2 class="section-title">최PD는 세 가지 얼굴을<br>가지고 있습니다</h2>
+    <p class="section-desc">교육가, 미디어 발행인, 작가. 세 가지 정체성이 하나의 브랜드를 만듭니다.</p>
+  </div>
+
+  <div class="identity-grid stagger">
+    <!-- 교육 -->
+    <div class="identity-card ic-education">
+      <div class="ic-number">01</div>
+      <div class="ic-icon" style="background:rgba(168,255,62,.1)">
+        <svg width="28" height="28" viewBox="0 0 24 24" stroke="#a8ff3e" fill="none" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.1 2.686 2 6 2s6-.9 6-2v-5"/></svg>
+      </div>
+      <div class="ic-title">스마트폰 창업 교육가</div>
+      <div class="ic-desc">
+        스마트폰 하나로 시작하는 창업의 모든 것.<br>
+        온라인, 오프라인, B2B 기업 교육까지.<br>
+        8년간 2,400명의 실제 창업을 이끌었습니다.
+      </div>
+      <a href="education.html" class="ic-link" style="color:var(--c-lime)">
+        강좌 보기
+        <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <!-- 미디어 -->
+    <div class="identity-card ic-media">
+      <div class="ic-number">02</div>
+      <div class="ic-icon" style="background:rgba(74,222,128,.1)">
+        <svg width="28" height="28" viewBox="0 0 24 24" stroke="#4ade80" fill="none" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+      <div class="ic-title">한국환경저널 발행인</div>
+      <div class="ic-desc">
+        환경 이슈를 쉽게 풀어 전하는 전문 미디어.<br>
+        발행인으로서 직접 기획하고 글을 씁니다.<br>
+        독자와 나누는 환경 이야기.
+      </div>
+      <a href="#" class="ic-link" style="color:#4ade80">
+        저널 보기
+        <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <!-- 작품/저자 -->
+    <div class="identity-card ic-works">
+      <div class="ic-number">03</div>
+      <div class="ic-icon" style="background:rgba(255,77,28,.12)">
+        <svg width="28" height="28" viewBox="0 0 24 24" stroke="var(--c-coral)" fill="none" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      </div>
+      <div class="ic-title">작가 · 스케치 아티스트</div>
+      <div class="ic-desc">
+        스마트폰 스케치 작가로서의 또 다른 얼굴.<br>
+        5권의 저서를 출간한 실용서 작가.<br>
+        그림과 글로 전하는 창업의 이야기.
+      </div>
+      <a href="#" class="ic-link" style="color:var(--c-coral)">
+        작품 보기
+        <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ STATS ══════════════════════════════ -->
+<section id="stats">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="reveal" style="text-align:center;margin-bottom:56px">
+      <div class="section-label" style="justify-content:center">Numbers</div>
+      <h2 class="section-title">숫자로 증명합니다</h2>
+    </div>
+    <div class="stats-grid stagger">
+      <div class="stat-box">
+        <div class="stat-num" style="color:var(--c-coral)" data-count="2400" data-suffix="+">0</div>
+        <div class="stat-label">누적 수강생</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:var(--c-gold)" data-count="8" data-suffix="년">0</div>
+        <div class="stat-label">강의 경력</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:var(--c-lime)" data-count="98" data-suffix="%">0</div>
+        <div class="stat-label">수강생 만족도</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:#7eb8ff" data-count="5" data-suffix="권">0</div>
+        <div class="stat-label">출간 저서</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ COURSES ════════════════════════════ -->
+<section id="courses">
+  <div class="courses-header reveal">
+    <div>
+      <div class="section-label">Courses</div>
+      <h2 class="section-title">지금 인기 강좌</h2>
+    </div>
+    <a href="education.html" style="font-size:13px;font-weight:700;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:6px;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'">
+      전체 보기
+      <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+  <div class="courses-scroll">
+    <!-- 강좌 1 -->
+    <div class="course-card">
+      <div class="course-thumb" style="background:linear-gradient(135deg,#1a0f2e,#3d1f7a)">
+        <div class="course-thumb-bg">📱</div>
+      </div>
+      <div class="course-body">
+        <div class="course-badge" style="background:rgba(168,255,62,.1);color:var(--c-lime);border:1px solid rgba(168,255,62,.2)">온라인 · 입문</div>
+        <div class="course-title">유튜브 채널 시작하기</div>
+        <div class="course-desc">스마트폰으로 촬영부터 편집, 업로드까지 완성하는 첫 채널 만들기</div>
+        <div class="course-footer">
+          <div class="course-price" style="color:var(--c-coral)">₩89,000</div>
+          <a href="#" class="course-btn">수강 신청</a>
+        </div>
+      </div>
+    </div>
+    <!-- 강좌 2 -->
+    <div class="course-card">
+      <div class="course-thumb" style="background:linear-gradient(135deg,#1a1a0a,#4a4a00)">
+        <div class="course-thumb-bg">📣</div>
+      </div>
+      <div class="course-body">
+        <div class="course-badge" style="background:rgba(240,192,64,.08);color:var(--c-gold);border:1px solid rgba(240,192,64,.2)">온라인 · 중급</div>
+        <div class="course-title">SNS 마케팅 완성 패키지</div>
+        <div class="course-desc">인스타그램·블로그·유튜브를 연계한 통합 SNS 전략 수립</div>
+        <div class="course-footer">
+          <div class="course-price" style="color:var(--c-gold)">₩129,000</div>
+          <a href="#" class="course-btn">수강 신청</a>
+        </div>
+      </div>
+    </div>
+    <!-- 강좌 3 -->
+    <div class="course-card">
+      <div class="course-thumb" style="background:linear-gradient(135deg,#0a1f0a,#1a4520)">
+        <div class="course-thumb-bg">🏫</div>
+      </div>
+      <div class="course-body">
+        <div class="course-badge" style="background:rgba(74,222,128,.08);color:#4ade80;border:1px solid rgba(74,222,128,.2)">오프라인 · B2B</div>
+        <div class="course-title">기업 맞춤 집중 교육</div>
+        <div class="course-desc">기관·기업 임직원 단체 교육. 방문 진행, 맞춤 커리큘럼 제공</div>
+        <div class="course-footer">
+          <div class="course-price" style="color:#4ade80">별도 문의</div>
+          <a href="#cta" class="course-btn">문의하기</a>
+        </div>
+      </div>
+    </div>
+    <!-- 강좌 4 -->
+    <div class="course-card">
+      <div class="course-thumb" style="background:linear-gradient(135deg,#1a0a0f,#4a0a25)">
+        <div class="course-thumb-bg">💰</div>
+      </div>
+      <div class="course-body">
+        <div class="course-badge" style="background:rgba(255,77,28,.08);color:var(--c-coral);border:1px solid rgba(255,77,28,.2)">온라인 · 고급</div>
+        <div class="course-title">스마트폰 수익화 전략</div>
+        <div class="course-desc">유튜브 광고·제휴마케팅·디지털 상품 판매로 실수익 만들기</div>
+        <div class="course-footer">
+          <div class="course-price" style="color:var(--c-coral)">₩199,000</div>
+          <a href="#" class="course-btn">수강 신청</a>
+        </div>
+      </div>
+    </div>
+    <!-- 강좌 5 -->
+    <div class="course-card">
+      <div class="course-thumb" style="background:linear-gradient(135deg,#0a0a1f,#1a1a50)">
+        <div class="course-thumb-bg">✍️</div>
+      </div>
+      <div class="course-body">
+        <div class="course-badge" style="background:rgba(126,184,255,.08);color:#7eb8ff;border:1px solid rgba(126,184,255,.2)">온라인 · 입문</div>
+        <div class="course-title">스마트폰 스케치 & 드로잉</div>
+        <div class="course-desc">스마트폰으로 시작하는 디지털 드로잉. 그림 전혀 못 그려도 OK</div>
+        <div class="course-footer">
+          <div class="course-price" style="color:#7eb8ff">₩69,000</div>
+          <a href="#" class="course-btn">수강 신청</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ STORY ══════════════════════════════ -->
+<section id="story">
+  <div class="story-grid">
+    <!-- 왼쪽 고정 -->
+    <div class="story-sticky reveal-left reveal">
+      <div class="section-label">Story</div>
+      <h2 class="section-title" style="font-size:clamp(2rem,3.5vw,3rem)">최PD의<br>여정</h2>
+      <p class="section-desc" style="margin-top:16px">2017년 첫 강의부터<br>2025년 imPD 플랫폼까지.</p>
+      <div style="margin-top:40px;padding:24px;border-radius:16px;background:rgba(255,77,28,.08);border:1px solid rgba(255,77,28,.15)">
+        <div style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:6px">현재 운영 중</div>
+        <div style="font-size:18px;font-weight:700">imPD 플랫폼</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.5);margin-top:4px;line-height:1.6">교육·미디어·유통 통합 브랜드 허브</div>
+      </div>
+    </div>
+
+    <!-- 오른쪽 타임라인 -->
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2017</div>
+        <div class="tl-title">스마트폰 창업 교육 시작</div>
+        <div class="tl-desc">중장년층을 위한 스마트폰 활용 창업 교육을 시작했습니다. 첫 해 수강생 100명 달성, 가능성을 확인했습니다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2019</div>
+        <div class="tl-title">한국환경저널 창간</div>
+        <div class="tl-desc">환경 이슈를 쉽게 전달하는 전문 미디어를 창간했습니다. 교육가에서 미디어 발행인으로 정체성을 확장했습니다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2021</div>
+        <div class="tl-title">첫 저서 출간 · B2B 교육 확장</div>
+        <div class="tl-desc">『스마트폰 하나로 창업하기』를 출간하고, 기업·기관 대상 B2B 교육으로 사업 영역을 넓혔습니다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2023</div>
+        <div class="tl-title">수강생 2,000명 돌파</div>
+        <div class="tl-desc">누적 수강생 2,000명을 달성하며 전국 유통 파트너십 시스템을 구축했습니다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--c-gold);box-shadow:0 0 0 3px rgba(240,192,64,.2),0 0 0 6px rgba(240,192,64,.08)"></div>
+        <div class="tl-year" style="color:var(--c-gold)">2025 NOW</div>
+        <div class="tl-title" style="color:var(--c-gold)">imPD 플랫폼 — 새로운 시작</div>
+        <div class="tl-desc">교육·미디어·유통을 하나로 통합한 imPD 플랫폼이 오픈되었습니다. 더 많은 사람의 인생 2막을 함께 열겠습니다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ CTA ════════════════════════════════ -->
+<section id="cta">
+  <div class="cta-bg"></div>
+  <div class="cta-content reveal">
+    <div class="section-label" style="justify-content:center;margin-bottom:28px">Newsletter</div>
+    <h2 class="cta-title">
+      매달 창업 인사이트를<br>
+      <span class="line2">무료로 받아보세요</span>
+    </h2>
+    <p class="cta-desc">최PD의 월간 창업 노하우, SNS 트렌드, 수익화 팁을 이메일로 전달합니다.</p>
+    <form class="nl-form" onsubmit="handleNl(event)">
+      <input type="email" class="nl-input" placeholder="이메일 주소를 입력하세요" id="nl-email" required>
+      <button type="submit" class="nl-btn" id="nl-btn">구독하기</button>
+    </form>
+    <p class="nl-count">이미 <strong style="color:rgba(255,255,255,.6)">1,248명</strong>이 구독 중입니다 · 언제든 해지 가능</p>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ════════════════════════════ -->
+<footer>
+  <div>
+    <div class="nav-logo" style="margin-bottom:8px">최<span class="accent">PD</span></div>
+    <div class="footer-copy">© 2025 imPD · 최범희 PD 퍼스널 브랜드 플랫폼</div>
+  </div>
+  <nav style="display:flex;gap:28px">
+    <a href="education.html" class="footer-copy" style="transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.25)'">교육</a>
+    <a href="#"              class="footer-copy" style="transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.25)'">미디어</a>
+    <a href="#"              class="footer-copy" style="transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.25)'">작품</a>
+  </nav>
+</footer>
+
+<style>
+@keyframes pulse {
+  0%,100% { transform:scale(1); opacity:1; }
+  50%      { transform:scale(1.5); opacity:.6; }
+}
+</style>
+
+<script>
+// ════════════════════════════════════════════════
+// 1. 커스텀 커서
+// ════════════════════════════════════════════════
+const dot  = document.getElementById('cursor-dot');
+const ring = document.getElementById('cursor-ring');
+const cur  = document.getElementById('cursor');
+let mx=0, my=0, rx=0, ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cur.style.left=mx+'px'; cur.style.top=my+'px'; });
+(function loop(){ rx+=(mx-rx)*.13; ry+=(my-ry)*.13; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(loop); })();
+
+// ════════════════════════════════════════════════
+// 2. 스크롤 진행바 + Nav
+// ════════════════════════════════════════════════
+const prog = document.getElementById('prog');
+const nav  = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  prog.style.width = (window.scrollY / h * 100) + '%';
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// ════════════════════════════════════════════════
+// 3. IntersectionObserver reveal
+// ════════════════════════════════════════════════
+const io = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if(!en.isIntersecting) return;
+    const el = en.target;
+    el.classList.add('visible');
+    // 카운터 트리거
+    el.querySelectorAll('[data-count]').forEach(animCount);
+    // 타임라인
+    el.querySelectorAll('.tl-item').forEach((item, i) => {
+      setTimeout(() => item.classList.add('visible'), i * 150);
+    });
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal, .stagger, #stats, #story').forEach(el => io.observe(el));
+
+// ════════════════════════════════════════════════
+// 4. 숫자 카운터
+// ════════════════════════════════════════════════
+function animCount(el) {
+  if(el._counted) return; el._counted = true;
+  const target = +el.dataset.count;
+  const suffix = el.dataset.suffix || '';
+  const dur = 1800;
+  const s   = performance.now();
+  (function tick(now) {
+    const t   = Math.min((now-s)/dur, 1);
+    const val = Math.round(easeOut(t) * target);
+    el.textContent = val.toLocaleString() + suffix;
+    if(t<1) requestAnimationFrame(tick);
+  })(s);
+}
+function easeOut(t) { return 1 - Math.pow(1-t, 4); }
+
+// ════════════════════════════════════════════════
+// 5. Word Swap (Kinetic Typography)
+// ════════════════════════════════════════════════
+const words   = ['창업', '성공', '수익', '도전', '성장'];
+const CHARS   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%';
+const swapEl  = document.getElementById('word-swap');
+let wordIdx   = 0;
+
+function scrambleTo(el, word) {
+  let iter = 0; const max = word.length * 4;
+  const iv = setInterval(() => {
+    el.textContent = word.split('').map((c, i) => {
+      if(i < Math.floor(iter/4)) return c;
+      return CHARS[Math.floor(Math.random()*CHARS.length)];
+    }).join('');
+    if(++iter > max) { el.textContent = word; clearInterval(iv); }
+  }, 45);
+}
+
+if(swapEl) {
+  setInterval(() => {
+    wordIdx = (wordIdx+1) % words.length;
+    scrambleTo(swapEl, words[wordIdx]);
+  }, 2800);
+}
+
+// ════════════════════════════════════════════════
+// 6. Tilt Card
+// ════════════════════════════════════════════════
+const tilt = document.getElementById('tilt');
+if(tilt) {
+  tilt.parentElement.addEventListener('mousemove', e => {
+    const r  = tilt.parentElement.getBoundingClientRect();
+    const rx = ((e.clientY - r.top  - r.height/2) / r.height) * -15;
+    const ry = ((e.clientX - r.left - r.width/2)  / r.width)  *  15;
+    tilt.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) rotate(-3deg)`;
+  });
+  tilt.parentElement.addEventListener('mouseleave', () => {
+    tilt.style.transform = 'rotate(-3deg)';
+  });
+}
+
+// ════════════════════════════════════════════════
+// 7. Magnetic Buttons
+// ════════════════════════════════════════════════
+document.querySelectorAll('.btn-main, .btn-ghost, .nav-cta').forEach(btn => {
+  btn.addEventListener('mousemove', e => {
+    const r  = btn.getBoundingClientRect();
+    const dx = (e.clientX - r.left - r.width/2)  * 0.25;
+    const dy = (e.clientY - r.top  - r.height/2) * 0.25;
+    btn.style.transform = `translate(${dx}px, ${dy}px) ${btn.classList.contains('btn-main') ? 'scale(1.05)' : ''}`;
+  });
+  btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+});
+
+// ════════════════════════════════════════════════
+// 8. Newsletter submit
+// ════════════════════════════════════════════════
+function handleNl(e) {
+  e.preventDefault();
+  const btn = document.getElementById('nl-btn');
+  btn.textContent = '✓ 구독 완료!';
+  btn.style.background = '#22c55e';
+  setTimeout(() => { btn.textContent='구독하기'; btn.style.background=''; }, 3000);
+}
+</script>
+</body>
+</html>
