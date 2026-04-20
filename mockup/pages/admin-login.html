@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>관리자 로그인 — imPD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../styles/main.css">
+  <style>
+    body {
+      background: var(--color-navy);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 80% at 20% 20%, rgba(255,107,71,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 60% at 80% 80%, rgba(61,80,128,0.40) 0%, transparent 60%);
+    }
+    .login-card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 400px;
+      padding: var(--space-xl);
+    }
+    /* 별 효과 */
+    .star {
+      position: fixed;
+      width: 2px; height: 2px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+      animation: twinkle 3s infinite;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.8; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 배경 별 -->
+  <div class="star" style="top:15%;left:10%;animation-delay:0.5s"></div>
+  <div class="star" style="top:25%;left:80%;animation-delay:1s;width:3px;height:3px"></div>
+  <div class="star" style="top:70%;left:15%;animation-delay:1.5s"></div>
+  <div class="star" style="top:55%;left:90%;animation-delay:2s;width:3px;height:3px"></div>
+  <div class="star" style="top:85%;left:50%;animation-delay:0.8s"></div>
+  <div class="star" style="top:10%;left:60%;animation-delay:2.2s"></div>
+
+  <div class="login-card animate-in">
+    <!-- 로고 -->
+    <div style="text-align:center;margin-bottom:var(--space-xl)">
+      <div style="font-family:'Noto Serif KR',serif;font-size:32px;font-weight:700;color:#fff;margin-bottom:8px">
+        최PD<span style="color:var(--color-coral)">.</span>
+      </div>
+      <p style="font-size:14px;color:rgba(255,255,255,0.45)">관리자 전용 로그인</p>
+    </div>
+
+    <!-- 글래스모피즘 카드 -->
+    <div class="card card--glass" style="padding:var(--space-xl)">
+      <!-- 탭 선택 -->
+      <div style="display:flex;gap:4px;background:rgba(255,255,255,0.08);border-radius:var(--radius-sm);padding:4px;margin-bottom:var(--space-xl)">
+        <button onclick="selectRole('admin',this)" id="tab-admin"
+          style="flex:1;padding:10px;border:none;border-radius:calc(var(--radius-sm) - 2px);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;background:#fff;color:var(--color-navy)">
+          어드민
+        </button>
+        <button onclick="selectRole('pd',this)" id="tab-pd"
+          style="flex:1;padding:10px;border:none;border-radius:calc(var(--radius-sm) - 2px);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;background:transparent;color:rgba(255,255,255,0.5)">
+          PD 대시보드
+        </button>
+      </div>
+
+      <!-- 로그인 폼 -->
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label" style="color:rgba(255,255,255,0.75)">이메일</label>
+          <input type="email" class="form-control" id="email-input"
+            placeholder="admin@choipd.com"
+            style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:#fff">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="color:rgba(255,255,255,0.75);display:flex;justify-content:space-between">
+            비밀번호
+          </label>
+          <div style="position:relative">
+            <input type="password" class="form-control" id="pw-input"
+              placeholder="••••••••"
+              style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:#fff">
+            <button type="button" onclick="togglePw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4)">
+              <svg id="eye-icon" width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 에러 메시지 (숨김) -->
+        <div id="error-msg" style="display:none;background:rgba(255,107,71,0.15);border:1px solid rgba(255,107,71,0.3);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:var(--color-coral-light);margin-bottom:var(--space-md)">
+          이메일 또는 비밀번호가 올바르지 않습니다.
+        </div>
+
+        <button type="submit" class="btn btn--primary" style="width:100%;justify-content:center" id="login-btn">
+          <span id="btn-text">로그인</span>
+          <span id="btn-spinner" style="display:none">
+            <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>
+          </span>
+        </button>
+      </form>
+    </div>
+
+    <!-- 힌트 -->
+    <p style="text-align:center;font-size:11px;color:rgba(255,255,255,0.25);margin-top:var(--space-md)">
+      개발 계정: admin@choipd.com / Admin1234!
+    </p>
+  </div>
+
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+    input::placeholder { color: rgba(255,255,255,0.3) !important; }
+    input:focus { background: rgba(255,255,255,0.12) !important; border-color: rgba(255,107,71,0.6) !important; color: #fff !important; }
+  </style>
+
+  <script>
+    let showPw = false;
+    function togglePw() {
+      showPw = !showPw;
+      const inp = document.getElementById('pw-input');
+      inp.type = showPw ? 'text' : 'password';
+    }
+
+    let currentRole = 'admin';
+    function selectRole(role, btn) {
+      currentRole = role;
+      const tabAdmin = document.getElementById('tab-admin');
+      const tabPd    = document.getElementById('tab-pd');
+      if (role === 'admin') {
+        tabAdmin.style.background = '#fff'; tabAdmin.style.color = 'var(--color-navy)';
+        tabPd.style.background = 'transparent'; tabPd.style.color = 'rgba(255,255,255,0.5)';
+        document.getElementById('email-input').placeholder = 'admin@choipd.com';
+      } else {
+        tabPd.style.background = '#fff'; tabPd.style.color = 'var(--color-navy)';
+        tabAdmin.style.background = 'transparent'; tabAdmin.style.color = 'rgba(255,255,255,0.5)';
+        document.getElementById('email-input').placeholder = 'pd@choipd.com';
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('login-btn');
+      const txt = document.getElementById('btn-text');
+      const spinner = document.getElementById('btn-spinner');
+      const errMsg = document.getElementById('error-msg');
+
+      // 로딩
+      btn.disabled = true;
+      txt.style.display = 'none';
+      spinner.style.display = 'block';
+      errMsg.style.display = 'none';
+
+      setTimeout(() => {
+        btn.disabled = false;
+        txt.style.display = 'block';
+        spinner.style.display = 'none';
+
+        const email = document.getElementById('email-input').value;
+        const pw    = document.getElementById('pw-input').value;
+
+        if ((email === 'admin@choipd.com' && pw === 'Admin1234!') ||
+            (email === 'pd@choipd.com' && pw === 'PD1234!pd')) {
+          window.location.href = 'admin-dashboard.html';
+        } else {
+          errMsg.style.display = 'block';
+        }
+      }, 1200);
+    }
+  </script>
+</body>
+</html>

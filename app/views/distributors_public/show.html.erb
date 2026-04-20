@@ -20,11 +20,36 @@
   .cta-back:hover { color: #ff4d1c; }
 </style>
 
+<% identity = (JSON.parse(@distributor.identity_json) rescue {}) || {} %>
+
 <section class="dist-hero">
   <span class="badge badge-<%= @distributor.status %>"><%= @distributor.status.upcase %></span>
   <h1><%= @distributor.name %></h1>
-  <p class="subtitle">imPD 공식 유통 파트너</p>
+  <% if identity["agenda"].present? %>
+    <p class="subtitle" style="font-size:18px;color:#fff;margin-top:8px;"><%= identity["agenda"] %></p>
+    <p style="color:rgba(255,255,255,.4);font-size:13px;">imPD 공식 유통 파트너</p>
+  <% else %>
+    <p class="subtitle">imPD 공식 유통 파트너</p>
+  <% end %>
+
+  <% if identity["tone"].is_a?(Array) && identity["tone"].any? %>
+    <div style="margin-top:16px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+      <% identity["tone"].first(5).each do |t| %>
+        <span style="font-size:11px;padding:4px 10px;background:rgba(255,255,255,.1);border-radius:999px;color:rgba(255,255,255,.85);"><%= t %></span>
+      <% end %>
+    </div>
+  <% end %>
 </section>
+
+<% if identity["keywords"].is_a?(Array) && identity["keywords"].any? %>
+  <section style="max-width:720px;margin:0 auto;padding:24px;">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
+      <% identity["keywords"].each do |k| %>
+        <span style="font-size:13px;padding:6px 12px;background:#fff;border:1px solid #e5e7eb;border-radius:999px;color:#16325c;">#<%= k %></span>
+      <% end %>
+    </div>
+  </section>
+<% end %>
 
 <section class="dist-info">
   <div class="info-card">

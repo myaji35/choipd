@@ -1,4 +1,6 @@
 class Distributor < ApplicationRecord
+  include SlugValidation
+
   has_many :distributor_activity_logs, dependent: :destroy
   has_many :payments, dependent: :destroy
   has_many :invoices, dependent: :destroy

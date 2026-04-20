@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>교육 과정 — 최PD의 스마트폰 연구소</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../styles/main.css">
+  <style>
+    .filter-btn { padding:8px 18px; border-radius:100px; font-size:13px; font-weight:600; cursor:pointer; border:1.5px solid var(--color-gray-100); background:#fff; color:var(--color-text-muted); transition:all 0.2s; }
+    .filter-btn.active, .filter-btn:hover { background:var(--color-navy); color:#fff; border-color:var(--color-navy); }
+    .filter-btn.coral.active { background:var(--color-coral); border-color:var(--color-coral); }
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">최PD<span>.</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">홈</a></li>
+        <li><a href="#" class="nav-link active">교육</a></li>
+        <li><a href="#" class="nav-link">미디어</a></li>
+        <li><a href="#" class="nav-link">작품</a></li>
+        <li><a href="#" class="nav-link">커뮤니티</a></li>
+      </ul>
+      <a href="#inquiry" class="btn btn--primary btn--sm">B2B 문의</a>
+    </div>
+  </nav>
+
+  <!-- PAGE HERO -->
+  <section style="background:var(--color-navy);padding:120px 0 64px;position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 60% 50%,rgba(255,107,71,0.12) 0%,transparent 60%)"></div>
+    <div class="container" style="position:relative">
+      <div class="animate-in" style="max-width:580px">
+        <span class="badge badge--coral" style="margin-bottom:var(--space-md)">교육 과정</span>
+        <h1 style="color:#fff;margin-bottom:var(--space-md)">스마트폰으로 만드는<br>나만의 창업 이야기</h1>
+        <p style="color:rgba(255,255,255,0.65);font-size:16px;line-height:1.8">온라인, 오프라인, 기업 맞춤(B2B) 교육을<br>상황에 맞게 선택하세요.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 필터 + 강좌 목록 -->
+  <section class="section bg-mesh">
+    <div class="container">
+      <!-- 필터 -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:var(--space-xl)" class="reveal">
+        <button class="filter-btn active" onclick="filterCourse('all',this)">전체</button>
+        <button class="filter-btn" onclick="filterCourse('online',this)">온라인</button>
+        <button class="filter-btn" onclick="filterCourse('offline',this)">오프라인</button>
+        <button class="filter-btn" onclick="filterCourse('b2b',this)">B2B</button>
+      </div>
+
+      <!-- 강좌 그리드 -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--space-md)" class="reveal" id="course-grid">
+        <!-- 강좌 1 -->
+        <div class="card course-item" data-type="online">
+          <div class="course-thumb">
+            <div class="course-thumb-placeholder" style="background:linear-gradient(135deg,#1a2744,#2a3d6e)">
+              <svg width="40" height="40" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.25)" fill="none" stroke-width="1.5"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.95C18.88 4 12 4 12 4s-6.88 0-8.59.47a2.78 2.78 0 0 0-1.95 1.95C1 8.12 1 12 1 12s0 3.88.46 5.58a2.78 2.78 0 0 0 1.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.47a2.78 2.78 0 0 0 1.95-1.95C23 15.88 23 12 23 12s0-3.88-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="rgba(255,255,255,0.4)"/></svg>
+            </div>
+          </div>
+          <div class="course-body">
+            <div style="display:flex;gap:6px;margin-bottom:8px">
+              <span class="badge badge--coral">온라인</span>
+              <span class="badge badge--navy">입문</span>
+            </div>
+            <div class="course-title">유튜브 채널 시작하기 — 촬영부터 업로드까지</div>
+            <p class="course-desc">스마트폰으로 유튜브 채널을 만들고 첫 구독자 100명을 달성하는 실전 과정</p>
+            <div class="course-footer">
+              <span class="course-price">₩89,000</span>
+              <a href="#" class="btn btn--primary btn--sm">수강 신청</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 강좌 2 -->
+        <div class="card course-item" data-type="online">
+          <div class="course-thumb">
+            <div class="course-thumb-placeholder" style="background:linear-gradient(135deg,#cc3300,#ff6b47)"></div>
+          </div>
+          <div class="course-body">
+            <div style="display:flex;gap:6px;margin-bottom:8px">
+              <span class="badge badge--coral">온라인</span>
+              <span class="badge badge--green">중급</span>
+            </div>
+            <div class="course-title">SNS 마케팅 완성 패키지</div>
+            <p class="course-desc">인스타그램, 블로그, 유튜브를 연계한 통합 SNS 마케팅 전략 수립</p>
+            <div class="course-footer">
+              <span class="course-price">₩129,000</span>
+              <a href="#" class="btn btn--primary btn--sm">수강 신청</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 강좌 3 -->
+        <div class="card course-item" data-type="offline">
+          <div class="course-thumb">
+            <div class="course-thumb-placeholder" style="background:linear-gradient(135deg,#1b5e20,#2e7d32)"></div>
+          </div>
+          <div class="course-body">
+            <div style="display:flex;gap:6px;margin-bottom:8px">
+              <span class="badge badge--gray">오프라인</span>
+              <span class="badge badge--navy">중급</span>
+            </div>
+            <div class="course-title">스마트폰 창업 1일 집중 워크샵</div>
+            <p class="course-desc">하루 만에 배우는 스마트폰 창업 핵심 노하우. 직접 만들어 보는 실습 중심</p>
+            <div class="course-footer">
+              <span class="course-price">₩180,000</span>
+              <a href="#" class="btn btn--navy btn--sm">오프라인 신청</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 강좌 4 -->
+        <div class="card course-item" data-type="b2b">
+          <div class="course-thumb">
+            <div class="course-thumb-placeholder" style="background:linear-gradient(135deg,#1a1a50,#3333aa)"></div>
+          </div>
+          <div class="course-body">
+            <div style="display:flex;gap:6px;margin-bottom:8px">
+              <span class="badge badge--gray">오프라인</span>
+              <span class="badge badge--navy">B2B</span>
+            </div>
+            <div class="course-title">기업 임직원 스마트폰 업무 혁신 교육</div>
+            <p class="course-desc">기업 환경에 최적화된 스마트폰 활용 교육. 맞춤 커리큘럼으로 기관 방문 진행</p>
+            <div class="course-footer">
+              <span class="course-price">별도 협의</span>
+              <a href="#inquiry" class="btn btn--outline btn--sm">문의하기</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 강좌 5 -->
+        <div class="card course-item" data-type="online">
+          <div class="course-thumb">
+            <div class="course-thumb-placeholder" style="background:linear-gradient(135deg,#4a1a6e,#7b2da8)"></div>
+          </div>
+          <div class="course-body">
+            <div style="display:flex;gap:6px;margin-bottom:8px">
+              <span class="badge badge--coral">온라인</span>
+              <span class="badge badge--green">고급</span>
+            </div>
+            <div class="course-title">스마트폰으로 월 수익 만들기 — 수익화 전략</div>
+            <p class="course-desc">유튜브 광고, 제휴마케팅, 디지털 상품 판매까지 실질적 수익을 만드는 방법</p>
+            <div class="course-footer">
+              <span class="course-price">₩199,000</span>
+              <a href="#" class="btn btn--primary btn--sm">수강 신청</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 강좌 6 -->
+        <div class="card course-item" data-type="offline b2b">
+          <div class="course-thumb">
+            <div class="course-thumb-placeholder" style="background:linear-gradient(135deg,#1a3d2e,#2e7d32)"></div>
+          </div>
+          <div class="course-body">
+            <div style="display:flex;gap:6px;margin-bottom:8px">
+              <span class="badge badge--gray">오프라인</span>
+              <span class="badge badge--navy">B2G</span>
+            </div>
+            <div class="course-title">평생교육원 시니어 스마트폰 창업 과정</div>
+            <p class="course-desc">지자체·평생교육원 협력 과정. 50-60대 시니어를 위한 눈높이 교육</p>
+            <div class="course-footer">
+              <span class="course-price">기관 협약</span>
+              <a href="#inquiry" class="btn btn--outline btn--sm">협약 문의</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- B2B 문의 -->
+  <section class="section" id="inquiry" style="background:var(--color-navy)">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(255,107,71,0.1) 0%,transparent 60%)"></div>
+    <div class="container" style="position:relative">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3xl);align-items:center">
+        <div>
+          <span class="badge badge--coral" style="margin-bottom:var(--space-md)">B2B · B2G</span>
+          <h2 style="color:#fff;margin-bottom:var(--space-md)">기관 · 기업 맞춤 교육 문의</h2>
+          <p style="color:rgba(255,255,255,0.6);font-size:15px;line-height:1.8;margin-bottom:var(--space-lg)">
+            인원, 장소, 시간에 맞춘 완전 맞춤형 교육을 제공합니다.<br>
+            평생교육원, 기업연수원, 도서관 등 방문 교육 가능합니다.
+          </p>
+          <div style="display:flex;flex-direction:column;gap:var(--space-md)">
+            <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.7);font-size:14px">
+              <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,107,71,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="16" height="16" viewBox="0 0 24 24" stroke="var(--color-coral-light)" fill="none" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              최소 5명 이상 단체 교육 가능
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.7);font-size:14px">
+              <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,107,71,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="16" height="16" viewBox="0 0 24 24" stroke="var(--color-coral-light)" fill="none" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              전국 어디든 방문 교육 제공
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.7);font-size:14px">
+              <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,107,71,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="16" height="16" viewBox="0 0 24 24" stroke="var(--color-coral-light)" fill="none" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              정부 바우처·보조금 연계 가능
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:var(--space-xl)">
+          <form>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
+              <div class="form-group">
+                <label class="form-label">담당자명</label>
+                <input type="text" class="form-control" placeholder="홍길동">
+              </div>
+              <div class="form-group">
+                <label class="form-label">연락처</label>
+                <input type="text" class="form-control" placeholder="010-0000-0000">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">기관/기업명</label>
+              <input type="text" class="form-control" placeholder="○○ 평생교육원">
+            </div>
+            <div class="form-group">
+              <label class="form-label">예상 교육 인원</label>
+              <select class="form-control">
+                <option>5 ~ 10명</option>
+                <option>11 ~ 30명</option>
+                <option>31 ~ 50명</option>
+                <option>50명 이상</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">교육 내용 및 문의</label>
+              <textarea class="form-control" placeholder="원하시는 교육 내용이나 기간, 예산 등을 알려주세요."></textarea>
+            </div>
+            <button type="submit" class="btn btn--primary" style="width:100%;justify-content:center">B2B 문의 보내기</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="background:var(--color-navy);color:rgba(255,255,255,0.4);padding:var(--space-xl) 0;border-top:1px solid rgba(255,255,255,0.06)">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between">
+      <div class="nav-logo" style="color:#fff">최PD<span style="color:var(--color-coral)">.</span></div>
+      <p style="font-size:12px">© 2025 imPD</p>
+    </div>
+  </footer>
+
+  <script>
+    // 스크롤 reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // 강좌 필터
+    function filterCourse(type, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.course-item').forEach(card => {
+        if (type === 'all' || card.dataset.type.includes(type)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

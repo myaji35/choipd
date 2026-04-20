@@ -41,11 +41,11 @@ Rails.application.routes.draw do
         post :reject
         post :suspend
         post :activate
-        get  :identity
       end
       collection do
         get :check_id
       end
+      resource :identity, controller: "distributor_identities", only: [ :show, :update, :destroy ]
     end
 
     resources :resources,    controller: "distributor_resources"

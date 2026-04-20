@@ -3,7 +3,13 @@
 <div class="mb-6 flex items-center justify-between">
   <div>
     <%= link_to "← 유통사 목록", admin_distributors_path, class: "text-primary text-sm hover:text-primary-dark" %>
-    <h1 class="text-xl font-bold text-navy mt-2"><%= @distributor.name %></h1>
+    <h1 class="text-2xl font-bold text-navy mt-2"><%= @distributor.name %></h1>
+    <% if @distributor.slug.present? %>
+      <p class="text-sm text-gray-500 mt-1">
+        공개 URL: <%= link_to "/#{@distributor.slug}", "/#{@distributor.slug}", target: "_blank", class: "text-primary hover:underline font-mono" %>
+        <%= link_to "↗ 새 탭", "/#{@distributor.slug}", target: "_blank", class: "text-xs text-blue-600 ml-2" %>
+      </p>
+    <% end %>
   </div>
   <div class="flex space-x-2">
     <%= link_to "수정", edit_admin_distributor_path(@distributor), class: "bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 transition-colors" %>
@@ -14,49 +20,88 @@
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-  <!-- 기본 정보 -->
+  <!-- 좌측 메인 -->
   <div class="lg:col-span-2 space-y-4">
-    <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-5">
+    <!-- 기본 정보 -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
       <h2 class="font-semibold text-navy mb-4">기본 정보</h2>
       <dl class="grid grid-cols-2 gap-4 text-sm">
         <div>
-          <dt class="text-gray-400 text-xs uppercase tracking-wider mb-1">이름</dt>
+          <dt class="text-gray-500 text-xs font-semibold mb-1">이름</dt>
           <dd class="text-navy font-medium"><%= @distributor.name %></dd>
         </div>
         <div>
-          <dt class="text-gray-400 text-xs uppercase tracking-wider mb-1">이메일</dt>
+          <dt class="text-gray-500 text-xs font-semibold mb-1">이메일</dt>
           <dd class="text-navy"><%= @distributor.email %></dd>
         </div>
+        <% if @distributor.phone.present? %>
+          <div>
+            <dt class="text-gray-500 text-xs font-semibold mb-1">연락처</dt>
+            <dd class="text-navy"><%= @distributor.phone %></dd>
+          </div>
+        <% end %>
         <div>
-          <dt class="text-gray-400 text-xs uppercase tracking-wider mb-1">업종</dt>
+          <dt class="text-gray-500 text-xs font-semibold mb-1">업종</dt>
           <dd class="text-navy"><%= @distributor.business_type || '-' %></dd>
         </div>
         <div>
-          <dt class="text-gray-400 text-xs uppercase tracking-wider mb-1">지역</dt>
+          <dt class="text-gray-500 text-xs font-semibold mb-1">지역</dt>
           <dd class="text-navy"><%= @distributor.region || '-' %></dd>
         </div>
         <div>
-          <dt class="text-gray-400 text-xs uppercase tracking-wider mb-1">플랜</dt>
+          <dt class="text-gray-500 text-xs font-semibold mb-1">플랜</dt>
           <dd class="text-navy"><%= @distributor.subscription_plan || '-' %></dd>
         </div>
         <div>
-          <dt class="text-gray-400 text-xs uppercase tracking-wider mb-1">총 매출</dt>
+          <dt class="text-gray-500 text-xs font-semibold mb-1">총 매출</dt>
           <dd class="text-navy font-bold">₩<%= number_with_delimiter(@distributor.total_revenue.to_i) %></dd>
+        </div>
+        <div class="col-span-2">
+          <dt class="text-gray-500 text-xs font-semibold mb-1">슬러그 (공개 URL)</dt>
+          <dd class="text-navy font-mono text-sm">/<%= @distributor.slug || '(미설정)' %></dd>
         </div>
       </dl>
     </div>
 
+    <!-- 공개 페이지 카드 -->
+    <% if @distributor.slug.present? %>
+      <div class="bg-gradient-to-br from-blue-50 to-white rounded-lg border border-blue-200 shadow-sm p-5">
+        <div class="flex items-start justify-between">
+          <div>
+            <h2 class="font-semibold text-navy text-base mb-1">🌐 회원 공개 페이지</h2>
+            <p class="text-sm text-gray-600 mb-3">팔로워가 보는 분양사 홈입니다.</p>
+            <a href="/<%= @distributor.slug %>" target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90">
+              새 탭에서 열기 ↗
+            </a>
+            <p class="text-xs text-gray-500 mt-2 font-mono"><%= request.protocol %><%= request.host_with_port %>/<%= @distributor.slug %></p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Identity Uploader (DistributorIdentityUploader) -->
+    <%= render "identity_uploader", distributor: @distributor %>
+
+    <!-- Identity Preview Card -->
+    <%= render "identity_preview", distributor: @distributor %>
+
     <!-- 활동 로그 -->
-    <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-5">
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
       <h2 class="font-semibold text-navy mb-4">활동 로그</h2>
       <% if @activity_logs.any? %>
-        <div class="space-y-3">
+        <div class="space-y-3 max-h-96 overflow-y-auto">
           <% @activity_logs.each do |log| %>
             <div class="flex items-start space-x-3 text-sm">
               <div class="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></div>
-              <div>
+              <div class="flex-1">
                 <p class="text-navy"><%= log.description %></p>
-                <p class="text-xs text-gray-400 mt-0.5"><%= log.created_at.strftime("%Y.%m.%d %H:%M") %></p>
+                <p class="text-xs text-gray-400 mt-0.5">
+                  <%= log.created_at.strftime("%Y.%m.%d %H:%M") %>
+                  <% if log.activity_type.present? %>
+                    · <span class="font-mono"><%= log.activity_type %></span>
+                  <% end %>
+                </p>
               </div>
             </div>
           <% end %>
@@ -67,26 +112,65 @@
     </div>
   </div>
 
-  <!-- 상태 패널 -->
+  <!-- 우측 사이드 -->
   <div class="space-y-4">
-    <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-5">
+    <!-- 상태 -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
       <h2 class="font-semibold text-navy mb-4">상태</h2>
       <div class="mb-4">
         <%= render "status_badge", distributor: @distributor %>
       </div>
       <% if @distributor.pending? %>
         <div class="space-y-2">
-          <%= button_to "승인", approve_admin_distributor_path(@distributor),
+          <%= button_to "✓ 승인", approve_admin_distributor_path(@distributor),
               class: "w-full bg-green-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors" %>
-          <%= button_to "거부", reject_admin_distributor_path(@distributor),
+          <%= button_to "✗ 거부", reject_admin_distributor_path(@distributor),
               class: "w-full bg-red-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors" %>
         </div>
+      <% elsif @distributor.approved? %>
+        <%= button_to "정지", suspend_admin_distributor_path(@distributor),
+            class: "w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors",
+            data: { turbo_confirm: "이 유통사를 정지하시겠습니까?" } %>
+      <% elsif @distributor.suspended? %>
+        <%= button_to "재활성화", activate_admin_distributor_path(@distributor),
+            class: "w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors" %>
       <% end %>
     </div>
-    <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-5">
+
+    <!-- 활동 정보 -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+      <h2 class="font-semibold text-navy mb-3 text-sm">활동 정보</h2>
+      <dl class="space-y-2 text-xs">
+        <div class="flex justify-between">
+          <dt class="text-gray-500">활동 로그</dt>
+          <dd class="text-navy font-semibold"><%= @distributor.distributor_activity_logs.count %>건</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-gray-500">결제 건수</dt>
+          <dd class="text-navy font-semibold"><%= @distributor.payments.count %>건</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-gray-500">청구서</dt>
+          <dd class="text-navy font-semibold"><%= @distributor.invoices.count %>건</dd>
+        </div>
+        <% if @distributor.identity_md.present? %>
+          <div class="flex justify-between pt-2 border-t border-gray-100">
+            <dt class="text-gray-500">Identity 문서</dt>
+            <dd class="text-green-600 font-semibold">✓ 등록됨</dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+
+    <!-- 등록 정보 -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
       <h2 class="font-semibold text-navy mb-3 text-sm">등록 정보</h2>
-      <p class="text-xs text-gray-400">등록일: <%= @distributor.created_at.strftime("%Y.%m.%d") %></p>
-      <p class="text-xs text-gray-400 mt-1">수정일: <%= @distributor.updated_at.strftime("%Y.%m.%d") %></p>
+      <p class="text-xs text-gray-500">등록일: <%= @distributor.created_at.strftime("%Y.%m.%d") %></p>
+      <p class="text-xs text-gray-500 mt-1">수정일: <%= @distributor.updated_at.strftime("%Y.%m.%d") %></p>
+      <% if @distributor.approved_at %>
+        <p class="text-xs text-gray-500 mt-1">승인일: <%= @distributor.approved_at.strftime("%Y.%m.%d") %></p>
+      <% end %>
+      <p class="text-xs text-gray-400 mt-2 font-mono">#<%= @distributor.id.to_s.rjust(4, '0') %></p>
     </div>
   </div>
 </div>

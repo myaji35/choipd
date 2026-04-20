@@ -1,0 +1,168 @@
+<%# Identity Preview Card — Next.js IdentityPreviewCard.tsx (348줄) 포팅 %>
+<% parsed = if distributor.identity_json.present?
+              JSON.parse(distributor.identity_json) rescue {}
+            else
+              {}
+            end %>
+
+<div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+  <div class="flex items-start justify-between mb-4">
+    <div>
+      <h2 class="font-semibold text-navy text-base">🎯 Identity 분석 미리보기</h2>
+      <p class="text-xs text-gray-500 mt-1">업로드한 markdown에서 자동 추출된 구조화 데이터</p>
+    </div>
+    <% if parsed["completeness"] %>
+      <% pct = parsed["completeness"].to_i %>
+      <% color = pct >= 80 ? "green" : pct >= 50 ? "yellow" : "red" %>
+      <span class="text-xs px-3 py-1 rounded-full bg-<%= color %>-100 text-<%= color %>-700 font-semibold">
+        완성도 <%= pct %>%
+      </span>
+    <% end %>
+  </div>
+
+  <% if distributor.identity_md.blank? %>
+    <div class="text-center py-8 text-gray-400 text-sm">
+      <p>📄 아직 등록된 Identity가 없습니다.</p>
+      <p class="text-xs mt-1">위 업로더에서 .md 파일을 등록해주세요.</p>
+    </div>
+  <% else %>
+    <!-- 핵심 필드 -->
+    <dl class="space-y-3 text-sm">
+      <% if parsed["agenda"].present? %>
+        <div>
+          <dt class="text-xs font-semibold text-gray-600 mb-1">아젠다 / 슬로건</dt>
+          <dd class="text-navy bg-blue-50 rounded p-3 border-l-4 border-blue-400">
+            <%= parsed["agenda"] %>
+          </dd>
+        </div>
+      <% end %>
+
+      <% if parsed["hero_copy"].present? && parsed["hero_copy"] != parsed["agenda"] %>
+        <div>
+          <dt class="text-xs font-semibold text-gray-600 mb-1">히어로 카피</dt>
+          <dd class="text-navy bg-orange-50 rounded p-3 border-l-4 border-orange-400">
+            <%= parsed["hero_copy"] %>
+          </dd>
+        </div>
+      <% end %>
+
+      <% if parsed["tone"].is_a?(Array) && parsed["tone"].any? %>
+        <div>
+          <dt class="text-xs font-semibold text-gray-600 mb-1">톤 앤 매너</dt>
+          <dd class="flex flex-wrap gap-1.5">
+            <% parsed["tone"].each do |t| %>
+              <span class="text-xs px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full font-medium"><%= t %></span>
+            <% end %>
+          </dd>
+        </div>
+      <% end %>
+
+      <% if parsed["keywords"].is_a?(Array) && parsed["keywords"].any? %>
+        <div>
+          <dt class="text-xs font-semibold text-gray-600 mb-1">키워드</dt>
+          <dd class="flex flex-wrap gap-1.5">
+            <% parsed["keywords"].each do |k| %>
+              <span class="text-xs px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full">#<%= k %></span>
+            <% end %>
+          </dd>
+        </div>
+      <% end %>
+
+      <% if parsed["target"].is_a?(Array) && parsed["target"].any? %>
+        <div>
+          <dt class="text-xs font-semibold text-gray-600 mb-1">타겟 오디언스</dt>
+          <dd class="flex flex-wrap gap-1.5">
+            <% parsed["target"].each do |t| %>
+              <span class="text-xs px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full"><%= t %></span>
+            <% end %>
+          </dd>
+        </div>
+      <% end %>
+
+      <% if parsed["usp"].is_a?(Array) && parsed["usp"].any? %>
+        <div>
+          <dt class="text-xs font-semibold text-gray-600 mb-1">차별점 (USP)</dt>
+          <dd class="space-y-1">
+            <% parsed["usp"].each do |u| %>
+              <div class="text-sm text-navy bg-gray-50 rounded px-3 py-1.5">✓ <%= u %></div>
+            <% end %>
+          </dd>
+        </div>
+      <% end %>
+
+      <% if parsed["anti_patterns"].is_a?(Array) && parsed["anti_patterns"].any? %>
+        <div>
+          <dt class="text-xs font-semibold text-gray-600 mb-1">피해야 할 것 (Anti-patterns)</dt>
+          <dd class="space-y-1">
+            <% parsed["anti_patterns"].each do |a| %>
+              <div class="text-sm text-red-700 bg-red-50 rounded px-3 py-1.5">✗ <%= a %></div>
+            <% end %>
+          </dd>
+        </div>
+      <% end %>
+
+      <% if parsed["hashtags"].is_a?(Array) && parsed["hashtags"].any? %>
+        <div>
+          <dt class="text-xs font-semibold text-gray-600 mb-1">해시태그</dt>
+          <dd class="flex flex-wrap gap-1.5">
+            <% parsed["hashtags"].each do |h| %>
+              <span class="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-mono"><%= h %></span>
+            <% end %>
+          </dd>
+        </div>
+      <% end %>
+
+      <% if parsed["mentions"].is_a?(Array) && parsed["mentions"].any? %>
+        <div>
+          <dt class="text-xs font-semibold text-gray-600 mb-1">멘션 / 수상·소속</dt>
+          <dd class="flex flex-wrap gap-1.5">
+            <% parsed["mentions"].each do |m| %>
+              <span class="text-xs px-2 py-0.5 bg-yellow-50 text-yellow-700 rounded font-mono"><%= m %></span>
+            <% end %>
+          </dd>
+        </div>
+      <% end %>
+
+      <% if parsed["missing"].is_a?(Array) && parsed["missing"].any? %>
+        <div class="pt-3 border-t border-gray-100">
+          <dt class="text-xs font-semibold text-amber-600 mb-1">⚠️ 누락된 필드</dt>
+          <dd class="flex flex-wrap gap-1.5">
+            <% parsed["missing"].each do |m| %>
+              <span class="text-xs px-2 py-0.5 bg-amber-50 text-amber-700 rounded"><%= m %></span>
+            <% end %>
+          </dd>
+        </div>
+      <% end %>
+
+      <% if parsed["summary"].present? %>
+        <div class="pt-3 border-t border-gray-100">
+          <dt class="text-xs font-semibold text-gray-600 mb-1">요약</dt>
+          <dd class="text-sm text-gray-700 italic"><%= parsed["summary"] %></dd>
+        </div>
+      <% end %>
+
+      <% if parsed["sections"].is_a?(Array) && parsed["sections"].any? %>
+        <details class="pt-3 border-t border-gray-100">
+          <summary class="cursor-pointer text-xs font-semibold text-gray-600">원본 섹션 목록 (<%= parsed["sections"].size %>개)</summary>
+          <div class="mt-2 space-y-2 max-h-64 overflow-y-auto">
+            <% parsed["sections"].each do |s| %>
+              <div class="text-xs">
+                <p class="font-semibold text-navy"><%= s["title"] %></p>
+                <p class="text-gray-500 mt-0.5"><%= s["preview"] %></p>
+              </div>
+            <% end %>
+          </div>
+        </details>
+      <% end %>
+    </dl>
+
+    <% if distributor.identity_parsed_at %>
+      <p class="text-xs text-gray-400 mt-4 text-right">
+        파싱: <%= distributor.identity_parsed_at.strftime("%Y.%m.%d %H:%M") %>
+        <% if parsed["raw_bytes"] %>
+          · <%= number_with_delimiter(parsed["raw_bytes"]) %>B
+        <% end %>
+      </p>
+    <% end %>
+  <% end %>
+</div>
