@@ -37,3 +37,16 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 ignore .github
+
+# .env files (use .env.example as template)
+.env
+.env.local
+.env.*.local
+
+# Migration tmp files
+/tmp/nextjs_export/
+
+# macOS metadata files
+._*
+.DS_Store
+!.env.example
