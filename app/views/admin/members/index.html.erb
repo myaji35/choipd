@@ -1,0 +1,82 @@
+<% content_for :title, "회원 관리" %>
+
+<div class="mb-6 flex items-center justify-between">
+  <div class="flex items-center space-x-3">
+    <%= form_with url: admin_members_path, method: :get, class: "flex items-center space-x-2" do |f| %>
+      <%= f.text_field :q, value: params[:q], placeholder: "이름/이메일/슬러그 검색",
+          class: "border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-56" %>
+      <%= f.select :status, [["전체 상태", ""], ["승인 대기", "pending_approval"], ["승인", "approved"], ["거부", "rejected"], ["정지", "suspended"]],
+          { selected: params[:status] }, class: "border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+      <%= f.select :impd, [["전체 IMPD", ""], ["없음", "none"], ["진행 중", "in_progress"], ["완료", "completed"], ["거부", "rejected"]],
+          { selected: params[:impd] }, class: "border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+      <%= f.select :profession, [["전체 직업", ""], ["보험설계사", "insurance_agent"], ["공인중개사", "realtor"], ["교육자", "educator"], ["저자", "author"], ["사장님", "shopowner"], ["프리랜서", "freelancer"], ["기타", "custom"]],
+          { selected: params[:profession] }, class: "border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+      <%= f.submit "검색", class: "bg-primary text-white px-4 py-2 rounded-lg text-sm cursor-pointer" %>
+    <% end %>
+  </div>
+  <%= link_to "+ 회원 추가", new_admin_member_path,
+      class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90" %>
+</div>
+
+<div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+  <table class="w-full">
+    <thead class="bg-gray-50 border-b">
+      <tr>
+        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase">회원</th>
+        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase">직업</th>
+        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase">지역</th>
+        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase">상태</th>
+        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase">IMPD</th>
+        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase">등록일</th>
+        <th class="px-4 py-3"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y">
+      <% @members.each do |m| %>
+        <tr class="hover:bg-gray-50 cursor-pointer"
+            onclick="if(!event.target.closest('a,button,form'))location.href='<%= admin_member_path(m) %>'">
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-3">
+              <% if m.profile_image.present? %>
+                <img src="<%= m.profile_image %>" alt="" class="w-10 h-10 rounded-full object-cover">
+              <% else %>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+                  <%= m.name[0] %>
+                </div>
+              <% end %>
+              <div>
+                <p class="font-medium text-navy"><%= m.name %></p>
+                <p class="text-xs text-gray-500"><%= m.email %></p>
+                <p class="text-xs text-gray-400 mt-0.5">/<%= m.slug %></p>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-3 text-sm text-gray-600"><%= m.profession || '-' %></td>
+          <td class="px-4 py-3 text-sm text-gray-600"><%= m.region || '-' %></td>
+          <td class="px-4 py-3">
+            <% color = case m.status; when 'approved' then 'green'; when 'pending_approval' then 'yellow'; when 'rejected' then 'red'; when 'suspended' then 'gray'; else 'gray'; end %>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-<%= color %>-100 text-<%= color %>-700"><%= m.status %></span>
+          </td>
+          <td class="px-4 py-3">
+            <% icolor = case m.impd_status; when 'completed' then 'green'; when 'in_progress' then 'blue'; when 'rejected' then 'red'; else 'gray'; end %>
+            <span class="text-xs px-2 py-0.5 rounded bg-<%= icolor %>-100 text-<%= icolor %>-700"><%= m.impd_status %></span>
+          </td>
+          <td class="px-4 py-3 text-xs text-gray-400"><%= m.created_at.strftime("%Y.%m.%d") %></td>
+          <td class="px-4 py-3 text-right">
+            <% if m.slug.present? %>
+              <%= link_to "공개페이지 ↗", "/#{m.slug}",
+                  target: "_blank", rel: "noopener noreferrer",
+                  class: "text-xs text-blue-600 hover:text-blue-800" %>
+            <% end %>
+            <%= link_to "보기", admin_member_path(m), class: "text-xs text-primary ml-2" %>
+          </td>
+        </tr>
+      <% end %>
+      <% if @members.empty? %>
+        <tr><td colspan="7" class="text-center py-12 text-gray-400">조건에 맞는 회원이 없습니다.</td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<p class="text-xs text-gray-400 mt-4 text-right">전체 <%= @members.respond_to?(:total_count) ? @members.total_count : @members.size %>명</p>

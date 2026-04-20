@@ -48,6 +48,22 @@ Rails.application.routes.draw do
       resource :identity, controller: "distributor_identities", only: [ :show, :update, :destroy ]
     end
 
+    resources :members do
+      member do
+        post :approve
+        post :reject
+        post :suspend
+        post :activate
+      end
+      resources :documents, controller: "member_documents", only: [ :index, :show, :create, :destroy ] do
+        member { post :parse }
+      end
+      resources :skills, controller: "member_skills", only: [ :index ]
+      resource :gap_report, controller: "member_gap_reports", only: [] do
+        post :generate
+      end
+    end
+
     resources :resources,    controller: "distributor_resources"
     resources :hero_images
     resources :newsletter,   only: [ :index ]

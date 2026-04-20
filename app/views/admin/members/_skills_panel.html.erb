@@ -1,0 +1,39 @@
+<div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+  <div class="flex items-start justify-between mb-3">
+    <div>
+      <h2 class="font-semibold text-navy text-base">🎯 추출된 달란트</h2>
+      <p class="text-xs text-gray-500 mt-1">업로드한 문서에서 자동 추출된 전문성 키워드</p>
+    </div>
+    <span class="text-xs px-2 py-1 bg-gray-100 rounded text-gray-700"><%= skills.size %>개</span>
+  </div>
+
+  <% if skills.any? %>
+    <div class="space-y-2">
+      <% skills.each do |ms| %>
+        <div class="flex items-center justify-between bg-gradient-to-r from-blue-50 to-white rounded px-3 py-2">
+          <div class="flex items-center gap-2 flex-1">
+            <% color = case ms.skill.category; when 'hard' then 'blue'; when 'meta' then 'purple'; when 'context' then 'emerald'; end %>
+            <span class="text-xs px-2 py-0.5 rounded bg-<%= color %>-100 text-<%= color %>-700"><%= ms.skill.category %></span>
+            <span class="text-sm font-medium text-navy"><%= ms.skill.canonical_name %></span>
+            <% if ms.skill.axis %>
+              <span class="text-xs text-gray-500">[<%= ms.skill.axis %>]</span>
+            <% end %>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs px-2 py-0.5 bg-gray-100 rounded"><%= ms.level %></span>
+            <% src_color = ms.source == 'verified' ? 'green' : ms.source == 'document' ? 'blue' : 'gray' %>
+            <span class="text-xs px-1.5 py-0.5 rounded bg-<%= src_color %>-50 text-<%= src_color %>-600"><%= ms.source %></span>
+            <div class="w-16 h-1.5 bg-gray-200 rounded overflow-hidden">
+              <div class="h-full bg-primary" style="width: <%= ms.weight %>%"></div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-center text-sm text-gray-400 py-6">
+      아직 추출된 달란트가 없습니다.<br>
+      <span class="text-xs">위에서 .md 파일을 업로드하면 자동 추출됩니다.</span>
+    </p>
+  <% end %>
+</div>

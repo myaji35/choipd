@@ -1,0 +1,68 @@
+<%# MD 문서 업로드 (talent 자동 추출) %>
+<div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5"
+     data-controller="member-doc-uploader"
+     data-member-doc-uploader-create-url-value="<%= admin_member_documents_path(member, format: :json) %>"
+     data-member-doc-uploader-csrf-value="<%= form_authenticity_token %>">
+
+  <div class="flex items-start justify-between mb-3">
+    <div>
+      <h2 class="font-semibold text-navy text-base">📄 문서 자료실 (MD 업로드)</h2>
+      <p class="text-xs text-gray-500 mt-1">.md 파일을 업로드하면 달란트·경력·고객사가 자동 추출됩니다</p>
+    </div>
+    <span data-member-doc-uploader-target="status" class="text-xs text-gray-400"></span>
+  </div>
+
+  <label class="block border-2 border-dashed border-gray-300 rounded-lg p-5 text-center hover:border-primary cursor-pointer transition-colors"
+         data-action="dragover->member-doc-uploader#dragover dragleave->member-doc-uploader#dragleave drop->member-doc-uploader#drop">
+    <p class="text-sm text-gray-600">📂 .md 파일을 끌어다 놓거나 클릭해서 업로드</p>
+    <p class="text-xs text-gray-400 mt-1">최대 1MB · .md / .markdown / .txt</p>
+    <input type="file" class="hidden" accept=".md,.markdown,.txt"
+           data-member-doc-uploader-target="fileInput"
+           data-action="change->member-doc-uploader#fileSelected">
+  </label>
+
+  <div class="mt-3 grid grid-cols-3 gap-2">
+    <input type="text" placeholder="제목 (선택)"
+           data-member-doc-uploader-target="title"
+           class="col-span-2 border border-gray-300 rounded px-2 py-1.5 text-sm">
+    <select data-member-doc-uploader-target="category" class="border border-gray-300 rounded px-2 py-1.5 text-sm">
+      <option value="other">기타</option>
+      <option value="bio">자기소개</option>
+      <option value="portfolio">포트폴리오</option>
+      <option value="curriculum">커리큘럼</option>
+      <option value="awards">수상</option>
+      <option value="interview">인터뷰</option>
+    </select>
+  </div>
+
+  <div data-member-doc-uploader-target="error" class="hidden mt-3 px-3 py-2 bg-red-50 border border-red-200 rounded text-sm text-red-700"></div>
+
+  <% if documents.any? %>
+    <div class="mt-4 border-t border-gray-100 pt-4">
+      <h3 class="text-xs font-semibold text-gray-600 mb-2">업로드된 문서 (<%= documents.size %>)</h3>
+      <div class="space-y-2">
+        <% documents.each do |d| %>
+          <div class="flex items-center justify-between text-sm bg-gray-50 rounded px-3 py-2">
+            <div>
+              <span class="font-medium text-navy"><%= d.title.presence || d.filename %></span>
+              <span class="text-xs text-gray-400 ml-2 font-mono"><%= d.filename %></span>
+              <span class="text-xs px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded ml-2"><%= d.category %></span>
+              <% if d.extracted_skills_count.to_i > 0 %>
+                <span class="text-xs text-emerald-600 ml-2">✓ 달란트 <%= d.extracted_skills_count %>개 추출</span>
+              <% end %>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-gray-400 mr-2"><%= d.uploaded_at.strftime("%y.%m.%d") %></span>
+              <%= button_to "삭제", admin_member_document_path(member, d, format: :json), method: :delete,
+                  class: "text-xs text-red-600 hover:text-red-700 cursor-pointer",
+                  data: { turbo_confirm: "삭제하시겠습니까?" },
+                  form: { class: "inline" } %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <p class="mt-4 text-center text-sm text-gray-400 py-3">아직 업로드된 문서가 없습니다.</p>
+  <% end %>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_20_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_20_140000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -225,6 +225,180 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_130000) do
     t.index ["tenant_id", "email"], name: "idx_leads_tenant_email", unique: true
   end
 
+  create_table "member_bookings", force: :cascade do |t|
+    t.string "booking_type"
+    t.text "description"
+    t.string "external_url"
+    t.integer "member_id", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.index ["member_id"], name: "index_member_bookings_on_member_id"
+    t.index ["tenant_id"], name: "index_member_bookings_on_tenant_id"
+  end
+
+  create_table "member_documents", force: :cascade do |t|
+    t.string "category", default: "other", null: false
+    t.string "content_hash", null: false
+    t.text "content_md", null: false
+    t.text "extracted_entities", default: "{}"
+    t.integer "extracted_skills_count", default: 0
+    t.string "filename", null: false
+    t.integer "member_id", null: false
+    t.datetime "parsed_at"
+    t.integer "size_bytes", default: 0
+    t.text "tags", default: "[]", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.string "title"
+    t.datetime "uploaded_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.index ["member_id", "content_hash"], name: "idx_member_documents_hash", unique: true
+    t.index ["member_id"], name: "index_member_documents_on_member_id"
+  end
+
+  create_table "member_gap_reports", force: :cascade do |t|
+    t.integer "completeness_score", default: 0
+    t.text "gaps_json", default: "[]", null: false
+    t.datetime "generated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.text "growth_path_json", default: "[]", null: false
+    t.integer "member_id", null: false
+    t.text "opportunities_json", default: "[]", null: false
+    t.integer "peer_sample_size", default: 0
+    t.string "profession", null: false
+    t.text "radar_median", null: false
+    t.text "radar_self", null: false
+    t.text "radar_top10", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.index ["member_id"], name: "index_member_gap_reports_on_member_id"
+  end
+
+  create_table "member_inquiries", force: :cascade do |t|
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.integer "is_read", default: 0
+    t.integer "member_id", null: false
+    t.text "message", null: false
+    t.string "sender_email", null: false
+    t.string "sender_name", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.index ["member_id"], name: "index_member_inquiries_on_member_id"
+    t.index ["tenant_id"], name: "index_member_inquiries_on_tenant_id"
+  end
+
+  create_table "member_portfolio_items", force: :cascade do |t|
+    t.string "category"
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.text "description"
+    t.string "media_type"
+    t.string "media_url", null: false
+    t.integer "member_id", null: false
+    t.integer "sort_order", default: 0
+    t.integer "tenant_id", default: 1, null: false
+    t.string "title", null: false
+    t.index ["member_id"], name: "index_member_portfolio_items_on_member_id"
+    t.index ["tenant_id"], name: "index_member_portfolio_items_on_tenant_id"
+  end
+
+  create_table "member_posts", force: :cascade do |t|
+    t.string "category"
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.integer "is_published", default: 0
+    t.integer "member_id", null: false
+    t.datetime "published_at"
+    t.integer "tenant_id", default: 1, null: false
+    t.string "thumbnail_url"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["member_id"], name: "index_member_posts_on_member_id"
+    t.index ["tenant_id"], name: "index_member_posts_on_tenant_id"
+  end
+
+  create_table "member_reviews", force: :cascade do |t|
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.integer "is_approved", default: 0
+    t.integer "member_id", null: false
+    t.integer "rating", null: false
+    t.string "reviewer_email"
+    t.string "reviewer_name", null: false
+    t.string "source", default: "public_form"
+    t.string "status", default: "new", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.index ["member_id"], name: "index_member_reviews_on_member_id"
+    t.index ["status"], name: "index_member_reviews_on_status"
+    t.index ["tenant_id"], name: "index_member_reviews_on_tenant_id"
+  end
+
+  create_table "member_services", force: :cascade do |t|
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.string "cta_label"
+    t.string "cta_url"
+    t.text "description"
+    t.string "image_url"
+    t.integer "is_active", default: 1
+    t.integer "member_id", null: false
+    t.string "price"
+    t.string "price_label"
+    t.integer "sort_order", default: 0
+    t.integer "tenant_id", default: 1, null: false
+    t.string "title", null: false
+    t.index ["member_id"], name: "index_member_services_on_member_id"
+    t.index ["tenant_id"], name: "index_member_services_on_tenant_id"
+  end
+
+  create_table "member_skills", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "level", default: "intermediate", null: false
+    t.integer "member_id", null: false
+    t.integer "skill_id", null: false
+    t.string "source", default: "self", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.datetime "verified_at"
+    t.integer "weight", default: 50, null: false
+    t.integer "years_experience"
+    t.index ["member_id", "skill_id"], name: "idx_member_skills_unique", unique: true
+    t.index ["member_id"], name: "index_member_skills_on_member_id"
+    t.index ["skill_id"], name: "index_member_skills_on_skill_id"
+  end
+
+  create_table "members", force: :cascade do |t|
+    t.text "bio"
+    t.string "business_type"
+    t.string "cover_image"
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.text "enabled_modules", default: "[]"
+    t.integer "featured_order", default: 0
+    t.datetime "impd_completed_at"
+    t.datetime "impd_started_at"
+    t.string "impd_status", default: "none", null: false
+    t.text "impd_steps_data", default: "{}"
+    t.string "impd_verification_id"
+    t.integer "is_featured", default: 0
+    t.string "name", null: false
+    t.string "phone"
+    t.string "profession"
+    t.string "profile_image"
+    t.string "region"
+    t.text "rejection_reason"
+    t.string "slug", null: false
+    t.text "social_links"
+    t.string "status", default: "pending_approval", null: false
+    t.string "subscription_plan", default: "basic"
+    t.integer "tenant_id", default: 1, null: false
+    t.text "theme_config", default: "{}"
+    t.string "townin_email"
+    t.string "townin_name"
+    t.string "townin_role"
+    t.string "towningraph_user_id"
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_members_on_email"
+    t.index ["impd_status"], name: "index_members_on_impd_status"
+    t.index ["impd_verification_id"], name: "index_members_on_impd_verification_id", unique: true
+    t.index ["slug"], name: "index_members_on_slug", unique: true
+    t.index ["tenant_id"], name: "index_members_on_tenant_id"
+    t.index ["towningraph_user_id"], name: "index_members_on_towningraph_user_id", unique: true
+  end
+
   create_table "payments", force: :cascade do |t|
     t.decimal "amount"
     t.datetime "created_at", null: false
@@ -259,6 +433,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_130000) do
     t.text "value"
     t.index ["key"], name: "index_settings_on_key", unique: true
     t.index ["tenant_id", "key"], name: "idx_settings_tenant_key", unique: true
+  end
+
+  create_table "skills", force: :cascade do |t|
+    t.text "aliases", default: "[]", null: false
+    t.string "axis"
+    t.string "canonical_name", null: false
+    t.string "category", null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.text "description"
+    t.integer "tenant_id", default: 1, null: false
+    t.index ["axis"], name: "index_skills_on_axis"
+    t.index ["tenant_id", "canonical_name"], name: "index_skills_on_tenant_id_and_canonical_name", unique: true
   end
 
   create_table "sns_accounts", force: :cascade do |t|
@@ -327,6 +513,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_130000) do
   add_foreign_key "invoices", "payments"
   add_foreign_key "kanban_columns", "kanban_projects"
   add_foreign_key "kanban_tasks", "kanban_columns"
+  add_foreign_key "member_bookings", "members", on_delete: :cascade
+  add_foreign_key "member_documents", "members", on_delete: :cascade
+  add_foreign_key "member_gap_reports", "members", on_delete: :cascade
+  add_foreign_key "member_inquiries", "members", on_delete: :cascade
+  add_foreign_key "member_portfolio_items", "members", on_delete: :cascade
+  add_foreign_key "member_posts", "members", on_delete: :cascade
+  add_foreign_key "member_reviews", "members", on_delete: :cascade
+  add_foreign_key "member_services", "members", on_delete: :cascade
+  add_foreign_key "member_skills", "members", on_delete: :cascade
+  add_foreign_key "member_skills", "skills", on_delete: :cascade
   add_foreign_key "payments", "distributors"
   add_foreign_key "sns_post_histories", "sns_scheduled_posts"
 end

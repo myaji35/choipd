@@ -1,0 +1,8 @@
+<% content_for :title, "#{@member.name} 수정" %>
+<div class="mb-6">
+  <%= link_to "← #{@member.name} 상세", admin_member_path(@member), class: "text-primary text-sm" %>
+  <h1 class="text-xl font-bold text-navy mt-2">회원 정보 수정</h1>
+</div>
+<div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6 max-w-4xl">
+  <%= render "form", member: @member %>
+</div>

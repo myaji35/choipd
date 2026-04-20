@@ -1,0 +1,179 @@
+<% content_for :title, @member.name %>
+
+<div class="mb-6 flex items-center justify-between">
+  <div>
+    <%= link_to "← 회원 목록", admin_members_path, class: "text-primary text-sm hover:text-primary-dark" %>
+    <h1 class="text-2xl font-bold text-navy mt-2"><%= @member.name %></h1>
+    <% if @member.slug.present? %>
+      <p class="text-sm text-gray-500 mt-1">
+        공개 URL: <%= link_to "/#{@member.slug}", "/#{@member.slug}", target: "_blank", class: "text-primary hover:underline font-mono" %>
+      </p>
+    <% end %>
+  </div>
+  <div class="flex space-x-2">
+    <%= link_to "수정", edit_admin_member_path(@member), class: "bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-200" %>
+    <%= button_to "삭제", admin_member_path(@member), method: :delete,
+        class: "bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm hover:bg-red-100",
+        data: { turbo_confirm: "정말 삭제하시겠습니까?" } %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="lg:col-span-2 space-y-4">
+    <!-- 기본 정보 -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+      <h2 class="font-semibold text-navy mb-4">기본 정보</h2>
+      <div class="flex items-start gap-5 mb-4">
+        <% if @member.profile_image.present? %>
+          <img src="<%= @member.profile_image %>" alt="" class="w-20 h-20 rounded-full object-cover border-2 border-gray-200">
+        <% else %>
+          <div class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-2xl">
+            <%= @member.name[0] %>
+          </div>
+        <% end %>
+        <div class="flex-1">
+          <h3 class="text-lg font-bold text-navy"><%= @member.name %></h3>
+          <p class="text-sm text-gray-500"><%= @member.email %></p>
+          <% if @member.bio.present? %>
+            <p class="text-sm text-gray-700 mt-2"><%= @member.bio %></p>
+          <% end %>
+        </div>
+      </div>
+      <dl class="grid grid-cols-2 gap-4 text-sm">
+        <div><dt class="text-xs font-semibold text-gray-600">전화</dt><dd class="text-navy"><%= @member.phone || '-' %></dd></div>
+        <div><dt class="text-xs font-semibold text-gray-600">직업</dt><dd class="text-navy"><%= @member.profession || '-' %></dd></div>
+        <div><dt class="text-xs font-semibold text-gray-600">지역</dt><dd class="text-navy"><%= @member.region || '-' %></dd></div>
+        <div><dt class="text-xs font-semibold text-gray-600">사업 유형</dt><dd class="text-navy"><%= @member.business_type || '-' %></dd></div>
+        <div><dt class="text-xs font-semibold text-gray-600">슬러그</dt><dd class="text-navy font-mono">/<%= @member.slug %></dd></div>
+        <div><dt class="text-xs font-semibold text-gray-600">구독 플랜</dt><dd class="text-navy"><%= @member.subscription_plan %></dd></div>
+      </dl>
+    </div>
+
+    <!-- 통계 카드 4개 -->
+    <div class="grid grid-cols-4 gap-3">
+      <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
+        <p class="text-xs text-gray-500 mb-1">포트폴리오</p>
+        <p class="text-2xl font-bold text-navy"><%= @portfolio_count %></p>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
+        <p class="text-xs text-gray-500 mb-1">서비스</p>
+        <p class="text-2xl font-bold text-navy"><%= @services_count %></p>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
+        <p class="text-xs text-gray-500 mb-1">포스트</p>
+        <p class="text-2xl font-bold text-navy"><%= @posts_count %></p>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
+        <p class="text-xs text-gray-500 mb-1">달란트</p>
+        <p class="text-2xl font-bold text-navy"><%= @skills.size %></p>
+      </div>
+    </div>
+
+    <!-- 문서 업로드 -->
+    <%= render "document_uploader", member: @member, documents: @documents %>
+
+    <!-- 추출된 달란트 -->
+    <%= render "skills_panel", member: @member, skills: @skills %>
+
+    <!-- 갭 리포트 -->
+    <%= render "gap_report_panel", member: @member, report: @gap_report %>
+
+    <!-- 후기 -->
+    <% if @reviews.any? %>
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+        <h2 class="font-semibold text-navy mb-4">최근 후기 (<%= @reviews.size %>)</h2>
+        <div class="space-y-3">
+          <% @reviews.each do |r| %>
+            <div class="border-l-4 border-yellow-400 pl-3 py-1">
+              <p class="text-sm">
+                <span class="font-medium text-navy"><%= r.reviewer_name %></span>
+                <span class="text-yellow-500 ml-2"><%= '★' * r.rating %></span>
+              </p>
+              <% if r.content.present? %>
+                <p class="text-xs text-gray-600 mt-1"><%= r.content %></p>
+              <% end %>
+              <p class="text-xs text-gray-400 mt-1"><%= r.created_at.strftime("%Y.%m.%d") %> · <span class="font-mono"><%= r.status %></span></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- 최근 문의 -->
+    <% if @inquiries.any? %>
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+        <h2 class="font-semibold text-navy mb-4">최근 문의 (<%= @inquiries.size %>)</h2>
+        <div class="space-y-3">
+          <% @inquiries.each do |i| %>
+            <div class="text-sm">
+              <p>
+                <span class="font-medium text-navy"><%= i.sender_name %></span>
+                <span class="text-xs text-gray-500"><%= i.sender_email %></span>
+                <% unless i.is_read.to_i.positive? %>
+                  <span class="text-xs px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded ml-2">신규</span>
+                <% end %>
+              </p>
+              <p class="text-gray-600 mt-1"><%= truncate(i.message, length: 120) %></p>
+              <p class="text-xs text-gray-400 mt-1"><%= i.created_at.strftime("%Y.%m.%d %H:%M") %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="space-y-4">
+    <!-- 상태 -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+      <h2 class="font-semibold text-navy mb-4">상태</h2>
+      <div class="mb-3">
+        <% color = case @member.status; when 'approved' then 'green'; when 'pending_approval' then 'yellow'; when 'rejected' then 'red'; when 'suspended' then 'gray'; else 'gray'; end %>
+        <span class="text-sm px-3 py-1 rounded-full bg-<%= color %>-100 text-<%= color %>-700 font-semibold"><%= @member.status %></span>
+      </div>
+      <% if @member.pending? %>
+        <div class="space-y-2">
+          <%= button_to "✓ 승인", approve_admin_member_path(@member), class: "w-full bg-green-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-600" %>
+          <%= button_to "✗ 거부", reject_admin_member_path(@member), class: "w-full bg-red-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-600" %>
+        </div>
+      <% elsif @member.approved? %>
+        <%= button_to "정지", suspend_admin_member_path(@member), class: "w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-orange-600", data: { turbo_confirm: "정지하시겠습니까?" } %>
+      <% elsif @member.status == "suspended" %>
+        <%= button_to "재활성화", activate_admin_member_path(@member), class: "w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600" %>
+      <% end %>
+    </div>
+
+    <!-- IMPD 검증 -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+      <h2 class="font-semibold text-navy mb-3 text-sm">IMPD 검증 (의지 필터)</h2>
+      <% icolor = case @member.impd_status; when 'completed' then 'green'; when 'in_progress' then 'blue'; when 'rejected' then 'red'; else 'gray'; end %>
+      <div class="mb-2">
+        <span class="text-xs px-2 py-0.5 rounded bg-<%= icolor %>-100 text-<%= icolor %>-700"><%= @member.impd_status %></span>
+      </div>
+      <% if @member.impd_started_at %>
+        <p class="text-xs text-gray-500">시작: <%= @member.impd_started_at.strftime("%Y.%m.%d") %></p>
+      <% end %>
+      <% if @member.impd_completed_at %>
+        <p class="text-xs text-gray-500">완료: <%= @member.impd_completed_at.strftime("%Y.%m.%d") %></p>
+      <% end %>
+    </div>
+
+    <!-- Townin 연동 -->
+    <% if @member.towningraph_user_id.present? %>
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+        <h2 class="font-semibold text-navy mb-3 text-sm">🔗 Townin 연동</h2>
+        <p class="text-xs text-gray-500">User ID: <span class="font-mono"><%= @member.towningraph_user_id %></span></p>
+        <% if @member.townin_role.present? %>
+          <p class="text-xs text-gray-500 mt-1">Role: <%= @member.townin_role %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <!-- 등록 정보 -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+      <h2 class="font-semibold text-navy mb-3 text-sm">등록 정보</h2>
+      <p class="text-xs text-gray-500">등록일: <%= @member.created_at.strftime("%Y.%m.%d") %></p>
+      <p class="text-xs text-gray-500 mt-1">수정일: <%= @member.updated_at.strftime("%Y.%m.%d") %></p>
+      <p class="text-xs text-gray-400 mt-2 font-mono">#<%= @member.id.to_s.rjust(4, '0') %></p>
+    </div>
+  </div>
+</div>
