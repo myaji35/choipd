@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_28_044202) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_20_103700) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -59,11 +59,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_044202) do
     t.string "external_link"
     t.integer "price"
     t.boolean "published", default: false, null: false
+    t.integer "tenant_id", default: 1, null: false
     t.string "thumbnail_url"
     t.string "title"
     t.datetime "updated_at", null: false
     t.index ["course_type"], name: "index_courses_on_course_type"
     t.index ["published"], name: "index_courses_on_published"
+    t.index ["tenant_id"], name: "index_courses_on_tenant_id"
   end
 
   create_table "distributor_activity_logs", force: :cascade do |t|
@@ -72,8 +74,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_044202) do
     t.text "description"
     t.integer "distributor_id", null: false
     t.text "metadata"
+    t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
     t.index ["distributor_id"], name: "index_distributor_activity_logs_on_distributor_id"
+    t.index ["tenant_id"], name: "index_distributor_activity_logs_on_tenant_id"
   end
 
   create_table "distributor_resources", force: :cascade do |t|
@@ -83,34 +87,68 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_044202) do
     t.string "file_type"
     t.string "file_url"
     t.string "required_plan"
+    t.integer "tenant_id", default: 1, null: false
     t.string "title"
     t.datetime "updated_at", null: false
     t.index ["category"], name: "index_distributor_resources_on_category"
     t.index ["required_plan"], name: "index_distributor_resources_on_required_plan"
+    t.index ["tenant_id"], name: "index_distributor_resources_on_tenant_id"
   end
 
   create_table "distributors", force: :cascade do |t|
+    t.datetime "approved_at"
     t.string "business_type"
     t.datetime "created_at", null: false
     t.string "email"
     t.string "name"
     t.string "region"
+    t.string "slug"
     t.string "status"
     t.string "subscription_plan"
+    t.integer "tenant_id", default: 1, null: false
     t.decimal "total_revenue", precision: 15, scale: 2, default: "0.0"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_distributors_on_email", unique: true
+    t.index ["slug"], name: "index_distributors_on_slug", unique: true
     t.index ["status"], name: "index_distributors_on_status"
     t.index ["subscription_plan"], name: "index_distributors_on_subscription_plan"
+    t.index ["tenant_id"], name: "index_distributors_on_tenant_id"
+  end
+
+  create_table "enrollments", force: :cascade do |t|
+    t.integer "amount"
+    t.integer "course_id", null: false
+    t.datetime "created_at", null: false
+    t.string "external_order_id"
+    t.json "metadata"
+    t.datetime "paid_at"
+    t.string "provider", null: false
+    t.datetime "refunded_at"
+    t.string "status", default: "pending", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.string "user_id", null: false
+    t.index ["course_id"], name: "index_enrollments_on_course_id"
+    t.index ["provider", "external_order_id"], name: "uq_enrollments_provider_order", unique: true
+    t.index ["tenant_id"], name: "index_enrollments_on_tenant_id"
+    t.index ["user_id"], name: "index_enrollments_on_user_id"
   end
 
   create_table "hero_images", force: :cascade do |t|
     t.string "alt_text"
     t.datetime "created_at", null: false
     t.integer "display_order"
+    t.integer "file_size"
     t.string "filename"
+    t.integer "height"
     t.boolean "is_active"
+    t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
+    t.string "upload_status", default: "pending", null: false
+    t.datetime "uploaded_at"
+    t.string "url"
+    t.integer "width"
+    t.index ["tenant_id"], name: "index_hero_images_on_tenant_id"
   end
 
   create_table "inquiries", force: :cascade do |t|
@@ -121,9 +159,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_044202) do
     t.string "name"
     t.string "phone"
     t.string "status", default: "pending"
+    t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
     t.index ["inquiry_type"], name: "index_inquiries_on_inquiry_type"
     t.index ["status"], name: "index_inquiries_on_status"
+    t.index ["tenant_id"], name: "index_inquiries_on_tenant_id"
   end
 
   create_table "invoices", force: :cascade do |t|
@@ -133,9 +173,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_044202) do
     t.datetime "issued_at"
     t.integer "payment_id", null: false
     t.string "status"
+    t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
     t.index ["distributor_id"], name: "index_invoices_on_distributor_id"
     t.index ["payment_id"], name: "index_invoices_on_payment_id"
+    t.index ["tenant_id"], name: "index_invoices_on_tenant_id"
   end
 
   create_table "kanban_columns", force: :cascade do |t|
@@ -172,8 +214,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_044202) do
     t.datetime "created_at", null: false
     t.string "email"
     t.datetime "subscribed_at"
+    t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_leads_on_email", unique: true
+    t.index ["tenant_id", "email"], name: "idx_leads_tenant_email", unique: true
   end
 
   create_table "payments", force: :cascade do |t|
@@ -183,8 +227,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_044202) do
     t.datetime "paid_at"
     t.string "payment_method"
     t.string "status"
+    t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
     t.index ["distributor_id"], name: "index_payments_on_distributor_id"
+    t.index ["tenant_id"], name: "index_payments_on_tenant_id"
   end
 
   create_table "posts", force: :cascade do |t|
@@ -192,18 +238,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_044202) do
     t.text "content"
     t.datetime "created_at", null: false
     t.boolean "published", default: false, null: false
+    t.integer "tenant_id", default: 1, null: false
     t.string "title"
     t.datetime "updated_at", null: false
     t.index ["category"], name: "index_posts_on_category"
     t.index ["published"], name: "index_posts_on_published"
+    t.index ["tenant_id"], name: "index_posts_on_tenant_id"
   end
 
   create_table "settings", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "key"
+    t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
     t.text "value"
     t.index ["key"], name: "index_settings_on_key", unique: true
+    t.index ["tenant_id", "key"], name: "idx_settings_tenant_key", unique: true
   end
 
   create_table "sns_accounts", force: :cascade do |t|
@@ -212,7 +262,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_044202) do
     t.datetime "created_at", null: false
     t.boolean "is_active"
     t.string "platform"
+    t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
+    t.index ["tenant_id"], name: "index_sns_accounts_on_tenant_id"
   end
 
   create_table "sns_post_histories", force: :cascade do |t|
@@ -221,8 +273,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_044202) do
     t.text "response"
     t.integer "sns_scheduled_post_id", null: false
     t.string "status"
+    t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
     t.index ["sns_scheduled_post_id"], name: "index_sns_post_histories_on_sns_scheduled_post_id"
+    t.index ["tenant_id"], name: "index_sns_post_histories_on_tenant_id"
   end
 
   create_table "sns_scheduled_posts", force: :cascade do |t|
@@ -233,7 +287,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_044202) do
     t.string "platform"
     t.datetime "scheduled_at"
     t.string "status"
+    t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
+    t.index ["tenant_id"], name: "index_sns_scheduled_posts_on_tenant_id"
   end
 
   create_table "subscription_plans", force: :cascade do |t|
@@ -242,7 +298,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_044202) do
     t.integer "max_distributors"
     t.string "name"
     t.integer "price"
+    t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
+    t.index ["tenant_id"], name: "index_subscription_plans_on_tenant_id"
   end
 
   create_table "works", force: :cascade do |t|
@@ -250,13 +308,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_044202) do
     t.datetime "created_at", null: false
     t.text "description"
     t.string "image_url"
+    t.integer "tenant_id", default: 1, null: false
     t.string "title"
     t.datetime "updated_at", null: false
+    t.index ["tenant_id"], name: "index_works_on_tenant_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "distributor_activity_logs", "distributors"
+  add_foreign_key "enrollments", "courses", on_delete: :cascade
   add_foreign_key "invoices", "distributors"
   add_foreign_key "invoices", "payments"
   add_foreign_key "kanban_columns", "kanban_projects"
