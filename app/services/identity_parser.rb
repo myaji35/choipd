@@ -68,9 +68,6 @@ class IdentityParser
     current = nil
     md.each_line do |raw|
       line = raw.chomp
-      if (h = line.match(/\A(#{1,4})\s+(.+?)\s*\z/) || line.match(/\A(#{1,4})\s+(.+?)\s*\z/))
-        # heading match
-      end
       m = line.match(/\A(#+)\s+(.+?)\s*\z/)
       if m && m[1].length.between?(1, 4)
         sections << current if current
