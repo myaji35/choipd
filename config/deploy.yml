@@ -1,7 +1,8 @@
 # imPD Rails - Kamal Deploy Config
 # 서버: Vultr ICN (158.247.235.31)
-# 접속: https://choipd.158.247.235.31.nip.io
-# 업데이트: 2026-02-28
+# 접속: http://impd.158.247.235.31.nip.io:3030
+# 브랜드명 변경: choipd → impd (2026-04-20)
+# 업데이트: 2026-04-20
 
 service: choipd
 image: myaji35/choipd
@@ -17,7 +18,7 @@ ssh:
 
 # ── Proxy 설정 (kamal-proxy via nip.io) ───
 proxy:
-  host: choipd.158.247.235.31.nip.io
+  host: impd.158.247.235.31.nip.io
   app_port: 3000
 
 # ── 레지스트리 (GitHub Container Registry) ──
