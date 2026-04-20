@@ -4,7 +4,9 @@
 require "net/http"
 require "uri"
 
-class ChoiProxyController < ActionController::API
+class ChoiProxyController < ApplicationController
+  skip_before_action :verify_authenticity_token, raise: false
+
   UPSTREAM_HOST = ENV.fetch("CHOI_UPSTREAM", "http://impd:3000")
   HOP_BY_HOP = %w[connection keep-alive proxy-authenticate proxy-authorization
                   te trailers transfer-encoding upgrade host content-length].freeze
@@ -19,7 +21,7 @@ class ChoiProxyController < ActionController::API
 
       request.headers.each do |name, value|
         next unless name.start_with?("HTTP_") || %w[CONTENT_TYPE CONTENT_LENGTH].include?(name)
-        header = name.sub(/^HTTP_/, "").split("_").map(&:capitalize).join("-")
+        header = name.sub(/^HTTP_/, "").split("_").map { |w| w.capitalize }.join("-")
         next if HOP_BY_HOP.include?(header.downcase)
         proxied[header] = value
       end
@@ -27,12 +29,16 @@ class ChoiProxyController < ActionController::API
       proxied.body = request.body.read if %w[POST PUT PATCH].include?(request.method)
 
       upstream_response = http.request(proxied)
-      response.status = upstream_response.code.to_i
+
       upstream_response.each_header do |k, v|
         next if HOP_BY_HOP.include?(k.downcase)
-        response.headers[k] = v
+        response.set_header(k, v)
       end
-      response.body = upstream_response.body
+
+      content_type = upstream_response["content-type"] || "application/octet-stream"
+      render body: upstream_response.body.to_s,
+             status: upstream_response.code.to_i,
+             content_type: content_type
     end
   rescue StandardError => e
     Rails.logger.error("[choi-proxy] #{e.class}: #{e.message}")
