@@ -15,6 +15,9 @@ Rails.application.routes.draw do
     get "/works",            to: "works#index",      as: :works
     get "/community",        to: "community#index",  as: :community
 
+    # 최범희 PD 개인 공개 페이지 (브랜드 변경 전 URL 유지)
+    get "/choipd",           to: "home#index",       as: :choipd
+
     resources :inquiries,    only: [ :new, :create ]
     resources :leads,        only: [ :create ]
   end
