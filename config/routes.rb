@@ -27,14 +27,24 @@ Rails.application.routes.draw do
       member do
         post :approve
         post :reject
+        post :suspend
+        post :activate
+        get  :identity
+      end
+      collection do
+        get :check_id
       end
     end
 
     resources :resources,    controller: "distributor_resources"
     resources :hero_images
     resources :newsletter,   only: [ :index ]
-    resources :payments,     only: [ :index, :show ]
-    resources :invoices,     only: [ :index, :show ]
+    resources :payments,     only: [ :index, :show ] do
+      member { post :refund }
+    end
+    resources :invoices,     only: [ :index, :show ] do
+      member { post :resend }
+    end
     resources :courses
     resources :posts
     resources :works
@@ -57,6 +67,58 @@ Rails.application.routes.draw do
     end
   end
 
-  # ── 헬스체크 ──────────────────────────────────────────
+  # ── API (JSON) — Phase 1 P0 ──────────────────────────
+  namespace :api, defaults: { format: :json } do
+    namespace :v1 do
+      # 인증
+      get  "auth/me",       to: "auth#me"
+      get  "auth/sessions", to: "auth#sessions"
+
+      # 헬스체크
+      get  "health", to: "health#index"
+
+      # 공개 폼
+      resources :inquiries, only: [ :create ]
+      resources :leads,     only: [ :create ]
+
+      namespace :admin do
+        resources :distributors do
+          member do
+            post :approve
+            post :reject
+            post :suspend
+            post :activate
+            get  :identity
+          end
+          collection do
+            get :check_id
+          end
+        end
+        resources :posts
+        resources :inquiries, only: [ :index, :show, :update ]
+        resources :hero_images
+        resources :payments, only: [ :index, :show ] do
+          member { post :refund }
+        end
+        resources :invoices, only: [ :index, :show ] do
+          member { post :resend }
+        end
+        resources :courses
+        resources :works
+        resources :newsletter, only: [ :index, :destroy ]
+        resource  :profile, only: [ :show, :update ]
+        resource  :settings, only: [ :show, :update ]
+        get :health, to: "health#index"
+      end
+
+      namespace :sns do
+        resources :accounts, controller: "sns_accounts"
+        resources :scheduled_posts, controller: "sns_scheduled_posts"
+        resources :post_histories, controller: "sns_post_histories", only: [ :index, :show ]
+      end
+    end
+  end
+
+  # ── 헬스체크 (kamal-proxy) ────────────────────────────
   get "up" => "rails/health#show", as: :rails_health_check
 end
