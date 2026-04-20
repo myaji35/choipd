@@ -1,7 +1,7 @@
 class Work < ApplicationRecord
   has_one_attached :image
 
-  enum :category, { gallery: "gallery", press: "press" }, prefix: true
+  enum :category, { gallery: "gallery", press: "press", book: "book", sketch: "sketch" }, prefix: true
 
   validates :title, presence: true
   validates :category, presence: true

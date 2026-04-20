@@ -1,5 +1,5 @@
 class Admin::DistributorsController < Admin::BaseController
-  before_action :set_distributor, only: [ :show, :edit, :update, :destroy, :approve, :reject ]
+  before_action :set_distributor, only: [ :show, :edit, :update, :destroy, :approve, :reject, :suspend, :activate, :identity ]
 
   def index
     @distributors = Distributor.all
@@ -44,8 +44,7 @@ class Admin::DistributorsController < Admin::BaseController
   end
 
   def approve
-    @distributor.update!(status: "approved")
-    @distributor.log_activity("status_change", "상태 변경: 승인")
+    @distributor.approve!(actor: current_admin_user)
     respond_to do |format|
       format.turbo_stream { render turbo_stream: turbo_stream.replace("distributor-#{@distributor.id}-status", partial: "admin/distributors/status_badge", locals: { distributor: @distributor }) }
       format.html { redirect_to admin_distributors_path, notice: "#{@distributor.name} 승인 완료" }
@@ -53,12 +52,31 @@ class Admin::DistributorsController < Admin::BaseController
   end
 
   def reject
-    @distributor.update!(status: "rejected")
-    @distributor.log_activity("status_change", "상태 변경: 거부")
+    @distributor.reject!(reason: params[:reason], actor: current_admin_user)
     respond_to do |format|
       format.turbo_stream { render turbo_stream: turbo_stream.replace("distributor-#{@distributor.id}-status", partial: "admin/distributors/status_badge", locals: { distributor: @distributor }) }
       format.html { redirect_to admin_distributors_path, notice: "#{@distributor.name} 거부 완료" }
     end
+  end
+
+  def suspend
+    @distributor.suspend!(reason: params[:reason], actor: current_admin_user)
+    redirect_to admin_distributor_path(@distributor), notice: "#{@distributor.name} 정지 완료"
+  end
+
+  def activate
+    @distributor.activate!(actor: current_admin_user)
+    redirect_to admin_distributor_path(@distributor), notice: "#{@distributor.name} 재활성화 완료"
+  end
+
+  def identity
+    redirect_to admin_distributor_path(@distributor)
+  end
+
+  def check_id
+    slug = params[:slug].to_s.strip
+    available = slug.present? && !Distributor.where(slug: slug).exists?
+    render json: { slug: slug, available: available }
   end
 
   private
@@ -68,6 +86,6 @@ class Admin::DistributorsController < Admin::BaseController
   end
 
   def distributor_params
-    params.require(:distributor).permit(:name, :email, :business_type, :region, :status, :subscription_plan)
+    params.require(:distributor).permit(:name, :email, :phone, :business_type, :region, :status, :subscription_plan, :slug)
   end
 end

@@ -12,6 +12,7 @@ class Distributor < ApplicationRecord
 
   scope :recent, -> { order(created_at: :desc) }
   scope :by_plan, ->(plan) { where(subscription_plan: plan) }
+  scope :by_status, ->(status) { where(status: status) }
   scope :for_tenant, ->(tenant_id = 1) { where(tenant_id: tenant_id) }
 
   def approve!(actor: nil)
