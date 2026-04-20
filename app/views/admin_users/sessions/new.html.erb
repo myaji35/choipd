@@ -1,0 +1,72 @@
+<% content_for :title, "로그인" %>
+
+<style>
+  body { margin: 0; background: #0a0a0a; color: #fff; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; min-height: 100vh; }
+  .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: radial-gradient(circle at 30% 30%, rgba(255,77,28,0.08), transparent 60%), radial-gradient(circle at 70% 70%, rgba(168,255,62,0.05), transparent 50%), #0a0a0a; }
+  .login-card { width: 100%; max-width: 420px; background: rgba(20,20,20,.85); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 48px 40px; box-shadow: 0 24px 64px rgba(0,0,0,.5); }
+  .login-brand { font-family: 'Black Han Sans', sans-serif; font-size: 36px; letter-spacing: -.02em; margin: 0 0 8px; }
+  .login-brand .accent { color: #ff4d1c; }
+  .login-subtitle { color: rgba(255,255,255,.55); font-size: 14px; margin: 0 0 32px; }
+  .login-field { margin-bottom: 18px; }
+  .login-field label { display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.65); margin-bottom: 8px; letter-spacing: .02em; text-transform: uppercase; }
+  .login-field input[type="email"], .login-field input[type="password"] { width: 100%; padding: 12px 16px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); border-radius: 8px; color: #fff; font-size: 15px; transition: border-color .15s, background .15s; box-sizing: border-box; }
+  .login-field input:focus { outline: none; border-color: #ff4d1c; background: rgba(255,77,28,.05); }
+  .login-remember { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; color: rgba(255,255,255,.7); font-size: 13px; }
+  .login-remember input[type="checkbox"] { width: 16px; height: 16px; accent-color: #ff4d1c; cursor: pointer; }
+  .login-submit { width: 100%; padding: 14px 24px; background: #ff4d1c; color: #fff; border: 0; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background .15s, transform .1s; }
+  .login-submit:hover { background: #e0440f; }
+  .login-submit:active { transform: translateY(1px); }
+  .login-hint { margin-top: 24px; padding: 12px 16px; background: rgba(168,255,62,.06); border: 1px solid rgba(168,255,62,.2); border-radius: 8px; font-size: 12px; color: rgba(168,255,62,.85); line-height: 1.6; }
+  .login-hint strong { color: #a8ff3e; }
+  .login-links { margin-top: 20px; text-align: center; font-size: 13px; }
+  .login-links a { color: rgba(255,255,255,.55); text-decoration: none; margin: 0 8px; transition: color .15s; }
+  .login-links a:hover { color: #ff4d1c; }
+  .alert-error { background: rgba(255,77,28,.1); border: 1px solid rgba(255,77,28,.3); color: #ff8866; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
+</style>
+
+<div class="login-wrap">
+  <div class="login-card">
+    <h1 class="login-brand">imPD<span class="accent">.</span></h1>
+    <p class="login-subtitle">관리자 / PD 계정으로 로그인하세요</p>
+
+    <% if alert.present? %>
+      <div class="alert-error"><%= alert %></div>
+    <% end %>
+
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+      <div class="login-field">
+        <%= f.label :email, "이메일" %>
+        <%= f.email_field :email,
+              value: "admin@impd.com",
+              autofocus: true,
+              autocomplete: "email",
+              placeholder: "admin@impd.com" %>
+      </div>
+
+      <div class="login-field">
+        <%= f.label :password, "비밀번호" %>
+        <%= f.password_field :password,
+              value: "admin123",
+              autocomplete: "current-password",
+              placeholder: "비밀번호 입력" %>
+      </div>
+
+      <% if devise_mapping.rememberable? %>
+        <div class="login-remember">
+          <%= f.check_box :remember_me %>
+          <%= f.label :remember_me, "로그인 유지" %>
+        </div>
+      <% end %>
+
+      <%= f.submit "로그인", class: "login-submit" %>
+    <% end %>
+
+    <div class="login-hint">
+      💡 데모 계정: <strong>admin@impd.com / admin123</strong> (자동 입력됨)
+    </div>
+
+    <div class="login-links">
+      <%= link_to "← 메인으로", root_path %>
+    </div>
+  </div>
+</div>

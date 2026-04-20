@@ -2,19 +2,19 @@
 puts "🌱 시드 데이터 생성 중..."
 
 # AdminUser 생성
-AdminUser.find_or_create_by!(email: "admin@choipd.com") do |u|
-  u.password = "Admin1234!"
-  u.password_confirmation = "Admin1234!"
+AdminUser.find_or_create_by!(email: "admin@impd.com") do |u|
+  u.password = "admin123"
+  u.password_confirmation = "admin123"
   u.role = "admin"
 end
-puts "✅ Admin 계정: admin@choipd.com / Admin1234!"
+puts "✅ Admin 계정: admin@impd.com / admin123"
 
-AdminUser.find_or_create_by!(email: "pd@choipd.com") do |u|
-  u.password = "PD1234!pd"
-  u.password_confirmation = "PD1234!pd"
+AdminUser.find_or_create_by!(email: "pd@impd.com") do |u|
+  u.password = "pd123!pd"
+  u.password_confirmation = "pd123!pd"
   u.role = "pd"
 end
-puts "✅ PD 계정: pd@choipd.com / PD1234!pd"
+puts "✅ PD 계정: pd@impd.com / pd123!pd"
 
 # 강좌
 [
