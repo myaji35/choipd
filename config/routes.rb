@@ -17,6 +17,15 @@ Rails.application.routes.draw do
 
     # 최범희 PD 개인 공개 페이지 (브랜드 변경 전 URL 유지)
     get "/choipd",           to: "home#index",       as: :choipd
+  end
+
+  # ── Legacy Next.js proxy ─────────────────────────────
+  # /choi (클라이언트 공유 URL) — Phase 1 변환 누락분, Next.js impd 컨테이너로 reverse-proxy
+  match "/choi(/*path)", to: "choi_proxy#proxy", via: :all, as: :choi_legacy
+  match "/api/choi(/*path)", to: "choi_proxy#proxy", via: :all
+  match "/_next(/*path)", to: "choi_proxy#proxy", via: :all  # Next.js static assets
+
+  scope module: :chopd do
 
     resources :inquiries,    only: [ :new, :create ]
     resources :leads,        only: [ :create ]
