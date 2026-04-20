@@ -1,0 +1,74 @@
+<% content_for :title, @distributor.name %>
+
+<style>
+  .dist-hero { padding: 80px 24px 48px; text-align: center; background: radial-gradient(circle at 30% 20%, rgba(255,77,28,.12), transparent 60%), #0a0a0a; color: #fff; }
+  .dist-hero h1 { font-family: 'Black Han Sans', sans-serif; font-size: clamp(36px, 6vw, 64px); margin: 0 0 12px; }
+  .dist-hero .badge { display: inline-block; padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; margin-bottom: 16px; }
+  .badge-approved { background: rgba(168,255,62,.15); color: #a8ff3e; border: 1px solid rgba(168,255,62,.3); }
+  .badge-pending  { background: rgba(255,200,0,.15); color: #ffc800; border: 1px solid rgba(255,200,0,.3); }
+  .badge-suspended{ background: rgba(255,77,28,.15); color: #ff7a4d; border: 1px solid rgba(255,77,28,.3); }
+  .dist-hero .subtitle { color: rgba(255,255,255,.6); font-size: 16px; }
+  .dist-info { max-width: 720px; margin: -24px auto 0; padding: 32px 24px 80px; }
+  .info-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 32px; box-shadow: 0 12px 40px rgba(0,0,0,.08); }
+  .info-row { display: grid; grid-template-columns: 120px 1fr; gap: 12px; padding: 14px 0; border-bottom: 1px solid #f3f4f6; align-items: start; }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { color: #6b7280; font-size: 13px; font-weight: 600; }
+  .info-value { color: #16325c; font-size: 15px; font-weight: 500; }
+  .info-value a { color: #ff4d1c; text-decoration: none; }
+  .info-value a:hover { text-decoration: underline; }
+  .cta-back { display: inline-block; margin-top: 20px; color: #6b7280; font-size: 13px; text-decoration: none; }
+  .cta-back:hover { color: #ff4d1c; }
+</style>
+
+<section class="dist-hero">
+  <span class="badge badge-<%= @distributor.status %>"><%= @distributor.status.upcase %></span>
+  <h1><%= @distributor.name %></h1>
+  <p class="subtitle">imPD 공식 유통 파트너</p>
+</section>
+
+<section class="dist-info">
+  <div class="info-card">
+    <div class="info-row">
+      <div class="info-label">유통사명</div>
+      <div class="info-value"><%= @distributor.name %></div>
+    </div>
+    <% if @distributor.business_type.present? %>
+      <div class="info-row">
+        <div class="info-label">사업 유형</div>
+        <div class="info-value"><%= @distributor.business_type %></div>
+      </div>
+    <% end %>
+    <% if @distributor.region.present? %>
+      <div class="info-row">
+        <div class="info-label">지역</div>
+        <div class="info-value"><%= @distributor.region %></div>
+      </div>
+    <% end %>
+    <% if @distributor.email.present? %>
+      <div class="info-row">
+        <div class="info-label">이메일</div>
+        <div class="info-value"><%= mail_to @distributor.email %></div>
+      </div>
+    <% end %>
+    <% if @distributor.phone.present? %>
+      <div class="info-row">
+        <div class="info-label">연락처</div>
+        <div class="info-value"><%= @distributor.phone %></div>
+      </div>
+    <% end %>
+    <% if @distributor.subscription_plan.present? %>
+      <div class="info-row">
+        <div class="info-label">구독 플랜</div>
+        <div class="info-value"><%= @distributor.subscription_plan %></div>
+      </div>
+    <% end %>
+    <div class="info-row">
+      <div class="info-label">파트너 번호</div>
+      <div class="info-value">#<%= @distributor.id.to_s.rjust(4, '0') %></div>
+    </div>
+  </div>
+
+  <div style="text-align:center;">
+    <%= link_to "← imPD 메인으로", root_path, class: "cta-back" %>
+  </div>
+</section>

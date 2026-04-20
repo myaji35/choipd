@@ -133,4 +133,13 @@ Rails.application.routes.draw do
 
   # ── 헬스체크 (kamal-proxy) ────────────────────────────
   get "up" => "rails/health#show", as: :rails_health_check
+
+  # ── Vanity URL: /<slug> → 분양사 공개 페이지 (가장 마지막) ───
+  # 예약어와 충돌 방지: 알파벳/숫자/하이픈만, 최소 2자
+  get "/:slug",
+      to: "distributors_public#show",
+      as: :distributor_public,
+      constraints: {
+        slug: /(?!admin|pd|auth|api|up|education|media|works|community|inquiries|leads|choi|choipd|assets|rails)[a-z0-9][a-z0-9\-]{1,}/
+      }
 end

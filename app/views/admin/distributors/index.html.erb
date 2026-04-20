@@ -35,11 +35,14 @@
     </thead>
     <tbody class="divide-y">
       <% @distributors.each do |d| %>
-        <tr class="hover:bg-gray-50">
+        <tr class="hover:bg-gray-50 cursor-pointer" onclick="if(!event.target.closest('a,button,form'))location.href='<%= admin_distributor_path(d) %>'">
           <td class="px-4 py-3">
             <div>
               <p class="font-medium text-navy"><%= d.name %></p>
               <p class="text-xs text-gray-400"><%= d.email %></p>
+              <% if d.slug.present? %>
+                <p class="text-xs text-gray-300 mt-0.5">/<%= d.slug %></p>
+              <% end %>
             </div>
           </td>
           <td class="px-4 py-3 text-gray-600"><%= d.business_type %></td>
@@ -60,6 +63,12 @@
                 <%= button_to "거부", reject_admin_distributor_path(d),
                     class: "text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200 transition-colors",
                     data: { turbo_stream: true } %>
+              <% end %>
+              <% if d.slug.present? %>
+                <%= link_to "홍보페이지 ↗", "/#{d.slug}",
+                    target: "_blank", rel: "noopener noreferrer",
+                    class: "text-xs text-blue-600 hover:text-blue-800 font-medium",
+                    title: "/#{d.slug} 새 탭에서 열기" %>
               <% end %>
               <%= link_to "보기", admin_distributor_path(d), class: "text-xs text-primary hover:text-primary-dark" %>
             </div>
