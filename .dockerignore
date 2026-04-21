@@ -49,3 +49,11 @@
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
+
+# macOS AppleDouble metadata (external SSD/filesystem) — blocks docker build sender
+**/._*
+.DS_Store
+**/.DS_Store
+
+# Claude Code working files
+/.claude/
