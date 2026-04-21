@@ -16,9 +16,11 @@ servers:
 ssh:
   user: root
 
-# ── Proxy 설정 (kamal-proxy via nip.io) ───
+# ── Proxy 설정 (kamal-proxy: 두 호스트 동시 서빙) ───
 proxy:
-  host: impd.158.247.235.31.nip.io
+  hosts:
+    - impd.townin.net               # 메인 도메인 (DNS A → 158.247.235.31)
+    - impd.158.247.235.31.nip.io    # nip.io fallback (DNS 안 거치는 직접 접근용)
   app_port: 3000
 
 # ── 레지스트리 (GitHub Container Registry) ──
