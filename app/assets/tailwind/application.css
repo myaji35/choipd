@@ -1,1 +1,136 @@
 @import "tailwindcss";
+
+/* ─────────────────────────────────────────────
+   imPD Design System (C1 — Editorial Magazine)
+   디자인 핸드오프: ~/Downloads/imPD.zip (2026-04-21)
+   원칙: 크림 종이 톤 + 직각 + 대형 타이포 + 인디고 액센트
+   ───────────────────────────────────────────── */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@700;800&family=Noto+Serif+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --impd-paper: #efece4;
+  --impd-card: #fbf8f1;
+  --impd-ink: #0f0d0b;
+  --impd-ink2: rgba(15,13,11,0.85);
+  --impd-muted: rgba(15,13,11,0.55);
+  --impd-soft-muted: rgba(15,13,11,0.35);
+  --impd-rule: rgba(15,13,11,0.15);
+  --impd-accent: #3a2af0;
+  --impd-accent-2: #ff5a1f;
+
+  --impd-font-display: "Inter Tight", "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+  --impd-font-sans: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+  --impd-font-serif: "Noto Serif KR", "Fraunces", serif;
+  --impd-font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* Tailwind v4 theme tokens */
+@theme {
+  --color-paper: #efece4;
+  --color-card: #fbf8f1;
+  --color-ink: #0f0d0b;
+  --color-ink2: rgba(15, 13, 11, 0.85);
+  --color-muted: rgba(15, 13, 11, 0.55);
+  --color-soft-muted: rgba(15, 13, 11, 0.35);
+  --color-rule: rgba(15, 13, 11, 0.15);
+  --color-accent: #3a2af0;
+  --color-accent2: #ff5a1f;
+
+  --font-display: "Inter Tight", "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+  --font-sans: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+  --font-serif: "Noto Serif KR", "Fraunces", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* 모노 라벨 (§01 같은 섹션 라벨용) */
+.impd-label {
+  font-family: var(--impd-font-mono);
+  font-size: 11px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--impd-accent);
+}
+.impd-label-muted {
+  font-family: var(--impd-font-mono);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--impd-muted);
+}
+
+/* Display 타이포 */
+.impd-display {
+  font-family: var(--impd-font-display);
+  font-weight: 800;
+  letter-spacing: -1.6px;
+  line-height: 1.05;
+}
+.impd-hero {
+  font-family: var(--impd-font-display);
+  font-weight: 800;
+  font-size: clamp(56px, 11vw, 128px);
+  letter-spacing: -3px;
+  line-height: 0.88;
+}
+
+.impd-serif { font-family: var(--impd-font-serif); font-style: italic; }
+
+/* 섹션 헤더 (§숫자 + 제목 + 메타) */
+.impd-section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  border-top: 1px solid var(--impd-ink);
+  padding-top: 14px;
+  margin-bottom: 24px;
+}
+
+/* 버튼 — 직각 */
+.impd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 18px;
+  height: 44px;
+  font-family: var(--impd-font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  cursor: pointer;
+  border: none;
+  border-radius: 0;
+  text-decoration: none;
+  transition: all 150ms ease;
+}
+.impd-btn-primary { background: var(--impd-ink); color: var(--impd-paper); }
+.impd-btn-primary:hover { background: var(--impd-accent); }
+.impd-btn-secondary { background: transparent; color: var(--impd-ink); border: 1px solid var(--impd-ink); }
+.impd-btn-secondary:hover { background: var(--impd-ink); color: var(--impd-paper); }
+.impd-btn-accent { background: var(--impd-accent); color: #fff; }
+
+/* 카드 */
+.impd-card {
+  background: var(--impd-card);
+  border: 1px solid var(--impd-rule);
+  border-radius: 0;
+  padding: 24px;
+}
+
+/* 애니메이션 */
+@keyframes c1FadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes c1Marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes c1Shine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@keyframes c1Pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.impd-fade-in { animation: c1FadeIn 700ms ease-out both; }
+.impd-marquee { animation: c1Marquee 28s linear infinite; }
+.impd-pulse { animation: c1Pulse 2s infinite; }
+
+/* Diagonal stripe placeholder */
+.impd-stripe {
+  background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.15) 0 3px, transparent 3px 8px);
+}
+
+.impd-scrollhide::-webkit-scrollbar { display: none; }
+.impd-scrollhide { scrollbar-width: none; }
