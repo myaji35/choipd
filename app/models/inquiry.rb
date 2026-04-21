@@ -1,6 +1,12 @@
 class Inquiry < ApplicationRecord
   enum :inquiry_type, { b2b: "b2b", contact: "contact" }, prefix: true
-  enum :status, { pending: "pending", in_progress: "in_progress", resolved: "resolved" }, prefix: true
+  enum :status, {
+    pending: "pending",
+    in_progress: "in_progress",
+    contacted: "contacted",
+    resolved: "resolved",
+    closed: "closed"
+  }, prefix: true
 
   validates :name, presence: true
   validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }

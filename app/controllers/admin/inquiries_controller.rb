@@ -3,10 +3,11 @@ class Admin::InquiriesController < Admin::BaseController
 
   def index
     @inquiries = Inquiry.all
-    @inquiries = @inquiries.by_status(params[:status]) if params[:status].present?
-    @inquiries = @inquiries.recent
-
-    @pagy, @inquiries = pagy(@inquiries, items: 20)
+    @inquiries = @inquiries.where(status: params[:status]) if params[:status].present?
+    @inquiries = @inquiries.where(inquiry_type: params[:type]) if params[:type].present?
+    @inquiries = @inquiries.where("name LIKE ? OR email LIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
+    @inquiries = @inquiries.order(created_at: :desc)
+    @pagy, @inquiries = pagy(@inquiries, items: 20) if respond_to?(:pagy)
   end
 
   def show; end

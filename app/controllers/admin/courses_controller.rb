@@ -2,7 +2,10 @@ class Admin::CoursesController < Admin::BaseController
   before_action :set_course, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @pagy, @courses = pagy(Course.recent, items: 20)
+    @courses = Course.recent
+    @courses = @courses.where(course_type: params[:type]) if params[:type].present?
+    @courses = @courses.where(published: params[:published] == "true") if params[:published].present?
+    @pagy, @courses = pagy(@courses, items: 24) if respond_to?(:pagy)
   end
 
   def show; end

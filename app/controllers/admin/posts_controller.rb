@@ -2,7 +2,10 @@ class Admin::PostsController < Admin::BaseController
   before_action :set_post, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @pagy, @posts = pagy(Post.recent, items: 20)
+    @posts = Post.recent
+    @posts = @posts.where(category: params[:category]) if params[:category].present?
+    @posts = @posts.where(published: params[:published] == "true") if params[:published].present?
+    @pagy, @posts = pagy(@posts, items: 20) if respond_to?(:pagy)
   end
 
   def show; end

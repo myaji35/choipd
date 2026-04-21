@@ -2,7 +2,9 @@ class Admin::WorksController < Admin::BaseController
   before_action :set_work, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @pagy, @works = pagy(Work.recent, items: 20)
+    @works = Work.recent
+    @works = @works.where(category: params[:category]) if params[:category].present?
+    @pagy, @works = pagy(@works, items: 24) if respond_to?(:pagy)
   end
 
   def show; end

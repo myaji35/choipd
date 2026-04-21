@@ -1,41 +1,69 @@
 <% content_for :title, "작품 관리" %>
 
 <div class="flex items-center justify-between mb-6">
-  <h1 class="text-xl font-bold text-navy">작품 관리</h1>
-  <%= link_to "새 작품", new_admin_work_path, class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors" %>
+  <div>
+    <h1 class="text-2xl font-bold text-navy">🎨 작품 관리</h1>
+    <p class="text-sm text-gray-500 mt-1">전체 <%= @works.size %>개 작품</p>
+  </div>
+  <div class="flex items-center gap-2">
+    <%= form_with url: admin_works_path, method: :get, class: "flex gap-2" do |f| %>
+      <%= f.select :category, [["전체 카테고리", ""], ["📚 도서", "book"], ["✏️ 스케치", "sketch"], ["🖼️ 갤러리", "gallery"], ["📰 언론보도", "press"]],
+          { selected: params[:category] }, class: "border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+      <%= f.submit "필터", class: "bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm cursor-pointer" %>
+    <% end %>
+    <%= link_to "+ 새 작품", new_admin_work_path,
+        class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90" %>
+  </div>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-  <% @works.each do |work| %>
-    <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
-      <% if work.image_url.present? %>
-        <div class="h-40 bg-gray-100 overflow-hidden">
-          <%= image_tag work.image_url, class: "w-full h-full object-cover", alt: work.title %>
-        </div>
-      <% else %>
-        <div class="h-40 bg-gray-50 flex items-center justify-center">
-          <svg class="w-10 h-10 text-gray-300" stroke="currentColor" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
-            <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
-        </div>
-      <% end %>
-      <div class="p-4">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full">
-            <%= work.gallery? ? '갤러리' : '언론' %>
-          </span>
-        </div>
-        <h3 class="font-medium text-navy text-sm mb-3"><%= work.title %></h3>
-        <div class="flex space-x-2">
-          <%= link_to "수정", edit_admin_work_path(work), class: "text-primary text-xs hover:text-blue-700" %>
-          <%= button_to "삭제", admin_work_path(work), method: :delete,
-              class: "text-red-500 text-xs hover:text-red-700",
-              data: { turbo_confirm: "삭제하시겠습니까?" } %>
-        </div>
-      </div>
+<!-- 카테고리 통계 -->
+<div class="grid grid-cols-4 gap-3 mb-4">
+  <% [['book', '📚 도서', 'amber'], ['sketch', '✏️ 스케치', 'green'], ['gallery', '🖼️ 갤러리', 'blue'], ['press', '📰 언론보도', 'purple']].each do |cat, label, color| %>
+    <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
+      <p class="text-xs text-gray-500"><%= label %></p>
+      <p class="text-2xl font-bold text-<%= color %>-600"><%= @works.where(category: cat).size %></p>
     </div>
   <% end %>
-  <% if @works.empty? %>
-    <div class="col-span-3 py-12 text-center text-gray-400">등록된 작품이 없습니다.</div>
-  <% end %>
 </div>
+
+<% if @works.any? %>
+  <!-- 갤러리 그리드 -->
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <% @works.each do |w| %>
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden group">
+        <div class="relative aspect-square bg-gray-100">
+          <% if w.image_url.present? %>
+            <img src="<%= w.image_url %>" alt="<%= w.title %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+          <% else %>
+            <div class="w-full h-full flex items-center justify-center text-4xl">
+              <% icons = { 'book' => '📚', 'sketch' => '✏️', 'gallery' => '🖼️', 'press' => '📰' } %>
+              <%= icons[w.category] || '🎨' %>
+            </div>
+          <% end %>
+          <% labels = { 'book' => ['도서', 'amber'], 'sketch' => ['스케치', 'green'], 'gallery' => ['갤러리', 'blue'], 'press' => ['보도', 'purple'] } %>
+          <% label, color = labels[w.category] || [w.category, 'gray'] %>
+          <span class="absolute top-2 right-2 text-xs px-2 py-0.5 bg-<%= color %>-500 text-white rounded-full"><%= label %></span>
+        </div>
+        <div class="p-3">
+          <h3 class="font-medium text-navy text-sm line-clamp-1"><%= w.title %></h3>
+          <% if w.description.present? %>
+            <p class="text-xs text-gray-500 line-clamp-2 mt-1"><%= w.description %></p>
+          <% end %>
+          <div class="mt-2 pt-2 border-t border-gray-100 flex justify-between items-center text-xs">
+            <span class="text-gray-400"><%= w.created_at.strftime("%y.%m.%d") %></span>
+            <div class="flex gap-2">
+              <%= link_to "수정", edit_admin_work_path(w), class: "text-primary" %>
+              <%= button_to "✕", admin_work_path(w), method: :delete,
+                  class: "text-red-500 hover:text-red-700",
+                  data: { turbo_confirm: "삭제하시겠습니까?" } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="bg-white rounded-lg border border-dashed border-gray-300 p-12 text-center">
+    <p class="text-gray-400">등록된 작품이 없습니다.</p>
+  </div>
+<% end %>
