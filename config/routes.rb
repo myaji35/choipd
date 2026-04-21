@@ -229,6 +229,7 @@ Rails.application.routes.draw do
     delete "/logout", to: "member_sessions#destroy", as: :logout_member
 
     namespace :member_admin, path: "admin", as: :slug_admin do
+      get "/",          to: redirect { |params, _req| "/#{params[:slug]}/admin/dashboard" }, as: :root
       get "/dashboard", to: "dashboard#show", as: :dashboard
       get "/editor",    to: "editor#show",    as: :editor
     end
