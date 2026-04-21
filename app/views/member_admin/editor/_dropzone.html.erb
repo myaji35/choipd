@@ -1,11 +1,11 @@
 <div style="border: 2px dashed var(--impd-ink); padding: 48px 24px; text-align: center; background: var(--impd-card);"
      data-controller="member-doc-uploader"
-     data-member-doc-uploader-create-url-value="<%= admin_member_documents_path(member, format: :json) %>"
+     data-member-doc-uploader-create-url-value="<%= slug_admin_documents_path(slug: member.slug, format: :json) %>"
      data-member-doc-uploader-csrf-value="<%= form_authenticity_token %>"
      data-action="dragover->member-doc-uploader#dragover dragleave->member-doc-uploader#dragleave drop->member-doc-uploader#drop">
   <p style="font-size: 48px; margin-bottom: 16px;">📂</p>
   <p style="font-family: var(--impd-font-display); font-size: 24px; font-weight: 800;">파일을 여기에 끌어다 놓으세요</p>
-  <p style="font-size: 14px; color: var(--impd-muted); margin-top: 8px;">또는 클릭해서 선택</p>
+  <p style="font-size: 14px; color: var(--impd-muted); margin-top: 8px;">또는 클릭해서 선택 (여러 개 한 번에 OK)</p>
   <label style="margin-top: 24px; display: inline-block; cursor: pointer;">
     <span class="impd-btn impd-btn-primary">파일 선택</span>
     <input type="file" multiple class="hidden" style="display:none;" accept=".md,.markdown,.txt"
@@ -15,6 +15,13 @@
   <input type="hidden" data-member-doc-uploader-target="title" value="">
   <select data-member-doc-uploader-target="category" style="display:none;"><option value="other">other</option></select>
   <p style="font-size: 11px; color: var(--impd-muted); margin-top: 12px;">파일명에 <strong>이력 / 수료 / 후기 / 강의 / 언론 / 작품</strong> 키워드가 있으면 자동 분류됩니다.</p>
+
+  <div data-member-doc-uploader-target="progress" style="display: none; margin-top: 20px;">
+    <div style="background: var(--impd-rule); height: 6px; overflow: hidden;">
+      <div data-member-doc-uploader-target="progressBar" style="background: var(--impd-accent); height: 100%; width: 0%; transition: width 0.2s ease;"></div>
+    </div>
+  </div>
+
   <div data-member-doc-uploader-target="error" style="display: none; margin-top: 16px; padding: 12px; background: rgba(255,90,31,.1); color: var(--impd-accent-2); font-size: 13px; text-align: left; line-height: 1.5;"></div>
   <p data-member-doc-uploader-target="status" class="impd-label-muted" style="margin-top: 16px; min-height: 16px; font-family: var(--impd-font-mono);"></p>
 </div>
@@ -30,17 +37,35 @@
           <th style="text-align: left; padding: 8px 0;" class="impd-label-muted">종류</th>
           <th style="text-align: left; padding: 8px 0;" class="impd-label-muted">자동 인식</th>
           <th style="text-align: right; padding: 8px 0;" class="impd-label-muted">업로드</th>
+          <th style="text-align: right; padding: 8px 0;" class="impd-label-muted">작업</th>
         </tr>
       </thead>
       <tbody>
         <% member.member_documents.order(uploaded_at: :desc).limit(10).each do |d| %>
-          <tr style="border-bottom: 1px solid var(--impd-rule);">
+          <tr style="border-bottom: 1px solid var(--impd-rule);"
+              data-controller="member-doc-row"
+              data-member-doc-row-delete-url-value="<%= slug_admin_document_path(slug: member.slug, id: d.id, format: :json) %>"
+              data-member-doc-row-reparse-url-value="<%= reparse_slug_admin_document_path(slug: member.slug, id: d.id, format: :json) %>"
+              data-member-doc-row-csrf-value="<%= form_authenticity_token %>"
+              data-member-doc-row-filename-value="<%= d.filename %>">
             <td style="padding: 10px 0; font-family: var(--impd-font-mono); font-size: 13px;"><%= d.filename %></td>
             <td style="padding: 10px 0; font-size: 13px;"><%= d.category %></td>
             <td style="padding: 10px 0; font-size: 12px; color: var(--impd-muted);">
               <% if d.extracted_skills_count.to_i > 0 %>달란트 <%= d.extracted_skills_count %>개<% else %>—<% end %>
             </td>
-            <td style="padding: 10px 0; text-align: right; font-family: var(--impd-font-mono); font-size: 11px; color: var(--impd-muted);"><%= d.uploaded_at.strftime("%y.%m.%d") %></td>
+            <td style="padding: 10px 0; text-align: right; font-family: var(--impd-font-mono); font-size: 11px; color: var(--impd-muted);">
+              <%= d.uploaded_at&.strftime("%y.%m.%d %H:%M") || "—" %>
+            </td>
+            <td style="padding: 10px 0; text-align: right; white-space: nowrap;">
+              <button type="button" data-action="click->member-doc-row#reparse"
+                      style="background: transparent; border: 1px solid var(--impd-rule); padding: 4px 10px; font-size: 11px; cursor: pointer; margin-right: 4px;">
+                ↻ 재추출
+              </button>
+              <button type="button" data-action="click->member-doc-row#destroy"
+                      style="background: transparent; border: 1px solid var(--impd-accent-2); color: var(--impd-accent-2); padding: 4px 10px; font-size: 11px; cursor: pointer;">
+                삭제
+              </button>
+            </td>
           </tr>
         <% end %>
       </tbody>
