@@ -1,0 +1,7 @@
+<% content_for :title, "#{@integration.name} 수정" %>
+<div class="mb-6"><%= link_to "← #{@integration.name}", admin_integration_path(@integration), class: "text-primary text-sm" %></div>
+<%= form_with model: [:admin, @integration], class: "bg-white border border-gray-200 rounded-lg p-6 max-w-2xl space-y-4" do |f| %>
+  <div><%= f.label :name, "이름", class: "block text-sm font-semibold mb-1" %><%= f.text_field :name, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <div><%= f.check_box :is_enabled %> <%= f.label :is_enabled, "활성", class: "text-sm" %></div>
+  <div><%= f.submit "수정", class: "bg-primary text-white px-6 py-2 rounded-lg text-sm cursor-pointer" %></div>
+<% end %>

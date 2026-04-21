@@ -1,0 +1,29 @@
+<% content_for :title, @integration.name %>
+<div class="mb-6">
+  <%= link_to "← 연동 목록", admin_integrations_path, class: "text-primary text-sm" %>
+  <div class="flex justify-between items-start mt-2">
+    <h1 class="text-2xl font-bold text-navy"><%= @integration.name %></h1>
+    <div class="flex gap-2">
+      <%= button_to "🔌 연결 테스트", test_admin_integration_path(@integration),
+          class: "bg-primary text-white px-4 py-2 rounded-lg text-sm" %>
+      <%= button_to "삭제", admin_integration_path(@integration), method: :delete,
+          class: "bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm",
+          data: { turbo_confirm: "삭제하시겠습니까?" } %>
+    </div>
+  </div>
+</div>
+
+<div class="bg-white border border-gray-200 rounded-lg p-6 max-w-2xl">
+  <dl class="space-y-3 text-sm">
+    <div class="flex justify-between"><dt class="text-gray-500">Provider</dt><dd class="font-mono"><%= @integration.provider %></dd></div>
+    <div class="flex justify-between"><dt class="text-gray-500">Type</dt><dd><%= @integration.type_name %></dd></div>
+    <div class="flex justify-between"><dt class="text-gray-500">활성</dt><dd><%= @integration.is_enabled? ? '✓' : '✗' %></dd></div>
+    <div class="flex justify-between"><dt class="text-gray-500">동기화 상태</dt><dd><%= @integration.sync_status %></dd></div>
+    <% if @integration.error_message %>
+      <div class="bg-red-50 border border-red-200 rounded p-3 text-red-700 text-xs">
+        ❌ <%= @integration.error_message %>
+      </div>
+    <% end %>
+    <div class="flex justify-between"><dt class="text-gray-500">마지막 동기</dt><dd><%= @integration.last_synced_at&.strftime("%Y.%m.%d %H:%M") || '—' %></dd></div>
+  </dl>
+</div>

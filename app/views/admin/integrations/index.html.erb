@@ -1,0 +1,38 @@
+<% content_for :title, "외부 연동" %>
+
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-navy">🔌 외부 연동</h1>
+    <p class="text-sm text-gray-500 mt-1">전체 <%= @integrations.size %>개 (활성 <%= @integrations.select(&:is_enabled?).size %>개)</p>
+  </div>
+  <%= link_to "+ 연동 추가", new_admin_integration_path,
+      class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90" %>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+  <% @integrations.each do |i| %>
+    <%= link_to admin_integration_path(i), class: "block bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md" do %>
+      <div class="flex justify-between items-start mb-3">
+        <div>
+          <p class="font-bold text-navy"><%= i.name %></p>
+          <p class="text-xs text-gray-500 mt-0.5"><%= i.provider %> · <%= i.type_name %></p>
+        </div>
+        <% if i.is_enabled? %>
+          <span class="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded">ON</span>
+        <% else %>
+          <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">OFF</span>
+        <% end %>
+      </div>
+      <% color = case i.sync_status; when 'active' then 'green'; when 'error' then 'red'; else 'gray'; end %>
+      <span class="text-xs px-2 py-0.5 bg-<%= color %>-50 text-<%= color %>-700 rounded">동기화: <%= i.sync_status || '—' %></span>
+      <% if i.last_synced_at %>
+        <p class="text-xs text-gray-400 mt-2"><%= i.last_synced_at.strftime("%y.%m.%d %H:%M") %></p>
+      <% end %>
+    <% end %>
+  <% end %>
+  <% if @integrations.empty? %>
+    <div class="col-span-3 py-12 text-center text-gray-400 bg-white rounded-lg border border-dashed border-gray-300">
+      등록된 연동이 없습니다.
+    </div>
+  <% end %>
+</div>

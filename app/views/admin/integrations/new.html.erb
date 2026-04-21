@@ -1,0 +1,24 @@
+<% content_for :title, "연동 추가" %>
+<div class="mb-6">
+  <%= link_to "← 연동 목록", admin_integrations_path, class: "text-primary text-sm" %>
+  <h1 class="text-2xl font-bold text-navy mt-2">+ 외부 연동 추가</h1>
+</div>
+<%= form_with url: admin_integrations_path, class: "bg-white border border-gray-200 rounded-lg p-6 max-w-2xl space-y-4" do |f| %>
+  <div><%= f.label :name, "표시 이름", class: "block text-sm font-semibold mb-1" %><%= f.text_field :name, required: true, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <div>
+    <%= f.label :provider, "Provider", class: "block text-sm font-semibold mb-1" %>
+    <%= f.select :provider, Integration::PROVIDERS.map { |p| [p, p] }, {}, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+  </div>
+  <div>
+    <%= f.label :type_name, "유형", class: "block text-sm font-semibold mb-1" %>
+    <%= f.select :type_name, Integration::TYPES.map { |t| [t, t] }, {}, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+  </div>
+  <div><%= f.label :webhook_url, "Webhook URL (선택)", class: "block text-sm font-semibold mb-1" %><%= f.url_field :webhook_url, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono" %></div>
+  <div>
+    <%= f.label :credentials_json, "인증 정보 (JSON)", class: "block text-sm font-semibold mb-1" %>
+    <%= f.text_area :credentials_json, rows: 4, value: '{"api_key":""}', class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono" %>
+  </div>
+  <div class="flex gap-3 pt-2">
+    <%= f.submit "추가", class: "bg-primary text-white px-6 py-2 rounded-lg text-sm cursor-pointer" %>
+  </div>
+<% end %>

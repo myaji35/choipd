@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_21_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_21_110000) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -115,6 +115,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_100000) do
     t.index ["event_name"], name: "index_analytics_events_on_event_name"
     t.index ["tenant_id", "created_at"], name: "index_analytics_events_on_tenant_id_and_created_at"
     t.index ["user_id"], name: "index_analytics_events_on_user_id"
+  end
+
+  create_table "automation_templates", force: :cascade do |t|
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.string "created_by", null: false
+    t.text "description", null: false
+    t.string "difficulty", default: "beginner", null: false
+    t.integer "estimated_time"
+    t.string "icon", default: "zap"
+    t.boolean "is_public", default: true, null: false
+    t.string "name", null: false
+    t.integer "popularity", default: 0, null: false
+    t.text "required_integrations"
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.text "workflow_template", null: false
+    t.index ["category"], name: "index_automation_templates_on_category"
+    t.index ["tenant_id"], name: "index_automation_templates_on_tenant_id"
   end
 
   create_table "cohort_users", force: :cascade do |t|
@@ -296,6 +315,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_100000) do
     t.index ["inquiry_type"], name: "index_inquiries_on_inquiry_type"
     t.index ["status"], name: "index_inquiries_on_status"
     t.index ["tenant_id"], name: "index_inquiries_on_tenant_id"
+  end
+
+  create_table "integrations", force: :cascade do |t|
+    t.text "config"
+    t.datetime "created_at", null: false
+    t.string "created_by", null: false
+    t.text "credentials", null: false
+    t.text "error_message"
+    t.boolean "is_enabled", default: true, null: false
+    t.datetime "last_synced_at"
+    t.string "name", null: false
+    t.string "provider", null: false
+    t.text "scopes"
+    t.string "sync_status", default: "active"
+    t.integer "tenant_id", default: 1, null: false
+    t.string "type_name", null: false
+    t.datetime "updated_at", null: false
+    t.string "webhook_url"
+    t.index ["provider"], name: "index_integrations_on_provider"
+    t.index ["tenant_id"], name: "index_integrations_on_tenant_id"
   end
 
   create_table "invoices", force: :cascade do |t|
@@ -666,6 +705,74 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_100000) do
     t.index ["tenant_id"], name: "index_subscription_plans_on_tenant_id"
   end
 
+  create_table "webhook_logs", force: :cascade do |t|
+    t.integer "attempt_number", default: 1, null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.text "error"
+    t.string "event", null: false
+    t.text "payload", null: false
+    t.text "response_body"
+    t.integer "response_code"
+    t.string "status", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.integer "webhook_id", null: false
+    t.index ["webhook_id", "created_at"], name: "index_webhook_logs_on_webhook_id_and_created_at"
+    t.index ["webhook_id"], name: "index_webhook_logs_on_webhook_id"
+  end
+
+  create_table "webhooks", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "created_by", null: false
+    t.text "events", null: false
+    t.integer "failure_count", default: 0, null: false
+    t.text "headers"
+    t.boolean "is_active", default: true, null: false
+    t.datetime "last_triggered_at"
+    t.string "name", null: false
+    t.text "retry_config"
+    t.string "secret", null: false
+    t.integer "success_count", default: 0, null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.string "url", null: false
+    t.index ["tenant_id"], name: "index_webhooks_on_tenant_id"
+  end
+
+  create_table "workflow_executions", force: :cascade do |t|
+    t.datetime "completed_at"
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.integer "duration"
+    t.text "error"
+    t.text "metadata"
+    t.datetime "started_at"
+    t.string "status", default: "pending", null: false
+    t.text "steps"
+    t.integer "tenant_id", default: 1, null: false
+    t.string "trigger", null: false
+    t.text "trigger_data"
+    t.integer "workflow_id", null: false
+    t.index ["workflow_id", "created_at"], name: "index_workflow_executions_on_workflow_id_and_created_at"
+    t.index ["workflow_id"], name: "index_workflow_executions_on_workflow_id"
+  end
+
+  create_table "workflows", force: :cascade do |t|
+    t.text "actions", null: false
+    t.datetime "created_at", null: false
+    t.string "created_by", null: false
+    t.text "description"
+    t.integer "execution_count", default: 0, null: false
+    t.integer "failure_count", default: 0, null: false
+    t.boolean "is_active", default: true, null: false
+    t.datetime "last_executed_at"
+    t.string "name", null: false
+    t.integer "success_count", default: 0, null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.string "trigger", null: false
+    t.text "trigger_config", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tenant_id"], name: "index_workflows_on_tenant_id"
+  end
+
   create_table "works", force: :cascade do |t|
     t.string "category"
     t.datetime "created_at", null: false
@@ -699,4 +806,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_100000) do
   add_foreign_key "member_skills", "skills", on_delete: :cascade
   add_foreign_key "payments", "distributors"
   add_foreign_key "sns_post_histories", "sns_scheduled_posts"
+  add_foreign_key "webhook_logs", "webhooks", on_delete: :cascade
+  add_foreign_key "workflow_executions", "workflows", on_delete: :cascade
 end

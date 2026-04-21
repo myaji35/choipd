@@ -97,6 +97,20 @@ Rails.application.routes.draw do
       end
     end
 
+    # ── 자동화 ───────────────────────────────────
+    resources :workflows do
+      member do
+        post :execute
+        post :toggle
+      end
+    end
+    resources :integrations do
+      member { post :test }
+    end
+    resources :webhooks do
+      member { post :test }
+    end
+
     resources :resources,    controller: "distributor_resources"
     resources :hero_images
     resources :newsletter,   only: [ :index ]

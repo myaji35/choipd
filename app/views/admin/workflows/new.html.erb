@@ -1,0 +1,33 @@
+<% content_for :title, "새 워크플로우" %>
+
+<div class="mb-6">
+  <%= link_to "← 워크플로우", admin_workflows_path, class: "text-primary text-sm" %>
+  <h1 class="text-2xl font-bold text-navy mt-2">+ 새 워크플로우</h1>
+</div>
+
+<%= form_with url: admin_workflows_path, class: "bg-white border border-gray-200 rounded-lg p-6 max-w-2xl space-y-4" do |f| %>
+  <div>
+    <%= f.label :name, "이름", class: "block text-sm font-semibold mb-1" %>
+    <%= f.text_field :name, required: true, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+  </div>
+  <div>
+    <%= f.label :description, "설명", class: "block text-sm font-semibold mb-1" %>
+    <%= f.text_area :description, rows: 2, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+  </div>
+  <div>
+    <%= f.label :trigger, "트리거", class: "block text-sm font-semibold mb-1" %>
+    <%= f.select :trigger, [["수동", "manual"], ["스케줄", "schedule"], ["이벤트", "event"], ["웹훅", "webhook"]],
+        {}, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+  </div>
+  <div>
+    <%= f.label :actions_text, "액션 (한 줄에 하나, 형식: type: value)", class: "block text-sm font-semibold mb-1" %>
+    <%= f.text_area :actions_text, rows: 6,
+        placeholder: "log: 워크플로우 시작&#10;webhook: https://hooks.slack.com/services/...&#10;wait: 5",
+        class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono" %>
+    <p class="text-xs text-gray-500 mt-1">예시: <code>log:</code>, <code>webhook:</code>, <code>wait:</code></p>
+  </div>
+  <div class="flex gap-3 pt-2">
+    <%= f.submit "워크플로우 생성", class: "bg-primary text-white px-6 py-2 rounded-lg text-sm cursor-pointer" %>
+    <%= link_to "취소", admin_workflows_path, class: "text-gray-500 px-6 py-2 rounded-lg text-sm" %>
+  </div>
+<% end %>

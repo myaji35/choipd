@@ -1,0 +1,14 @@
+<% content_for :title, "웹훅 추가" %>
+<div class="mb-6"><%= link_to "← 웹훅 목록", admin_webhooks_path, class: "text-primary text-sm" %></div>
+<%= form_with url: admin_webhooks_path, class: "bg-white border border-gray-200 rounded-lg p-6 max-w-2xl space-y-4" do |f| %>
+  <div><%= f.label :name, "이름", class: "block text-sm font-semibold mb-1" %><%= f.text_field :name, required: true, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <div><%= f.label :url, "URL", class: "block text-sm font-semibold mb-1" %><%= f.url_field :url, required: true, placeholder: "https://hooks.slack.com/...", class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono" %></div>
+  <div>
+    <%= f.label :events_text, "이벤트 (쉼표 구분)", class: "block text-sm font-semibold mb-1" %>
+    <%= f.text_field :events_text, value: "distributor.created,payment.completed", class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono" %>
+  </div>
+  <div><%= f.label :secret, "Secret (HMAC) — 비워두면 자동 생성", class: "block text-sm font-semibold mb-1" %><%= f.text_field :secret, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono" %></div>
+  <div class="flex gap-3 pt-2">
+    <%= f.submit "추가", class: "bg-primary text-white px-6 py-2 rounded-lg text-sm cursor-pointer" %>
+  </div>
+<% end %>

@@ -1,0 +1,10 @@
+<% content_for :title, "#{@workflow.name} 수정" %>
+<div class="mb-6">
+  <%= link_to "← #{@workflow.name}", admin_workflow_path(@workflow), class: "text-primary text-sm" %>
+  <h1 class="text-2xl font-bold text-navy mt-2">워크플로우 수정</h1>
+</div>
+<%= form_with model: [:admin, @workflow], class: "bg-white border border-gray-200 rounded-lg p-6 max-w-2xl space-y-4" do |f| %>
+  <div><%= f.label :name, "이름", class: "block text-sm font-semibold mb-1" %><%= f.text_field :name, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <div><%= f.label :description, "설명", class: "block text-sm font-semibold mb-1" %><%= f.text_area :description, rows: 2, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <div><%= f.submit "수정", class: "bg-primary text-white px-6 py-2 rounded-lg text-sm cursor-pointer" %></div>
+<% end %>
