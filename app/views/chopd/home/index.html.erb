@@ -27,33 +27,55 @@
     </div>
   </div>
 
-  <!-- ── HERO §01 ───────────────────────── -->
+  <!-- ── HERO §01 (v2: 좌우 2컬럼 + Polaroid Stack) ───────────────────────── -->
   <section class="impd-wrap" style="padding: 80px 40px 40px;">
     <div class="impd-label" style="margin-bottom: 28px;">§01 · 업로드만 하세요. 나머지는 저희가.</div>
 
-    <div class="impd-hero impd-fade-in" data-controller="impd-rotator">
-      <div>당신은</div>
-      <div style="height: 1.05em; overflow: hidden; position: relative;">
-        <div data-impd-rotator-target="word" style="color: var(--impd-accent); font-style: italic;">강사</div>
+    <div class="impd-hero-grid" style="display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 60px; align-items: start;">
+      <!-- 좌: 헤드라인 + 본문 + CTA -->
+      <div>
+        <div class="impd-fade-in" data-controller="impd-rotator"
+             style="font-family: var(--impd-font-display); font-weight: 800; font-size: clamp(48px, 8vw, 96px); letter-spacing: -4.5px; line-height: 0.9;">
+          <div>당신은</div>
+          <div style="height: 1em; overflow: hidden; position: relative;">
+            <div data-impd-rotator-target="word" style="color: var(--impd-accent); font-style: italic;">강사</div>
+          </div>
+          <div>사진 몇 장,</div>
+          <div><span style="color: var(--impd-accent); font-style: italic;">수료증 하나</span>면</div>
+          <div>완성됩니다.</div>
+        </div>
+
+        <p style="margin-top: 36px; font-size: 16px; line-height: 1.6; color: var(--impd-ink2); max-width: 480px;">
+          SNS에 흩어진 사진, 서랍 속 수료증, 그동안 진행해 온 강의 이력 —
+          그냥 올리기만 하세요. imPD가 자동으로 정리해 당신만의 홍보 페이지로 만들어 드립니다.
+        </p>
+
+        <div style="display: flex; gap: 12px; margin-top: 28px;">
+          <%= link_to "내 페이지 만들기 →", new_admin_user_session_path,
+              class: "impd-btn impd-btn-primary", style: "height: 54px; padding: 0 22px; font-size: 16px;" %>
+          <%= link_to "예시 보기", "/byjreporter",
+              class: "impd-btn impd-btn-secondary", style: "height: 54px; padding: 0 22px; font-size: 16px;" %>
+        </div>
       </div>
-      <div style="display: inline; color: var(--impd-ink);">사진 몇 장,</div>
-      <div><span style="color: var(--impd-accent); font-style: italic;">수료증 하나</span>면</div>
-      <div>홍보 페이지가 완성됩니다.</div>
+
+      <!-- 우: Polaroid Stack (340x400) -->
+      <div style="display: flex; justify-content: center; padding-top: 20px;">
+        <%= render "shared/polaroid_stack", width: 340, height: 400, items: [
+          { color: "#ff5a1f", kind: "활동 사진", date: "26.04",   caption: "수강생 환한 표정." },
+          { color: "#3a2af0", kind: "수료증",    date: "23.07",   caption: "요가 지도자 자격." },
+          { color: "#2a9d8f", kind: "SNS",       date: "이번 달", caption: "팔로워 급증한 릴." },
+          { color: "#e4b230", kind: "포스터",    date: "지난달",  caption: "워크숍 모객 전단." },
+          { color: "#aa2a6a", kind: "후기",      date: "최근",    caption: "5점 만점 리뷰들." },
+          { color: "#1a1a1a", kind: "릴스",      date: "이번주",  caption: "조회수 1.2만." }
+        ] %>
+      </div>
     </div>
 
-    <div style="display: flex; gap: 60px; margin-top: 56px; align-items: flex-start; flex-wrap: wrap;">
-      <p style="flex: 0 0 420px; font-size: 16px; line-height: 1.6; color: var(--impd-ink2);">
-        SNS에 흩어진 사진, 서랍 속 수료증, 그동안 진행해 온 강의 이력 —
-        그냥 올리기만 하세요. imPD가 자동으로 정리해 당신만의
-        홍보 페이지로 만들어 드립니다.
-      </p>
-      <div style="display: flex; gap: 12px; flex: 1;">
-        <%= link_to "내 페이지 만들기 →", new_admin_user_session_path,
-            class: "impd-btn impd-btn-primary", style: "height: 54px; padding: 0 22px; font-size: 16px;" %>
-        <%= link_to "예시 보기", "/byjreporter",
-            class: "impd-btn impd-btn-secondary", style: "height: 54px; padding: 0 22px; font-size: 16px;" %>
-      </div>
-    </div>
+    <style>
+      @media (max-width: 768px) {
+        .impd-hero-grid { grid-template-columns: 1fr !important; }
+      }
+    </style>
   </section>
 
   <!-- ── Stats ───────────────────────── -->

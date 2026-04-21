@@ -1,0 +1,47 @@
+<%# Stacked Polaroids — variants/c1/polaroids.jsx 포팅
+    locals: items (Array of {color, kind, date, caption}), width (default 320), height (default 380) %>
+<% width  = local_assigns[:width]  || 320 %>
+<% height = local_assigns[:height] || 380 %>
+
+<div data-controller="polaroid-stack" aria-hidden="true"
+     style="position: relative; width: <%= width %>px; height: <%= height %>px; perspective: 1200px;">
+  <% items.each do |item| %>
+    <div data-polaroid-stack-target="card"
+         style="position: absolute; top: 0; left: 0;
+                width: <%= width - 40 %>px; height: <%= height - 30 %>px;
+                background: #fcfaf4;
+                padding: 14px 14px 50px;
+                transform-origin: 50% 60%;
+                transition: transform 900ms cubic-bezier(.2,.8,.2,1), box-shadow 600ms, opacity 600ms;
+                border: 1px solid rgba(15,13,11,0.08);">
+      <!-- 사진 영역 -->
+      <div style="width: 100%; height: calc(100% - 14px); position: relative; overflow: hidden;
+                  background: <%= item[:color] %>;">
+        <div style="position: absolute; inset: 0;
+                    background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.16) 0 3px, transparent 3px 10px);"></div>
+        <div style="position: absolute; top: 10px; left: 10px;
+                    font-family: 'JetBrains Mono', ui-monospace, monospace;
+                    font-size: 9px; letter-spacing: 1.2px; color: #fff; opacity: 0.85; text-transform: uppercase;">
+          <%= item[:kind] %>
+        </div>
+        <div style="position: absolute; bottom: 10px; right: 12px;
+                    font-family: 'JetBrains Mono', ui-monospace, monospace;
+                    font-size: 9px; letter-spacing: 0.6px; color: #fff; opacity: 0.75;">
+          <%= item[:date] %>
+        </div>
+      </div>
+      <!-- 손글씨 캡션 -->
+      <div style="position: absolute; left: 16px; right: 16px; bottom: 12px;
+                  font-family: 'Caveat', 'Nanum Pen Script', 'Gaegu', cursive;
+                  font-size: 22px; color: #0f0d0b; line-height: 1; letter-spacing: 0.2px;">
+        <%= item[:caption] %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- 테이프 조각 (장식) -->
+  <div style="position: absolute; top: -8px; left: <%= width / 2 - 30 %>px;
+              width: 60px; height: 18px;
+              background: rgba(58,42,240,0.22); transform: rotate(-4deg); z-index: 100;
+              border-left: 1px dashed rgba(0,0,0,0.08); border-right: 1px dashed rgba(0,0,0,0.08);"></div>
+</div>
