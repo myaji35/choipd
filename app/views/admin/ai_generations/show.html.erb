@@ -1,0 +1,31 @@
+<% content_for :title, "AI 생성 #{@gen.id}" %>
+<div class="mb-6"><%= link_to "← 생성 이력", admin_ai_generations_path, class: "text-primary text-sm" %></div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+  <div class="lg:col-span-2 space-y-4">
+    <div class="bg-white border border-gray-200 rounded-lg p-5">
+      <span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded"><%= @gen.content_type %></span>
+      <h2 class="font-semibold text-navy mt-2 mb-3">📥 프롬프트</h2>
+      <pre class="bg-gray-50 rounded p-3 text-sm whitespace-pre-wrap"><%= @gen.prompt %></pre>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-lg p-5">
+      <h2 class="font-semibold text-navy mb-3">📤 생성 결과</h2>
+      <div class="bg-gradient-to-br from-blue-50 to-white rounded p-4 text-sm whitespace-pre-wrap"><%= @gen.generated_text %></div>
+    </div>
+  </div>
+  <div class="space-y-4">
+    <div class="bg-white border border-gray-200 rounded-lg p-5">
+      <h2 class="font-semibold text-navy mb-3 text-sm">정보</h2>
+      <dl class="space-y-2 text-xs">
+        <div class="flex justify-between"><dt class="text-gray-500">상태</dt><dd class="font-bold"><%= @gen.status %></dd></div>
+        <div class="flex justify-between"><dt class="text-gray-500">모델</dt><dd class="font-mono"><%= @gen.model %></dd></div>
+        <div class="flex justify-between"><dt class="text-gray-500">생성자</dt><dd><%= @gen.user_id %></dd></div>
+        <div class="flex justify-between"><dt class="text-gray-500">생성일</dt><dd><%= @gen.created_at.strftime("%Y.%m.%d %H:%M") %></dd></div>
+      </dl>
+    </div>
+    <% unless @gen.status == "approved" %>
+      <%= button_to "✓ 승인", approve_admin_ai_generation_path(@gen), class: "w-full bg-green-500 text-white py-2 rounded-lg text-sm font-medium" %>
+    <% end %>
+    <%= button_to "삭제", admin_ai_generation_path(@gen), method: :delete, class: "w-full bg-red-50 text-red-600 py-2 rounded-lg text-sm", data: { turbo_confirm: "삭제?" } %>
+  </div>
+</div>

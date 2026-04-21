@@ -1,0 +1,26 @@
+<% content_for :title, @faq.question %>
+<div class="mb-6"><%= link_to "← FAQ 목록", admin_faqs_path, class: "text-primary text-sm" %></div>
+<div class="bg-white border border-gray-200 rounded-lg p-6 max-w-3xl">
+  <span class="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded"><%= @faq.category %></span>
+  <h2 class="text-xl font-bold text-navy mt-3"><%= @faq.question %></h2>
+  <div class="mt-4 prose">
+    <p class="text-gray-700 whitespace-pre-line"><%= @faq.answer %></p>
+  </div>
+  <div class="mt-6 pt-4 border-t border-gray-100">
+    <div class="flex flex-wrap gap-1.5 mb-3">
+      <% @faq.keywords_list.each do |k| %>
+        <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded">#<%= k %></span>
+      <% end %>
+    </div>
+    <div class="flex gap-4 text-xs text-gray-500">
+      <span>매칭 <%= @faq.match_count %>회</span>
+      <span>👍 <%= @faq.helpful_count %></span>
+      <span>👎 <%= @faq.not_helpful_count %></span>
+      <span class="ml-auto">우선순위 <%= @faq.priority %></span>
+    </div>
+  </div>
+  <div class="mt-4 flex gap-2">
+    <%= link_to "수정", edit_admin_faq_path(@faq), class: "bg-gray-100 text-gray-700 px-4 py-2 rounded text-sm" %>
+    <%= button_to "삭제", admin_faq_path(@faq), method: :delete, class: "bg-red-50 text-red-600 px-4 py-2 rounded text-sm", data: { turbo_confirm: "삭제?" } %>
+  </div>
+</div>

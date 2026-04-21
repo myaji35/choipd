@@ -1,0 +1,10 @@
+<% content_for :title, "FAQ 수정" %>
+<div class="mb-6"><%= link_to "← #{@faq.question}", admin_faq_path(@faq), class: "text-primary text-sm" %></div>
+<%= form_with model: [:admin, @faq], class: "bg-white border border-gray-200 rounded-lg p-6 max-w-2xl space-y-4" do |f| %>
+  <div><%= f.select :category, FaqKnowledgeBase::CATEGORIES.map { |c| [c, c] }, {}, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <div><%= f.text_field :question, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <div><%= f.text_area :answer, rows: 5, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <div><%= f.number_field :priority, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <div><%= f.check_box :is_active %> <%= f.label :is_active, "활성", class: "text-sm" %></div>
+  <div><%= f.submit "수정", class: "bg-primary text-white px-6 py-2 rounded-lg text-sm cursor-pointer" %></div>
+<% end %>

@@ -1,4 +1,6 @@
 class Chopd::HomeController < Chopd::BaseController
+  layout "impd"
+
   def index
     @hero_images = HeroImage.active
     @latest_courses = Course.published.recent.limit(6)

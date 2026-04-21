@@ -1,0 +1,13 @@
+<% content_for :title, "새 FAQ" %>
+<div class="mb-6"><%= link_to "← FAQ 목록", admin_faqs_path, class: "text-primary text-sm" %></div>
+<%= form_with url: admin_faqs_path, class: "bg-white border border-gray-200 rounded-lg p-6 max-w-2xl space-y-4" do |f| %>
+  <div>
+    <%= f.label :category, "카테고리", class: "block text-sm font-semibold mb-1" %>
+    <%= f.select :category, FaqKnowledgeBase::CATEGORIES.map { |c| [c, c] }, {}, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+  </div>
+  <div><%= f.label :question, "질문", class: "block text-sm font-semibold mb-1" %><%= f.text_field :question, required: true, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <div><%= f.label :answer, "답변", class: "block text-sm font-semibold mb-1" %><%= f.text_area :answer, rows: 5, required: true, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <div><%= f.label :keywords_text, "키워드 (쉼표 구분)", class: "block text-sm font-semibold mb-1" %><%= f.text_field :keywords_text, placeholder: "결제, 환불, 구독", class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <div><%= f.label :priority, "우선순위 (높을수록 먼저)", class: "block text-sm font-semibold mb-1" %><%= f.number_field :priority, value: 0, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <div class="flex gap-3 pt-2"><%= f.submit "추가", class: "bg-primary text-white px-6 py-2 rounded-lg text-sm cursor-pointer" %></div>
+<% end %>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= content_for?(:title) ? yield(:title) + " | imPD" : "imPD — 강사·공방·아티스트의 홍보 페이지" %></title>
+    <meta name="description" content="<%= content_for?(:description) ? yield(:description) : '사진과 수료증만 올리면 자동으로 홍보 페이지가 완성됩니다.' %>">
+
+    <!-- imPD 디자인 시스템 폰트 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@700;800&family=Noto+Serif+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+
+    <style>
+      :root {
+        --impd-paper: #efece4;
+        --impd-card: #fbf8f1;
+        --impd-ink: #0f0d0b;
+        --impd-ink2: rgba(15,13,11,0.85);
+        --impd-muted: rgba(15,13,11,0.55);
+        --impd-soft-muted: rgba(15,13,11,0.35);
+        --impd-rule: rgba(15,13,11,0.15);
+        --impd-accent: #3a2af0;
+        --impd-accent-2: #ff5a1f;
+        --impd-font-display: "Inter Tight", "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+        --impd-font-sans: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+        --impd-font-serif: "Noto Serif KR", serif;
+        --impd-font-mono: "JetBrains Mono", ui-monospace, monospace;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        background: var(--impd-paper);
+        color: var(--impd-ink);
+        font-family: var(--impd-font-sans);
+        font-feature-settings: "ss01" on, "ss02" on;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+      a { color: inherit; text-decoration: none; }
+
+      /* 핵심 클래스 (Tailwind 빌드 의존도 제거) */
+      .impd-label { font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-accent); }
+      .impd-label-muted { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted); }
+      .impd-display { font-family: var(--impd-font-display); font-weight: 800; letter-spacing: -1.6px; line-height: 1.05; }
+      .impd-hero { font-family: var(--impd-font-display); font-weight: 800; font-size: clamp(56px, 11vw, 128px); letter-spacing: -3px; line-height: 0.88; }
+      .impd-serif { font-family: var(--impd-font-serif); font-style: italic; }
+      .impd-section-header { display: flex; align-items: baseline; gap: 16px; border-top: 1px solid var(--impd-ink); padding-top: 14px; margin-bottom: 24px; }
+      .impd-btn { display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; height: 44px; font-family: var(--impd-font-sans); font-size: 14px; font-weight: 600; letter-spacing: -0.2px; cursor: pointer; border: none; border-radius: 0; transition: all 150ms ease; }
+      .impd-btn-primary { background: var(--impd-ink); color: var(--impd-paper); }
+      .impd-btn-primary:hover { background: var(--impd-accent); }
+      .impd-btn-secondary { background: transparent; color: var(--impd-ink); border: 1px solid var(--impd-ink); }
+      .impd-btn-secondary:hover { background: var(--impd-ink); color: var(--impd-paper); }
+      .impd-btn-accent { background: var(--impd-accent); color: #fff; }
+
+      @keyframes c1FadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes c1Marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+      @keyframes c1Pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+      .impd-fade-in { animation: c1FadeIn 700ms ease-out both; }
+      .impd-marquee { animation: c1Marquee 28s linear infinite; }
+      .impd-pulse { animation: c1Pulse 2s infinite; }
+      .impd-stripe { background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.15) 0 3px, transparent 3px 8px); }
+    </style>
+
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body>
+    <!-- imPD TopNav -->
+    <div style="position: sticky; top: 0; z-index: 20; background: var(--impd-paper); border-bottom: 1px solid var(--impd-rule); padding: 14px 40px; display: flex; align-items: center; gap: 32px;">
+      <%= link_to root_path, style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 20px; letter-spacing: -0.8px; color: var(--impd-ink);" do %>
+        imPD<span style="color: var(--impd-accent);">.</span>
+      <% end %>
+      <div style="display: flex; gap: 22px; flex: 1;">
+        <% [["홈", root_path], ["교육", education_path], ["미디어", media_path], ["작품", works_path], ["커뮤니티", community_path]].each do |label, path| %>
+          <%= link_to label, path, style: "color: var(--impd-muted); font-size: 13px; font-weight: 500;" %>
+        <% end %>
+      </div>
+      <%= link_to "로그인", new_admin_user_session_path,
+          class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 14px; font-size: 13px;" %>
+    </div>
+
+    <% if flash[:notice] %>
+      <div style="background: rgba(58,42,240,.1); border-left: 3px solid var(--impd-accent); color: var(--impd-accent); padding: 12px 40px; font-size: 13px;"><%= flash[:notice] %></div>
+    <% end %>
+    <% if flash[:alert] %>
+      <div style="background: rgba(255,90,31,.1); border-left: 3px solid var(--impd-accent-2); color: var(--impd-accent-2); padding: 12px 40px; font-size: 13px;"><%= flash[:alert] %></div>
+    <% end %>
+
+    <main>
+      <%= yield %>
+    </main>
+  </body>
+</html>

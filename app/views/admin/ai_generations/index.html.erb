@@ -1,0 +1,38 @@
+<% content_for :title, "AI 생성 콘텐츠" %>
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <%= link_to "← AI 도구", admin_ai_path, class: "text-primary text-sm" %>
+    <h1 class="text-2xl font-bold text-navy mt-2">✍️ AI 생성 콘텐츠 (<%= @generations.size %>)</h1>
+  </div>
+  <%= link_to "+ 새로 생성", new_admin_ai_generation_path, class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium" %>
+</div>
+
+<div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-gray-50 border-b">
+      <tr>
+        <th class="text-left px-4 py-3 text-xs font-semibold uppercase">유형</th>
+        <th class="text-left px-4 py-3 text-xs font-semibold uppercase">프롬프트</th>
+        <th class="text-left px-4 py-3 text-xs font-semibold uppercase">모델</th>
+        <th class="text-left px-4 py-3 text-xs font-semibold uppercase">상태</th>
+        <th class="text-left px-4 py-3 text-xs font-semibold uppercase">생성일</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y">
+      <% @generations.each do |g| %>
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded"><%= g.content_type %></span></td>
+          <td class="px-4 py-3 text-sm text-navy max-w-md truncate"><%= g.prompt %></td>
+          <td class="px-4 py-3 text-xs font-mono"><%= g.model %></td>
+          <td class="px-4 py-3"><% color = case g.status; when 'approved' then 'green'; when 'published' then 'blue'; when 'rejected' then 'red'; else 'gray'; end %><span class="text-xs px-2 py-0.5 bg-<%= color %>-100 text-<%= color %>-700 rounded"><%= g.status %></span></td>
+          <td class="px-4 py-3 text-xs text-gray-400"><%= g.created_at.strftime("%y.%m.%d %H:%M") %></td>
+          <td class="px-4 py-3 text-right"><%= link_to "보기", admin_ai_generation_path(g), class: "text-xs text-primary" %></td>
+        </tr>
+      <% end %>
+      <% if @generations.empty? %>
+        <tr><td colspan="6" class="px-4 py-12 text-center text-gray-400">생성 이력 없음.</td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_21_110000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_21_120000) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -90,6 +90,39 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_110000) do
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
+  create_table "ai_generated_contents", force: :cascade do |t|
+    t.string "content_type", null: false
+    t.datetime "created_at", null: false
+    t.text "generated_text", null: false
+    t.integer "max_tokens"
+    t.text "metadata"
+    t.string "model", null: false
+    t.text "prompt", null: false
+    t.string "status", default: "draft", null: false
+    t.integer "temperature"
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.integer "used_in_content_id"
+    t.string "user_id", null: false
+    t.string "user_type", null: false
+    t.index ["tenant_id"], name: "index_ai_generated_contents_on_tenant_id"
+  end
+
+  create_table "ai_recommendations", force: :cascade do |t|
+    t.boolean "clicked", default: false
+    t.datetime "clicked_at"
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.text "metadata"
+    t.text "reason"
+    t.string "recommendation_type", null: false
+    t.integer "score", null: false
+    t.integer "target_id", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.string "user_id", null: false
+    t.string "user_type", null: false
+    t.index ["user_id", "recommendation_type"], name: "index_ai_recommendations_on_user_id_and_recommendation_type"
+  end
+
   create_table "analytics_events", force: :cascade do |t|
     t.string "browser"
     t.string "city"
@@ -136,6 +169,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_110000) do
     t.index ["tenant_id"], name: "index_automation_templates_on_tenant_id"
   end
 
+  create_table "chatbot_conversations", force: :cascade do |t|
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.string "intent"
+    t.text "message", null: false
+    t.text "metadata"
+    t.string "role", null: false
+    t.string "session_id", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.string "user_id"
+    t.string "user_type", null: false
+    t.index ["session_id", "created_at"], name: "index_chatbot_conversations_on_session_id_and_created_at"
+  end
+
   create_table "cohort_users", force: :cascade do |t|
     t.integer "cohort_id", null: false
     t.datetime "joined_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -160,6 +206,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_110000) do
     t.datetime "updated_at", null: false
     t.integer "user_count", default: 0, null: false
     t.index ["tenant_id"], name: "index_cohorts_on_tenant_id"
+  end
+
+  create_table "content_embeddings", force: :cascade do |t|
+    t.integer "content_id", null: false
+    t.string "content_type", null: false
+    t.datetime "created_at", null: false
+    t.text "embedding", null: false
+    t.string "embedding_model", null: false
+    t.text "metadata"
+    t.integer "tenant_id", default: 1, null: false
+    t.text "text_content", null: false
+    t.datetime "updated_at", null: false
+    t.index ["content_type", "content_id"], name: "index_content_embeddings_on_content_type_and_content_id"
+  end
+
+  create_table "content_quality_scores", force: :cascade do |t|
+    t.datetime "analyzed_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.string "analyzed_by", null: false
+    t.integer "content_id", null: false
+    t.string "content_type", null: false
+    t.integer "engagement_score"
+    t.text "keyword_density"
+    t.integer "overall_score", null: false
+    t.integer "readability_score"
+    t.integer "sentiment_score"
+    t.integer "seo_score"
+    t.text "suggestions"
+    t.integer "tenant_id", default: 1, null: false
+    t.index ["content_type", "content_id"], name: "index_content_quality_scores_on_content_type_and_content_id"
   end
 
   create_table "courses", force: :cascade do |t|
@@ -271,6 +346,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_110000) do
     t.index ["user_id"], name: "index_enrollments_on_user_id"
   end
 
+  create_table "faq_knowledge_bases", force: :cascade do |t|
+    t.text "answer", null: false
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.string "created_by", null: false
+    t.integer "helpful_count", default: 0, null: false
+    t.boolean "is_active", default: true, null: false
+    t.text "keywords", null: false
+    t.integer "match_count", default: 0, null: false
+    t.integer "not_helpful_count", default: 0, null: false
+    t.integer "priority", default: 0, null: false
+    t.text "question", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.index ["tenant_id", "category"], name: "index_faq_knowledge_bases_on_tenant_id_and_category"
+  end
+
   create_table "funnels", force: :cascade do |t|
     t.text "conversion_data"
     t.integer "conversion_window", default: 7
@@ -300,6 +392,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_110000) do
     t.string "url"
     t.integer "width"
     t.index ["tenant_id"], name: "index_hero_images_on_tenant_id"
+  end
+
+  create_table "image_auto_tags", force: :cascade do |t|
+    t.boolean "adult_content", default: false
+    t.text "categories", null: false
+    t.text "colors"
+    t.integer "confidence", null: false
+    t.integer "content_id", null: false
+    t.string "content_type", null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.string "image_url", null: false
+    t.string "model", null: false
+    t.text "objects"
+    t.text "ocr_text"
+    t.text "tags", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.index ["content_type", "content_id"], name: "index_image_auto_tags_on_content_type_and_content_id"
   end
 
   create_table "inquiries", force: :cascade do |t|
@@ -703,6 +812,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_110000) do
     t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
     t.index ["tenant_id"], name: "index_subscription_plans_on_tenant_id"
+  end
+
+  create_table "user_activity_patterns", force: :cascade do |t|
+    t.text "active_days_of_week"
+    t.text "active_hours"
+    t.integer "average_session_duration"
+    t.string "churn_risk", default: "low"
+    t.datetime "created_at", null: false
+    t.integer "engagement_score", default: 0, null: false
+    t.string "last_activity_type"
+    t.datetime "last_analyzed_at"
+    t.text "preferred_categories"
+    t.integer "tenant_id", default: 1, null: false
+    t.integer "total_sessions", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.string "user_id", null: false
+    t.string "user_type", null: false
+    t.index ["user_id"], name: "index_user_activity_patterns_on_user_id", unique: true
   end
 
   create_table "webhook_logs", force: :cascade do |t|

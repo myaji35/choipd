@@ -111,6 +111,13 @@ Rails.application.routes.draw do
       member { post :test }
     end
 
+    # ── AI ───────────────────────────────────────
+    get "/ai", to: "ai#index", as: :ai
+    resources :faqs
+    resources :ai_generations, only: [ :index, :show, :new, :create, :destroy ] do
+      member { post :approve }
+    end
+
     resources :resources,    controller: "distributor_resources"
     resources :hero_images
     resources :newsletter,   only: [ :index ]

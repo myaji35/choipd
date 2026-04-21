@@ -1,0 +1,17 @@
+<% content_for :title, "AI 생성" %>
+<div class="mb-6"><%= link_to "← 생성 이력", admin_ai_generations_path, class: "text-primary text-sm" %></div>
+<%= form_with url: admin_ai_generations_path, class: "bg-white border border-gray-200 rounded-lg p-6 max-w-2xl space-y-4" do |f| %>
+  <div>
+    <%= f.label :content_type, "콘텐츠 유형", class: "block text-sm font-semibold mb-1" %>
+    <%= f.select :content_type, AiGeneratedContent::CONTENT_TYPES.map { |c| [c, c] }, {}, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+  </div>
+  <div>
+    <%= f.label :prompt, "프롬프트", class: "block text-sm font-semibold mb-1" %>
+    <%= f.text_area :prompt, rows: 6, required: true, placeholder: "어떤 콘텐츠를 생성하고 싶으신가요?",
+        class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+  </div>
+  <div class="bg-amber-50 border border-amber-200 rounded p-3 text-xs text-amber-700">
+    💡 OpenAI/Anthropic API 키가 설정되지 않은 경우 stub 응답이 반환됩니다.
+  </div>
+  <div class="flex gap-3 pt-2"><%= f.submit "🤖 생성", class: "bg-primary text-white px-6 py-2 rounded-lg text-sm cursor-pointer" %></div>
+<% end %>

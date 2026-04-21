@@ -1,0 +1,115 @@
+<% content_for :title, "AI 도구" %>
+
+<div class="mb-6">
+  <h1 class="text-2xl font-bold text-navy">🤖 AI 도구</h1>
+  <p class="text-sm text-gray-500 mt-1">콘텐츠 추천 · 챗봇 · AI 생성 · 품질 점수 · FAQ 지식베이스</p>
+</div>
+
+<!-- API 상태 -->
+<div class="grid grid-cols-2 gap-3 mb-4">
+  <% [["openai", "OpenAI", "🟢"], ["anthropic", "Anthropic", "🟣"]].each do |key, name, icon| %>
+    <% active = @api_status[key.to_sym] %>
+    <div class="bg-white border border-gray-200 rounded-lg p-4 flex items-center gap-3">
+      <span class="text-2xl"><%= icon %></span>
+      <div class="flex-1">
+        <p class="font-bold text-navy"><%= name %></p>
+        <p class="text-xs <%= active ? 'text-green-600' : 'text-gray-400' %>"><%= active ? "API 키 감지됨 — 실제 호출 가능" : "API 키 없음 — stub 모드" %></p>
+      </div>
+      <span class="text-xs px-2 py-0.5 rounded <%= active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' %>"><%= active ? "ON" : "OFF" %></span>
+    </div>
+  <% end %>
+</div>
+
+<!-- KPI 4 카드 -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+  <div class="bg-white border border-gray-200 rounded-lg p-4 text-center">
+    <p class="text-2xl">🎯</p>
+    <p class="text-xs text-gray-500 mt-1">추천</p>
+    <p class="text-2xl font-bold text-navy"><%= @rec_count %></p>
+  </div>
+  <div class="bg-white border border-gray-200 rounded-lg p-4 text-center">
+    <p class="text-2xl">✍️</p>
+    <p class="text-xs text-gray-500 mt-1">AI 생성</p>
+    <p class="text-2xl font-bold text-blue-600"><%= @gen_count %></p>
+  </div>
+  <div class="bg-white border border-gray-200 rounded-lg p-4 text-center">
+    <p class="text-2xl">💬</p>
+    <p class="text-xs text-gray-500 mt-1">챗봇 세션</p>
+    <p class="text-2xl font-bold text-emerald-600"><%= @conv_count %></p>
+  </div>
+  <div class="bg-white border border-gray-200 rounded-lg p-4 text-center">
+    <p class="text-2xl">📚</p>
+    <p class="text-xs text-gray-500 mt-1">FAQ</p>
+    <p class="text-2xl font-bold text-purple-600"><%= @faq_count %></p>
+  </div>
+</div>
+
+<!-- 빠른 액션 -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+  <%= link_to new_admin_ai_generation_path,
+      class: "block bg-white border border-gray-200 rounded-lg p-5 hover:shadow-md" do %>
+    <p class="text-2xl">✍️</p>
+    <p class="font-bold text-navy mt-2">AI 콘텐츠 생성</p>
+    <p class="text-xs text-gray-500 mt-1">SNS 포스트 / 이메일 / 설명 자동 작성</p>
+  <% end %>
+  <%= link_to admin_faqs_path,
+      class: "block bg-white border border-gray-200 rounded-lg p-5 hover:shadow-md" do %>
+    <p class="text-2xl">📚</p>
+    <p class="font-bold text-navy mt-2">FAQ 지식베이스</p>
+    <p class="text-xs text-gray-500 mt-1">챗봇이 답하는 자주 묻는 질문</p>
+  <% end %>
+  <%= link_to admin_ai_generations_path,
+      class: "block bg-white border border-gray-200 rounded-lg p-5 hover:shadow-md" do %>
+    <p class="text-2xl">📋</p>
+    <p class="font-bold text-navy mt-2">생성 이력</p>
+    <p class="text-xs text-gray-500 mt-1">draft/approved/published 상태 관리</p>
+  <% end %>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+  <!-- 최근 생성 -->
+  <div class="bg-white border border-gray-200 rounded-lg p-5">
+    <h2 class="font-semibold text-navy mb-3">📝 최근 AI 생성 (<%= @recent_generations.size %>)</h2>
+    <% if @recent_generations.any? %>
+      <div class="space-y-2">
+        <% @recent_generations.each do |g| %>
+          <%= link_to admin_ai_generation_path(g), class: "block bg-gray-50 rounded p-3 hover:bg-gray-100" do %>
+            <div class="flex items-start justify-between mb-1">
+              <span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded"><%= g.content_type %></span>
+              <span class="text-xs text-gray-400"><%= g.created_at.strftime("%y.%m.%d") %></span>
+            </div>
+            <p class="text-sm text-navy line-clamp-2"><%= g.prompt %></p>
+            <p class="text-xs text-gray-500 mt-1">→ <%= truncate(g.generated_text, length: 80) %></p>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-sm text-gray-400 text-center py-6">아직 생성 이력이 없습니다.</p>
+    <% end %>
+  </div>
+
+  <!-- Top FAQ -->
+  <div class="bg-white border border-gray-200 rounded-lg p-5">
+    <h2 class="font-semibold text-navy mb-3">🔥 Top FAQ (<%= @top_faq.size %>)</h2>
+    <% if @top_faq.any? %>
+      <div class="space-y-2">
+        <% @top_faq.each do |f| %>
+          <%= link_to admin_faq_path(f), class: "block bg-gray-50 rounded p-3 hover:bg-gray-100" do %>
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <span class="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded"><%= f.category %></span>
+                <p class="text-sm text-navy mt-1"><%= f.question %></p>
+              </div>
+              <div class="text-right text-xs text-gray-400 ml-2">
+                <p>매칭 <%= f.match_count %></p>
+                <p>👍 <%= f.helpful_rate %>%</p>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-sm text-gray-400 text-center py-6">아직 FAQ가 없습니다.</p>
+    <% end %>
+  </div>
+</div>
