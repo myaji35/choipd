@@ -1,6 +1,8 @@
 class Member < ApplicationRecord
   include SlugValidation
 
+  has_secure_password validations: false
+
   has_many :member_portfolio_items, dependent: :destroy
   has_many :member_services,        dependent: :destroy
   has_many :member_posts,           dependent: :destroy

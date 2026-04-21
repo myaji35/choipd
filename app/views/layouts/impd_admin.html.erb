@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= content_for?(:title) ? yield(:title) + " | imPD admin" : "imPD admin" %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@700;800&family=Noto+Serif+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&family=Caveat:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <style>
+      :root {
+        --impd-paper: #efece4; --impd-card: #fbf8f1; --impd-ink: #0f0d0b;
+        --impd-ink2: rgba(15,13,11,0.85); --impd-muted: rgba(15,13,11,0.55);
+        --impd-soft-muted: rgba(15,13,11,0.35); --impd-rule: rgba(15,13,11,0.15);
+        --impd-accent: #3a2af0; --impd-accent-2: #ff5a1f;
+        --impd-font-display: "Inter Tight","Pretendard Variable","Pretendard",system-ui,sans-serif;
+        --impd-font-sans: "Pretendard Variable","Pretendard",system-ui,sans-serif;
+        --impd-font-serif: "Noto Serif KR",serif; --impd-font-mono: "JetBrains Mono",ui-monospace,monospace;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: var(--impd-paper); color: var(--impd-ink); font-family: var(--impd-font-sans); -webkit-font-smoothing: antialiased; }
+      a { color: inherit; text-decoration: none; }
+      .impd-label { font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-accent); }
+      .impd-label-muted { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted); }
+      .impd-display { font-family: var(--impd-font-display); font-weight: 800; letter-spacing: -1.6px; line-height: 1.05; }
+      .impd-section-header { display: flex; align-items: baseline; gap: 16px; border-top: 1px solid var(--impd-ink); padding-top: 14px; margin-bottom: 24px; }
+      .impd-btn { display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; height: 44px; font-family: var(--impd-font-sans); font-size: 14px; font-weight: 600; letter-spacing: -0.2px; cursor: pointer; border: none; border-radius: 0; }
+      .impd-btn-primary { background: var(--impd-ink); color: var(--impd-paper); }
+      .impd-btn-primary:hover { background: var(--impd-accent); }
+      .impd-btn-secondary { background: transparent; color: var(--impd-ink); border: 1px solid var(--impd-ink); }
+      .impd-card { background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 24px; }
+    </style>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body>
+    <!-- imPD admin TopNav -->
+    <div style="position: sticky; top: 0; z-index: 20; background: var(--impd-paper); border-bottom: 1px solid var(--impd-rule); padding: 14px 40px; display: flex; align-items: center; gap: 32px;">
+      <%= link_to "/", style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 20px; color: var(--impd-ink);" do %>
+        imPD<span style="color: var(--impd-accent);">.</span>
+      <% end %>
+      <div style="display: flex; gap: 22px; flex: 1;">
+        <%= link_to "홈", "/", style: "color: var(--impd-muted); font-size: 13px; font-weight: 500;" %>
+        <% if @member %>
+          <%= link_to "예시 페이지", "/#{@member.slug}", target: "_blank", style: "color: var(--impd-muted); font-size: 13px; font-weight: 500;" %>
+          <%= link_to "에디터", slug_admin_editor_path(slug: @member.slug),
+              style: "color: #{request.path.include?('editor') ? 'var(--impd-ink)' : 'var(--impd-muted)'}; font-size: 13px; font-weight: #{request.path.include?('editor') ? '600' : '500'}; border-bottom: #{request.path.include?('editor') ? '2px solid var(--impd-accent)' : '2px solid transparent'}; padding: 4px 0;" %>
+          <%= link_to "대시보드", slug_admin_dashboard_path(slug: @member.slug),
+              style: "color: #{request.path.include?('dashboard') ? 'var(--impd-ink)' : 'var(--impd-muted)'}; font-size: 13px; font-weight: #{request.path.include?('dashboard') ? '600' : '500'}; border-bottom: #{request.path.include?('dashboard') ? '2px solid var(--impd-accent)' : '2px solid transparent'}; padding: 4px 0;" %>
+        <% end %>
+      </div>
+      <% if @member %>
+        <span class="impd-label-muted"><%= @member.name %>님</span>
+        <%= button_to "로그아웃", logout_member_path(slug: @member.slug), method: :delete, class: "impd-btn impd-btn-secondary", style: "height: 32px; padding: 0 12px; font-size: 12px;" %>
+      <% end %>
+    </div>
+
+    <% if flash[:notice] %><div style="background: rgba(58,42,240,.1); border-left: 3px solid var(--impd-accent); color: var(--impd-accent); padding: 12px 40px; font-size: 13px;"><%= flash[:notice] %></div><% end %>
+    <% if flash[:alert] %><div style="background: rgba(255,90,31,.1); border-left: 3px solid var(--impd-accent-2); color: var(--impd-accent-2); padding: 12px 40px; font-size: 13px;"><%= flash[:alert] %></div><% end %>
+
+    <main><%= yield %></main>
+  </body>
+</html>

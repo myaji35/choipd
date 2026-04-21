@@ -1,0 +1,126 @@
+<% content_for :title, "대시보드 — #{@member.name}" %>
+
+<div style="max-width: 1400px; margin: 0 auto; padding: 40px;">
+  <!-- Masthead -->
+  <div style="margin-bottom: 32px;">
+    <p class="impd-label-muted">DASHBOARD · /<%= @member.slug %></p>
+    <h1 class="impd-display" style="font-size: 56px; margin-top: 12px;">
+      안녕하세요, <span style="color: var(--impd-accent); font-style: italic;"><%= @member.name %></span>님.
+    </h1>
+    <p style="margin-top: 12px; font-size: 16px; color: var(--impd-ink2);">
+      오늘 <strong><%= @today_visits %>명</strong>이 방문했어요.
+    </p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 320px; gap: 40px;" class="dashboard-grid">
+    <!-- Main 영역 -->
+    <div>
+      <!-- Stats 4 카드 -->
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--impd-ink); margin-bottom: 40px;">
+        <% [
+          ["방문자", @today_visits, "오늘", "var(--impd-accent)"],
+          ["문의", @inquiries_count, "총합", "var(--impd-accent-2)"],
+          ["서비스", @services_count, "활성", "#2a9d8f"],
+          ["수익(추정)", "₩#{number_with_delimiter(@revenue)}", "오늘", "#e4b230"]
+        ].each_with_index do |(label, val, sub, color), i| %>
+          <div style="padding: 24px 20px; <%= 'border-left: 1px solid var(--impd-rule);' if i > 0 %>">
+            <p class="impd-label-muted"><%= label %></p>
+            <p style="font-family: var(--impd-font-display); font-size: 48px; font-weight: 800; line-height: 1; margin-top: 8px; color: <%= color %>;"><%= val %></p>
+            <p style="font-size: 11px; color: var(--impd-muted); margin-top: 6px;"><%= sub %></p>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Bar chart 14일 -->
+      <div style="background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 24px;">
+        <div class="impd-section-header" style="margin-bottom: 16px;">
+          <span class="impd-label">§01</span>
+          <span class="impd-display" style="font-size: 24px; flex: 1;">14일 방문 추이</span>
+          <span class="impd-label-muted">DAILY</span>
+        </div>
+        <% max_val = [@bar_data.map(&:last).max, 1].max.to_f %>
+        <div style="display: flex; align-items: flex-end; gap: 6px; height: 160px;">
+          <% @bar_data.each_with_index do |(date, count), i| %>
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
+              <span style="font-family: var(--impd-font-mono); font-size: 9px; color: var(--impd-muted);"><%= count %></span>
+              <div style="width: 100%; background: <%= count > 0 ? 'var(--impd-accent)' : 'var(--impd-rule)' %>; height: <%= [(count.to_f / max_val * 100).round, 4].max %>%; margin-top: 2px;" title="<%= date %>: <%= count %>"></div>
+              <span style="font-family: var(--impd-font-mono); font-size: 9px; color: var(--impd-muted); margin-top: 4px;"><%= date.strftime("%-d") %></span>
+            </div>
+          <% end %>
+        </div>
+        <p class="impd-label-muted" style="margin-top: 12px; text-align: right;">오늘 <%= @today_visits %>명 · 평균 <%= (@bar_data.map(&:last).sum.to_f / @bar_data.size).round %>명/일</p>
+      </div>
+
+      <!-- Inquiries -->
+      <div style="background: #fff; border: 1px solid var(--impd-rule); padding: 24px; margin-top: 16px;">
+        <div class="impd-section-header" style="margin-bottom: 16px;">
+          <span class="impd-label">§02</span>
+          <span class="impd-display" style="font-size: 24px; flex: 1;">최근 문의</span>
+          <span class="impd-label-muted"><%= @recent_inquiries.size %>건</span>
+        </div>
+        <% if @recent_inquiries.any? %>
+          <div style="display: grid; gap: 12px;">
+            <% @recent_inquiries.each do |inq| %>
+              <div style="border-left: 3px solid <%= inq.is_read.to_i.positive? ? 'var(--impd-rule)' : 'var(--impd-accent)' %>; padding-left: 16px; padding: 12px 16px; background: <%= inq.is_read.to_i.positive? ? 'transparent' : 'rgba(58,42,240,.04)' %>;">
+                <div style="display: flex; justify-content: space-between;">
+                  <p style="font-weight: 600;"><%= inq.sender_name %></p>
+                  <p class="impd-label-muted"><%= inq.created_at.strftime("%m/%d %H:%M") %></p>
+                </div>
+                <p style="margin-top: 4px; font-size: 13px; color: var(--impd-ink2);"><%= truncate(inq.message, length: 100) %></p>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p style="text-align: center; padding: 32px; color: var(--impd-muted); font-size: 14px;">아직 문의가 없습니다.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Right rail -->
+    <div>
+      <!-- Share card (다크 ink) -->
+      <div style="background: var(--impd-ink); color: var(--impd-paper); padding: 24px; margin-bottom: 16px;">
+        <p class="impd-label" style="color: var(--impd-accent);">§A · 공유</p>
+        <p style="font-family: var(--impd-font-display); font-size: 24px; margin-top: 12px;">내 페이지</p>
+        <div style="background: rgba(255,255,255,.08); padding: 12px; margin-top: 16px; font-family: var(--impd-font-mono); font-size: 13px; word-break: break-all;">
+          impd.townin.net/<%= @member.slug %>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+          <a href="/<%= @member.slug %>" target="_blank" style="flex: 1; background: var(--impd-accent); color: #fff; padding: 10px; text-align: center; font-size: 13px; font-weight: 600;">↗ 열기</a>
+          <button onclick="navigator.clipboard.writeText('https://impd.townin.net/<%= @member.slug %>'); alert('링크 복사됨')" style="flex: 1; background: rgba(255,255,255,.1); color: #fff; padding: 10px; text-align: center; font-size: 13px; font-weight: 600; border: none; cursor: pointer;">📋 복사</button>
+        </div>
+      </div>
+
+      <!-- Checklist -->
+      <div style="background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 20px; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <p class="impd-label">§B · 완성도</p>
+          <p style="font-family: var(--impd-font-display); font-size: 32px; font-weight: 800;"><%= @completion_pct %>%</p>
+        </div>
+        <div style="background: var(--impd-rule); height: 4px; margin-top: 8px;">
+          <div style="background: var(--impd-accent); height: 100%; width: <%= @completion_pct %>%;"></div>
+        </div>
+        <ul style="margin-top: 16px; list-style: none; padding: 0;">
+          <% @checklist.each do |item| %>
+            <li style="padding: 8px 0; border-bottom: 1px solid var(--impd-rule); font-size: 13px; display: flex; gap: 8px; align-items: center;">
+              <span style="color: <%= item[:done] ? 'var(--impd-accent)' : 'var(--impd-soft-muted)' %>;"><%= item[:done] ? '✓' : '○' %></span>
+              <span style="flex: 1; color: <%= item[:done] ? 'var(--impd-ink2)' : 'var(--impd-muted)' %>;"><%= item[:label] %></span>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+
+      <!-- Plan -->
+      <div style="background: #fff; border: 1px solid var(--impd-rule); padding: 20px;">
+        <p class="impd-label">§C · 요금제</p>
+        <p style="font-family: var(--impd-font-display); font-size: 28px; font-weight: 800; margin-top: 8px;"><%= @member.subscription_plan&.upcase || "BASIC" %></p>
+        <p style="font-size: 12px; color: var(--impd-muted); margin-top: 4px;">현재 활성 플랜</p>
+        <a href="<%= slug_admin_editor_path(slug: @member.slug) %>" class="impd-btn impd-btn-secondary" style="width: 100%; justify-content: center; margin-top: 16px;">에디터로 가기 →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr !important; } }
+</style>

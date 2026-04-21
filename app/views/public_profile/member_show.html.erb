@@ -1,0 +1,174 @@
+<% content_for :title, "#{@member.name} | imPD" %>
+<% content_for :description, @member.bio.to_s.first(160) %>
+
+<style>
+  .impd-wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+  .impd-section { padding: 64px 0; }
+  @media (max-width: 768px) { .impd-wrap { padding: 0 20px; } .impd-section { padding: 40px 0; } }
+</style>
+
+<!-- ── Masthead (3컬럼) ───────────────────────── -->
+<section class="impd-wrap impd-section">
+  <div style="display: grid; grid-template-columns: 1.3fr 1fr 0.9fr; gap: 40px; align-items: start;" class="masthead-grid">
+    <!-- 좌: 이름 -->
+    <div>
+      <div class="impd-label">§A · imPD 검증 회원</div>
+      <h1 style="font-family: var(--impd-font-display); font-weight: 800; font-size: clamp(64px, 10vw, 128px); line-height: 0.88; letter-spacing: -4px; margin-top: 16px;">
+        <%= @member.name %>
+        <% if @member.profession.present? %>
+          <br><span style="color: var(--impd-accent); font-style: italic;"><%= @member.profession %>.</span>
+        <% end %>
+      </h1>
+      <% if @member.bio.present? %>
+        <p class="impd-serif" style="font-size: 22px; line-height: 1.45; margin-top: 24px; color: var(--impd-ink2); max-width: 480px;">
+          "<%= @member.bio %>"
+        </p>
+      <% end %>
+    </div>
+
+    <!-- 중: Polaroid Stack -->
+    <div style="display: flex; justify-content: center;">
+      <%= render "shared/polaroid_stack", width: 300, height: 360, items: [
+        { color: "#ff5a1f", kind: "최근 활동", date: "이번 달", caption: "현장 사진." },
+        { color: "#3a2af0", kind: "수료증",    date: "검증 완료", caption: "공인 자격." },
+        { color: "#2a9d8f", kind: "포트폴리오", date: "오늘",     caption: "최신 작업물." },
+        { color: "#e4b230", kind: "후기",      date: "별점 5",   caption: "고객의 칭찬." },
+        { color: "#1a1a1a", kind: "인터뷰",    date: "최근",     caption: "미디어 출연기." }
+      ] %>
+    </div>
+
+    <!-- 우: 직함·지역·CTA -->
+    <div>
+      <dl style="border-top: 1px solid var(--impd-ink); padding-top: 16px;">
+        <% if @member.profession.present? %>
+          <div style="margin-bottom: 12px;"><dt class="impd-label-muted">직함</dt><dd style="font-family: var(--impd-font-display); font-size: 20px; margin-top: 4px;"><%= @member.profession %></dd></div>
+        <% end %>
+        <% if @member.region.present? %>
+          <div style="margin-bottom: 12px;"><dt class="impd-label-muted">지역</dt><dd style="font-family: var(--impd-font-display); font-size: 20px; margin-top: 4px;"><%= @member.region %></dd></div>
+        <% end %>
+        <% if @services.any? %>
+          <div style="margin-bottom: 12px;"><dt class="impd-label-muted">서비스</dt><dd style="font-family: var(--impd-font-display); font-size: 20px; margin-top: 4px;"><%= @services.first.title %></dd></div>
+        <% end %>
+      </dl>
+      <a href="#contact" class="impd-btn impd-btn-primary" style="width: 100%; justify-content: center; margin-top: 24px;">문의하기 →</a>
+      <a href="#classes" class="impd-btn impd-btn-secondary" style="width: 100%; justify-content: center; margin-top: 8px;">서비스 보기</a>
+    </div>
+  </div>
+
+  <style>
+    @media (max-width: 768px) { .masthead-grid { grid-template-columns: 1fr !important; gap: 32px !important; } }
+  </style>
+</section>
+
+<!-- ── §B Gallery (포트폴리오) ───────────────────────── -->
+<% if @portfolio.any? %>
+  <section class="impd-wrap impd-section">
+    <div class="impd-section-header">
+      <span class="impd-label">§B</span>
+      <span class="impd-display" style="font-size: 36px; flex: 1;">갤러리</span>
+      <span class="impd-label-muted"><%= @portfolio.size %> ITEMS</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
+      <% @portfolio.first(8).each_with_index do |p, i| %>
+        <div style="aspect-ratio: 1 / 1.1; background: <%= ["#ff5a1f", "#3a2af0", "#2a9d8f", "#e4b230", "#1a1a1a", "#aa2a6a"][i % 6] %>; position: relative; overflow: hidden;" class="impd-stripe">
+          <% if p.media_url.present? %>
+            <img src="<%= p.media_url %>" alt="<%= p.title %>" style="width: 100%; height: 100%; object-fit: cover;">
+          <% end %>
+          <div style="position: absolute; bottom: 12px; left: 12px; color: #fff;">
+            <p class="impd-label" style="color: rgba(255,255,255,.7);"><%= p.category || "WORK" %></p>
+            <p style="font-family: var(--impd-font-display); font-size: 18px; margin-top: 4px;"><%= p.title %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+
+<!-- ── §C Services (수업/상품) ───────────────────────── -->
+<% if @services.any? %>
+  <section class="impd-wrap impd-section" id="classes">
+    <div class="impd-section-header">
+      <span class="impd-label">§C</span>
+      <span class="impd-display" style="font-size: 36px; flex: 1;">서비스 / 수업</span>
+      <span class="impd-label-muted"><%= @services.size %> ITEMS</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
+      <% @services.first(6).each_with_index do |s, i| %>
+        <div style="background: <%= ["#fbf8f1", "#f5f1e7", "#fbf8f1"][i % 3] %>; border: 1px solid var(--impd-rule); padding: 24px; position: relative; min-height: 180px;">
+          <span class="impd-label-muted" style="position: absolute; top: 16px; right: 16px;"><%= s.is_active.to_i.positive? ? "신청 가능" : "마감" %></span>
+          <h3 class="impd-display" style="font-size: 24px;"><%= s.title %></h3>
+          <% if s.description.present? %>
+            <p style="margin-top: 12px; font-size: 14px; color: var(--impd-ink2); line-height: 1.5;"><%= truncate(s.description, length: 80) %></p>
+          <% end %>
+          <p style="margin-top: 16px; font-family: var(--impd-font-mono); font-size: 13px; color: var(--impd-accent);">
+            <%= s.price_label.presence || (s.price.present? ? "₩#{s.price}" : "문의") %>
+          </p>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+
+<!-- ── Testimonial (인용) ───────────────────────── -->
+<% if @reviews.any? && @reviews.first.content.present? %>
+  <section style="background: var(--impd-ink); color: var(--impd-paper); padding: 80px 0; margin: 64px 0;">
+    <div class="impd-wrap" style="text-align: center;">
+      <p class="impd-label" style="color: var(--impd-accent);">§Testimonial</p>
+      <p class="impd-serif" style="font-size: clamp(28px, 4vw, 40px); line-height: 1.4; margin-top: 24px; max-width: 800px; margin-left: auto; margin-right: auto;">
+        "<%= @reviews.first.content %>"
+      </p>
+      <p class="impd-label-muted" style="color: rgba(239,236,228,.55); margin-top: 24px;">
+        — <%= @reviews.first.reviewer_name %> · <%= '★' * @reviews.first.rating %>
+      </p>
+    </div>
+  </section>
+<% end %>
+
+<!-- ── §D 활동 연대기 (CV) ───────────────────────── -->
+<% if @posts.any? %>
+  <section class="impd-wrap impd-section">
+    <div class="impd-section-header">
+      <span class="impd-label">§D</span>
+      <span class="impd-display" style="font-size: 36px; flex: 1;">활동 기록</span>
+      <span class="impd-label-muted">CV</span>
+    </div>
+    <div>
+      <% @posts.each do |p| %>
+        <div style="display: grid; grid-template-columns: 120px 1fr; gap: 24px; padding: 20px 0; border-top: 1px solid var(--impd-rule);">
+          <span class="impd-label-muted"><%= p.published_at&.strftime("%Y.%m.%d") || p.created_at.strftime("%Y.%m.%d") %></span>
+          <div>
+            <h4 class="impd-display" style="font-size: 22px;"><%= p.title %></h4>
+            <% if p.content.present? %>
+              <p style="margin-top: 8px; color: var(--impd-ink2); font-size: 14px;"><%= truncate(p.content.to_s, length: 140) %></p>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+
+<!-- ── Contact CTA ───────────────────────── -->
+<section class="impd-wrap impd-section" id="contact">
+  <div style="background: var(--impd-card); border: 1px solid var(--impd-ink); padding: 60px 40px; text-align: center;">
+    <p class="impd-label">§E · 함께 일하실 분</p>
+    <h2 class="impd-display" style="font-size: clamp(36px, 5vw, 64px); margin-top: 16px;">
+      <%= @member.name %>님께<br>
+      <span style="color: var(--impd-accent); font-style: italic;">직접 문의</span>하세요.
+    </h2>
+    <% if @member.email.present? %>
+      <a href="mailto:<%= @member.email %>" class="impd-btn impd-btn-primary" style="margin-top: 32px; height: 54px; padding: 0 28px; font-size: 16px;">이메일 보내기 →</a>
+    <% end %>
+    <% if @member.phone.present? %>
+      <a href="tel:<%= @member.phone %>" class="impd-btn impd-btn-secondary" style="margin-top: 32px; margin-left: 12px; height: 54px; padding: 0 28px; font-size: 16px;">전화 <%= @member.phone %></a>
+    <% end %>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer style="border-top: 1px solid var(--impd-rule); padding: 32px 40px; display: flex; gap: 32px; flex-wrap: wrap; align-items: center; font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted);">
+  <span class="impd-display" style="font-size: 16px; text-transform: none; color: var(--impd-ink);">imPD<span style="color: var(--impd-accent);">.</span></span>
+  <span><%= @member.name %> · /<%= @member.slug %></span>
+  <span style="flex: 1;"></span>
+  <span>powered by imPD</span>
+</footer>

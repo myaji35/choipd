@@ -222,12 +222,26 @@ Rails.application.routes.draw do
   # ── 헬스체크 (kamal-proxy) ────────────────────────────
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # ── Vanity URL: /<slug> → 분양사 공개 페이지 (가장 마지막) ───
-  # 예약어와 충돌 방지: 알파벳/숫자/하이픈만, 최소 2자
+  # ── 회원 본인 admin (/<slug>/admin/*) ─────────────────
+  scope "/:slug", constraints: { slug: /[a-z0-9][a-z0-9\-]{1,}/ } do
+    get  "/login",  to: "member_sessions#new",     as: :login_member
+    post "/login",  to: "member_sessions#create",  as: :login_member_post
+    delete "/logout", to: "member_sessions#destroy", as: :logout_member
+
+    namespace :member_admin, path: "admin", as: :slug_admin do
+      get "/dashboard", to: "dashboard#show", as: :dashboard
+      get "/editor",    to: "editor#show",    as: :editor
+    end
+  end
+
+  # ── Vanity URL: /<slug> → 회원 또는 분양사 공개 페이지 (가장 마지막) ───
+  # 정확히 예약어와 같으면 차단, 아니면 통과 (-가 포함되면 OK → /choi-pd 통과)
+  RESERVED_SLUGS = %w[admin pd auth api up education media works community inquiries leads choi choipd assets rails webhooks login logout].freeze
   get "/:slug",
-      to: "distributors_public#show",
-      as: :distributor_public,
-      constraints: {
-        slug: /(?!admin|pd|auth|api|up|education|media|works|community|inquiries|leads|choi|choipd|assets|rails)[a-z0-9][a-z0-9\-]{1,}/
+      to: "public_profile#show",
+      as: :public_profile,
+      constraints: lambda { |req|
+        slug = req.path_parameters[:slug].to_s
+        slug.match?(/\A[a-z0-9][a-z0-9\-]{1,}\z/) && !RESERVED_SLUGS.include?(slug)
       }
 end

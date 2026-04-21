@@ -1,0 +1,71 @@
+<% content_for :title, "에디터 — #{@member.name}" %>
+
+<div style="max-width: 1200px; margin: 0 auto; padding: 40px;">
+  <!-- 4단계 progress rail -->
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--impd-ink); margin-bottom: 48px;">
+    <% steps = [
+      [1, "업로드", "자료 올리기"],
+      [2, "정보 확인", "AI 추출 검토"],
+      [3, "스타일 선택", "테마/레이아웃"],
+      [4, "발행", "공개"]
+    ] %>
+    <% steps.each_with_index do |(n, label, desc), i| %>
+      <% active = @step >= n %>
+      <% current = @step == n %>
+      <div style="padding: 16px 20px; <%= 'border-left: 1px solid var(--impd-rule);' if i > 0 %> position: relative;">
+        <% if current %><div style="position: absolute; top: -2px; left: 0; right: 0; height: 3px; background: var(--impd-accent);"></div><% end %>
+        <div class="impd-label" style="color: <%= active ? 'var(--impd-accent)' : 'var(--impd-soft-muted)' %>;">§0<%= n %></div>
+        <p style="font-family: var(--impd-font-display); font-weight: 800; font-size: 20px; margin-top: 6px; color: <%= active ? 'var(--impd-ink)' : 'var(--impd-soft-muted)' %>;"><%= label %></p>
+        <p style="font-size: 12px; color: var(--impd-muted); margin-top: 4px;"><%= desc %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @step == 1 %>
+    <!-- ── Step 1: 업로드 ───────────────────────── -->
+    <div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 60px;" class="editor-grid">
+      <div>
+        <div class="impd-label">§01 · 가지고 있는 자료를 올려주세요.</div>
+        <h2 class="impd-display" style="font-size: 48px; margin-top: 16px;">
+          뭘 올려야<br>할지<br>
+          <span style="color: var(--impd-accent); font-style: italic;">고민 마세요.</span>
+        </h2>
+        <p style="margin-top: 24px; font-size: 14px; color: var(--impd-ink2); line-height: 1.6;">
+          사진, 수료증, SNS 캡처, 강의 이력 PDF, 후기 스크린샷 — <strong>무엇이든 그냥 올리세요.</strong> imPD가 자동으로 분류해서 페이지로 만들어 드립니다.
+        </p>
+        <div style="margin-top: 24px; padding: 16px; background: var(--impd-card); border: 1px solid var(--impd-rule);">
+          <p class="impd-label-muted">허용 형식</p>
+          <p style="margin-top: 8px; font-size: 13px;">📷 JPG · PNG · HEIC · 📄 PDF · 📝 MD · TXT · 🎬 MP4 (200MB 이하)</p>
+        </div>
+      </div>
+      <div>
+        <%= render "member_admin/editor/dropzone", member: @member %>
+      </div>
+    </div>
+
+  <% elsif @step == 2 %>
+    <div class="impd-section-header"><span class="impd-label">§02</span><span class="impd-display" style="font-size: 36px; flex: 1;">정보 확인 — AI가 추출한 내용을 검토하세요</span></div>
+    <p style="text-align: center; padding: 60px; color: var(--impd-muted);">곧 출시 예정 — Step 1의 업로드 자료를 AI가 분석하여 카테고리/달란트/이력으로 자동 분류합니다.</p>
+
+  <% elsif @step == 3 %>
+    <div class="impd-section-header"><span class="impd-label">§03</span><span class="impd-display" style="font-size: 36px; flex: 1;">스타일 선택</span></div>
+    <p style="text-align: center; padding: 60px; color: var(--impd-muted);">곧 출시 예정 — 다크/크림/매거진/카드 4개 테마 중 선택.</p>
+
+  <% else %>
+    <div class="impd-section-header"><span class="impd-label">§04</span><span class="impd-display" style="font-size: 36px; flex: 1;">발행 — 공개 페이지를 활성화합니다</span></div>
+    <div style="text-align: center; padding: 60px;">
+      <p style="font-size: 18px; color: var(--impd-ink2);">최종 검토 후 발행 버튼을 누르면 <strong style="color: var(--impd-accent);">/<%= @member.slug %></strong> 가 공개됩니다.</p>
+      <a href="/<%= @member.slug %>" target="_blank" class="impd-btn impd-btn-primary" style="margin-top: 32px; height: 54px; padding: 0 28px; font-size: 16px;">예시 보기 →</a>
+    </div>
+  <% end %>
+
+  <!-- 단계 네비 -->
+  <div style="display: flex; justify-content: space-between; margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--impd-rule);">
+    <% if @step > 1 %><a href="?step=<%= @step - 1 %>" class="impd-btn impd-btn-secondary">← 이전</a><% else %><span></span><% end %>
+    <% if @step < 4 %><a href="?step=<%= @step + 1 %>" class="impd-btn impd-btn-primary">다음 →</a><% end %>
+  </div>
+</div>
+
+<style>
+  @media (max-width: 768px) { .editor-grid { grid-template-columns: 1fr !important; } }
+</style>

@@ -1,0 +1,30 @@
+<% content_for :title, "로그인" %>
+<div style="max-width: 480px; margin: 100px auto; padding: 40px; background: var(--impd-card); border: 1px solid var(--impd-rule);">
+  <% if @member %>
+    <p class="impd-label">§ <%= @member.name %>님의 admin</p>
+    <h1 class="impd-display" style="font-size: 36px; margin-top: 12px;">
+      <%= @member.name %><br>
+      <span style="color: var(--impd-accent); font-style: italic;">로그인</span>
+    </h1>
+  <% else %>
+    <h1 class="impd-display" style="font-size: 36px;">존재하지 않는 페이지입니다</h1>
+  <% end %>
+
+  <% if @member %>
+    <%= form_with url: login_member_post_path(slug: @member.slug), local: true, style: "margin-top: 32px;" do |f| %>
+      <div style="margin-bottom: 16px;">
+        <%= f.label :password, "비밀번호", style: "display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;" %>
+        <%= f.password_field :password, autofocus: true,
+            placeholder: "(데모 — 비밀번호 없이 입장 가능)",
+            style: "width: 100%; padding: 12px; border: 1px solid var(--impd-rule); border-radius: 0; font-size: 14px;" %>
+      </div>
+      <%= f.submit "로그인 →", class: "impd-btn impd-btn-primary", style: "width: 100%; justify-content: center;" %>
+    <% end %>
+
+    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--impd-rule); font-size: 12px; color: var(--impd-muted);">
+      <p>💡 데모 모드: 비밀번호 비어있으면 무조건 로그인됨 (Phase 1)</p>
+    </div>
+  <% end %>
+
+  <a href="/" style="display: block; margin-top: 24px; text-align: center; font-size: 13px; color: var(--impd-muted);">← imPD 메인으로</a>
+</div>
