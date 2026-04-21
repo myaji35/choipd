@@ -17,6 +17,13 @@ class MemberAdmin::BaseController < ApplicationController
     return if warden.user(:admin_user)
     return if session[:member_id] == @member.id
 
+    # 데모 자동 패스 (Phase 1) — 비밀번호 미설정 회원은 자동 로그인
+    if @member.password_digest.blank?
+      session[:member_id] = @member.id
+      @member.update_columns(last_sign_in_at: Time.current)
+      return
+    end
+
     redirect_to login_member_path(slug: @member.slug), alert: "로그인이 필요합니다"
   end
 
