@@ -1,0 +1,24 @@
+<% content_for :title, "#{@test.name} 수정" %>
+
+<div class="mb-6">
+  <%= link_to "← #{@test.name}", admin_ab_test_path(@test), class: "text-primary text-sm" %>
+  <h1 class="text-2xl font-bold text-navy mt-2">테스트 수정</h1>
+</div>
+
+<%= form_with model: [:admin, @test], class: "bg-white border border-gray-200 rounded-lg p-6 max-w-2xl space-y-4" do |f| %>
+  <div>
+    <%= f.label :name, "이름", class: "block text-sm font-semibold mb-1" %>
+    <%= f.text_field :name, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+  </div>
+  <div>
+    <%= f.label :hypothesis, "가설", class: "block text-sm font-semibold mb-1" %>
+    <%= f.text_area :hypothesis, rows: 3, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+  </div>
+  <div>
+    <%= f.label :winner, "승자 변형", class: "block text-sm font-semibold mb-1" %>
+    <%= f.select :winner, [["미정", ""]] + @test.variants_list.map { |v| [v, v] }, {}, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+  </div>
+  <div class="flex gap-3 pt-2">
+    <%= f.submit "수정", class: "bg-primary text-white px-6 py-2 rounded-lg text-sm cursor-pointer" %>
+  </div>
+<% end %>

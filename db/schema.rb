@@ -10,7 +10,45 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_21_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_21_100000) do
+  create_table "ab_test_participants", force: :cascade do |t|
+    t.integer "ab_test_id", null: false
+    t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.integer "conversion_value"
+    t.boolean "converted", default: false
+    t.datetime "converted_at"
+    t.text "metadata"
+    t.string "session_id", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.string "user_id"
+    t.string "variant", null: false
+    t.index ["ab_test_id", "variant"], name: "index_ab_test_participants_on_ab_test_id_and_variant"
+    t.index ["ab_test_id"], name: "index_ab_test_participants_on_ab_test_id"
+    t.index ["session_id"], name: "index_ab_test_participants_on_session_id"
+  end
+
+  create_table "ab_tests", force: :cascade do |t|
+    t.integer "confidence_level", default: 95
+    t.datetime "created_at", null: false
+    t.string "created_by", null: false
+    t.text "description"
+    t.datetime "end_date"
+    t.text "hypothesis"
+    t.string "name", null: false
+    t.text "results"
+    t.datetime "start_date"
+    t.string "status", default: "draft", null: false
+    t.string "target_metric", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.integer "total_participants", default: 0
+    t.text "traffic_allocation", null: false
+    t.datetime "updated_at", null: false
+    t.text "variants", null: false
+    t.string "winner"
+    t.index ["status"], name: "index_ab_tests_on_status"
+    t.index ["tenant_id"], name: "index_ab_tests_on_tenant_id"
+  end
+
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -52,6 +90,59 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_090000) do
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
+  create_table "analytics_events", force: :cascade do |t|
+    t.string "browser"
+    t.string "city"
+    t.string "country"
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.string "device_type"
+    t.string "event_action"
+    t.string "event_category", null: false
+    t.string "event_label"
+    t.string "event_name", null: false
+    t.integer "event_value"
+    t.string "ip_address"
+    t.text "metadata"
+    t.string "os"
+    t.string "page_path"
+    t.string "page_title"
+    t.string "referrer"
+    t.string "session_id"
+    t.integer "tenant_id", default: 1, null: false
+    t.string "user_agent"
+    t.string "user_id"
+    t.string "user_type"
+    t.index ["event_name"], name: "index_analytics_events_on_event_name"
+    t.index ["tenant_id", "created_at"], name: "index_analytics_events_on_tenant_id_and_created_at"
+    t.index ["user_id"], name: "index_analytics_events_on_user_id"
+  end
+
+  create_table "cohort_users", force: :cascade do |t|
+    t.integer "cohort_id", null: false
+    t.datetime "joined_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.text "metadata"
+    t.integer "tenant_id", default: 1, null: false
+    t.string "user_email"
+    t.string "user_id", null: false
+    t.index ["cohort_id"], name: "index_cohort_users_on_cohort_id"
+  end
+
+  create_table "cohorts", force: :cascade do |t|
+    t.string "cohort_type", null: false
+    t.datetime "created_at", null: false
+    t.string "created_by", null: false
+    t.text "criteria", null: false
+    t.text "description"
+    t.datetime "end_date", null: false
+    t.text "metrics"
+    t.string "name", null: false
+    t.datetime "start_date", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_count", default: 0, null: false
+    t.index ["tenant_id"], name: "index_cohorts_on_tenant_id"
+  end
+
   create_table "courses", force: :cascade do |t|
     t.string "course_type"
     t.datetime "created_at", null: false
@@ -66,6 +157,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_090000) do
     t.index ["course_type"], name: "index_courses_on_course_type"
     t.index ["published"], name: "index_courses_on_published"
     t.index ["tenant_id"], name: "index_courses_on_tenant_id"
+  end
+
+  create_table "custom_reports", force: :cascade do |t|
+    t.text "chart_config"
+    t.string "chart_type"
+    t.text "columns", null: false
+    t.datetime "created_at", null: false
+    t.string "created_by", null: false
+    t.string "data_source", null: false
+    t.text "description"
+    t.text "filters"
+    t.text "group_by"
+    t.boolean "is_public", default: false
+    t.string "name", null: false
+    t.text "order_by"
+    t.text "recipients"
+    t.string "report_type", null: false
+    t.text "schedule"
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.index ["tenant_id"], name: "index_custom_reports_on_tenant_id"
   end
 
   create_table "distributor_activity_logs", force: :cascade do |t|
@@ -138,6 +250,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_090000) do
     t.index ["provider", "external_order_id"], name: "uq_enrollments_provider_order", unique: true
     t.index ["tenant_id"], name: "index_enrollments_on_tenant_id"
     t.index ["user_id"], name: "index_enrollments_on_user_id"
+  end
+
+  create_table "funnels", force: :cascade do |t|
+    t.text "conversion_data"
+    t.integer "conversion_window", default: 7
+    t.datetime "created_at", null: false
+    t.string "created_by", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.text "steps", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.integer "total_users", default: 0
+    t.datetime "updated_at", null: false
+    t.index ["tenant_id"], name: "index_funnels_on_tenant_id"
   end
 
   create_table "hero_images", force: :cascade do |t|
@@ -455,6 +581,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_090000) do
     t.index ["tenant_id"], name: "index_posts_on_tenant_id"
   end
 
+  create_table "rfm_segments", force: :cascade do |t|
+    t.datetime "calculated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.integer "frequency_score", null: false
+    t.datetime "last_activity_at"
+    t.integer "monetary_score", null: false
+    t.integer "recency_score", null: false
+    t.string "rfm_segment", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.integer "total_revenue", default: 0
+    t.integer "total_transactions", default: 0
+    t.string "user_id", null: false
+    t.string "user_type", null: false
+    t.index ["rfm_segment"], name: "index_rfm_segments_on_rfm_segment"
+    t.index ["tenant_id"], name: "index_rfm_segments_on_tenant_id"
+  end
+
   create_table "settings", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "key"
@@ -535,8 +677,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_090000) do
     t.index ["tenant_id"], name: "index_works_on_tenant_id"
   end
 
+  add_foreign_key "ab_test_participants", "ab_tests", on_delete: :cascade
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "cohort_users", "cohorts", on_delete: :cascade
   add_foreign_key "distributor_activity_logs", "distributors"
   add_foreign_key "enrollments", "courses", on_delete: :cascade
   add_foreign_key "invoices", "distributors"

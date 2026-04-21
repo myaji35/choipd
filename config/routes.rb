@@ -85,6 +85,18 @@ Rails.application.routes.draw do
       post   "/tasks/:id/reopen",       to: "kanban_tasks#reopen",   as: :kanban_task_reopen
     end
 
+    # ── 분석 ─────────────────────────────────────
+    get "/analytics", to: "analytics#index", as: :analytics
+    get "/analytics/events", to: "analytics#events", as: :analytics_events
+
+    resources :ab_tests do
+      member do
+        post :start
+        post :pause
+        post :complete
+      end
+    end
+
     resources :resources,    controller: "distributor_resources"
     resources :hero_images
     resources :newsletter,   only: [ :index ]

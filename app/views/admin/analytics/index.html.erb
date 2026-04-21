@@ -1,0 +1,172 @@
+<% content_for :title, "분석 대시보드" %>
+
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-navy">📊 분석 대시보드</h1>
+    <p class="text-sm text-gray-500 mt-1">최근 <%= @period_days %>일</p>
+  </div>
+  <div class="flex gap-2">
+    <% [7, 30, 90].each do |d| %>
+      <%= link_to "#{d}일", admin_analytics_path(days: d),
+          class: "text-xs px-3 py-1.5 rounded #{@period_days == d ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700'}" %>
+    <% end %>
+  </div>
+</div>
+
+<!-- KPI 4 카드 -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+  <div class="bg-white border border-gray-200 rounded-lg p-5">
+    <p class="text-xs text-gray-500">전체 이벤트</p>
+    <p class="text-3xl font-bold text-navy mt-1"><%= number_with_delimiter(@events_count) %></p>
+  </div>
+  <div class="bg-white border border-gray-200 rounded-lg p-5">
+    <p class="text-xs text-gray-500">고유 사용자</p>
+    <p class="text-3xl font-bold text-blue-600 mt-1"><%= number_with_delimiter(@unique_users) %></p>
+  </div>
+  <div class="bg-white border border-gray-200 rounded-lg p-5">
+    <p class="text-xs text-gray-500">평균/일</p>
+    <p class="text-3xl font-bold text-emerald-600 mt-1"><%= number_with_delimiter((@events_count / [@period_days, 1].max.to_f).round) %></p>
+  </div>
+  <div class="bg-white border border-gray-200 rounded-lg p-5">
+    <p class="text-xs text-gray-500">실행 중 AB</p>
+    <p class="text-3xl font-bold text-purple-600 mt-1"><%= AbTest.for_tenant.running.count %></p>
+  </div>
+</div>
+
+<!-- 도구 카드 -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+  <%= link_to admin_ab_tests_path, class: "block bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow" do %>
+    <p class="text-2xl">🧪</p>
+    <p class="font-bold text-navy mt-2">AB 테스트</p>
+    <p class="text-xs text-gray-500 mt-1">전체 <%= @ab_tests_count %>개</p>
+  <% end %>
+  <div class="block bg-white border border-gray-200 rounded-lg p-4 opacity-50">
+    <p class="text-2xl">👥</p>
+    <p class="font-bold text-navy mt-2">코호트</p>
+    <p class="text-xs text-gray-500 mt-1">전체 <%= @cohorts_count %>개 (준비 중)</p>
+  </div>
+  <div class="block bg-white border border-gray-200 rounded-lg p-4 opacity-50">
+    <p class="text-2xl">📉</p>
+    <p class="font-bold text-navy mt-2">퍼널 분석</p>
+    <p class="text-xs text-gray-500 mt-1">전체 <%= @funnels_count %>개 (준비 중)</p>
+  </div>
+  <div class="block bg-white border border-gray-200 rounded-lg p-4 opacity-50">
+    <p class="text-2xl">⭐</p>
+    <p class="font-bold text-navy mt-2">RFM 세그먼트</p>
+    <p class="text-xs text-gray-500 mt-1">전체 <%= @rfm_segments_count %>개 (준비 중)</p>
+  </div>
+</div>
+
+<!-- 일별 차트 (간단 SVG) -->
+<div class="bg-white border border-gray-200 rounded-lg p-5 mb-6">
+  <h2 class="font-semibold text-navy mb-3">📈 일별 이벤트 추이</h2>
+  <% if @daily_counts.any? %>
+    <% max_val = @daily_counts.values.max.to_f %>
+    <div class="flex items-end gap-1 h-40">
+      <% @daily_counts.sort.each do |date, count| %>
+        <div class="flex-1 flex flex-col items-center justify-end">
+          <span class="text-xs text-gray-400"><%= count %></span>
+          <div class="w-full bg-blue-400 rounded-t" style="height: <%= max_val.zero? ? 0 : (count.to_f / max_val * 100).round %>%" title="<%= date %>: <%= count %>"></div>
+          <span class="text-xs text-gray-400 mt-1"><%= date.to_s.split('-').last %></span>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-sm text-gray-400 text-center py-12">아직 이벤트가 없습니다.</p>
+  <% end %>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+  <!-- Top 이벤트 -->
+  <div class="bg-white border border-gray-200 rounded-lg p-5">
+    <h2 class="font-semibold text-navy mb-3">🔥 Top 10 이벤트</h2>
+    <% if @top_events.any? %>
+      <% max = @top_events.first[1].to_f %>
+      <div class="space-y-2">
+        <% @top_events.each do |name, count| %>
+          <div class="flex items-center gap-3 text-sm">
+            <span class="font-mono text-xs text-gray-600 w-32 truncate"><%= name %></span>
+            <div class="flex-1 bg-gray-100 rounded h-5 relative">
+              <div class="bg-blue-500 h-full rounded" style="width: <%= (count.to_f / max * 100).round %>%"></div>
+            </div>
+            <span class="text-xs font-bold text-navy w-12 text-right"><%= count %></span>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-sm text-gray-400">데이터 없음</p>
+    <% end %>
+  </div>
+
+  <!-- 카테고리/디바이스 -->
+  <div class="space-y-4">
+    <div class="bg-white border border-gray-200 rounded-lg p-5">
+      <h2 class="font-semibold text-navy mb-3">📂 카테고리</h2>
+      <% if @category_counts.any? %>
+        <div class="space-y-1">
+          <% @category_counts.each do |cat, c| %>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-700"><%= cat %></span>
+              <span class="font-bold text-navy"><%= c %></span>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-gray-400">데이터 없음</p>
+      <% end %>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-lg p-5">
+      <h2 class="font-semibold text-navy mb-3">📱 디바이스</h2>
+      <% if @device_counts.any? %>
+        <% icons = { 'desktop' => '🖥️', 'mobile' => '📱', 'tablet' => '📲' } %>
+        <div class="flex gap-3">
+          <% @device_counts.each do |dev, c| %>
+            <div class="flex-1 text-center bg-gray-50 rounded p-3">
+              <p class="text-2xl"><%= icons[dev] || '📊' %></p>
+              <p class="text-xs text-gray-500 mt-1"><%= dev %></p>
+              <p class="font-bold text-navy"><%= c %></p>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-gray-400">데이터 없음</p>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- 최근 이벤트 -->
+<div class="bg-white border border-gray-200 rounded-lg p-5">
+  <div class="flex justify-between items-center mb-3">
+    <h2 class="font-semibold text-navy">🕒 최근 이벤트 (<%= @recent_events.size %>)</h2>
+    <%= link_to "전체 보기 →", admin_analytics_events_path, class: "text-xs text-primary" %>
+  </div>
+  <% if @recent_events.any? %>
+    <table class="w-full text-sm">
+      <thead class="text-left border-b">
+        <tr class="text-xs text-gray-500">
+          <th class="py-2">시간</th>
+          <th class="py-2">이벤트</th>
+          <th class="py-2">사용자</th>
+          <th class="py-2">페이지</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y">
+        <% @recent_events.each do |e| %>
+          <tr>
+            <td class="py-2 text-xs text-gray-500"><%= e.created_at.strftime("%m/%d %H:%M:%S") %></td>
+            <td class="py-2 text-xs font-mono"><%= e.event_name %></td>
+            <td class="py-2 text-xs text-gray-600"><%= e.user_id || '익명' %></td>
+            <td class="py-2 text-xs text-gray-500 truncate max-w-xs"><%= e.page_path %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p class="text-sm text-gray-400 text-center py-6">
+      아직 트래킹된 이벤트가 없습니다.<br>
+      <span class="text-xs">AnalyticsEvent.track(event_name: 'page_view') 호출 시 표시됩니다.</span>
+    </p>
+  <% end %>
+</div>
