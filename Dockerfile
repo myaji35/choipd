@@ -58,6 +58,8 @@ RUN chmod +x bin/*
 RUN bundle exec bootsnap precompile -j 1 app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
+# Tailwind CSS 명시적 빌드 (precompile 전에 builds/tailwind.css 생성)
+RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails tailwindcss:build || true
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 
