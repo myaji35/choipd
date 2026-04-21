@@ -1,5 +1,19 @@
 import { Controller } from "@hotwired/stimulus"
 
+const CATEGORY_RULES = [
+  [/(이력|career|cv|resume|profile)/i, "career"],
+  [/(수료|certificate|cert|license|자격)/i, "certificate"],
+  [/(후기|review|testimonial|추천)/i, "review"],
+  [/(강의|course|lecture|커리큘럼|syllabus)/i, "course"],
+  [/(언론|press|기사|보도|media)/i, "press"],
+  [/(작품|portfolio|work|gallery)/i, "portfolio"]
+]
+
+function inferCategory(filename) {
+  for (const [re, cat] of CATEGORY_RULES) if (re.test(filename)) return cat
+  return "other"
+}
+
 export default class extends Controller {
   static targets = ["fileInput", "title", "category", "error", "status"]
   static values = { createUrl: String, csrf: String }
@@ -9,49 +23,67 @@ export default class extends Controller {
   drop(e) {
     e.preventDefault()
     e.currentTarget.classList.remove("border-primary", "bg-blue-50")
-    const file = e.dataTransfer.files[0]
-    if (file) this.processFile(file)
+    const files = Array.from(e.dataTransfer.files)
+    if (files.length) this.processFiles(files)
   }
   fileSelected(e) {
-    const file = e.target.files[0]
-    if (file) this.processFile(file)
+    const files = Array.from(e.target.files)
+    if (files.length) this.processFiles(files)
   }
 
-  async processFile(file) {
+  async processFiles(files) {
+    this.errorTarget.style.display = "none"
+    const total = files.length
+    let ok = 0, fail = 0
+    const failures = []
+
+    for (let i = 0; i < total; i++) {
+      const file = files[i]
+      this.statusTarget.textContent = `[${i + 1}/${total}] ${file.name} — 업로드 중…`
+      const result = await this.uploadOne(file)
+      if (result.ok) ok++
+      else { fail++; failures.push(`${file.name}: ${result.error}`) }
+    }
+
+    if (fail === 0) {
+      this.statusTarget.textContent = `✓ ${ok}개 업로드 완료`
+      setTimeout(() => location.reload(), 600)
+    } else {
+      this.statusTarget.textContent = `${ok}개 성공 · ${fail}개 실패`
+      this.showError(failures.join(" / "))
+      if (ok > 0) setTimeout(() => location.reload(), 1500)
+    }
+  }
+
+  async uploadOne(file) {
     if (!/\.(md|markdown|txt)$/i.test(file.name)) {
-      return this.showError(".md / .markdown / .txt 파일만 허용됩니다.")
+      return { ok: false, error: "확장자 불가 (.md/.txt만)" }
     }
     if (file.size > 1024 * 1024) {
-      return this.showError("최대 1MB")
+      return { ok: false, error: "1MB 초과" }
     }
-    this.statusTarget.textContent = "업로드 중..."
-    const text = await file.text()
     try {
+      const text = await file.text()
       const res = await fetch(this.createUrlValue, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRF-Token": this.csrfValue },
         body: JSON.stringify({
           filename: file.name,
           title: this.titleTarget.value || null,
-          category: this.categoryTarget.value,
+          category: inferCategory(file.name),
           content: text
         })
       })
       const data = await res.json()
-      if (data.success) {
-        this.statusTarget.textContent = "✓ 업로드 완료"
-        setTimeout(() => location.reload(), 500)
-      } else {
-        this.showError(data.error || (data.errors || []).join(", ") || "업로드 실패")
-      }
+      if (data.success) return { ok: true }
+      return { ok: false, error: data.error || (data.errors || []).join(", ") || "실패" }
     } catch (e) {
-      this.showError(e.message)
+      return { ok: false, error: e.message }
     }
   }
 
   showError(msg) {
     this.errorTarget.textContent = msg
-    this.errorTarget.classList.remove("hidden")
-    this.statusTarget.textContent = ""
+    this.errorTarget.style.display = "block"
   }
 }
