@@ -236,13 +236,13 @@ Rails.application.routes.draw do
   end
 
   # ── Vanity URL: /<slug> → 회원 또는 분양사 공개 페이지 (가장 마지막) ───
-  # 정확히 예약어와 같으면 차단, 아니면 통과 (-가 포함되면 OK → /choi-pd 통과)
-  RESERVED_SLUGS = %w[admin pd auth api up education media works community inquiries leads choi choipd assets rails webhooks login logout].freeze
+  # CRIT-4: SlugValidation::RESERVED_SLUGS 단일 source of truth.
+  # 모델 검증과 라우트 차단이 동일 목록을 사용하므로 충돌 불가.
   get "/:slug",
       to: "public_profile#show",
       as: :public_profile,
       constraints: lambda { |req|
         slug = req.path_parameters[:slug].to_s
-        slug.match?(/\A[a-z0-9][a-z0-9\-]{1,}\z/) && !RESERVED_SLUGS.include?(slug)
+        slug.match?(/\A[a-z0-9][a-z0-9\-]{1,}\z/) && !SlugValidation::RESERVED_SLUGS.include?(slug)
       }
 end

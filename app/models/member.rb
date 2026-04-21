@@ -20,6 +20,7 @@ class Member < ApplicationRecord
   PROFESSIONS = %w[insurance_agent realtor educator author shopowner freelancer custom].freeze
 
   validates :name, :email, :slug, presence: true
+  validates :slug, uniqueness: { case_sensitive: false }
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :status, inclusion: { in: STATUSES }
   validates :impd_status, inclusion: { in: IMPD_STATUSES }

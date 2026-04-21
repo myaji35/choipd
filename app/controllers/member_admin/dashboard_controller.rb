@@ -1,15 +1,19 @@
 class MemberAdmin::DashboardController < MemberAdmin::BaseController
   def show
     today = Date.current
-    @today_visits = AnalyticsEvent.for_tenant.where(event_name: "page_view", page_path: "/#{@member.slug}").where(created_at: today.beginning_of_day..today.end_of_day).count
+    # CRIT-3 fix: owner/admin 트래픽 제외 — user_type='anonymous'만 카운트
+    visit_scope = AnalyticsEvent.for_tenant
+                                .where(event_name: "page_view", page_path: "/#{@member.slug}")
+                                .where(user_type: "anonymous")
+    @today_visits = visit_scope.where(created_at: today.beginning_of_day..today.end_of_day).count
     @inquiries_count = @member.member_inquiries.count
     @services_count = @member.member_services.count
     @revenue = (@today_visits * 7000) # stub: 방문자당 평균
 
-    # 14일 방문 추이 (실제 analytics_events 기반)
+    # 14일 방문 추이 (owner 제외)
     @bar_data = (0..13).map { |i|
       d = today - i.days
-      count = AnalyticsEvent.for_tenant.where(event_name: "page_view", page_path: "/#{@member.slug}").where(created_at: d.beginning_of_day..d.end_of_day).count
+      count = visit_scope.where(created_at: d.beginning_of_day..d.end_of_day).count
       [d, count]
     }.reverse
 
