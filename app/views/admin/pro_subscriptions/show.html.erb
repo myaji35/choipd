@@ -1,0 +1,17 @@
+<% content_for :title, "Pro 구독 #{@subscription.id}" %>
+<div class="mb-6"><%= link_to "← Pro 구독", admin_pro_subscriptions_path, class: "text-primary text-sm" %></div>
+
+<div class="bg-white border border-gray-200 rounded-lg p-6 max-w-2xl">
+  <h2 class="text-xl font-bold text-navy mb-4"><%= @subscription.tier %> 구독 상세</h2>
+  <dl class="space-y-3 text-sm">
+    <div class="flex justify-between"><dt class="text-gray-500">상태</dt><dd class="font-bold"><%= @subscription.status %></dd></div>
+    <div class="flex justify-between"><dt class="text-gray-500">월 요금</dt><dd>₩<%= number_with_delimiter(@subscription.price_krw || 14900) %></dd></div>
+    <% if @subscription.trial? %>
+      <div class="flex justify-between"><dt class="text-gray-500">체험 종료</dt><dd><%= @subscription.trial_ends_at.strftime("%Y.%m.%d %H:%M") %></dd></div>
+    <% end %>
+    <% if @subscription.current_period_end %>
+      <div class="flex justify-between"><dt class="text-gray-500">다음 결제</dt><dd><%= @subscription.current_period_end.strftime("%Y.%m.%d") %></dd></div>
+    <% end %>
+    <div class="flex justify-between"><dt class="text-gray-500">결제 수단</dt><dd><%= @subscription.payment_method || "—" %></dd></div>
+  </dl>
+</div>

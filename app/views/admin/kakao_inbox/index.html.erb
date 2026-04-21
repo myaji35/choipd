@@ -1,0 +1,96 @@
+<% content_for :title, "카카오 채널 인박스 (Pro)" %>
+
+<div class="mb-6 flex items-center justify-between">
+  <div>
+    <h1 class="text-2xl font-bold text-navy">💬 카카오 채널 어시스턴트 <span class="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded ml-2">Pro</span></h1>
+    <p class="text-sm text-gray-500 mt-1">사장님이 직접 답해야 할 것 + 오늘 요약 — AI 보조 (자동답변 X)</p>
+  </div>
+  <%= link_to admin_pro_subscriptions_path, class: "text-xs text-primary" do %>
+    구독 관리 →
+  <% end %>
+</div>
+
+<!-- Pro 구독 상태 카드 -->
+<% if @subscription.nil? %>
+  <div class="bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-300 rounded-lg p-5 mb-4">
+    <h2 class="font-bold text-amber-900">⚡ 14일 무료 체험 시작하기</h2>
+    <p class="text-sm text-amber-800 mt-1">카카오 채널 1개 연결 + 일일 요약 + 긴급 알림 — 카드 등록 불필요</p>
+    <%= button_to "체험 시작 →", start_trial_admin_pro_subscriptions_path,
+        class: "mt-3 bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-800" %>
+  </div>
+<% elsif @subscription.trial? %>
+  <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 flex justify-between items-center">
+    <div>
+      <p class="font-bold text-blue-900">🎁 무료 체험 중 — <%= @subscription.trial_days_left %>일 남음</p>
+      <p class="text-xs text-blue-700"><%= @subscription.trial_ends_at.strftime("%Y.%m.%d") %>까지</p>
+    </div>
+    <%= button_to "지금 결제하기 →", activate_admin_pro_subscription_path(@subscription),
+        class: "bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium" %>
+  </div>
+<% elsif @subscription.status == "active" %>
+  <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 text-sm text-green-800">
+    ✓ Pro 활성 (월 ₩<%= number_with_delimiter(@subscription.price_krw || 14900) %>)
+  </div>
+<% end %>
+
+<!-- 동의 체크리스트 -->
+<% unless @consents.values.all? %>
+  <div class="bg-amber-50 border border-amber-200 rounded-lg p-5 mb-4">
+    <h2 class="font-bold text-amber-900 mb-3">📋 사용 전 동의 사항</h2>
+    <% [
+      ["kakao_data_processing", "카카오 대화 데이터 처리 동의 (imPD가 메시지를 읽고 분석)"],
+      ["customer_disclosure", "고객 공지 의무 (채널 프로필에 'AI 보조 사용 중' 표기)"],
+      ["tos", "Pro 서비스 이용약관 동의"]
+    ].each do |type, label| %>
+      <div class="flex items-center justify-between py-2 border-b border-amber-100">
+        <span class="text-sm <%= 'text-green-700' if @consents[type.to_sym] %>">
+          <%= @consents[type.to_sym] ? "✓" : "○" %> <%= label %>
+        </span>
+        <% unless @consents[type.to_sym] %>
+          <%= button_to "동의", admin_pro_consents_path(consent_type: type),
+              class: "text-xs bg-amber-700 text-white px-3 py-1 rounded" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<!-- 채널 목록 -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+  <% @channels.each do |c| %>
+    <%= link_to admin_kakao_inbox_path(c), class: "block bg-white border border-gray-200 rounded-lg p-5 hover:shadow-md" do %>
+      <div class="flex justify-between items-start mb-2">
+        <div>
+          <p class="font-bold text-navy"><%= c.channel_name %></p>
+          <p class="text-xs text-gray-500 font-mono"><%= c.channel_id %></p>
+        </div>
+        <% color = case c.status; when 'connected' then 'green'; when 'error' then 'red'; else 'gray'; end %>
+        <span class="text-xs px-2 py-0.5 bg-<%= color %>-100 text-<%= color %>-700 rounded"><%= c.status %></span>
+      </div>
+      <div class="mt-3 flex gap-3 text-xs text-gray-500">
+        <span>📨 <%= c.kakao_messages.unanswered.count %> 미답변</span>
+        <span>🚨 <%= c.kakao_alerts.unread.count %> 알림</span>
+      </div>
+    <% end %>
+  <% end %>
+
+  <!-- 채널 추가 -->
+  <% if @channels.size < (@subscription&.tier == "enterprise" ? 99 : 1) || @channels.empty? %>
+    <%= form_with url: admin_kakao_inbox_connect_path, class: "bg-white border-2 border-dashed border-gray-300 rounded-lg p-5 hover:border-primary text-center" do |f| %>
+      <p class="text-3xl mb-2">➕</p>
+      <p class="font-bold text-navy">채널 연결하기</p>
+      <%= f.text_field :channel_id, placeholder: "@채널아이디",
+          class: "w-full mt-3 border border-gray-300 rounded px-2 py-1.5 text-sm font-mono" %>
+      <%= f.text_field :channel_name, placeholder: "표시 이름",
+          class: "w-full mt-2 border border-gray-300 rounded px-2 py-1.5 text-sm" %>
+      <%= f.submit "연결 (데모)", class: "mt-3 w-full bg-primary text-white py-2 rounded text-sm cursor-pointer" %>
+    <% end %>
+  <% end %>
+</div>
+
+<% if @channels.empty? %>
+  <div class="text-center py-12 text-gray-400">
+    <p>아직 연결된 카카오 채널이 없습니다.</p>
+    <p class="text-xs mt-2">위 입력창에 채널 ID(@아이디)를 입력해 데모 연결해보세요.</p>
+  </div>
+<% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_21_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_21_140000) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -460,6 +460,91 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_120000) do
     t.index ["tenant_id"], name: "index_invoices_on_tenant_id"
   end
 
+  create_table "kakao_alerts", force: :cascade do |t|
+    t.boolean "acknowledged", default: false
+    t.datetime "acknowledged_at"
+    t.string "alert_type", null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.integer "kakao_channel_id", null: false
+    t.integer "kakao_message_id", null: false
+    t.string "keyword"
+    t.text "reason"
+    t.integer "severity", default: 1
+    t.integer "tenant_id", default: 1, null: false
+    t.index ["kakao_channel_id", "acknowledged"], name: "index_kakao_alerts_on_kakao_channel_id_and_acknowledged"
+    t.index ["kakao_channel_id"], name: "index_kakao_alerts_on_kakao_channel_id"
+    t.index ["kakao_message_id"], name: "index_kakao_alerts_on_kakao_message_id"
+  end
+
+  create_table "kakao_channels", force: :cascade do |t|
+    t.string "access_token_encrypted"
+    t.string "channel_id", null: false
+    t.string "channel_name"
+    t.datetime "connected_at"
+    t.datetime "created_at", null: false
+    t.text "error_message"
+    t.datetime "last_sync_at"
+    t.string "owner_id", null: false
+    t.string "owner_type", default: "AdminUser"
+    t.string "refresh_token_encrypted"
+    t.string "status", default: "pending", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "token_expires_at"
+    t.datetime "updated_at", null: false
+    t.index ["channel_id"], name: "index_kakao_channels_on_channel_id", unique: true
+    t.index ["owner_id"], name: "index_kakao_channels_on_owner_id"
+    t.index ["tenant_id"], name: "index_kakao_channels_on_tenant_id"
+  end
+
+  create_table "kakao_keywords", force: :cascade do |t|
+    t.string "category", default: "general"
+    t.datetime "created_at", null: false
+    t.boolean "is_active", default: true
+    t.string "keyword", null: false
+    t.string "owner_id", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.integer "weight", default: 50
+    t.index ["owner_id", "keyword"], name: "index_kakao_keywords_on_owner_id_and_keyword", unique: true
+  end
+
+  create_table "kakao_messages", force: :cascade do |t|
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.integer "kakao_channel_id", null: false
+    t.string "message_type", default: "text"
+    t.boolean "purged", default: false
+    t.string "question_kind"
+    t.datetime "received_at", null: false
+    t.boolean "replied", default: false, null: false
+    t.datetime "replied_at"
+    t.string "sender_display"
+    t.string "sender_kakao_id", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.integer "urgency_score", default: 0
+    t.index ["kakao_channel_id", "received_at"], name: "index_kakao_messages_on_kakao_channel_id_and_received_at"
+    t.index ["kakao_channel_id"], name: "index_kakao_messages_on_kakao_channel_id"
+    t.index ["replied", "urgency_score"], name: "index_kakao_messages_on_replied_and_urgency_score"
+  end
+
+  create_table "kakao_summaries", force: :cascade do |t|
+    t.text "daily_summary_lines", null: false
+    t.datetime "generated_at", null: false
+    t.integer "kakao_channel_id", null: false
+    t.string "model", default: "stub-1.0"
+    t.text "must_reply_lines", null: false
+    t.boolean "pushed", default: false
+    t.datetime "pushed_at"
+    t.date "summary_date", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.integer "total_messages", default: 0
+    t.integer "unanswered_count", default: 0
+    t.integer "urgent_count", default: 0
+    t.index ["kakao_channel_id", "summary_date"], name: "index_kakao_summaries_on_kakao_channel_id_and_summary_date", unique: true
+    t.index ["kakao_channel_id"], name: "index_kakao_summaries_on_kakao_channel_id"
+  end
+
   create_table "kanban_columns", force: :cascade do |t|
     t.string "color", default: "#6b7280"
     t.datetime "created_at", null: false
@@ -729,6 +814,38 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_120000) do
     t.index ["tenant_id"], name: "index_posts_on_tenant_id"
   end
 
+  create_table "pro_consents", force: :cascade do |t|
+    t.text "consent_text"
+    t.string "consent_type", null: false
+    t.boolean "consented", default: false, null: false
+    t.datetime "consented_at"
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.string "ip_address"
+    t.string "owner_id", null: false
+    t.datetime "revoked_at"
+    t.integer "tenant_id", default: 1, null: false
+    t.string "user_agent"
+    t.index ["owner_id", "consent_type"], name: "index_pro_consents_on_owner_id_and_consent_type"
+  end
+
+  create_table "pro_subscriptions", force: :cascade do |t|
+    t.datetime "cancelled_at"
+    t.datetime "created_at", null: false
+    t.datetime "current_period_end"
+    t.datetime "current_period_start"
+    t.text "metadata"
+    t.string "owner_id", null: false
+    t.string "owner_type", default: "AdminUser"
+    t.string "payment_method"
+    t.integer "price_krw"
+    t.string "status", default: "trial", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.string "tier", default: "pro", null: false
+    t.datetime "trial_ends_at"
+    t.datetime "updated_at", null: false
+    t.index ["owner_id"], name: "index_pro_subscriptions_on_owner_id", unique: true
+  end
+
   create_table "rfm_segments", force: :cascade do |t|
     t.datetime "calculated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.integer "frequency_score", null: false
@@ -919,6 +1036,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_120000) do
   add_foreign_key "enrollments", "courses", on_delete: :cascade
   add_foreign_key "invoices", "distributors"
   add_foreign_key "invoices", "payments"
+  add_foreign_key "kakao_alerts", "kakao_channels", on_delete: :cascade
+  add_foreign_key "kakao_alerts", "kakao_messages", on_delete: :cascade
+  add_foreign_key "kakao_messages", "kakao_channels", on_delete: :cascade
+  add_foreign_key "kakao_summaries", "kakao_channels", on_delete: :cascade
   add_foreign_key "kanban_columns", "kanban_projects"
   add_foreign_key "kanban_tasks", "kanban_columns"
   add_foreign_key "member_bookings", "members", on_delete: :cascade

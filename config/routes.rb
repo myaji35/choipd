@@ -118,6 +118,21 @@ Rails.application.routes.draw do
       member { post :approve }
     end
 
+    # ── Pro/Kakao 채널 어시스턴트 ──────────────────
+    get  "/kakao_inbox", to: "kakao_inbox#index", as: :kakao_inbox_index
+    post "/kakao_inbox/connect", to: "kakao_inbox#connect", as: :kakao_inbox_connect
+    get  "/kakao_inbox/:id", to: "kakao_inbox#show", as: :kakao_inbox
+    post "/kakao_inbox/:id/reply", to: "kakao_inbox#reply", as: :kakao_inbox_reply
+    post "/kakao_inbox/:id/ack_alert", to: "kakao_inbox#ack_alert", as: :kakao_inbox_ack
+    post "/kakao_inbox/:id/simulate", to: "kakao_inbox#simulate", as: :kakao_inbox_simulate
+
+    resources :pro_subscriptions, only: [ :index, :show ] do
+      collection { post :start_trial }
+      member { post :activate; post :cancel }
+    end
+    post "/pro_consents",        to: "pro_consents#create", as: :pro_consents
+    post "/pro_consents/revoke", to: "pro_consents#revoke", as: :pro_consents_revoke
+
     resources :resources,    controller: "distributor_resources"
     resources :hero_images
     resources :newsletter,   only: [ :index ]
@@ -200,6 +215,9 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  # ── 외부 webhook (인증 없음) ───────────────────────
+  post "/webhooks/kakao/message", to: "webhooks/kakao#message"
 
   # ── 헬스체크 (kamal-proxy) ────────────────────────────
   get "up" => "rails/health#show", as: :rails_health_check
