@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_20_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_21_090000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -187,33 +187,48 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_140000) do
   end
 
   create_table "kanban_columns", force: :cascade do |t|
+    t.string "color", default: "#6b7280"
     t.datetime "created_at", null: false
     t.integer "kanban_project_id", null: false
-    t.integer "position"
+    t.integer "sort_order"
+    t.integer "tenant_id", default: 1, null: false
     t.string "title"
     t.datetime "updated_at", null: false
     t.index ["kanban_project_id"], name: "index_kanban_columns_on_kanban_project_id"
+    t.index ["tenant_id"], name: "index_kanban_columns_on_tenant_id"
   end
 
   create_table "kanban_projects", force: :cascade do |t|
     t.string "color"
     t.datetime "created_at", null: false
     t.text "description"
+    t.string "icon", default: "folder"
+    t.boolean "is_archived", default: false
+    t.integer "sort_order", default: 0
+    t.integer "tenant_id", default: 1, null: false
     t.string "title"
     t.datetime "updated_at", null: false
+    t.index ["tenant_id"], name: "index_kanban_projects_on_tenant_id"
   end
 
   create_table "kanban_tasks", force: :cascade do |t|
+    t.string "assignee"
+    t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.text "description"
     t.date "due_date"
+    t.boolean "is_completed", default: false
     t.integer "kanban_column_id", null: false
     t.text "labels"
-    t.integer "position"
     t.string "priority"
+    t.integer "project_id"
+    t.integer "sort_order"
+    t.integer "tenant_id", default: 1, null: false
     t.string "title"
     t.datetime "updated_at", null: false
     t.index ["kanban_column_id"], name: "index_kanban_tasks_on_kanban_column_id"
+    t.index ["project_id"], name: "index_kanban_tasks_on_project_id"
+    t.index ["tenant_id"], name: "index_kanban_tasks_on_tenant_id"
   end
 
   create_table "leads", force: :cascade do |t|
@@ -397,6 +412,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_140000) do
     t.index ["slug"], name: "index_members_on_slug", unique: true
     t.index ["tenant_id"], name: "index_members_on_tenant_id"
     t.index ["towningraph_user_id"], name: "index_members_on_towningraph_user_id", unique: true
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.boolean "is_read", default: false, null: false
+    t.string "link"
+    t.text "message"
+    t.string "notification_type"
+    t.datetime "read_at"
+    t.integer "related_id"
+    t.string "related_type"
+    t.integer "tenant_id", default: 1, null: false
+    t.string "title", null: false
+    t.integer "user_id"
+    t.index ["tenant_id", "user_id", "is_read"], name: "idx_notifications_user_unread"
   end
 
   create_table "payments", force: :cascade do |t|

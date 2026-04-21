@@ -4,5 +4,8 @@ class KanbanProject < ApplicationRecord
 
   validates :title, presence: true
 
+  scope :for_tenant, ->(tid = 1) { where(tenant_id: tid) }
   scope :recent, -> { order(created_at: :desc) }
+  scope :active, -> { where(is_archived: false) }
+  scope :sorted, -> { order(:sort_order, :created_at) }
 end

@@ -1,0 +1,43 @@
+<% content_for :title, "칸반 보드" %>
+
+<div class="mb-6 flex items-center justify-between">
+  <div>
+    <h1 class="text-2xl font-bold text-navy">📋 칸반 보드</h1>
+    <p class="text-sm text-gray-500 mt-1">프로젝트별 할 일을 관리하세요</p>
+  </div>
+
+  <%= form_with url: admin_kanban_projects_path, class: "flex gap-2" do |f| %>
+    <%= f.text_field :title, placeholder: "새 프로젝트 이름",
+        class: "border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-64" %>
+    <%= f.submit "+ 프로젝트 추가", class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 cursor-pointer" %>
+  <% end %>
+</div>
+
+<% if @projects.any? %>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <% @projects.each do |p| %>
+      <%= link_to admin_kanban_project_path(p),
+          class: "block bg-white rounded-lg border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow",
+          style: "border-left: 4px solid #{p.color || '#3b82f6'}" do %>
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <h3 class="font-bold text-navy"><%= p.title %></h3>
+            <% if p.description.present? %>
+              <p class="text-xs text-gray-500 mt-1 line-clamp-2"><%= p.description %></p>
+            <% end %>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center gap-3 text-xs text-gray-500">
+          <span>📑 컬럼 <%= p.kanban_columns.count %></span>
+          <span>📌 카드 <%= p.kanban_tasks.count %></span>
+          <span class="ml-auto"><%= p.created_at.strftime("%Y.%m.%d") %></span>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="bg-white rounded-lg border border-dashed border-gray-300 p-12 text-center">
+    <p class="text-gray-400">아직 프로젝트가 없습니다.</p>
+    <p class="text-xs text-gray-400 mt-2">위 입력창에서 첫 프로젝트를 만들어보세요.</p>
+  </div>
+<% end %>

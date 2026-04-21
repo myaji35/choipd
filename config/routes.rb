@@ -64,6 +64,27 @@ Rails.application.routes.draw do
       end
     end
 
+    # ── 칸반 ─────────────────────────────────────
+    get    "/kanban", to: "kanban#index", as: :kanban
+    post   "/kanban/projects", to: "kanban#create_project", as: :kanban_projects
+    get    "/kanban/projects/:id", to: "kanban#show", as: :kanban_project
+    patch  "/kanban/projects/:id", to: "kanban#update_project"
+    delete "/kanban/projects/:id", to: "kanban#destroy_project"
+
+    scope "/kanban/projects/:project_id" do
+      post   "/columns",          to: "kanban_columns#create",  as: :kanban_columns
+      patch  "/columns/:id",      to: "kanban_columns#update",  as: :kanban_column
+      delete "/columns/:id",      to: "kanban_columns#destroy"
+      post   "/columns/reorder",  to: "kanban_columns#reorder", as: :kanban_columns_reorder
+
+      post   "/tasks",                  to: "kanban_tasks#create",   as: :kanban_tasks
+      patch  "/tasks/:id",              to: "kanban_tasks#update",   as: :kanban_task
+      delete "/tasks/:id",              to: "kanban_tasks#destroy"
+      post   "/tasks/:id/move",         to: "kanban_tasks#move",     as: :kanban_task_move
+      post   "/tasks/:id/complete",     to: "kanban_tasks#complete", as: :kanban_task_complete
+      post   "/tasks/:id/reopen",       to: "kanban_tasks#reopen",   as: :kanban_task_reopen
+    end
+
     resources :resources,    controller: "distributor_resources"
     resources :hero_images
     resources :newsletter,   only: [ :index ]
