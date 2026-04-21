@@ -1,6 +1,6 @@
 class MemberAdmin::DocumentsController < MemberAdmin::BaseController
-  MAX_BYTES = 5 * 1024 * 1024  # 5MB (PDF 고려)
-  ALLOWED_EXT = %w[.md .markdown .txt .pdf].freeze
+  MAX_BYTES = 1 * 1024 * 1024  # 1MB
+  ALLOWED_EXT = %w[.md .markdown .txt].freeze
 
   skip_before_action :verify_authenticity_token, only: [ :create, :destroy, :reparse, :update ]
   before_action :set_document, only: [ :destroy, :reparse, :update ]
@@ -15,16 +15,11 @@ class MemberAdmin::DocumentsController < MemberAdmin::BaseController
       return render json: { success: false, error: "INVALID_EXT", message: "#{ext} 확장자는 지원되지 않습니다." }, status: :unprocessable_entity
     end
 
-    content =
-      if ext == ".pdf"
-        binary = params[:binary_b64].presence ? Base64.decode64(params[:binary_b64]) : params[:content].to_s
-        if binary.bytesize > MAX_BYTES
-          return render json: { success: false, error: "FILE_TOO_LARGE", message: "PDF가 5MB를 초과합니다." }, status: :unprocessable_entity
-        end
-        PdfTextExtractor.extract(binary)
-      else
-        params[:content].to_s
-      end
+    if ext == ".pdf"
+      return render json: { success: false, error: "PDF_NOT_SUPPORTED_YET", message: "PDF 지원은 곧 출시 예정입니다. 지금은 .md/.txt만 업로드 가능합니다." }, status: :unprocessable_entity
+    end
+
+    content = params[:content].to_s
 
     if content.bytesize > MAX_BYTES
       return render json: { success: false, error: "FILE_TOO_LARGE", message: "파일이 너무 큽니다." }, status: :unprocessable_entity
