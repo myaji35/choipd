@@ -1,7 +1,17 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static values = { deleteUrl: String, reparseUrl: String, csrf: String, filename: String }
+  static values = { deleteUrl: String, reparseUrl: String, updateUrl: String, csrf: String, filename: String }
+
+  async updateCategory(e) {
+    const newCat = e.currentTarget.value
+    const res = await fetch(this.updateUrlValue, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", "X-CSRF-Token": this.csrfValue, "Accept": "application/json" },
+      body: JSON.stringify({ category: newCat })
+    })
+    if (!res.ok) alert("저장 실패")
+  }
 
   async destroy(e) {
     e.preventDefault()

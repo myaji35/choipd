@@ -233,7 +233,7 @@ Rails.application.routes.draw do
       get "/dashboard", to: "dashboard#show", as: :dashboard
       get "/editor",    to: "editor#show",    as: :editor
 
-      resources :documents, only: [ :create, :destroy ] do
+      resources :documents, only: [ :create, :update, :destroy ] do
         member { post :reparse }
       end
     end

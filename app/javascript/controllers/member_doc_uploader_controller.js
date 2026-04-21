@@ -69,24 +69,38 @@ export default class extends Controller {
   }
 
   async uploadOne(file) {
-    if (!/\.(md|markdown|txt)$/i.test(file.name)) {
-      return { ok: false, error: "확장자 불가 (.md/.txt만)" }
-    }
-    if (file.size > 1024 * 1024) {
-      return { ok: false, error: "1MB 초과" }
-    }
+    const isPdf = /\.pdf$/i.test(file.name)
+    const isText = /\.(md|markdown|txt)$/i.test(file.name)
+    if (!isPdf && !isText) return { ok: false, error: "확장자 불가 (.md/.txt/.pdf만)" }
+    const maxBytes = isPdf ? 5 * 1024 * 1024 : 1024 * 1024
+    if (file.size > maxBytes) return { ok: false, error: `${isPdf ? "5MB" : "1MB"} 초과` }
+
     try {
-      const text = await file.text()
-      if (!text.trim()) return { ok: false, error: "빈 파일" }
-      const res = await fetch(this.createUrlValue, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRF-Token": this.csrfValue },
-        body: JSON.stringify({
+      let payload
+      if (isPdf) {
+        const buf = await file.arrayBuffer()
+        const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)))
+        payload = {
+          filename: file.name,
+          title: this.titleTarget.value || null,
+          category: inferCategory(file.name),
+          binary_b64: b64
+        }
+      } else {
+        const text = await file.text()
+        if (!text.trim()) return { ok: false, error: "빈 파일" }
+        payload = {
           filename: file.name,
           title: this.titleTarget.value || null,
           category: inferCategory(file.name),
           content: text
-        })
+        }
+      }
+
+      const res = await fetch(this.createUrlValue, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRF-Token": this.csrfValue },
+        body: JSON.stringify(payload)
       })
       const data = await res.json().catch(() => ({}))
       if (res.ok && data.success) return { ok: true }
