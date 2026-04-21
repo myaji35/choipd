@@ -48,9 +48,10 @@ volumes:
 # ── 에셋 브릿지 ───────────────────────────
 asset_path: /rails/public/assets
 
-# ── 빌더 (Mac 로컬 amd64 크로스컴파일) ──
+# ── 빌더 (서버 네이티브 amd64 빌드 — QEMU gcc segfault 회피) ──
 builder:
   arch: amd64
+  remote: ssh://root@158.247.235.31
 
 # ── 별칭 ──────────────────────────────────
 aliases:
