@@ -274,16 +274,14 @@
         <div class="auth-field">
           <%= f.label :email, "이메일" %>
           <%= f.email_field :email,
-                value: "admin@impd.com",
                 autofocus: true,
                 autocomplete: "email",
-                placeholder: "admin@impd.com" %>
+                placeholder: "name@example.com" %>
         </div>
 
         <div class="auth-field">
           <%= f.label :password, "비밀번호" %>
           <%= f.password_field :password,
-                value: "admin123",
                 autocomplete: "current-password",
                 placeholder: "비밀번호 입력" %>
         </div>
@@ -297,10 +295,6 @@
 
         <%= f.submit "로그인 →", class: "auth-submit" %>
       <% end %>
-
-      <div class="auth-demo">
-        <strong>데모 계정 ·</strong> admin@impd.com / admin123 <span style="opacity:.6;">(자동 입력됨)</span>
-      </div>
 
       <%# 구분선 — 회원용 OAuth 진입 %>
       <div style="display: flex; align-items: center; gap: 12px; margin: 32px 0 20px; color: rgba(15,13,11,0.4); font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase;">
