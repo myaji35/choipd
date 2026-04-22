@@ -78,9 +78,34 @@
           <%= link_to label, path, style: "color: var(--impd-muted); font-size: 13px; font-weight: 500;" %>
         <% end %>
       </div>
-      <%# 일반 방문자용 로그인 — 회원(Google OAuth) 페이지로. 운영자는 /admin/login 직접 접속 %>
-      <%= link_to "로그인", member_login_path,
-          class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 14px; font-size: 13px;" %>
+      <%# 로그인 상태에 따른 우측 액션 영역 %>
+      <% if member_signed_in? %>
+        <%# 로그인됨: 내 페이지 / 로그아웃. 이름은 너무 길면 8자로 잘라서 표시. %>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted);">
+            <%= truncate(current_member.name.to_s, length: 12) %>
+          </span>
+          <%= link_to "내 페이지", "/#{current_member.slug}",
+                class: "impd-btn impd-btn-secondary",
+                style: "height: 36px; padding: 0 14px; font-size: 13px;" %>
+          <%= button_to "로그아웃", member_logout_path,
+                method: :delete,
+                form: { data: { turbo_confirm: "로그아웃하시겠습니까?" } },
+                class: "impd-btn",
+                style: "height: 36px; padding: 0 14px; font-size: 13px; background: transparent; color: var(--impd-ink); border: 1px solid var(--impd-rule); cursor: pointer;" %>
+        </div>
+      <% else %>
+        <%# 미로그인: 회원가입 + 로그인 2버튼 %>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <%= link_to "회원가입", member_signup_path,
+                style: "font-size: 13px; color: var(--impd-muted); text-decoration: none;",
+                onmouseover: "this.style.color='var(--impd-accent)'",
+                onmouseout: "this.style.color='var(--impd-muted)'" %>
+          <%= link_to "로그인", member_login_path,
+                class: "impd-btn impd-btn-secondary",
+                style: "height: 36px; padding: 0 14px; font-size: 13px;" %>
+        </div>
+      <% end %>
     </div>
 
     <% if flash[:notice] %>
