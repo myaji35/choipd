@@ -76,6 +76,43 @@ class Admin::MembersController < Admin::BaseController
     redirect_to admin_member_path(@member), notice: "#{@member.name} 의 #{provider} 소셜 연결이 해제되었습니다."
   end
 
+  # ── Townin 파트너 관리 ─────────────────────────
+  # Townin user_id/이메일/역할 등록 (또는 수정)
+  def link_townin
+    permitted = params.permit(:towningraph_user_id, :townin_email, :townin_name, :townin_role)
+    if permitted[:towningraph_user_id].blank?
+      redirect_to admin_member_path(@member), alert: "Townin User ID는 필수입니다." and return
+    end
+    # 최초 등록 시 pending, 이미 active면 유지
+    new_partner_status = @member.partner_active? ? @member.partner_status : "pending"
+    @member.update!(permitted.merge(partner_status: new_partner_status))
+    redirect_to admin_member_path(@member), notice: "#{@member.name} 의 Townin 정보가 등록되었습니다. 검증 후 '파트너 승급'을 눌러주세요."
+  end
+
+  # 파트너 승급 (검증 완료 시)
+  def promote_partner
+    unless @member.partner_connected?
+      redirect_to admin_member_path(@member), alert: "먼저 Townin User ID를 등록해주세요." and return
+    end
+    @member.promote_to_partner!(notes: params[:notes])
+    redirect_to admin_member_path(@member), notice: "#{@member.name} 을(를) Townin 파트너로 승급했습니다."
+  end
+
+  # 파트너 자격 중지
+  def suspend_partner
+    @member.demote_from_partner!(reason: params[:reason])
+    redirect_to admin_member_path(@member), notice: "#{@member.name} 의 파트너 자격을 중지했습니다."
+  end
+
+  # Townin 연결 완전 해제
+  def unlink_townin
+    @member.update!(
+      towningraph_user_id: nil, townin_email: nil, townin_name: nil, townin_role: nil,
+      partner_status: "none", partner_promoted_at: nil
+    )
+    redirect_to admin_member_path(@member), notice: "#{@member.name} 의 Townin 연결이 해제되었습니다."
+  end
+
   private
 
   def set_member

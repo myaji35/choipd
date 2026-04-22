@@ -70,6 +70,11 @@ Rails.application.routes.draw do
         post :suspend
         post :activate
         post :unlink_oauth
+        # Townin 파트너 관리
+        post :link_townin
+        post :promote_partner
+        post :suspend_partner
+        post :unlink_townin
       end
       resources :documents, controller: "member_documents", only: [ :index, :show, :create, :destroy ] do
         member { post :parse }

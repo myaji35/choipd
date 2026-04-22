@@ -193,16 +193,101 @@
       </div>
     <% end %>
 
-    <!-- Townin 연동 -->
-    <% if @member.towningraph_user_id.present? %>
-      <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
-        <h2 class="font-semibold text-navy mb-3 text-sm">🔗 Townin 연동</h2>
-        <p class="text-xs text-gray-500">User ID: <span class="font-mono"><%= @member.towningraph_user_id %></span></p>
-        <% if @member.townin_role.present? %>
-          <p class="text-xs text-gray-500 mt-1">Role: <%= @member.townin_role %></p>
+    <!-- Townin 파트너 연결 -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-semibold text-navy text-sm flex items-center gap-2">
+          🔗 Townin 파트너
+        </h2>
+        <% case @member.partner_status
+           when "active" %>
+          <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded font-medium">⭐ 파트너</span>
+        <% when "pending" %>
+          <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded font-medium">검증 대기</span>
+        <% when "suspended" %>
+          <span class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded font-medium">자격 중지</span>
+        <% else %>
+          <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">미연결</span>
         <% end %>
       </div>
-    <% end %>
+
+      <% if @member.partner_connected? %>
+        <p class="text-xs text-gray-600">User ID: <span class="font-mono"><%= @member.towningraph_user_id %></span></p>
+        <% if @member.townin_name.present? %>
+          <p class="text-xs text-gray-600 mt-1">이름: <%= @member.townin_name %></p>
+        <% end %>
+        <% if @member.townin_email.present? %>
+          <p class="text-xs text-gray-600 mt-1">이메일: <%= @member.townin_email %></p>
+        <% end %>
+        <% if @member.townin_role.present? %>
+          <p class="text-xs text-gray-600 mt-1">역할: <%= @member.townin_role %></p>
+        <% end %>
+        <% if @member.partner_promoted_at %>
+          <p class="text-xs text-purple-600 mt-1">승급일: <%= @member.partner_promoted_at.strftime("%y.%m.%d %H:%M") %></p>
+        <% end %>
+        <% if @member.partner_notes.present? %>
+          <p class="text-xs text-gray-500 mt-1 whitespace-pre-wrap"><%= @member.partner_notes %></p>
+        <% end %>
+
+        <%# 액션 버튼 %>
+        <div class="mt-3 flex flex-col gap-2">
+          <% unless @member.partner_active? %>
+            <%= button_to "⭐ 파트너로 승급",
+                  promote_partner_admin_member_path(@member),
+                  method: :post,
+                  class: "w-full text-xs px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded font-medium" %>
+          <% end %>
+          <% if @member.partner_active? %>
+            <%= button_to "파트너 자격 중지",
+                  suspend_partner_admin_member_path(@member),
+                  method: :post,
+                  data: { turbo_confirm: "파트너 자격을 중지하시겠습니까? 공개 페이지의 파트너 섹션이 숨겨집니다." },
+                  class: "w-full text-xs px-3 py-2 border border-amber-300 text-amber-700 hover:bg-amber-50 rounded" %>
+          <% end %>
+          <%= button_to "Townin 연결 해제",
+                unlink_townin_admin_member_path(@member),
+                method: :post,
+                data: { turbo_confirm: "Townin 연결을 완전히 해제하시겠습니까?" },
+                class: "w-full text-xs px-3 py-2 border border-red-300 text-red-600 hover:bg-red-50 rounded" %>
+        </div>
+      <% else %>
+        <p class="text-xs text-gray-500 mb-3">Townin 계정을 연결하면 회원을 파트너로 승급할 수 있습니다.</p>
+      <% end %>
+
+      <%# 등록/수정 폼 — 토글 %>
+      <details class="mt-3" <%= "open" unless @member.partner_connected? %>>
+        <summary class="text-xs text-gray-600 cursor-pointer hover:text-navy">
+          <%= @member.partner_connected? ? "✏️ Townin 정보 수정" : "➕ Townin 정보 등록" %>
+        </summary>
+        <%= form_with url: link_townin_admin_member_path(@member), method: :post, local: true, class: "mt-3 space-y-2" do %>
+          <div>
+            <label class="block text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">User ID</label>
+            <input type="text" name="towningraph_user_id" value="<%= @member.towningraph_user_id %>"
+                   placeholder="townin-user-123"
+                   class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">이메일</label>
+            <input type="email" name="townin_email" value="<%= @member.townin_email %>"
+                   placeholder="user@example.com"
+                   class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">이름</label>
+            <input type="text" name="townin_name" value="<%= @member.townin_name %>"
+                   placeholder="Townin에서 사용하는 이름"
+                   class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">역할</label>
+            <input type="text" name="townin_role" value="<%= @member.townin_role %>"
+                   placeholder="partner / reporter / expert 등"
+                   class="w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+          </div>
+          <%= submit_tag "저장", class: "w-full text-xs px-3 py-2 bg-navy hover:bg-navy/90 text-white rounded font-medium cursor-pointer" %>
+        <% end %>
+      </details>
+    </div>
 
     <!-- 등록 정보 -->
     <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">

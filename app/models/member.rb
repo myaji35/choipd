@@ -57,6 +57,43 @@ class Member < ApplicationRecord
     status == "approved"
   end
 
+  # ── Townin 파트너 계층 ──────────────────────────
+  # status=approved → 일반 회원 (소소한 활동, 본인 페이지 편집 가능)
+  # partner_status=active → Townin 파트너 (공개 페이지에 파트너 활동 섹션 자동 노출)
+  PARTNER_STATUSES = %w[none pending active suspended].freeze
+
+  def partner_active?
+    partner_status == "active"
+  end
+
+  def partner_pending?
+    partner_status == "pending"
+  end
+
+  def partner_connected?
+    towningraph_user_id.present?
+  end
+
+  def partner_display_role
+    return nil unless partner_active?
+    townin_role.presence || "파트너"
+  end
+
+  def promote_to_partner!(notes: nil)
+    update!(
+      partner_status: "active",
+      partner_promoted_at: Time.current,
+      partner_notes: notes.presence,
+    )
+  end
+
+  def demote_from_partner!(reason: nil)
+    update!(
+      partner_status: "suspended",
+      partner_notes: [ partner_notes, "[suspended #{Time.current.to_date}] #{reason}" ].compact.join("\n"),
+    )
+  end
+
   # ── OAuth ──────────────────────────────────────
   OAUTH_PROVIDERS = %w[google_oauth2].freeze
 

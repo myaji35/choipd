@@ -78,7 +78,8 @@
           <%= link_to label, path, style: "color: var(--impd-muted); font-size: 13px; font-weight: 500;" %>
         <% end %>
       </div>
-      <%= link_to "로그인", new_admin_user_session_path,
+      <%# 일반 방문자용 로그인 — 회원(Google OAuth) 페이지로. 운영자는 /admin/login 직접 접속 %>
+      <%= link_to "로그인", member_login_path,
           class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 14px; font-size: 13px;" %>
     </div>
 
