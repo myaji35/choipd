@@ -213,6 +213,14 @@ Rails.application.routes.draw do
         resources :scheduled_posts, controller: "sns_scheduled_posts"
         resources :post_histories, controller: "sns_post_histories", only: [ :index, :show ]
       end
+
+      namespace :pd do
+        namespace :kanban do
+          resources :projects, only: [ :index, :create, :show, :update, :destroy ]
+          resources :columns,  only: [ :index, :create, :update, :destroy ]
+          resources :tasks,    only: [ :index, :create, :update, :destroy ]
+        end
+      end
     end
   end
 
