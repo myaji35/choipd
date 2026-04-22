@@ -16,17 +16,33 @@
                 border: 1px solid rgba(15,13,11,0.08);">
       <!-- 사진 영역 -->
       <div style="width: 100%; height: calc(100% - 14px); position: relative; overflow: hidden;
-                  background: <%= item[:color] %>;">
-        <div style="position: absolute; inset: 0;
-                    background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.16) 0 3px, transparent 3px 10px);"></div>
+                  background: <%= item[:color] || "#1a1a1a" %>;">
+        <% if item[:image_url].present? %>
+          <% if item[:video_url].present? %>
+            <video src="<%= item[:video_url] %>"
+                   style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;"
+                   preload="metadata" muted playsinline loop autoplay></video>
+          <% else %>
+            <img src="<%= item[:image_url] %>"
+                 alt="<%= item[:caption] %>"
+                 style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;"
+                 loading="lazy">
+          <% end %>
+          <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.25) 100%);"></div>
+        <% else %>
+          <div style="position: absolute; inset: 0;
+                      background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.16) 0 3px, transparent 3px 10px);"></div>
+        <% end %>
         <div style="position: absolute; top: 10px; left: 10px;
                     font-family: 'JetBrains Mono', ui-monospace, monospace;
-                    font-size: 9px; letter-spacing: 1.2px; color: #fff; opacity: 0.85; text-transform: uppercase;">
+                    font-size: 9px; letter-spacing: 1.2px; color: #fff; opacity: 0.9; text-transform: uppercase;
+                    text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
           <%= item[:kind] %>
         </div>
         <div style="position: absolute; bottom: 10px; right: 12px;
                     font-family: 'JetBrains Mono', ui-monospace, monospace;
-                    font-size: 9px; letter-spacing: 0.6px; color: #fff; opacity: 0.75;">
+                    font-size: 9px; letter-spacing: 0.6px; color: #fff; opacity: 0.85;
+                    text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
           <%= item[:date] %>
         </div>
       </div>

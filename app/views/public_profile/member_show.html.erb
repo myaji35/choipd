@@ -26,15 +26,36 @@
       <% end %>
     </div>
 
-    <!-- 중: Polaroid Stack -->
+    <!-- 중: Polaroid Stack (업로드된 사진 우선, 없으면 더미) -->
     <div style="display: flex; justify-content: center;">
-      <%= render "shared/polaroid_stack", width: 300, height: 360, items: [
-        { color: "#ff5a1f", kind: "최근 활동", date: "이번 달", caption: "현장 사진." },
-        { color: "#3a2af0", kind: "수료증",    date: "검증 완료", caption: "공인 자격." },
-        { color: "#2a9d8f", kind: "포트폴리오", date: "오늘",     caption: "최신 작업물." },
-        { color: "#e4b230", kind: "후기",      date: "별점 5",   caption: "고객의 칭찬." },
-        { color: "#1a1a1a", kind: "인터뷰",    date: "최근",     caption: "미디어 출연기." }
-      ] %>
+      <%
+        fallback_colors = [ "#ff5a1f", "#3a2af0", "#2a9d8f", "#e4b230", "#1a1a1a" ]
+        fallback_items = [
+          { kind: "최근 활동", date: "이번 달", caption: "현장 사진." },
+          { kind: "수료증",    date: "검증 완료", caption: "공인 자격." },
+          { kind: "포트폴리오", date: "오늘",     caption: "최신 작업물." },
+          { kind: "후기",      date: "별점 5",   caption: "고객의 칭찬." },
+          { kind: "인터뷰",    date: "최근",     caption: "미디어 출연기." }
+        ]
+        # 일상 사진 상위 5장을 폴라로이드로 (업로드된 것 있으면 우선)
+        recent_photos = @moments&.first(5) || []
+        polaroid_items = fallback_items.each_with_index.map do |item, i|
+          photo = recent_photos[i]
+          if photo && photo.image.attached?
+            {
+              color: fallback_colors[i],
+              kind: photo.category.to_s.upcase,
+              date: photo.uploaded_at&.strftime("%y.%m.%d") || item[:date],
+              caption: photo.caption.presence || item[:caption],
+              image_url: photo.video? ? nil : (photo.thumbnail_url || photo.display_url),
+              video_url: photo.video? ? photo.display_url : nil,
+            }
+          else
+            { color: fallback_colors[i] }.merge(item)
+          end
+        end
+      %>
+      <%= render "shared/polaroid_stack", width: 300, height: 360, items: polaroid_items %>
     </div>
 
     <!-- 우: 직함·지역·CTA -->
@@ -60,25 +81,69 @@
   </style>
 </section>
 
-<!-- ── §B Gallery (포트폴리오) ───────────────────────── -->
-<% if @portfolio.any? %>
+<!-- ── §B Gallery (포트폴리오 + 일상 사진 자동 보강) ───────── -->
+<%
+  # 갤러리 우선순위:
+  #   1) 업로드된 사진·영상 (실제 데이터)
+  #   2) 포트폴리오 아이템 중 media_url이 유효한 것
+  # 깨진 placeholder를 피하려 실제 사진을 먼저 배치
+  gallery_tiles = []
+
+  photo_pool = (@moments || []).to_a
+  photo_pool.each do |photo|
+    break if gallery_tiles.size >= 8
+    next unless photo.image.attached?
+    gallery_tiles << {
+      kind: :moment,
+      title: photo.caption.presence || @member.name + "의 일상",
+      category: photo.category.to_s.upcase,
+      media_url: photo.video? ? photo.display_url : (photo.thumbnail_url || photo.display_url),
+      is_video: photo.video?,
+    }
+  end
+
+  # 포트폴리오 보강 (8장이 안 채워졌을 때)
+  @portfolio.first(8 - gallery_tiles.size).each do |p|
+    gallery_tiles << {
+      kind: :portfolio,
+      title: p.title,
+      category: p.category || "WORK",
+      media_url: p.media_url,
+      is_video: false,
+    }
+  end
+%>
+<% if gallery_tiles.any? %>
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
       <span class="impd-label">§B</span>
       <span class="impd-display" style="font-size: 36px; flex: 1;">갤러리</span>
-      <span class="impd-label-muted"><%= @portfolio.size %> ITEMS</span>
+      <span class="impd-label-muted"><%= gallery_tiles.size %> ITEMS</span>
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
-      <% @portfolio.first(8).each_with_index do |p, i| %>
-        <div style="aspect-ratio: 1 / 1.1; background: <%= ["#ff5a1f", "#3a2af0", "#2a9d8f", "#e4b230", "#1a1a1a", "#aa2a6a"][i % 6] %>; position: relative; overflow: hidden;" class="impd-stripe">
-          <% if p.media_url.present? %>
-            <img src="<%= p.media_url %>" alt="<%= p.title %>" style="width: 100%; height: 100%; object-fit: cover;">
+      <% gallery_tiles.each_with_index do |t, i| %>
+        <% bg_color = ["#ff5a1f", "#3a2af0", "#2a9d8f", "#e4b230", "#1a1a1a", "#aa2a6a"][i % 6] %>
+        <figure style="aspect-ratio: 1 / 1.1; background: <%= bg_color %>; position: relative; overflow: hidden; margin: 0;" class="<%= 'impd-stripe' unless t[:media_url].present? %>">
+          <% if t[:media_url].present? %>
+            <% if t[:is_video] %>
+              <video src="<%= t[:media_url] %>"
+                     style="width: 100%; height: 100%; object-fit: cover; display: block; background: #000;"
+                     preload="metadata" muted playsinline loop
+                     onmouseover="this.play()" onmouseout="this.pause(); this.currentTime=0;"></video>
+            <% else %>
+              <img src="<%= t[:media_url] %>"
+                   alt="<%= t[:title] %>"
+                   onerror="this.style.display='none'"
+                   style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                   loading="lazy">
+            <% end %>
+            <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%);"></div>
           <% end %>
-          <div style="position: absolute; bottom: 12px; left: 12px; color: #fff;">
-            <p class="impd-label" style="color: rgba(255,255,255,.7);"><%= p.category || "WORK" %></p>
-            <p style="font-family: var(--impd-font-display); font-size: 18px; margin-top: 4px;"><%= p.title %></p>
-          </div>
-        </div>
+          <figcaption style="position: absolute; bottom: 12px; left: 12px; right: 12px; color: #fff;">
+            <p class="impd-label" style="color: rgba(255,255,255,.75);"><%= t[:category] %></p>
+            <p style="font-family: var(--impd-font-display); font-size: 18px; margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.4);"><%= t[:title] %></p>
+          </figcaption>
+        </figure>
       <% end %>
     </div>
   </section>
