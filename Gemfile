@@ -70,6 +70,9 @@ group :development do
   # Kept in :development only — production image doesn't need kamal CLI
   # (avoids ed25519 native compile errors in Docker build)
   gem "kamal", require: false
+
+  # .env 자동 로드 (로컬 개발 전용 — 프로덕션은 kamal secrets 사용)
+  gem "dotenv-rails"
 end
 
 # OAuth (Google)

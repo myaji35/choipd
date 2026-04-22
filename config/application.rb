@@ -27,6 +27,10 @@ module ChoiPdRails
     # 서버(libvips 설치)에서는 ENV["ACTIVE_STORAGE_VARIANT_PROCESSOR"]=vips로 override 가능.
     config.active_storage.variant_processor = (ENV["ACTIVE_STORAGE_VARIANT_PROCESSOR"] || "mini_magick").to_sym
 
+    # CSRF: omniauth-rails_csrf_protection이 form 파라미터를 직접 검증하므로
+    # per-form token을 끄고 global masked token을 사용 (middleware 레벨에서 정상 매치).
+    config.action_controller.per_form_csrf_tokens = false
+
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.

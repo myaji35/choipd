@@ -34,12 +34,15 @@ registry:
 env:
   secret:
     - RAILS_MASTER_KEY
+    - GOOGLE_OAUTH_CLIENT_SECRET
   clear:
     SOLID_QUEUE_IN_PUMA: true
     RAILS_ENV: production
     PORT: "3000"
     WEB_CONCURRENCY: "1"
     RAILS_SERVE_STATIC_FILES: "true"
+    # Google OAuth — Client ID는 public이라 clear로 관리 가능
+    GOOGLE_OAUTH_CLIENT_ID: "515047956016-9k5n7n2t0ab9g72100u8b5o8391u047k.apps.googleusercontent.com"
 
 # ── 볼륨 ──────────────────────────────────
 volumes:
