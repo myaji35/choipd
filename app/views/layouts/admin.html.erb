@@ -43,7 +43,7 @@
         <%= render "layouts/admin_nav_item", icon: "trello", label: "칸반 보드", path: admin_kanban_path %>
         <%= render "layouts/admin_nav_item", icon: "book", label: "강좌 관리", path: admin_courses_path %>
         <%= render "layouts/admin_nav_item", icon: "file-text", label: "게시글 관리", path: admin_posts_path %>
-        <%= render "layouts/admin_nav_item", icon: "image", label: "히어로 이미지", path: admin_hero_images_path %>
+        <%# 히어로 이미지는 회원별 콘텐츠 → /pd/hero-images(PD 대시보드)에서 관리 %>
         <%= render "layouts/admin_nav_item", icon: "folder", label: "유통사 자료", path: admin_resources_path %>
         <%= render "layouts/admin_nav_item", icon: "mail", label: "뉴스레터", path: admin_newsletter_index_path %>
         <%= render "layouts/admin_nav_item", icon: "message-square", label: "문의 관리", path: admin_inquiries_path %>
