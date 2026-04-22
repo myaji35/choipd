@@ -27,7 +27,8 @@ Rails.application.routes.draw do
   root "chopd/home#index"
 
   # ── imPD 프로모 시네마틱 (30s HTML 영상) ─────────────
-  get "/promo", to: "promo#show", as: :promo
+  get "/promo",       to: "promo#show",  as: :promo
+  get "/promo/watch", to: "promo#watch", as: :promo_watch
 
   scope module: :chopd do
     get "/education",        to: "education#index",  as: :education

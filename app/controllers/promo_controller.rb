@@ -3,6 +3,13 @@ class PromoController < ApplicationController
   layout false
 
   def show
-    # 정적 HTML/CSS 애니메이션. 모델/DB 접근 없음.
+    # 정적 HTML/CSS 애니메이션 (라이브 재생 버전).
+  end
+
+  def watch
+    # mp4 재생 + 공유 버튼 + OG 메타 (카톡/SNS 썸네일 노출).
+    @video_url  = "/promo/impd-promo.mp4"
+    @poster_url = "/promo/shot-profile-hero.png"
+    @share_url  = request.protocol + request.host_with_port + "/promo/watch"
   end
 end
