@@ -324,6 +324,12 @@
       </p>
 
       <div class="auth-alt">
+        <strong>처음이신가요?</strong> ·
+        <%= link_to "회원가입 →", member_signup_path %>
+        에서 이메일로 바로 가입할 수 있습니다.
+      </div>
+
+      <div class="auth-alt" style="margin-top: 10px;">
         <strong>관리자이신가요?</strong> · 운영자 로그인은
         <%= link_to "/admin/login", "/admin/login" %>에서 이메일·비밀번호로 접속해 주세요.
       </div>

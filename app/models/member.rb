@@ -22,7 +22,9 @@ class Member < ApplicationRecord
 
   validates :name, :email, :slug, presence: true
   validates :slug, uniqueness: { case_sensitive: false }
+  validates :slug, format: { with: /\A[a-z0-9][a-z0-9\-]*\z/, message: "은 소문자/숫자/하이픈만 가능합니다" }, allow_blank: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :email, uniqueness: { case_sensitive: false, message: "이 이미 사용 중입니다" }
   validates :status, inclusion: { in: STATUSES }
   validates :impd_status, inclusion: { in: IMPD_STATUSES }
 
@@ -166,6 +168,30 @@ class Member < ApplicationRecord
 
   def pending?
     status == "pending_approval"
+  end
+
+  # 이름/이메일에서 slug 후보를 만든다. 중복이면 suffix로 unique 확보.
+  # "홍길동" / "honggildong@x.com" → "honggildong" → "honggildong-1" ...
+  # 한글만 있으면 이메일 로컬파트를 쓰고, 그것도 비었으면 랜덤.
+  def self.generate_unique_slug(name: nil, email: nil)
+    seeds = [
+      email.to_s.split("@").first,
+      name.to_s,
+    ].compact_blank
+
+    base = seeds.filter_map do |s|
+      s.to_s.downcase.gsub(/[^a-z0-9\-]/, "-").gsub(/-+/, "-").gsub(/^-|-$/, "").presence
+    end.first
+
+    base = "m-#{SecureRandom.hex(3)}" if base.blank? || base.length < 2
+
+    slug = base
+    i = 0
+    while where(slug: slug).exists?
+      i += 1
+      slug = "#{base}-#{i}"
+    end
+    slug
   end
 
   # ── Townin 활동 스냅샷 ─────────────────────────

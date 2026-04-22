@@ -1,0 +1,247 @@
+<% content_for :title, "회원가입 · imPD" %>
+
+<style>
+  body { margin: 0; background: var(--impd-paper, #efece4); color: var(--impd-ink, #0f0d0b); font-family: var(--impd-font-sans, 'Pretendard Variable', 'Pretendard', system-ui, sans-serif); min-height: 100vh; }
+  .auth-shell { min-height: 100vh; display: grid; grid-template-columns: 1.1fr 1fr; align-items: stretch; }
+  @media (max-width: 860px) { .auth-shell { grid-template-columns: 1fr; } .auth-poster { min-height: 220px; } }
+
+  .auth-form-col { display: flex; flex-direction: column; padding: 48px 56px; background: var(--impd-paper, #efece4); position: relative; }
+  .auth-form-col::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: linear-gradient(to right, rgba(15,13,11,0.06) 1px, transparent 1px);
+    background-size: 80px 100%; pointer-events: none; opacity: 0.5;
+  }
+  .auth-brand { font-family: var(--impd-font-display, 'Inter Tight', system-ui); font-weight: 800; font-size: 36px; letter-spacing: -1.6px; color: var(--impd-ink, #0f0d0b); margin: 0; position: relative; }
+  .auth-brand .dot { color: var(--impd-accent, #3a2af0); }
+  .auth-strap { font-family: var(--impd-font-mono, 'JetBrains Mono', monospace); font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-accent, #3a2af0); margin-top: 4px; position: relative; }
+
+  .auth-form-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 480px; width: 100%; position: relative; padding-top: 48px; }
+
+  .auth-head { border-top: 1px solid var(--impd-ink, #0f0d0b); padding-top: 20px; margin-bottom: 28px; }
+  .auth-section { font-family: var(--impd-font-mono, 'JetBrains Mono', monospace); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-accent, #3a2af0); margin-bottom: 8px; }
+  .auth-headline { font-family: var(--impd-font-display, 'Inter Tight'); font-weight: 800; font-size: 44px; letter-spacing: -1.8px; line-height: 1.02; margin: 0; }
+  .auth-headline .serif { font-family: var(--impd-font-serif, 'Noto Serif KR', serif); font-style: italic; font-weight: 400; color: var(--impd-accent, #3a2af0); }
+  .auth-sub { margin-top: 16px; font-size: 14px; color: rgba(15,13,11,0.65); line-height: 1.6; }
+
+  .auth-alert { background: rgba(255,90,31,0.08); border-left: 2px solid var(--impd-accent-2, #ff5a1f); color: var(--impd-accent-2, #ff5a1f); padding: 10px 14px; font-size: 13px; margin-bottom: 16px; }
+  .auth-notice { background: rgba(58,42,240,0.06); border-left: 2px solid var(--impd-accent, #3a2af0); color: var(--impd-accent, #3a2af0); padding: 10px 14px; font-size: 13px; margin-bottom: 16px; }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  .field-label { font-family: var(--impd-font-mono, 'JetBrains Mono', monospace); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(15,13,11,0.65); }
+  .field-req { color: var(--impd-accent-2, #ff5a1f); margin-left: 4px; }
+  .field-hint { font-size: 11px; color: rgba(15,13,11,0.55); margin-top: 2px; }
+  .field-err { font-size: 11px; color: var(--impd-accent-2, #ff5a1f); margin-top: 2px; }
+
+  .field-input {
+    display: block; width: 100%;
+    padding: 0 14px; height: 48px;
+    background: #fff; color: var(--impd-ink, #0f0d0b);
+    border: 1px solid var(--impd-ink, #0f0d0b);
+    font-family: var(--impd-font-sans, 'Pretendard Variable');
+    font-size: 14px; letter-spacing: -0.2px;
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+  .field-input::placeholder { color: rgba(15,13,11,0.35); }
+  .field-input:focus { border-color: var(--impd-accent, #3a2af0); box-shadow: inset 0 0 0 1px var(--impd-accent, #3a2af0); }
+  .field-input.has-error { border-color: var(--impd-accent-2, #ff5a1f); }
+
+  .field-select {
+    display: block; width: 100%;
+    padding: 0 14px; height: 48px;
+    background: #fff; color: var(--impd-ink, #0f0d0b);
+    border: 1px solid var(--impd-ink, #0f0d0b);
+    font-family: var(--impd-font-sans, 'Pretendard Variable');
+    font-size: 14px;
+    outline: none;
+  }
+
+  .submit-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; height: 52px;
+    background: var(--impd-ink, #0f0d0b); color: var(--impd-paper, #efece4);
+    border: 1px solid var(--impd-ink, #0f0d0b);
+    font-family: var(--impd-font-sans, 'Pretendard Variable');
+    font-size: 14px; font-weight: 600; letter-spacing: -0.2px;
+    cursor: pointer; transition: background 150ms ease;
+    margin-top: 8px;
+  }
+  .submit-btn:hover { background: var(--impd-accent, #3a2af0); border-color: var(--impd-accent, #3a2af0); }
+
+  .auth-divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(15,13,11,0.45); }
+  .auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: rgba(15,13,11,0.15); }
+
+  .oauth-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 0 22px; height: 52px; background: #fff; color: var(--impd-ink, #0f0d0b); border: 1px solid var(--impd-ink, #0f0d0b); border-radius: 0; font-family: var(--impd-font-sans, 'Pretendard Variable'); font-size: 14px; font-weight: 600; letter-spacing: -0.2px; cursor: pointer; transition: background 150ms ease; }
+  .oauth-btn:hover { background: var(--impd-card, #fbf8f1); }
+
+  .auth-fine { margin-top: 16px; font-size: 11px; color: var(--impd-muted, rgba(15,13,11,0.55)); line-height: 1.6; }
+  .auth-alt { margin-top: 20px; padding: 14px 16px; background: #fff; border: 1px solid var(--impd-rule, rgba(15,13,11,0.15)); font-size: 12px; color: rgba(15,13,11,0.75); line-height: 1.6; }
+  .auth-alt strong { color: var(--impd-ink, #0f0d0b); }
+  .auth-alt a { color: var(--impd-accent, #3a2af0); text-decoration: underline; }
+
+  .auth-foot { margin-top: auto; padding-top: 32px; display: flex; align-items: center; justify-content: space-between; font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(15,13,11,0.45); position: relative; }
+  .auth-foot a { color: inherit; text-decoration: none; }
+  .auth-foot a:hover { color: var(--impd-accent, #3a2af0); }
+
+  .auth-poster { background: var(--impd-ink, #0f0d0b); color: var(--impd-paper, #efece4); padding: 56px 48px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+  .auth-poster::before { content: ""; position: absolute; inset: 0; background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.04) 0 3px, transparent 3px 10px); pointer-events: none; }
+  .auth-poster-label { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; color: rgba(255,255,255,0.55); position: relative; }
+  .auth-poster-title { font-family: var(--impd-font-display, 'Inter Tight'); font-weight: 800; font-size: clamp(44px, 5.5vw, 72px); letter-spacing: -2.6px; line-height: 0.95; position: relative; margin-top: 40px; }
+  .auth-poster-title .serif { font-family: var(--impd-font-serif, 'Noto Serif KR', serif); font-style: italic; font-weight: 400; color: var(--impd-accent-2, #ff5a1f); }
+  .auth-poster-sub { margin-top: 20px; font-family: var(--impd-font-serif, 'Noto Serif KR', serif); font-style: italic; font-size: 18px; line-height: 1.5; color: rgba(255,255,255,0.75); max-width: 32ch; position: relative; }
+  .auth-poster-meta { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,0.45); display: flex; justify-content: space-between; position: relative; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.15); }
+</style>
+
+<main class="auth-shell">
+  <section class="auth-form-col">
+    <div style="position: relative;">
+      <h1 class="auth-brand">imPD<span class="dot">.</span></h1>
+      <p class="auth-strap">EST. 2026 · SEOUL</p>
+    </div>
+
+    <div class="auth-form-wrap">
+      <div class="auth-head">
+        <div class="auth-section">§ SIGN UP · 회원가입</div>
+        <h2 class="auth-headline">
+          하나의 페이지로<br>
+          <span class="serif">시작합니다.</span>
+        </h2>
+        <p class="auth-sub">
+          이름과 이메일만 있으면 충분합니다.
+          가입 후 관리자 승인을 거쳐 본인 공개 페이지(/이름)가 열리고 편집을 시작할 수 있습니다.
+        </p>
+      </div>
+
+      <% if alert.present? %>
+        <div class="auth-alert"><%= alert %></div>
+      <% end %>
+      <% if notice.present? %>
+        <div class="auth-notice"><%= notice %></div>
+      <% end %>
+      <% if @member.errors.any? %>
+        <div class="auth-alert">
+          <%= @member.errors.full_messages.first(3).join(" · ") %>
+        </div>
+      <% end %>
+
+      <%= form_with model: @member, url: member_signup_path, method: :post, local: true do |f| %>
+        <div class="field-group">
+          <label class="field-label" for="member_name">이름<span class="field-req">*</span></label>
+          <%= f.text_field :name,
+                required: true, autocomplete: "name",
+                placeholder: "홍길동 또는 활동명",
+                id: "member_name",
+                class: "field-input #{'has-error' if @member.errors[:name].any?}" %>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="member_email">이메일<span class="field-req">*</span></label>
+          <%= f.email_field :email,
+                required: true, autocomplete: "email", inputmode: "email",
+                placeholder: "you@example.com",
+                id: "member_email",
+                class: "field-input #{'has-error' if @member.errors[:email].any?}" %>
+          <% if @member.errors[:email].any? %>
+            <p class="field-err"><%= @member.errors[:email].first %></p>
+          <% end %>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" for="member_password">비밀번호<span class="field-req">*</span></label>
+            <%= f.password_field :password,
+                  required: true, autocomplete: "new-password",
+                  placeholder: "8자 이상",
+                  id: "member_password",
+                  class: "field-input #{'has-error' if @member.errors[:password].any?}" %>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="member_password_confirmation">비밀번호 확인<span class="field-req">*</span></label>
+            <%= f.password_field :password_confirmation,
+                  required: true, autocomplete: "new-password",
+                  placeholder: "다시 한 번",
+                  id: "member_password_confirmation",
+                  class: "field-input #{'has-error' if @member.errors[:password_confirmation].any?}" %>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="member_slug">페이지 주소 <span style="text-transform: none; color: rgba(15,13,11,0.45);">(선택 · 비우면 자동)</span></label>
+          <div style="display: flex; align-items: stretch; gap: 0;">
+            <span style="display: inline-flex; align-items: center; padding: 0 12px; background: var(--impd-card, #fbf8f1); border: 1px solid var(--impd-ink); border-right: none; font-family: var(--impd-font-mono); font-size: 13px; color: rgba(15,13,11,0.55);">/</span>
+            <%= f.text_field :slug,
+                  placeholder: "honggildong",
+                  pattern: "[a-z0-9][a-z0-9\\-]*",
+                  id: "member_slug",
+                  class: "field-input #{'has-error' if @member.errors[:slug].any?}" %>
+          </div>
+          <p class="field-hint">영문 소문자/숫자/하이픈만. 비워두시면 이름에서 자동 생성됩니다.</p>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" for="member_profession">직업 / 분야</label>
+            <%= f.select :profession,
+                  [["직접 입력", "custom"], ["보험설계사", "insurance_agent"], ["공인중개사", "realtor"], ["강사", "educator"], ["작가", "author"], ["자영업자", "shopowner"], ["프리랜서", "freelancer"]],
+                  { selected: "custom" },
+                  id: "member_profession", class: "field-select" %>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="member_region">지역 (선택)</label>
+            <%= f.text_field :region,
+                  placeholder: "서울 · 성북",
+                  id: "member_region", class: "field-input" %>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn">이메일로 가입하기 →</button>
+      <% end %>
+
+      <div class="auth-divider">또는</div>
+
+      <%= button_to "/auth/google_oauth2", method: :post, data: { turbo: false }, class: "oauth-btn" do %>
+        <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        <span>Google로 한 번에 가입하기</span>
+      <% end %>
+
+      <p class="auth-fine">
+        가입과 함께 서비스 이용 약관 및 개인정보 처리 방침에 동의합니다.
+        가입 직후 상태는 <strong>관리자 승인 대기</strong>이며, 승인 완료 시 안내 메일을 보내드립니다.
+      </p>
+
+      <div class="auth-alt">
+        <strong>이미 회원이신가요?</strong> ·
+        <%= link_to "이메일로 로그인", member_login_path %> 또는 Google로 로그인하세요.
+      </div>
+
+      <div class="auth-foot">
+        <%= link_to "← 메인으로", root_path %>
+        <span>VOL. 1 · ISSUE 04</span>
+      </div>
+    </div>
+  </section>
+
+  <aside class="auth-poster" aria-hidden="true">
+    <div class="auth-poster-label">§ MANIFESTO — ONE ADDRESS</div>
+    <div>
+      <h3 class="auth-poster-title">
+        흩어진<br>
+        내 일,<br>
+        <span class="serif">하나의<br>주소로.</span>
+      </h3>
+      <p class="auth-poster-sub">
+        여기저기 흩어진 실적·후기·포트폴리오·사진. imPD가 당신의 이름 하나로 모아드립니다.
+      </p>
+    </div>
+    <div class="auth-poster-meta">
+      <span>2026 · 봄호</span>
+      <span>SIGN UP · /auth/signup</span>
+    </div>
+  </aside>
+</main>
