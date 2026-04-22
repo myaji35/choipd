@@ -1,5 +1,6 @@
 class Admin::MembersController < Admin::BaseController
-  before_action :set_member, only: [ :show, :edit, :update, :destroy, :approve, :reject, :suspend, :activate ]
+  before_action :set_member, only: [ :show, :edit, :update, :destroy, :approve, :reject, :suspend, :activate,
+                                     :unlink_oauth, :lookup_townin, :link_townin, :promote_partner, :suspend_partner, :unlink_townin ]
 
   def index
     @members = Member.for_tenant.recent
