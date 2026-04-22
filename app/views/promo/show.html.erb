@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>imPD — 내 일의 PD가 됩니다</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       imPD Promo — 30초 시네마틱
+       씬 타임라인:
+         S1  0.0 –  5.0s : 다섯 개의 로그인 창 (플랫폼 조각 drift)
+         S2  5.0 – 10.0s : 흩어진 내 일 (조각 수렴)
+         S3 10.0 – 15.0s : 하나의 주소로 (impd.me/demo 타이핑)
+         S4 15.0 – 22.0s : 한 사람의 모든 화면 (3D 플립 목업)
+         S5 22.0 – 27.0s : 진짜 일하고 있다는 증거 (LIVE 카운터)
+         S6 27.0 – 30.0s : 내 일의 PD가 됩니다 (종이 페이드)
+    ═══════════════════════════════════════════════════════════════ */
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --hero: #00A1E0;
+      --hero-soft: rgba(0, 161, 224, 0.35);
+      --hero-glow: 0 0 30px rgba(34, 211, 238, 0.35);
+      --ink: #0f172a;
+      --ink-deeper: #060b18;
+      --paper: #efece4;
+      --ink-paper: #1a1a1a;
+      --muted: rgba(255, 255, 255, 0.6);
+      --muted-strong: rgba(255, 255, 255, 0.8);
+      --chip-border: rgba(255, 255, 255, 0.12);
+
+      --font-body: 'Inter', -apple-system, 'Noto Sans KR', sans-serif;
+      --font-serif: 'Noto Serif KR', serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+      --duration: 30s;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      color: #fff;
+      font-family: var(--font-body);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 16:9 고정 스테이지. 뷰포트보다 크면 object-fit 느낌으로 스케일 */
+    .stage {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--ink);
+    }
+
+    /* ─── 씬 공통 ─────────────────────────────────── */
+    .scene {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      visibility: hidden;
+    }
+    .scene.running { animation-play-state: running; }
+    .scene.paused  { animation-play-state: paused; }
+
+    /* scene 타이밍은 개별 @keyframes 로 제어 — 각 씬별 start/end */
+    .s1 { animation: showS1 var(--duration) linear forwards; }
+    .s2 { animation: showS2 var(--duration) linear forwards; }
+    .s3 { animation: showS3 var(--duration) linear forwards; }
+    .s4 { animation: showS4 var(--duration) linear forwards; }
+    .s5 { animation: showS5 var(--duration) linear forwards; }
+    .s6 { animation: showS6 var(--duration) linear forwards; }
+
+    /* 각 씬 visibility on/off. %는 초 단위 기반 (30s 기준):
+       5s=16.667%, 10s=33.333%, 15s=50%, 22s=73.333%, 27s=90%, 30s=100% */
+    @keyframes showS1 {
+      0%       { opacity: 0; visibility: visible; }
+      1%       { opacity: 1; }
+      15%      { opacity: 1; }
+      16.667%  { opacity: 0; visibility: hidden; }
+      100%     { opacity: 0; visibility: hidden; }
+    }
+    @keyframes showS2 {
+      0%, 15%     { opacity: 0; visibility: hidden; }
+      16.666%     { opacity: 0; visibility: visible; }
+      17.5%       { opacity: 1; }
+      32%         { opacity: 1; }
+      33.333%     { opacity: 0; visibility: hidden; }
+      100%        { opacity: 0; visibility: hidden; }
+    }
+    @keyframes showS3 {
+      0%, 32%     { opacity: 0; visibility: hidden; }
+      33.333%     { opacity: 0; visibility: visible; }
+      34.5%       { opacity: 1; }
+      48%         { opacity: 1; }
+      50%         { opacity: 0; visibility: hidden; }
+      100%        { opacity: 0; visibility: hidden; }
+    }
+    @keyframes showS4 {
+      0%, 48%     { opacity: 0; visibility: hidden; }
+      50%         { opacity: 0; visibility: visible; }
+      51.5%       { opacity: 1; }
+      71%         { opacity: 1; }
+      73.333%     { opacity: 0; visibility: hidden; }
+      100%        { opacity: 0; visibility: hidden; }
+    }
+    @keyframes showS5 {
+      0%, 71%     { opacity: 0; visibility: hidden; }
+      73.333%     { opacity: 0; visibility: visible; }
+      74.5%       { opacity: 1; }
+      88%         { opacity: 1; }
+      90%         { opacity: 0; visibility: hidden; }
+      100%        { opacity: 0; visibility: hidden; }
+    }
+    @keyframes showS6 {
+      0%, 88%     { opacity: 0; visibility: hidden; }
+      90%         { opacity: 0; visibility: visible; }
+      91.5%       { opacity: 1; }
+      100%        { opacity: 1; }
+    }
+
+    /* ─── 공통 타이포 ─────────────────────────────── */
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: clamp(11px, 0.95vw, 14px);
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--hero);
+      margin-bottom: 1.2rem;
+      opacity: 0.9;
+    }
+    .h1 {
+      font-family: var(--font-body);
+      font-weight: 800;
+      font-size: clamp(44px, 6.2vw, 108px);
+      line-height: 1.02;
+      letter-spacing: -0.02em;
+    }
+    .h1 .serif {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 700;
+    }
+    .h2 {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: clamp(28px, 3.6vw, 60px);
+      line-height: 1.1;
+      letter-spacing: -0.015em;
+    }
+    .subline {
+      font-family: var(--font-body);
+      font-size: clamp(15px, 1.2vw, 20px);
+      color: var(--muted-strong);
+      margin-top: 1rem;
+      font-weight: 500;
+    }
+
+    /* ─── 레코딩 인디케이터 ──────────────────────── */
+    .rec {
+      position: absolute;
+      top: 28px;
+      left: 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.55);
+      z-index: 50;
+      text-transform: uppercase;
+    }
+    .rec::before {
+      content: '';
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #ef4444;
+      animation: blink 1.2s ease-in-out infinite;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.25; }
+    }
+
+    /* ─── 프로그레스 바 ──────────────────────────── */
+    .progress {
+      position: absolute;
+      left: 32px;
+      right: 32px;
+      bottom: 28px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      z-index: 50;
+    }
+    .progress > i {
+      display: block;
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--hero), #67e8f9);
+      animation: progressGrow var(--duration) linear forwards;
+    }
+    @keyframes progressGrow {
+      to { width: 100%; }
+    }
+
+    .timecode {
+      position: absolute;
+      bottom: 40px;
+      right: 32px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.45);
+      z-index: 50;
+    }
+
+    /* ═══════════════════════════════════════════════
+       씬 1 — 다섯 개의 로그인 창
+       ═══════════════════════════════════════════════ */
+    .s1 {
+      background: radial-gradient(ellipse at center, #0f172a 0%, #060b18 70%);
+    }
+    .s1 .center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 0 8vw;
+      z-index: 3;
+    }
+
+    .chip {
+      position: absolute;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: 1px solid var(--chip-border);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(8px);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.82);
+      white-space: nowrap;
+      will-change: transform;
+    }
+    .chip .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--hero);
+      box-shadow: 0 0 8px var(--hero);
+    }
+    .chip--warn .dot { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+    .chip--pink .dot { background: #ec4899; box-shadow: 0 0 8px #ec4899; }
+    .chip--green .dot { background: #10b981; box-shadow: 0 0 8px #10b981; }
+    .chip--violet .dot { background: #a78bfa; box-shadow: 0 0 8px #a78bfa; }
+
+    /* 각 칩: 드리프트 → 수렴 */
+    .chip-1 { top: 18%; left: 8%;  animation: drift1 var(--duration) ease-in-out forwards; }
+    .chip-2 { top: 28%; right: 12%; animation: drift2 var(--duration) ease-in-out forwards; }
+    .chip-3 { top: 62%; left: 14%;  animation: drift3 var(--duration) ease-in-out forwards; }
+    .chip-4 { top: 72%; right: 18%; animation: drift4 var(--duration) ease-in-out forwards; }
+    .chip-5 { top: 44%; left: 42%;  animation: drift5 var(--duration) ease-in-out forwards; }
+
+    @keyframes drift1 {
+      0%    { transform: translate(0, 0) rotate(-6deg); opacity: 0; }
+      2%    { opacity: 1; }
+      14%   { transform: translate(-20px, 14px) rotate(-8deg); opacity: 1; }
+      17%   { opacity: 0; }
+      /* 씬 2 수렴 */
+      18%   { transform: translate(40vw, 32vh) rotate(-8deg) scale(0.6); opacity: 1; }
+      32%   { transform: translate(46vw, 42vh) rotate(-12deg) scale(0); opacity: 0; }
+      100%  { transform: translate(46vw, 42vh) rotate(-12deg) scale(0); opacity: 0; }
+    }
+    @keyframes drift2 {
+      0%    { transform: translate(0, 0) rotate(4deg); opacity: 0; }
+      3%    { opacity: 1; }
+      14%   { transform: translate(16px, -12px) rotate(6deg); opacity: 1; }
+      17%   { opacity: 0; }
+      18%   { transform: translate(-34vw, 30vh) rotate(6deg) scale(0.6); opacity: 1; }
+      32%   { transform: translate(-40vw, 38vh) rotate(12deg) scale(0); opacity: 0; }
+      100%  { transform: translate(-40vw, 38vh) scale(0); opacity: 0; }
+    }
+    @keyframes drift3 {
+      0%    { transform: translate(0, 0) rotate(-3deg); opacity: 0; }
+      4%    { opacity: 1; }
+      14%   { transform: translate(12px, -18px) rotate(-5deg); opacity: 1; }
+      17%   { opacity: 0; }
+      18%   { transform: translate(34vw, -10vh) rotate(-5deg) scale(0.6); opacity: 1; }
+      32%   { transform: translate(40vw, -14vh) rotate(-10deg) scale(0); opacity: 0; }
+      100%  { transform: translate(40vw, -14vh) scale(0); opacity: 0; }
+    }
+    @keyframes drift4 {
+      0%    { transform: translate(0, 0) rotate(5deg); opacity: 0; }
+      5%    { opacity: 1; }
+      14%   { transform: translate(-14px, -10px) rotate(7deg); opacity: 1; }
+      17%   { opacity: 0; }
+      18%   { transform: translate(-26vw, -14vh) rotate(7deg) scale(0.6); opacity: 1; }
+      32%   { transform: translate(-32vw, -18vh) rotate(14deg) scale(0); opacity: 0; }
+      100%  { transform: translate(-32vw, -18vh) scale(0); opacity: 0; }
+    }
+    @keyframes drift5 {
+      0%    { transform: translate(0, 0) rotate(2deg); opacity: 0; }
+      6%    { opacity: 1; }
+      14%   { transform: translate(6px, 18px) rotate(-2deg); opacity: 1; }
+      17%   { opacity: 0; }
+      18%   { transform: translate(0, 6vh) rotate(-2deg) scale(0.6); opacity: 1; }
+      32%   { transform: translate(0, 10vh) rotate(-6deg) scale(0); opacity: 0; }
+      100%  { transform: translate(0, 10vh) scale(0); opacity: 0; }
+    }
+
+    .s1 .eyebrow,
+    .s1 .h1 {
+      animation: fadeUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.6s both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══════════════════════════════════════════════
+       씬 2 — 흩어진 내 일 (중앙 수렴)
+       ═══════════════════════════════════════════════ */
+    .s2 {
+      background: radial-gradient(ellipse at center, #0f172a 0%, #060b18 80%);
+    }
+    .s2 .center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 3;
+    }
+    .s2 .black-hole {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--hero);
+      transform: translate(-50%, -50%);
+      box-shadow:
+        0 0 40px var(--hero),
+        0 0 80px var(--hero-soft),
+        0 0 140px var(--hero-soft);
+      animation: pulse 2s ease-in-out infinite;
+      opacity: 0.9;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50%      { transform: translate(-50%, -50%) scale(1.4); }
+    }
+    .s2 .h1 {
+      position: relative;
+      text-align: center;
+      animation: fadeUp 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) 0.8s both;
+    }
+
+    /* ═══════════════════════════════════════════════
+       씬 3 — impd.me/demo 타이핑
+       ═══════════════════════════════════════════════ */
+    .s3 {
+      background: #000;
+    }
+    .s3::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(0, 161, 224, 0.12) 0%, transparent 60%);
+    }
+    .s3 .center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      z-index: 3;
+      padding: 0 4vw;
+    }
+    .url-box {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0;
+      font-family: var(--font-mono);
+      font-size: clamp(36px, 6vw, 96px);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 2.5rem;
+      padding: 1.2rem 2rem;
+      border: 1px solid rgba(0, 161, 224, 0.25);
+      border-radius: 16px;
+      background: rgba(0, 161, 224, 0.04);
+      box-shadow: var(--hero-glow);
+    }
+    .url-fixed { color: rgba(255, 255, 255, 0.55); }
+    .url-slug {
+      color: var(--hero);
+      text-shadow: 0 0 20px rgba(0, 161, 224, 0.5);
+      overflow: hidden;
+      white-space: nowrap;
+      display: inline-block;
+      max-width: 0;
+      animation: typeSlug 1.4s steps(4, end) forwards;
+      animation-delay: calc(var(--duration) * 0.355);
+    }
+    .url-caret {
+      display: inline-block;
+      width: 3px;
+      height: 0.9em;
+      background: var(--hero);
+      margin-left: 4px;
+      transform: translateY(0.08em);
+      animation: caretBlink 0.7s steps(2) infinite;
+    }
+    @keyframes typeSlug {
+      from { max-width: 0; }
+      to   { max-width: 8ch; }
+    }
+    @keyframes caretBlink {
+      50% { opacity: 0; }
+    }
+    .s3 .h1,
+    .s3 .subline {
+      animation: fadeUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      opacity: 0;
+    }
+    .s3 .h1 { animation-delay: calc(var(--duration) * 0.345); }
+    .s3 .subline { animation-delay: calc(var(--duration) * 0.40); }
+
+    /* ═══════════════════════════════════════════════
+       씬 4 — 3D 플립 목업 카드
+       ═══════════════════════════════════════════════ */
+    .s4 {
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(0, 161, 224, 0.10) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(0, 161, 224, 0.06) 0%, transparent 50%),
+        #0a1222;
+      perspective: 1800px;
+    }
+    .s4 .eyebrow-wrap {
+      position: absolute;
+      top: 14vh;
+      left: 0;
+      right: 0;
+      text-align: center;
+      z-index: 2;
+    }
+    .s4 .eyebrow {
+      font-size: clamp(13px, 1.1vw, 17px);
+      margin: 0;
+    }
+    .s4 .h2 {
+      text-align: center;
+      margin-top: 0.8rem;
+    }
+    .mockup-stage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 3vw;
+      padding-top: 4vh;
+      transform-style: preserve-3d;
+    }
+    .mockup {
+      position: relative;
+      width: 22vw;
+      min-width: 280px;
+      max-width: 420px;
+      aspect-ratio: 3 / 4;
+      border-radius: 18px;
+      background: linear-gradient(155deg, #0f1e36 0%, #081123 100%);
+      border: 1px solid rgba(0, 161, 224, 0.22);
+      box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+        var(--hero-glow);
+      transform: rotateY(90deg);
+      opacity: 0;
+      padding: 24px;
+      overflow: hidden;
+    }
+    .mockup-1 {
+      animation: flipIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      animation-delay: calc(var(--duration) * 0.52);
+    }
+    .mockup-2 {
+      animation: flipIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      animation-delay: calc(var(--duration) * 0.56);
+    }
+    .mockup-3 {
+      animation: flipIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      animation-delay: calc(var(--duration) * 0.60);
+    }
+    @keyframes flipIn {
+      from { transform: rotateY(90deg) translateY(30px); opacity: 0; }
+      to   { transform: rotateY(0deg) translateY(0); opacity: 1; }
+    }
+
+    .mockup-label {
+      position: absolute;
+      top: 20px;
+      left: 24px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--hero);
+      text-transform: uppercase;
+    }
+    .mockup-title {
+      position: absolute;
+      top: 44px;
+      left: 24px;
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+    .mock-bar {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .mock-bar > i {
+      display: block;
+      height: 100%;
+      background: var(--hero);
+      border-radius: 6px;
+    }
+    .mock-kpi {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: #fff;
+    }
+    .mock-kpi .label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+    }
+    .mock-kpi .value {
+      font-size: 20px;
+      font-weight: 700;
+      margin-top: 4px;
+      color: var(--hero);
+    }
+
+    /* 목업 1 — 공개 프로필 */
+    .m1-avatar {
+      position: absolute;
+      top: 90px;
+      left: 24px;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--hero), #67e8f9);
+    }
+    .m1-name {
+      position: absolute;
+      top: 96px;
+      left: 90px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .m1-handle {
+      position: absolute;
+      top: 118px;
+      left: 90px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .m1-btn {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .m1-btn.primary {
+      top: 168px;
+      background: var(--hero);
+      color: #05161f;
+    }
+    .m1-btn.ghost {
+      top: 212px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.7);
+    }
+    .m1-row {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      height: 38px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .m1-r1 { top: 262px; }
+    .m1-r2 { top: 306px; }
+    .m1-r3 { top: 350px; }
+
+    /* 목업 2 — 어드민 대시보드 */
+    .m2-kpi-1 { top: 84px;  left: 24px; width: calc(50% - 28px); }
+    .m2-kpi-2 { top: 84px;  right: 24px; width: calc(50% - 28px); }
+    .m2-bar-1 { top: 170px; }
+    .m2-bar-2 { top: 190px; width: 60%; }
+    .m2-bar-3 { top: 210px; width: 80%; }
+    .m2-chart {
+      position: absolute;
+      top: 240px;
+      left: 24px;
+      right: 24px;
+      height: 120px;
+      border-radius: 10px;
+      background:
+        linear-gradient(180deg, rgba(0, 161, 224, 0.2) 0%, transparent 100%);
+      border: 1px solid rgba(0, 161, 224, 0.2);
+      overflow: hidden;
+    }
+    .m2-chart svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 목업 3 — 로그인 */
+    .m3-logo {
+      position: absolute;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .m3-logo .dot-blue { color: var(--hero); }
+    .m3-input {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      height: 42px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .m3-i1 { top: 160px; }
+    .m3-i2 { top: 216px; }
+    .m3-btn {
+      position: absolute;
+      top: 272px;
+      left: 24px;
+      right: 24px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--hero);
+      color: #05161f;
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--hero-glow);
+    }
+    .m3-hint {
+      position: absolute;
+      top: 336px;
+      left: 24px;
+      right: 24px;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+    }
+
+    /* ═══════════════════════════════════════════════
+       씬 5 — LIVE 지표 스트림
+       ═══════════════════════════════════════════════ */
+    .s5 {
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(0, 161, 224, 0.08) 0%, transparent 55%),
+        #0a1222;
+    }
+    .s5 .split {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 0 8vw;
+      gap: 5vw;
+    }
+    .stacked {
+      position: relative;
+      width: 100%;
+      max-width: 380px;
+      justify-self: end;
+      aspect-ratio: 3 / 4;
+    }
+    .stacked .card {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: linear-gradient(155deg, #0f1e36 0%, #081123 100%);
+      border: 1px solid rgba(0, 161, 224, 0.22);
+      box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.6),
+        var(--hero-glow);
+      transform-origin: center bottom;
+    }
+    .stacked .card:nth-child(1) {
+      transform: translate(-24px, -16px) rotate(-5deg);
+      opacity: 0.65;
+    }
+    .stacked .card:nth-child(2) {
+      transform: translate(-12px, -8px) rotate(-2deg);
+      opacity: 0.85;
+    }
+    .stacked .card:nth-child(3) {
+      transform: translate(0, 0) rotate(0deg);
+    }
+    .stacked .card .brand-mini {
+      position: absolute;
+      top: 22px;
+      left: 22px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--hero);
+      text-transform: uppercase;
+    }
+    .stacked .card .headline {
+      position: absolute;
+      top: 50px;
+      left: 22px;
+      right: 22px;
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+    }
+    .stacked .card .headline span {
+      color: var(--hero);
+    }
+
+    .live-panel {
+      justify-self: start;
+      width: 100%;
+      max-width: 500px;
+    }
+    .live-panel .eyebrow-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      color: #10b981;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+    .live-panel .eyebrow-live::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      animation: blink 1.4s ease-in-out infinite;
+      box-shadow: 0 0 8px #10b981;
+    }
+    .live-panel .h2 {
+      text-align: left;
+      margin-bottom: 2rem;
+    }
+    .stream {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .metric {
+      padding: 18px 20px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(0, 161, 224, 0.18);
+    }
+    .metric .lbl {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      color: rgba(255, 255, 255, 0.55);
+      text-transform: uppercase;
+    }
+    .metric .val {
+      font-size: clamp(28px, 2.6vw, 40px);
+      font-weight: 800;
+      color: #fff;
+      margin-top: 6px;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .metric .val .unit {
+      font-size: 0.55em;
+      color: rgba(255, 255, 255, 0.55);
+      font-weight: 600;
+      margin-left: 4px;
+    }
+    .metric .delta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--hero);
+      margin-top: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    /* s5 카운트업은 CSS counter-based 폴백 + JS 실제 숫자 갱신 */
+    .s5 .stacked .card,
+    .s5 .stream .metric,
+    .s5 .live-panel .eyebrow-live,
+    .s5 .live-panel .h2 {
+      opacity: 0;
+      transform: translateY(24px);
+      animation: fadeUpDelay 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+    .s5 .live-panel .eyebrow-live { animation-delay: calc(var(--duration) * 0.745); }
+    .s5 .live-panel .h2           { animation-delay: calc(var(--duration) * 0.755); }
+    .s5 .stacked .card:nth-child(1) { animation-delay: calc(var(--duration) * 0.745); }
+    .s5 .stacked .card:nth-child(2) { animation-delay: calc(var(--duration) * 0.76); }
+    .s5 .stacked .card:nth-child(3) { animation-delay: calc(var(--duration) * 0.775); }
+    .s5 .stream .metric:nth-child(1) { animation-delay: calc(var(--duration) * 0.78); }
+    .s5 .stream .metric:nth-child(2) { animation-delay: calc(var(--duration) * 0.795); }
+    .s5 .stream .metric:nth-child(3) { animation-delay: calc(var(--duration) * 0.81); }
+    .s5 .stream .metric:nth-child(4) { animation-delay: calc(var(--duration) * 0.825); }
+
+    .s5 .stacked .card:nth-child(1) {
+      animation-name: fadeUpDeck1;
+    }
+    .s5 .stacked .card:nth-child(2) {
+      animation-name: fadeUpDeck2;
+    }
+    .s5 .stacked .card:nth-child(3) {
+      animation-name: fadeUpDeck3;
+    }
+    @keyframes fadeUpDeck1 {
+      from { opacity: 0; transform: translate(-24px, 12px) rotate(-5deg); }
+      to   { opacity: 0.65; transform: translate(-24px, -16px) rotate(-5deg); }
+    }
+    @keyframes fadeUpDeck2 {
+      from { opacity: 0; transform: translate(-12px, 12px) rotate(-2deg); }
+      to   { opacity: 0.85; transform: translate(-12px, -8px) rotate(-2deg); }
+    }
+    @keyframes fadeUpDeck3 {
+      from { opacity: 0; transform: translate(0, 12px) rotate(0deg); }
+      to   { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+    }
+    @keyframes fadeUpDelay {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══════════════════════════════════════════════
+       씬 6 — 종이 배경 엔딩
+       ═══════════════════════════════════════════════ */
+    .s6 {
+      background: var(--paper);
+      color: var(--ink-paper);
+    }
+    .s6 .center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      z-index: 3;
+      padding: 0 4vw;
+    }
+    .s6 .logo {
+      font-family: var(--font-body);
+      font-weight: 800;
+      font-size: clamp(56px, 8vw, 140px);
+      letter-spacing: -0.04em;
+      color: var(--ink-paper);
+      animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      animation-delay: calc(var(--duration) * 0.905);
+      opacity: 0;
+    }
+    .s6 .logo .accent { color: var(--hero); }
+    .s6 .logo .dot { color: var(--hero); }
+    .s6 .h1-dark {
+      font-weight: 800;
+      font-size: clamp(32px, 4.4vw, 68px);
+      line-height: 1.1;
+      color: var(--ink-paper);
+      letter-spacing: -0.02em;
+      margin-top: 1.5rem;
+      animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      animation-delay: calc(var(--duration) * 0.925);
+      opacity: 0;
+    }
+    .s6 .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 2.5rem;
+      padding: 18px 36px;
+      border-radius: 14px;
+      background: var(--hero);
+      color: #fff;
+      font-weight: 700;
+      font-size: clamp(15px, 1.3vw, 19px);
+      letter-spacing: -0.005em;
+      box-shadow: 0 0 40px rgba(0, 161, 224, 0.45), 0 20px 40px rgba(0, 161, 224, 0.2);
+      animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, ctaGlow 2s ease-in-out infinite alternate;
+      animation-delay: calc(var(--duration) * 0.945), calc(var(--duration) * 0.96);
+      opacity: 0;
+    }
+    .s6 .cta .arrow {
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+    @keyframes ctaGlow {
+      from { box-shadow: 0 0 40px rgba(0, 161, 224, 0.45), 0 20px 40px rgba(0, 161, 224, 0.2); }
+      to   { box-shadow: 0 0 60px rgba(0, 161, 224, 0.65), 0 20px 50px rgba(0, 161, 224, 0.3); }
+    }
+    .s6 .tagline {
+      font-family: var(--font-mono);
+      font-size: clamp(11px, 0.95vw, 14px);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(0, 0, 0, 0.45);
+      margin-top: 3rem;
+      animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      animation-delay: calc(var(--duration) * 0.965);
+      opacity: 0;
+    }
+
+    /* ═══════════════════════════════════════════════
+       재생 완료 후 리플레이 UI (JS 트리거)
+       ═══════════════════════════════════════════════ */
+    .replay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(16px);
+      z-index: 100;
+    }
+    .replay.show { display: flex; }
+    .replay button {
+      padding: 18px 40px;
+      border-radius: 14px;
+      background: var(--hero);
+      color: #05161f;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 18px;
+      border: none;
+      cursor: pointer;
+      box-shadow: var(--hero-glow);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .replay button:hover { transform: translateY(-2px); }
+
+    .scene-hint {
+      position: absolute;
+      bottom: 56px;
+      left: 32px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.3);
+      letter-spacing: 0.15em;
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    /* prefers-reduced-motion 사용자 존중 (녹화가 필요한 경우 쿼리 무시 클래스 가능) */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01s !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage" id="stage">
+
+    <!-- 상단 REC 인디케이터 -->
+    <div class="rec" aria-hidden="true">REC · imPD PROMO 30s</div>
+
+    <!-- 씬 힌트 (단축키 안내) -->
+    <div class="scene-hint">1~6 SCENE JUMP · SPACE PAUSE · R REPLAY</div>
+
+    <!-- ─── S1 : 다섯 개의 로그인 창 ───────────────── -->
+    <section class="scene s1" aria-label="Scene 1">
+      <span class="chip chip-1"><i class="dot"></i>카카오톡 채널</span>
+      <span class="chip chip-2 chip--warn"><i class="dot"></i>네이버 블로그</span>
+      <span class="chip chip-3 chip--pink"><i class="dot"></i>인스타그램</span>
+      <span class="chip chip-4 chip--green"><i class="dot"></i>스레드</span>
+      <span class="chip chip-5 chip--violet"><i class="dot"></i>이메일 뉴스레터</span>
+      <div class="center">
+        <p class="eyebrow">MONDAY · 09:00 AM</p>
+        <h1 class="h1">매일, 다섯 개의<br><span class="serif">로그인 창.</span></h1>
+      </div>
+    </section>
+
+    <!-- ─── S2 : 흩어진 내 일 ─────────────────────── -->
+    <section class="scene s2" aria-label="Scene 2">
+      <div class="black-hole" aria-hidden="true"></div>
+      <div class="center">
+        <h1 class="h1">흩어진 <span class="serif">내 일.</span></h1>
+      </div>
+    </section>
+
+    <!-- ─── S3 : 하나의 주소로 ─────────────────────── -->
+    <section class="scene s3" aria-label="Scene 3">
+      <div class="center">
+        <div class="url-box">
+          <span class="url-fixed">impd.me/</span><span class="url-slug">demo</span><span class="url-caret"></span>
+        </div>
+        <h1 class="h1">하나의 주소로.</h1>
+        <p class="subline">5분이면 켭니다 · ₩0으로 시작 · 신용카드 없이</p>
+      </div>
+    </section>
+
+    <!-- ─── S4 : 3D 플립 목업 ──────────────────────── -->
+    <section class="scene s4" aria-label="Scene 4">
+      <div class="eyebrow-wrap">
+        <p class="eyebrow">한 사람의 모든 화면</p>
+        <h2 class="h2">공개 프로필 · 관리자 대시보드 · 로그인</h2>
+      </div>
+
+      <div class="mockup-stage">
+        <!-- 목업 1: 공개 프로필 -->
+        <article class="mockup mockup-1" aria-label="공개 프로필">
+          <span class="mockup-label">PUBLIC</span>
+          <h3 class="mockup-title">impd.me/demo</h3>
+          <div class="m1-avatar"></div>
+          <div class="m1-name">Demo Studio</div>
+          <div class="m1-handle">@demo · 1인 사업가</div>
+          <div class="m1-btn primary">예약하기 →</div>
+          <div class="m1-btn ghost">포트폴리오 보기</div>
+          <div class="m1-row m1-r1"></div>
+          <div class="m1-row m1-r2"></div>
+          <div class="m1-row m1-r3"></div>
+        </article>
+
+        <!-- 목업 2: 어드민 대시보드 -->
+        <article class="mockup mockup-2" aria-label="어드민 대시보드">
+          <span class="mockup-label">ADMIN</span>
+          <h3 class="mockup-title">이번 주 성과</h3>
+          <div class="mock-kpi m2-kpi-1">
+            <div class="label">방문자</div>
+            <div class="value">1,284</div>
+          </div>
+          <div class="mock-kpi m2-kpi-2">
+            <div class="label">문의</div>
+            <div class="value">24</div>
+          </div>
+          <div class="mock-bar m2-bar-1"><i style="width: 92%"></i></div>
+          <div class="mock-bar m2-bar-2"><i style="width: 68%"></i></div>
+          <div class="mock-bar m2-bar-3"><i style="width: 84%"></i></div>
+          <div class="m2-chart">
+            <svg viewBox="0 0 340 120" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#00A1E0" stop-opacity="0.5"/>
+                  <stop offset="100%" stop-color="#00A1E0" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M0 95 L40 85 L80 70 L120 78 L160 55 L200 62 L240 42 L280 48 L320 22 L340 28 L340 120 L0 120 Z" fill="url(#grad)"/>
+              <path d="M0 95 L40 85 L80 70 L120 78 L160 55 L200 62 L240 42 L280 48 L320 22 L340 28" stroke="#00A1E0" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </article>
+
+        <!-- 목업 3: 로그인 -->
+        <article class="mockup mockup-3" aria-label="로그인 화면">
+          <span class="mockup-label">SIGN IN</span>
+          <h3 class="mockup-title">&nbsp;</h3>
+          <div class="m3-logo">im<span class="dot-blue">PD</span><span class="dot-blue">.</span></div>
+          <div class="m3-input m3-i1"></div>
+          <div class="m3-input m3-i2"></div>
+          <div class="m3-btn">내 페이지 열기</div>
+          <div class="m3-hint">5분이면 켭니다</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ─── S5 : LIVE 지표 스트림 ───────────────────── -->
+    <section class="scene s5" aria-label="Scene 5">
+      <div class="split">
+        <div class="stacked" aria-hidden="true">
+          <div class="card">
+            <span class="brand-mini">LIVE · impd.me/demo</span>
+            <p class="headline">이번 주 <span>+₩420만</span></p>
+          </div>
+          <div class="card">
+            <span class="brand-mini">LIVE · 예약 현황</span>
+            <p class="headline">대기 중 <span>12명</span></p>
+          </div>
+          <div class="card">
+            <span class="brand-mini">LIVE · 방금 도착</span>
+            <p class="headline">★ 4.9 / 새 후기 <span>24건</span></p>
+          </div>
+        </div>
+
+        <div class="live-panel">
+          <p class="eyebrow-live">LIVE · 지금 작동 중</p>
+          <h2 class="h2">지금, 진짜 일하고 있다는 증거.</h2>
+          <div class="stream">
+            <div class="metric">
+              <div class="lbl">이번 주 매출</div>
+              <div class="val" data-counter="420" data-prefix="₩" data-suffix="만">₩0만</div>
+              <div class="delta">+12.4% ↑</div>
+            </div>
+            <div class="metric">
+              <div class="lbl">예약 대기</div>
+              <div class="val" data-counter="12" data-suffix="명">0명</div>
+              <div class="delta">실시간</div>
+            </div>
+            <div class="metric">
+              <div class="lbl">평점</div>
+              <div class="val" data-counter="49" data-divide="10" data-prefix="★ ">★ 0.0</div>
+              <div class="delta">최근 30일</div>
+            </div>
+            <div class="metric">
+              <div class="lbl">새 후기</div>
+              <div class="val" data-counter="24" data-suffix="건">0건</div>
+              <div class="delta">지난 7일</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── S6 : 엔딩 ──────────────────────────────── -->
+    <section class="scene s6" aria-label="Scene 6">
+      <div class="center">
+        <div class="logo">im<span class="accent">PD</span><span class="dot">.</span></div>
+        <h1 class="h1-dark">내 일의 PD가 됩니다.</h1>
+        <a class="cta" href="#">내 페이지 만들기 <span class="arrow">→</span></a>
+        <p class="tagline">흩어진 내 일, 하나의 주소로</p>
+      </div>
+    </section>
+
+    <!-- 프로그레스 바 -->
+    <div class="progress"><i></i></div>
+    <div class="timecode" id="timecode">00:00 / 00:30</div>
+
+    <!-- 리플레이 오버레이 -->
+    <div class="replay" id="replay">
+      <button type="button" onclick="window.location.reload()">▶ 다시 재생</button>
+    </div>
+  </main>
+
+  <script>
+    // ─── 타임코드 & 리플레이 ──────────────────────
+    const DURATION = 30_000; // ms
+    const start = performance.now();
+    const tc = document.getElementById('timecode');
+    const replay = document.getElementById('replay');
+
+    function fmt(sec) {
+      const s = Math.max(0, Math.floor(sec));
+      const m = Math.floor(s / 60).toString().padStart(2, '0');
+      const r = (s % 60).toString().padStart(2, '0');
+      return m + ':' + r;
+    }
+
+    let finished = false;
+    function tick(now) {
+      const elapsed = (now - start) / 1000;
+      if (tc) tc.textContent = fmt(elapsed) + ' / 00:30';
+      if (elapsed >= 30 && !finished) {
+        finished = true;
+        setTimeout(() => replay && replay.classList.add('show'), 400);
+      }
+      if (elapsed < 31) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    // ─── S5 카운트업 ───────────────────────────────
+    const S5_START = 22_000; // ms
+    const S5_DUR = 1_800;
+    const counters = document.querySelectorAll('[data-counter]');
+    let counted = false;
+    function runCounters() {
+      counters.forEach(el => {
+        const target = parseFloat(el.dataset.counter);
+        const divide = parseFloat(el.dataset.divide || '1');
+        const prefix = el.dataset.prefix || '';
+        const suffix = el.dataset.suffix || '';
+        const startTs = performance.now();
+        function step(now) {
+          const p = Math.min(1, (now - startTs) / S5_DUR);
+          const ease = 1 - Math.pow(1 - p, 3);
+          const cur = target * ease;
+          const display = divide > 1
+            ? (cur / divide).toFixed(1)
+            : Math.floor(cur).toLocaleString();
+          el.textContent = prefix + display + suffix;
+          if (p < 1) requestAnimationFrame(step);
+          else {
+            const final = divide > 1 ? (target / divide).toFixed(1) : target.toLocaleString();
+            el.textContent = prefix + final + suffix;
+          }
+        }
+        requestAnimationFrame(step);
+      });
+    }
+    function watchS5(now) {
+      const elapsed = now - start;
+      if (!counted && elapsed >= S5_START) {
+        counted = true;
+        runCounters();
+      }
+      if (elapsed < 30_000) requestAnimationFrame(watchS5);
+    }
+    requestAnimationFrame(watchS5);
+
+    // ─── 단축키: 1~6 씬 점프, SPACE 일시정지, R 리플레이 ──
+    const sceneOffsets = { '1': 0, '2': 5, '3': 10, '4': 15, '5': 22, '6': 27 };
+    let paused = false;
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'r' || e.key === 'R') {
+        window.location.reload();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        paused = !paused;
+        document.querySelectorAll('.scene, .progress > i, .chip, .black-hole, .url-slug, .url-caret, .mockup, .stacked .card, .metric, .logo, .h1-dark, .cta, .tagline, .eyebrow-live, .eyebrow, .h1, .h2, .subline').forEach(el => {
+          el.style.animationPlayState = paused ? 'paused' : 'running';
+        });
+      } else if (sceneOffsets.hasOwnProperty(e.key)) {
+        // 씬 점프: 모든 애니메이션의 animation-delay 를 음수로 shift
+        const offsetSec = sceneOffsets[e.key];
+        document.querySelectorAll('.scene, .progress > i').forEach(el => {
+          el.style.animationDelay = `-${offsetSec}s`;
+        });
+      }
+    });
+  </script>
+</body>
+</html>

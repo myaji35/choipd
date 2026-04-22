@@ -26,6 +26,9 @@ Rails.application.routes.draw do
   # ── 공개 사이트 (Chopd) ──────────────────────────────
   root "chopd/home#index"
 
+  # ── imPD 프로모 시네마틱 (30s HTML 영상) ─────────────
+  get "/promo", to: "promo#show", as: :promo
+
   scope module: :chopd do
     get "/education",        to: "education#index",  as: :education
     get "/media",            to: "media#index",      as: :media
