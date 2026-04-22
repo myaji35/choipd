@@ -27,6 +27,27 @@
       .nav-mobile-btn { display: flex !important; }
     }
     @media (min-width: 769px) { .nav-mobile-btn { display: none; } }
+    /* 회원 세션 영역 — 로그인/가입/내페이지/로그아웃 */
+    .nav-session { display: inline-flex; align-items: center; gap: 10px; }
+    .nav-session-name { font-family: 'Noto Sans KR', sans-serif; font-size: 11px; letter-spacing: .6px; text-transform: uppercase; color: rgba(255,255,255,0.55); white-space: nowrap; }
+    .nav-session-link {
+      font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.85);
+      text-decoration: none; padding: 7px 12px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.04);
+      transition: all .2s; white-space: nowrap;
+    }
+    .nav-session-link:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); color: #fff; }
+    .nav-session-form { display: inline-flex; margin: 0; padding: 0; }
+    .nav-session-btn {
+      font: inherit; cursor: pointer;
+      font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.85);
+      padding: 7px 12px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.04);
+      transition: all .2s; white-space: nowrap;
+    }
+    .nav-session-btn:hover { background: #ff4d1c; border-color: #ff4d1c; color: #fff; }
+    .nav-signup { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.55); text-decoration: none; transition: color .2s; white-space: nowrap; }
+    .nav-signup:hover { color: #fff; }
     .mobile-menu {
       display: none; position: fixed; inset: 0; top: 60px;
       background: rgba(10,14,26,0.97); backdrop-filter: blur(20px);
@@ -51,8 +72,25 @@
     <%= link_to "커뮤니티", community_path, class: "nav-link" %>
   </nav>
 
-  <!-- CTA -->
-  <div class="nav-cta-wrap">
+  <!-- CTA + 회원 세션 -->
+  <div class="nav-cta-wrap" style="display: inline-flex; align-items: center; gap: 14px;">
+    <% if member_signed_in? %>
+      <div class="nav-session">
+        <span class="nav-session-name"><%= truncate(current_member.name.to_s, length: 12) %></span>
+        <%= link_to "내 페이지", "/#{current_member.slug}", class: "nav-session-link" %>
+        <%= button_to member_logout_path,
+              method: :delete,
+              form: { class: "nav-session-form", data: { turbo_confirm: "로그아웃하시겠습니까?" } },
+              class: "nav-session-btn" do %>
+          로그아웃
+        <% end %>
+      </div>
+    <% else %>
+      <div class="nav-session">
+        <%= link_to "회원가입", member_signup_path, class: "nav-signup" %>
+        <%= link_to "로그인", member_login_path, class: "nav-session-link" %>
+      </div>
+    <% end %>
     <%= link_to new_inquiry_path, class: "nav-cta" do %>
       <svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
       강좌 문의
@@ -75,6 +113,22 @@
   <%= link_to "미디어", media_path, class: "mobile-nav-link" %>
   <%= link_to "작품", works_path, class: "mobile-nav-link" %>
   <%= link_to "커뮤니티", community_path, class: "mobile-nav-link" %>
+  <% if member_signed_in? %>
+    <div class="mobile-nav-link" style="color: rgba(255,255,255,.5); font-size: 12px; letter-spacing: 1px; text-transform: uppercase;">
+      <%= truncate(current_member.name.to_s, length: 20) %>
+    </div>
+    <%= link_to "내 페이지", "/#{current_member.slug}", class: "mobile-nav-link" %>
+    <%= button_to member_logout_path,
+          method: :delete,
+          form: { data: { turbo_confirm: "로그아웃하시겠습니까?" }, style: "display: block; margin: 0;" },
+          class: "mobile-nav-link",
+          style: "width: 100%; text-align: left; background: none; border: none; border-bottom: 1px solid rgba(255,255,255,.06); cursor: pointer; font-family: inherit;" do %>
+      로그아웃 →
+    <% end %>
+  <% else %>
+    <%= link_to "회원가입", member_signup_path, class: "mobile-nav-link" %>
+    <%= link_to "로그인", member_login_path, class: "mobile-nav-link" %>
+  <% end %>
   <%= link_to "강좌 문의", new_inquiry_path, class: "nav-cta", style: "margin-top:16px;justify-content:center;" %>
 </div>
 
