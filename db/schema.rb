@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_21_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_22_020411) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -655,6 +655,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_150000) do
     t.index ["tenant_id"], name: "index_member_inquiries_on_tenant_id"
   end
 
+  create_table "member_photos", force: :cascade do |t|
+    t.string "caption"
+    t.string "category", default: "daily"
+    t.datetime "created_at", null: false
+    t.integer "file_size"
+    t.integer "height"
+    t.integer "member_id", null: false
+    t.integer "sort_order", default: 0
+    t.datetime "taken_at"
+    t.datetime "updated_at", null: false
+    t.datetime "uploaded_at"
+    t.integer "width"
+    t.index ["member_id", "category"], name: "index_member_photos_on_member_id_and_category"
+    t.index ["member_id", "uploaded_at"], name: "index_member_photos_on_member_id_and_uploaded_at"
+    t.index ["member_id"], name: "index_member_photos_on_member_id"
+  end
+
   create_table "member_portfolio_items", force: :cascade do |t|
     t.string "category"
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
@@ -1048,6 +1065,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_150000) do
   add_foreign_key "member_documents", "members", on_delete: :cascade
   add_foreign_key "member_gap_reports", "members", on_delete: :cascade
   add_foreign_key "member_inquiries", "members", on_delete: :cascade
+  add_foreign_key "member_photos", "members"
   add_foreign_key "member_portfolio_items", "members", on_delete: :cascade
   add_foreign_key "member_posts", "members", on_delete: :cascade
   add_foreign_key "member_reviews", "members", on_delete: :cascade

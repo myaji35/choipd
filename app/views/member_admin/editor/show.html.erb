@@ -35,12 +35,16 @@
         </p>
         <div style="margin-top: 24px; padding: 16px; background: var(--impd-card); border: 1px solid var(--impd-rule);">
           <p class="impd-label-muted">현재 지원</p>
-          <p style="margin-top: 8px; font-size: 13px;"><strong>MD · TXT</strong> (최대 1MB · 여러 개 한 번에 OK)</p>
-          <p style="margin-top: 8px; font-size: 11px; color: var(--impd-muted);">PDF · 이미지 · 영상은 Phase 3 예정</p>
+          <p style="margin-top: 8px; font-size: 13px;"><strong>MD · TXT</strong> (자료 · 최대 1MB · 여러 개 한 번에 OK)</p>
+          <p style="margin-top: 8px; font-size: 13px;"><strong>이미지</strong> (일상 사진 · JPG/PNG/WebP/HEIC · 최대 15MB · 여러 장 가능)</p>
+          <p style="margin-top: 8px; font-size: 11px; color: var(--impd-muted);">PDF · 영상은 Phase 3 예정</p>
         </div>
       </div>
       <div>
         <%= render "member_admin/editor/dropzone", member: @member %>
+        <div style="margin-top: 32px;">
+          <%= render "member_admin/editor/photo_uploader", member: @member %>
+        </div>
       </div>
     </div>
 

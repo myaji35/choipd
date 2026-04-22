@@ -12,6 +12,7 @@ class Member < ApplicationRecord
   has_many :member_skills,          dependent: :destroy
   has_many :skills, through: :member_skills
   has_many :member_documents,       dependent: :destroy
+  has_many :member_photos,          dependent: :destroy
   has_many :member_gap_reports,     dependent: :destroy
 
   STATUSES = %w[pending_approval approved rejected suspended].freeze

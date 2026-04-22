@@ -244,6 +244,7 @@ Rails.application.routes.draw do
       resources :documents, only: [ :create, :update, :destroy ] do
         member { post :reparse }
       end
+      resources :photos, only: [ :create, :update, :destroy ]
     end
   end
 
