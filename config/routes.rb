@@ -1,17 +1,24 @@
 Rails.application.routes.draw do
-  # Devise 인증 (Admin/PD 공통)
-  devise_for :admin_users, path: "auth", path_names: {
+  # ── 관리자 전용 로그인 (Devise) ────────────────────
+  # /admin/login  · /admin/logout
+  devise_for :admin_users, path: "admin", path_names: {
     sign_in: "login",
     sign_out: "logout"
   }
 
-  # OAuth (회원 소셜 로그인) — OmniAuth는 전역 /auth/<provider> 경로 사용
-  # request phase: POST /auth/google_oauth2 (omniauth-rails_csrf_protection이 강제)
-  # callback     : GET/POST /auth/google_oauth2/callback
-  get   "/auth/:provider/callback", to: "omniauth_callbacks#google_oauth2", constraints: { provider: /google_oauth2/ }
-  post  "/auth/:provider/callback", to: "omniauth_callbacks#google_oauth2", constraints: { provider: /google_oauth2/ }
-  get   "/auth/failure",            to: "omniauth_callbacks#failure"
-  delete "/auth/member/logout",     to: "omniauth_callbacks#destroy", as: :member_oauth_logout
+  # ── 회원 전용 OAuth 로그인 (Google) ────────────────
+  # /auth/login        : 회원 OAuth 진입 페이지 (Google 버튼 전용)
+  # /auth/google_oauth2: OmniAuth request phase (POST, CSRF 보호)
+  # /auth/*/callback   : OAuth 콜백
+  # /auth/failure      : OAuth 실패 처리
+  # /auth/logout       : 회원 세션 종료
+  get    "/auth/login",              to: "member_auth#new",      as: :member_login
+  get    "/auth/:provider/callback", to: "omniauth_callbacks#google_oauth2", constraints: { provider: /google_oauth2/ }
+  post   "/auth/:provider/callback", to: "omniauth_callbacks#google_oauth2", constraints: { provider: /google_oauth2/ }
+  get    "/auth/failure",            to: "omniauth_callbacks#failure"
+  delete "/auth/logout",             to: "omniauth_callbacks#destroy",       as: :member_logout
+  # 하위 호환 (과거 alias)
+  delete "/auth/member/logout",      to: "omniauth_callbacks#destroy",       as: :member_oauth_logout
 
   # ── 공개 사이트 (Chopd) ──────────────────────────────
   root "chopd/home#index"

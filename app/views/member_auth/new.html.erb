@@ -14,7 +14,6 @@
     .auth-poster { min-height: 220px; }
   }
 
-  /* ── 좌측 폼 ─────────────────────────── */
   .auth-form-col {
     display: flex;
     flex-direction: column;
@@ -25,8 +24,7 @@
   .auth-form-col::before {
     content: "";
     position: absolute; inset: 0;
-    background-image:
-      linear-gradient(to right, rgba(15,13,11,0.06) 1px, transparent 1px);
+    background-image: linear-gradient(to right, rgba(15,13,11,0.06) 1px, transparent 1px);
     background-size: 80px 100%;
     pointer-events: none;
     opacity: 0.5;
@@ -61,7 +59,7 @@
   .auth-head {
     border-top: 1px solid var(--impd-ink, #0f0d0b);
     padding-top: 20px;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
   }
   .auth-section {
     font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
@@ -90,67 +88,6 @@
     line-height: 1.6;
   }
 
-  .auth-field { margin-bottom: 16px; }
-  .auth-field label {
-    display: block;
-    font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
-    font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase;
-    color: rgba(15,13,11,0.55);
-    margin-bottom: 6px;
-  }
-  .auth-field input[type="email"],
-  .auth-field input[type="password"] {
-    width: 100%;
-    padding: 12px 14px;
-    background: #fff;
-    border: 1px solid var(--impd-ink, #0f0d0b);
-    border-radius: 0;
-    color: var(--impd-ink, #0f0d0b);
-    font-size: 15px;
-    font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
-    box-sizing: border-box;
-    transition: background 150ms ease, border-color 150ms ease;
-  }
-  .auth-field input:focus {
-    outline: none;
-    border-color: var(--impd-accent, #3a2af0);
-    background: #fcfaf4;
-    box-shadow: 0 0 0 3px rgba(58,42,240,0.1);
-  }
-
-  .auth-remember {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 24px;
-    color: rgba(15,13,11,0.65);
-    font-size: 13px;
-  }
-  .auth-remember input[type="checkbox"] {
-    width: 16px; height: 16px;
-    accent-color: var(--impd-accent, #3a2af0);
-    cursor: pointer;
-  }
-
-  .auth-submit {
-    display: inline-flex; align-items: center; justify-content: center;
-    gap: 8px;
-    width: 100%;
-    padding: 0 22px;
-    height: 52px;
-    background: var(--impd-ink, #0f0d0b);
-    color: var(--impd-paper, #efece4);
-    border: 0;
-    border-radius: 0;
-    font-family: var(--impd-font-sans, 'Pretendard Variable');
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: -0.2px;
-    cursor: pointer;
-    transition: background 150ms ease;
-  }
-  .auth-submit:hover { background: var(--impd-accent, #3a2af0); }
-
   .auth-alert {
     background: rgba(255,90,31,0.08);
     border-left: 2px solid var(--impd-accent-2, #ff5a1f);
@@ -159,18 +96,51 @@
     font-size: 13px;
     margin-bottom: 16px;
   }
+  .auth-notice {
+    background: rgba(58,42,240,0.06);
+    border-left: 2px solid var(--impd-accent, #3a2af0);
+    color: var(--impd-accent, #3a2af0);
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
 
-  .auth-demo {
-    margin-top: 28px;
+  .oauth-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%;
+    padding: 0 22px;
+    height: 52px;
+    background: #fff;
+    color: var(--impd-ink, #0f0d0b);
+    border: 1px solid var(--impd-ink, #0f0d0b);
+    border-radius: 0;
+    font-family: var(--impd-font-sans, 'Pretendard Variable');
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    cursor: pointer;
+    transition: background 150ms ease;
+  }
+  .oauth-btn:hover { background: var(--impd-card, #fbf8f1); }
+
+  .auth-fine {
+    margin-top: 16px;
+    font-size: 11px;
+    color: var(--impd-muted, rgba(15,13,11,0.55));
+    line-height: 1.6;
+  }
+
+  .auth-alt {
+    margin-top: 24px;
     padding: 14px 16px;
     background: #fff;
     border: 1px solid var(--impd-rule, rgba(15,13,11,0.15));
-    font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
-    font-size: 11px;
+    font-size: 12px;
     color: rgba(15,13,11,0.75);
-    line-height: 1.7;
+    line-height: 1.6;
   }
-  .auth-demo strong { color: var(--impd-ink, #0f0d0b); font-weight: 700; }
+  .auth-alt strong { color: var(--impd-ink, #0f0d0b); }
+  .auth-alt a { color: var(--impd-accent, #3a2af0); text-decoration: underline; }
 
   .auth-foot {
     margin-top: auto;
@@ -186,7 +156,6 @@
   .auth-foot a { color: inherit; text-decoration: none; }
   .auth-foot a:hover { color: var(--impd-accent, #3a2af0); }
 
-  /* ── 우측 포스터 ──────────────────────── */
   .auth-poster {
     background: var(--impd-ink, #0f0d0b);
     color: var(--impd-paper, #efece4);
@@ -247,7 +216,6 @@
 </style>
 
 <main class="auth-shell">
-  <!-- 좌측: 폼 -->
   <section class="auth-form-col">
     <div style="position: relative;">
       <h1 class="auth-brand">imPD<span class="dot">.</span></h1>
@@ -256,63 +224,51 @@
 
     <div class="auth-form-wrap">
       <div class="auth-head">
-        <div class="auth-section">§ ADMIN · 운영자 전용</div>
+        <div class="auth-section">§ LOGIN · 회원 전용</div>
         <h2 class="auth-headline">
-          관리자<br>
-          <span class="serif">로그인.</span>
+          Google 한 번이면<br>
+          <span class="serif">충분합니다.</span>
         </h2>
         <p class="auth-sub">
-          <strong>이곳은 imPD 운영자 전용 로그인 페이지입니다.</strong><br>
-          일반 회원이시라면 <%= link_to "/auth/login", "/auth/login", style: "color: var(--impd-accent); text-decoration: underline;" %>에서 Google로 접속해 주세요.
+          비밀번호를 외울 필요 없이, Google 계정 한 번만 연결하면 바로 imPD 회원 페이지가 생깁니다.
+          처음이신 분은 관리자 승인 후 편집을 시작할 수 있습니다.
         </p>
       </div>
 
       <% if alert.present? %>
         <div class="auth-alert"><%= alert %></div>
       <% end %>
-
-      <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-        <div class="auth-field">
-          <%= f.label :email, "이메일" %>
-          <%= f.email_field :email,
-                autofocus: true,
-                autocomplete: "email",
-                placeholder: "name@example.com" %>
-        </div>
-
-        <div class="auth-field">
-          <%= f.label :password, "비밀번호" %>
-          <%= f.password_field :password,
-                autocomplete: "current-password",
-                placeholder: "비밀번호 입력" %>
-        </div>
-
-        <% if devise_mapping.rememberable? %>
-          <div class="auth-remember">
-            <%= f.check_box :remember_me %>
-            <%= f.label :remember_me, "로그인 유지" %>
-          </div>
-        <% end %>
-
-        <%= f.submit "로그인 →", class: "auth-submit" %>
+      <% if notice.present? %>
+        <div class="auth-notice"><%= notice %></div>
       <% end %>
 
-      <%# 회원이신 분들을 위한 안내 %>
-      <div style="margin-top: 24px; padding: 14px 16px; background: #fff; border: 1px solid var(--impd-rule, rgba(15,13,11,0.15)); font-size: 12px; color: rgba(15,13,11,0.75); line-height: 1.6;">
-        <strong style="color: var(--impd-ink);">회원이신가요?</strong> ·
-        운영자가 아닌 일반 회원은
-        <%= link_to "/auth/login", "/auth/login", style: "color: var(--impd-accent); text-decoration: underline;" %>에서
-        Google 로그인으로 접속해 주세요.
+      <%= button_to "/auth/google_oauth2", method: :post, data: { turbo: false }, class: "oauth-btn" do %>
+        <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        <span>Google로 계속하기</span>
+      <% end %>
+
+      <p class="auth-fine">
+        Google 로그인 시 이메일, 이름, 프로필 사진 정보를 받아 회원 페이지 생성에 사용합니다.
+        언제든 관리자 대시보드에서 소셜 연결을 해제할 수 있습니다.
+      </p>
+
+      <div class="auth-alt">
+        <strong>관리자이신가요?</strong> · 운영자 로그인은
+        <%= link_to "/admin/login", "/admin/login" %>에서 이메일·비밀번호로 접속해 주세요.
       </div>
 
       <div class="auth-foot">
         <%= link_to "← 메인으로", root_path %>
-        <span>ADMIN · /admin/login</span>
+        <span>VOL. 1 · ISSUE 04</span>
       </div>
     </div>
   </section>
 
-  <!-- 우측: 에디토리얼 포스터 -->
   <aside class="auth-poster" aria-hidden="true">
     <div class="auth-poster-label">§ MANIFESTO — OUR QUIET PROMISE</div>
     <div>
@@ -327,7 +283,7 @@
     </div>
     <div class="auth-poster-meta">
       <span>2026 · 봄호</span>
-      <span>ADMIN · /admin/login</span>
+      <span>AUTH · /auth/login</span>
     </div>
   </aside>
 </main>
