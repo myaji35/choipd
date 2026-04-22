@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_22_072954) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_22_224956) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -782,6 +782,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_072954) do
     t.text "rejection_reason"
     t.string "slug", null: false
     t.text "social_links"
+    t.string "stats_display_mode", default: "revenue_range"
+    t.datetime "stats_synced_at"
     t.string "status", default: "pending_approval", null: false
     t.string "subscription_plan", default: "basic"
     t.integer "tenant_id", default: 1, null: false
@@ -789,6 +791,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_072954) do
     t.string "townin_email"
     t.string "townin_name"
     t.string "townin_role"
+    t.text "townin_stats_json"
     t.string "towningraph_user_id"
     t.string "uid"
     t.datetime "updated_at", null: false

@@ -10,6 +10,10 @@ class PublicProfileController < ApplicationController
       @reviews = @member.member_reviews.public_visible.recent.limit(4)
       @posts = @member.member_posts.published.recent.limit(3)
       @moments = @member.member_photos.ordered.limit(12)
+      # 파트너 스냅샷: 6시간 캐시. 백그라운드 새로고침 (실패해도 UI는 그대로).
+      if @member.partner_active? && !@member.stats_fresh?
+        TowninSnapshotFetcher.fetch!(@member) rescue nil
+      end
       track_visit(@member)
       render :member_show
     else

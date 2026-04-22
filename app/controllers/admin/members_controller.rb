@@ -1,6 +1,7 @@
 class Admin::MembersController < Admin::BaseController
   before_action :set_member, only: [ :show, :edit, :update, :destroy, :approve, :reject, :suspend, :activate,
-                                     :unlink_oauth, :lookup_townin, :link_townin, :promote_partner, :suspend_partner, :unlink_townin ]
+                                     :unlink_oauth, :lookup_townin, :link_townin, :promote_partner, :suspend_partner, :unlink_townin,
+                                     :update_stats, :refresh_stats ]
 
   def index
     @members = Member.for_tenant.recent
@@ -144,6 +145,45 @@ class Admin::MembersController < Admin::BaseController
     redirect_to admin_member_path(@member), notice: "#{@member.name} 의 파트너 자격을 중지했습니다."
   end
 
+  # ── Townin 활동 스냅샷 (공개 페이지 §B-3에 노출되는 부러움 유발 수치) ──
+  # 관리자가 직접 수치를 입력하거나 (Townin API 엔드포인트가 아직 없을 때),
+  # Townin에서 즉시 리프레시를 강제할 수 있다.
+  def update_stats
+    stats = {
+      "monthly_revenue" => params[:monthly_revenue].presence&.to_i,
+      "monthly_revenue_delta_pct" => params[:monthly_revenue_delta_pct].presence&.to_f,
+      "customer_count" => params[:customer_count].presence&.to_i,
+      "customer_delta" => params[:customer_delta].presence&.to_i,
+      "issues_resolved_week" => params[:issues_resolved_week].presence&.to_i,
+      "active_days_streak" => params[:active_days_streak].presence&.to_i,
+      "rating" => params[:rating].presence&.to_f,
+      "review_count" => params[:review_count].presence&.to_i,
+      "tenure_months" => params[:tenure_months].presence&.to_i,
+      "last_activity_at" => params[:last_activity_at].presence || Time.current.iso8601,
+      "recent_activities" => parse_activities_input(params[:recent_activities]),
+    }.compact
+
+    mode = params[:stats_display_mode].presence || "revenue_range"
+    mode = "revenue_range" unless Member::DISPLAY_MODES.include?(mode)
+
+    @member.update!(
+      townin_stats_json: stats.to_json,
+      stats_synced_at: Time.current,
+      stats_display_mode: mode,
+    )
+    redirect_to admin_member_path(@member), notice: "#{@member.name} 의 Townin 활동 스냅샷이 업데이트되었습니다."
+  end
+
+  # Townin API에서 즉시 스냅샷 리프레시 (실패 시 기존 값 유지).
+  def refresh_stats
+    result = TowninSnapshotFetcher.fetch!(@member, force: true)
+    if result
+      redirect_to admin_member_path(@member), notice: "Townin에서 최신 활동 스냅샷을 가져왔습니다."
+    else
+      redirect_to admin_member_path(@member), alert: "Townin API에서 스냅샷을 가져오지 못했습니다. 수동 입력을 사용해주세요."
+    end
+  end
+
   # Townin 연결 완전 해제
   def unlink_townin
     @member.update!(
@@ -157,6 +197,17 @@ class Admin::MembersController < Admin::BaseController
 
   def set_member
     @member = Member.for_tenant.find_by(slug: params[:id]) || Member.for_tenant.find(params[:id])
+  end
+
+  # "유형|제목|2026-04-23T10:00" 한 줄씩 들어오는 포맷을 파싱.
+  # 빈 줄 무시. 최대 10개까지 저장.
+  def parse_activities_input(raw)
+    return [] if raw.blank?
+    raw.to_s.lines.filter_map do |line|
+      parts = line.strip.split("|").map(&:strip)
+      next if parts.empty? || parts[1].blank?
+      { "type" => parts[0].presence || "activity", "title" => parts[1], "at" => parts[2].presence || Time.current.iso8601 }
+    end.first(10)
   end
 
   def member_params

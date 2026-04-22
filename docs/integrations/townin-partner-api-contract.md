@@ -182,8 +182,56 @@ POST https://impd.townin.net/webhooks/townin/partner_changed
 X-Townin-Signature: sha256=HMAC(secret, body)
 ```
 
-### P4 · KPI 동기화
-Townin의 `posts_count`, `followers_count`, `rating_avg` 등을 imPD의 `last_snapshot_json`에 주기 캐시.
+### P4 · 파트너 활동 스냅샷 (ISS-330 · 제안 v1.0)
+**목적**: imPD 공개 페이지 `§B-3`에서 **"이 파트너가 지금 살아 움직이고 있다"**는 증거를 노출.
+정적 메타데이터(승급일/역할) 대신 동적 수치(매출/고객/이번주 처리 건수/활동 타임라인)로 **다른 회원에게 부러움을 유발**하는 것이 설계 목적.
+
+#### 요청
+```
+GET /api/v1/partners/:partner_id/impd-snapshot
+X-API-Key: <CHOPD_API_KEY>
+Accept: application/json
+```
+- `:partner_id` — imPD `members.towningraph_user_id` 값. Townin 쪽에서 partners 테이블의 user_id 또는 partner_id 중 매핑되는 쪽으로 해석.
+- **Idempotent**, **서버 캐시 권장** (Townin 쪽에서 60초 캐시 → imPD 쪽에서 6시간 캐시 = 총 2단 캐시).
+
+#### 응답 (200)
+```jsonc
+{
+  "monthly_revenue": 4_200_000,           // 이번달 총 매출 (KRW, integer)
+  "monthly_revenue_delta_pct": 18.4,      // 전월 대비 % (소수 1자리)
+  "customer_count": 12,                   // 현재 돌보는(활성) 고객 수
+  "customer_delta": 3,                    // 이번달 순증 (-값 허용)
+  "issues_resolved_week": 24,             // 최근 7일 해결한 이슈/요청 수
+  "active_days_streak": 14,               // 연속 활동 일수
+  "rating": 4.9,                          // 평균 평점 (0.0~5.0)
+  "review_count": 47,                     // 누적 리뷰 수
+  "tenure_months": 8,                     // 파트너 승급 후 개월 수
+  "last_activity_at": "2026-04-23T09:14:02+09:00",  // 가장 최근 활동 시각 — LIVE 배지 판정에 사용
+  "recent_activities": [                  // 최근 3~10건, imPD는 상위 3건만 노출
+    { "type": "consult", "title": "성북구 김○○님 건강검진 상담 완료", "at": "2026-04-23T09:14:02+09:00" },
+    { "type": "contract", "title": "신규 파트너 3곳 온보딩 완료", "at": "2026-04-22T10:00:00+09:00" },
+    { "type": "reply", "title": "고객 문의 답변 8건", "at": "2026-04-21T18:30:00+09:00" }
+  ]
+}
+```
+
+#### 프라이버시 / 노출 제어
+- **imPD 쪽에서** 회원별 `stats_display_mode` 로 매출 노출 방식 선택:
+  - `revenue_exact` · `₩4,200,000`
+  - `revenue_range` · `₩400만원대` (기본)
+  - `revenue_delta` · `전월 대비 +18%`
+  - `revenue_hidden` · 매출 카드 완전 숨김 (고객/리뷰/리듬만 표시)
+- Townin은 **raw 데이터를 그대로 제공**. 공개 가공은 imPD 책임.
+
+#### 에러
+- **404** — partner_id 미존재. imPD는 UI를 graceful degrade (정적 "검증된 파트너" 배지만).
+- **429** — rate-limit. imPD는 기존 캐시 유지, 다음 주기에 재시도.
+- **500/503** — 동상. 알림 로깅.
+
+#### 현재 상태
+- **2026-04-23 시점**: Townin 쪽 미구현. imPD는 `TowninSnapshotFetcher` 가 404를 받으면 관리자 수동 입력값(`/admin/members/:id` 의 스냅샷 폼)으로 자동 폴백.
+- Townin 쪽 구현 시 별도 커밋 없이 자동 활성화.
 
 ---
 
@@ -191,3 +239,4 @@ Townin의 `posts_count`, `followers_count`, `rating_avg` 등을 imPD의 `last_sn
 
 - **v0.1 · 2026-04-22** · imPD 초안 작성 (질문 포함)
 - **v1.0 · 2026-04-22** · Townin 구현 반영 (commit `7904ca2`) + imPD 구현 완료 (commit `a12c30f`). IMPLEMENTED 전환
+- **v1.1 · 2026-04-23** · P4 활동 스냅샷 엔드포인트 스펙 제안 (ISS-330). imPD 소비 측 구현 완료, Townin 생산 측 대기

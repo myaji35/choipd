@@ -77,6 +77,9 @@ Rails.application.routes.draw do
         post :unlink_townin
         # ISS-321: 이메일로 Townin 계정 자동 조회 (저장 전 확인용)
         get  :lookup_townin
+        # ISS-330: 파트너 활동 스냅샷 (공개 페이지 §B-3 부러움 유발 수치)
+        post :update_stats
+        post :refresh_stats
       end
       resources :documents, controller: "member_documents", only: [ :index, :show, :create, :destroy ] do
         member { post :parse }

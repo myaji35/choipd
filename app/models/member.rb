@@ -167,4 +167,49 @@ class Member < ApplicationRecord
   def pending?
     status == "pending_approval"
   end
+
+  # ── Townin 활동 스냅샷 ─────────────────────────
+  # 공개 페이지에 "지금 진짜 일하고 있다"는 증거를 노출한다.
+  # 숫자 뽐내기가 아니라 "동료가 숨쉬고 있다"는 리듬이 목적.
+  # 출처: Townin API (추후) 또는 관리자가 직접 입력.
+  DISPLAY_MODES = %w[revenue_exact revenue_range revenue_delta revenue_hidden].freeze
+
+  def stats
+    @stats ||= JSON.parse(townin_stats_json || "{}") rescue {}
+  end
+
+  def stats_fresh?
+    stats.any? && stats_synced_at.present? && stats_synced_at > 30.days.ago
+  end
+
+  # 부러움 유발의 핵심: "지금 살아 움직이고 있다"는 신호.
+  # 활동 기록이 있고 최근 7일 내 업데이트됐으면 LIVE 배지.
+  def activity_live?
+    last = stats["last_activity_at"]
+    return false if last.blank?
+    Time.parse(last.to_s) > 7.days.ago rescue false
+  end
+
+  # 매출 노출은 본인이 고른 모드 따라. 기본값은 범위.
+  def revenue_label
+    return nil unless stats["monthly_revenue"].present?
+    mode = stats_display_mode.presence || "revenue_range"
+    value = stats["monthly_revenue"].to_i
+    case mode
+    when "revenue_hidden"  then nil
+    when "revenue_exact"   then "₩#{value.to_s(:delimited)}"
+    when "revenue_range"   then revenue_range_label(value)
+    when "revenue_delta"
+      delta = stats["monthly_revenue_delta_pct"].to_f
+      delta.zero? ? "이번달 꾸준히" : "전월 대비 #{delta.positive? ? '+' : ''}#{delta.round}%"
+    end
+  end
+
+  def revenue_range_label(value)
+    return "이번달 시작" if value < 100_000
+    return "₩10만원대" if value < 1_000_000
+    return "₩#{(value / 100_000).floor * 10}만원대" if value < 10_000_000
+    "₩#{(value / 1_000_000).floor}백만원대"
+  end
+  private :revenue_range_label
 end
