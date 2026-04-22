@@ -9,6 +9,7 @@ class PublicProfileController < ApplicationController
       @portfolio = @member.member_portfolio_items.sorted
       @reviews = @member.member_reviews.public_visible.recent.limit(4)
       @posts = @member.member_posts.published.recent.limit(3)
+      @moments = @member.member_photos.ordered.limit(12)
       track_visit(@member)
       render :member_show
     else

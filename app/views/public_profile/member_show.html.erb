@@ -84,6 +84,49 @@
   </section>
 <% end %>
 
+<!-- ── §B-2 Moments (일상 사진·영상) ───────────────────── -->
+<% if @moments.present? && @moments.any? %>
+  <section class="impd-wrap impd-section" id="moments">
+    <div class="impd-section-header">
+      <span class="impd-label">§B-2</span>
+      <span class="impd-display" style="font-size: 36px; flex: 1;">일상 장면</span>
+      <span class="impd-label-muted"><%= @member.member_photos.count %> MOMENTS</span>
+    </div>
+    <p style="font-family: var(--impd-font-serif); font-style: italic; font-size: 17px; color: var(--impd-ink2); line-height: 1.55; max-width: 58ch; margin-bottom: 28px;">
+      작업 현장, 수강생의 환한 표정, 손끝의 순간들. 한 장의 사진이 한 줄의 카피보다 많은 것을 전합니다.
+    </p>
+
+    <%# 에디토리얼 마소나리: 첫 장은 크게, 나머지는 정방형 그리드 %>
+    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;">
+      <% @moments.each_with_index do |photo, i| %>
+        <% span = (i == 0 ? 3 : (i == 1 || i == 2 ? 2 : 1)) %>
+        <% aspect = (i == 0 ? "4/3" : "1/1") %>
+        <% next unless photo.image.attached? %>
+        <figure style="grid-column: span <%= span %>; aspect-ratio: <%= aspect %>; position: relative; overflow: hidden; background: var(--impd-ink); margin: 0; border: 1px solid var(--impd-rule);">
+          <% if photo.video? %>
+            <video src="<%= photo.display_url %>"
+                   style="width: 100%; height: 100%; object-fit: cover; display: block; background: #000;"
+                   preload="metadata" muted playsinline loop
+                   onmouseover="this.play()" onmouseout="this.pause(); this.currentTime=0;"></video>
+            <div style="position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); color: var(--impd-ink); font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; padding: 3px 8px;">▶ VIDEO</div>
+          <% else %>
+            <img src="<%= photo.thumbnail_url %>"
+                 data-fallback="<%= photo.display_url %>"
+                 onerror="if(this.dataset.fallback && this.src !== this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}"
+                 alt="<%= photo.caption || @member.name %> 일상"
+                 style="width: 100%; height: 100%; object-fit: cover; display: block;" loading="lazy">
+          <% end %>
+          <% if photo.caption.present? %>
+            <figcaption style="position: absolute; bottom: 0; left: 0; right: 0; padding: 10px 12px; background: linear-gradient(to top, rgba(15,13,11,0.75), transparent); color: #fff; font-size: 12px; font-family: var(--impd-font-serif); font-style: italic;">
+              <%= photo.caption %>
+            </figcaption>
+          <% end %>
+        </figure>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+
 <!-- ── §C Services (수업/상품) ───────────────────────── -->
 <% if @services.any? %>
   <section class="impd-wrap impd-section" id="classes">

@@ -172,6 +172,57 @@
     </div>
   </section>
 
+  <!-- ── §05.5 Real Moments (회원들이 올린 실제 장면) ──────────── -->
+  <% if @featured_moments.present? && @featured_moments.any? %>
+    <section class="impd-wrap impd-section" style="background: var(--impd-card); margin: 0 -100vw; padding-left: 100vw; padding-right: 100vw;">
+      <div class="impd-section-header">
+        <span class="impd-label">§05.5</span>
+        <span class="impd-display" style="font-size: 36px; flex: 1;">실제 페이지에서 살아있는 장면들.</span>
+        <span class="impd-label-muted"><%= @featured_moments.size %> MOMENTS</span>
+      </div>
+      <p style="font-family: var(--impd-font-serif); font-style: italic; font-size: 17px; color: var(--impd-ink2); line-height: 1.55; max-width: 58ch; margin-bottom: 28px;">
+        템플릿이 아니라 진짜 순간들. imPD 회원들이 <span style="color: var(--impd-accent-2);">직접 올린 사진과 영상</span>이
+        자동으로 정리된 결과물입니다.
+      </p>
+
+      <%# 가로 스크롤 가능한 마스타헤드 스타일 마퀴 — 최대 10장 %>
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+        <% @featured_moments.first(10).each_with_index do |photo, i| %>
+          <% next unless photo.image.attached? %>
+          <% link = "/" + photo.member.slug.to_s %>
+          <% aspect = (i.zero? || i == 5) ? "3/4" : "1/1" %>
+          <a href="<%= link %>" style="display: block; text-decoration: none; position: relative; aspect-ratio: <%= aspect %>; overflow: hidden; background: var(--impd-ink); border: 1px solid var(--impd-rule); grid-row: span <%= (i.zero? || i == 5) ? 2 : 1 %>;">
+            <% if photo.video? %>
+              <video src="<%= photo.display_url %>"
+                     style="width: 100%; height: 100%; object-fit: cover; display: block; background: #000;"
+                     preload="metadata" muted playsinline loop
+                     onmouseover="this.play()" onmouseout="this.pause(); this.currentTime=0;"></video>
+            <% else %>
+              <img src="<%= photo.thumbnail_url %>"
+                   data-fallback="<%= photo.display_url %>"
+                   onerror="if(this.dataset.fallback && this.src !== this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}"
+                   alt="<%= photo.member.name %>의 <%= photo.category %>"
+                   style="width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 400ms ease;"
+                   loading="lazy"
+                   onmouseover="this.style.transform='scale(1.04)'"
+                   onmouseout="this.style.transform='scale(1)'">
+            <% end %>
+            <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 10px 12px; background: linear-gradient(to top, rgba(15,13,11,0.85), transparent); color: #fff;">
+              <div style="font-family: var(--impd-font-mono); font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; opacity: 0.75;">
+                <%= photo.category %> · <%= photo.member.name %>
+              </div>
+            </div>
+          </a>
+        <% end %>
+      </div>
+
+      <div style="margin-top: 28px; display: flex; align-items: center; justify-content: center; gap: 14px;">
+        <a href="#signup" class="impd-btn impd-btn-primary">내 페이지 만들기 →</a>
+        <span style="font-family: var(--impd-font-mono); font-size: 11px; color: var(--impd-muted);">업로드 한 번 · 정리 자동</span>
+      </div>
+    </section>
+  <% end %>
+
   <!-- ── §06 Testimonials ───────────────────────── -->
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
