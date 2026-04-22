@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   # /auth/failure      : OAuth 실패 처리
   # /auth/logout       : 회원 세션 종료
   get    "/auth/login",              to: "member_auth#new",      as: :member_login
+  post   "/auth/login",              to: "member_auth#create"
   get    "/auth/:provider/callback", to: "omniauth_callbacks#google_oauth2", constraints: { provider: /google_oauth2/ }
   post   "/auth/:provider/callback", to: "omniauth_callbacks#google_oauth2", constraints: { provider: /google_oauth2/ }
   get    "/auth/failure",            to: "omniauth_callbacks#failure"

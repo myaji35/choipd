@@ -123,6 +123,50 @@
   }
   .oauth-btn:hover { background: var(--impd-card, #fbf8f1); }
 
+  .email-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .email-field {
+    display: block; width: 100%;
+    padding: 0 14px; height: 48px;
+    background: #fff;
+    color: var(--impd-ink, #0f0d0b);
+    border: 1px solid var(--impd-ink, #0f0d0b);
+    font-family: var(--impd-font-sans, 'Pretendard Variable');
+    font-size: 14px;
+    letter-spacing: -0.2px;
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+  .email-field::placeholder { color: rgba(15,13,11,0.35); }
+  .email-field:focus { border-color: var(--impd-accent, #3a2af0); box-shadow: inset 0 0 0 1px var(--impd-accent, #3a2af0); }
+
+  .email-submit {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%;
+    height: 52px;
+    background: var(--impd-ink, #0f0d0b);
+    color: var(--impd-paper, #efece4);
+    border: 1px solid var(--impd-ink, #0f0d0b);
+    font-family: var(--impd-font-sans, 'Pretendard Variable');
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    cursor: pointer;
+    transition: background 150ms ease;
+  }
+  .email-submit:hover { background: var(--impd-accent, #3a2af0); border-color: var(--impd-accent, #3a2af0); }
+
+  .auth-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 18px 0;
+    font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
+    font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase;
+    color: rgba(15,13,11,0.45);
+  }
+  .auth-divider::before,
+  .auth-divider::after {
+    content: ""; flex: 1; height: 1px; background: rgba(15,13,11,0.15);
+  }
+
   .auth-fine {
     margin-top: 16px;
     font-size: 11px;
@@ -226,11 +270,11 @@
       <div class="auth-head">
         <div class="auth-section">§ LOGIN · 회원 전용</div>
         <h2 class="auth-headline">
-          Google 한 번이면<br>
-          <span class="serif">충분합니다.</span>
+          당신의 페이지로<br>
+          <span class="serif">들어갑니다.</span>
         </h2>
         <p class="auth-sub">
-          비밀번호를 외울 필요 없이, Google 계정 한 번만 연결하면 바로 imPD 회원 페이지가 생깁니다.
+          이메일과 비밀번호로 로그인하거나, Google 계정으로 한 번에 연결하세요.
           처음이신 분은 관리자 승인 후 편집을 시작할 수 있습니다.
         </p>
       </div>
@@ -241,6 +285,28 @@
       <% if notice.present? %>
         <div class="auth-notice"><%= notice %></div>
       <% end %>
+
+      <%= form_with url: member_login_path, method: :post, local: true, class: "email-form" do |f| %>
+        <%= f.email_field :email,
+              value: params[:email],
+              required: true,
+              autocomplete: "email",
+              inputmode: "email",
+              placeholder: "이메일",
+              "aria-label": "이메일",
+              class: "email-field" %>
+        <%= f.password_field :password,
+              required: true,
+              autocomplete: "current-password",
+              placeholder: "비밀번호",
+              "aria-label": "비밀번호",
+              class: "email-field" %>
+        <button type="submit" class="email-submit">
+          이메일로 로그인 →
+        </button>
+      <% end %>
+
+      <div class="auth-divider">또는</div>
 
       <%= button_to "/auth/google_oauth2", method: :post, data: { turbo: false }, class: "oauth-btn" do %>
         <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
@@ -253,8 +319,8 @@
       <% end %>
 
       <p class="auth-fine">
-        Google 로그인 시 이메일, 이름, 프로필 사진 정보를 받아 회원 페이지 생성에 사용합니다.
-        언제든 관리자 대시보드에서 소셜 연결을 해제할 수 있습니다.
+        비밀번호를 잊으셨나요? 관리자에게 문의하시면 재설정해 드립니다.
+        Google 로그인 시 이메일·이름·프로필 사진 정보를 받아 회원 페이지 생성에 사용합니다.
       </p>
 
       <div class="auth-alt">
