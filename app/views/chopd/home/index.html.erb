@@ -50,11 +50,19 @@
           그냥 올리기만 하세요. imPD가 자동으로 정리해 당신만의 홍보 페이지로 만들어 드립니다.
         </p>
 
-        <div style="display: flex; gap: 12px; margin-top: 28px;">
+        <div style="display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap;">
           <%= link_to "내 페이지 만들기 →", member_login_path,
               class: "impd-btn impd-btn-primary", style: "height: 54px; padding: 0 22px; font-size: 16px;" %>
           <%= link_to "예시 보기", "/byjreporter",
               class: "impd-btn impd-btn-secondary", style: "height: 54px; padding: 0 22px; font-size: 16px;" %>
+          <%= link_to promo_watch_path,
+              class: "impd-btn impd-btn-secondary",
+              style: "height: 54px; padding: 0 22px; font-size: 16px; display: inline-flex; align-items: center; gap: 8px;" do %>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="6 3 20 12 6 21 6 3" fill="currentColor" stroke="none"/>
+            </svg>
+            홍보 영상 <span style="font-family: var(--impd-font-mono); font-size: 11px; color: var(--impd-muted); letter-spacing: 1px;">30s</span>
+          <% end %>
         </div>
       </div>
 
