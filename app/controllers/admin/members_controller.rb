@@ -77,6 +77,20 @@ class Admin::MembersController < Admin::BaseController
   end
 
   # ── Townin 파트너 관리 ─────────────────────────
+  # ISS-321: 이메일로 Townin 계정 조회 (JSON) — "조회" 버튼이 호출
+  def lookup_townin
+    email = params[:email].to_s.strip.downcase
+    if email.blank? || !email.include?("@")
+      render json: { found: false, error: "이메일을 입력하세요" }, status: :bad_request and return
+    end
+    result = TowninClient.lookup_by_email(email)
+    render json: result
+  rescue TowninClient::Unauthorized => e
+    render json: { found: false, error: "Townin API 키 설정 오류: #{e.message}" }, status: :service_unavailable
+  rescue TowninClient::Error => e
+    render json: { found: false, error: e.message }, status: :service_unavailable
+  end
+
   # Townin user_id/이메일/역할 등록 (또는 수정)
   def link_townin
     permitted = params.permit(:towningraph_user_id, :townin_email, :townin_name, :townin_role)
@@ -89,13 +103,38 @@ class Admin::MembersController < Admin::BaseController
     redirect_to admin_member_path(@member), notice: "#{@member.name} 의 Townin 정보가 등록되었습니다. 검증 후 '파트너 승급'을 눌러주세요."
   end
 
-  # 파트너 승급 (검증 완료 시)
+  # ISS-321: 파트너 승급 — Townin API 호출로 실제 users.role = partner 전환 + partners 레코드 생성
   def promote_partner
     unless @member.partner_connected?
       redirect_to admin_member_path(@member), alert: "먼저 Townin User ID를 등록해주세요." and return
     end
-    @member.promote_to_partner!(notes: params[:notes])
-    redirect_to admin_member_path(@member), notice: "#{@member.name} 을(를) Townin 파트너로 승급했습니다."
+
+    # Townin API 호출 (실패해도 로컬 상태는 업데이트하지 않음 — 양성화 원칙)
+    if TowninClient.enabled?
+      begin
+        result = TowninClient.upgrade_role(
+          user_id: @member.towningraph_user_id,
+          target_role: "partner",
+          verification_id: "impd-member-#{@member.id}",
+        )
+        @member.promote_to_partner!(notes: params[:notes])
+        partner_id = result["partnerId"]
+        if partner_id.present?
+          @member.update(partner_notes: [@member.partner_notes, "[townin.partnerId=#{partner_id}] promoted #{Time.current.iso8601}"].compact.join("\n"))
+        end
+        redirect_to admin_member_path(@member), notice: "#{@member.name} 을(를) Townin 파트너로 승급했습니다. (partnerId: #{partner_id || '—'})"
+      rescue TowninClient::BadRequest => e
+        redirect_to admin_member_path(@member), alert: "Townin 승급 거부: #{e.message}"
+      rescue TowninClient::NotFound
+        redirect_to admin_member_path(@member), alert: "Townin에 해당 User ID가 존재하지 않습니다. User ID를 재확인해주세요."
+      rescue TowninClient::Error => e
+        redirect_to admin_member_path(@member), alert: "Townin API 호출 실패: #{e.message}"
+      end
+    else
+      # API 키 미설정 시 로컬만 업데이트 (개발 환경용 폴백)
+      @member.promote_to_partner!(notes: params[:notes])
+      redirect_to admin_member_path(@member), notice: "#{@member.name} 을(를) 로컬 파트너로 승급했습니다. (Townin API 연동 비활성)"
+    end
   end
 
   # 파트너 자격 중지

@@ -75,6 +75,8 @@ Rails.application.routes.draw do
         post :promote_partner
         post :suspend_partner
         post :unlink_townin
+        # ISS-321: 이메일로 Townin 계정 자동 조회 (저장 전 확인용)
+        get  :lookup_townin
       end
       resources :documents, controller: "member_documents", only: [ :index, :show, :create, :destroy ] do
         member { post :parse }
