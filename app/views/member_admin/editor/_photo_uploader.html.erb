@@ -1,7 +1,7 @@
 <% photo_categories = MemberPhoto::CATEGORIES %>
 <% photos = member.member_photos.ordered.limit(30) %>
 
-<div class="impd-label" style="margin-bottom: 12px;">§01-B · 일상 사진도 올려주세요</div>
+<div class="impd-label" style="margin-bottom: 12px;">§01-B · 일상 사진·영상도 올려주세요</div>
 
 <div style="border: 2px dashed var(--impd-accent); padding: 36px 24px; text-align: center; background: var(--impd-card);"
      data-controller="member-photo-uploader"
@@ -12,19 +12,19 @@
     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
     <circle cx="12" cy="13" r="4"/>
   </svg>
-  <p style="font-family: var(--impd-font-display); font-size: 20px; font-weight: 800;">사진을 여기로</p>
+  <p style="font-family: var(--impd-font-display); font-size: 20px; font-weight: 800;">사진·영상을 여기로</p>
   <p style="font-size: 13px; color: var(--impd-muted); margin-top: 6px;">폰에서는 아래 버튼으로 카메라/갤러리 바로 열기</p>
 
   <div style="margin-top: 18px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
     <label style="cursor: pointer;">
       <span class="impd-btn impd-btn-primary" style="display: inline-block;">📷 카메라로 촬영</span>
-      <input type="file" accept="image/*" capture="environment" multiple style="display:none;"
+      <input type="file" accept="image/*,video/*" capture="environment" multiple style="display:none;"
              data-member-photo-uploader-target="cameraInput"
              data-action="change->member-photo-uploader#fileSelected">
     </label>
     <label style="cursor: pointer;">
       <span class="impd-btn" style="display: inline-block; background: var(--impd-paper); color: var(--impd-ink); border: 1px solid var(--impd-ink);">🖼 갤러리에서 선택</span>
-      <input type="file" accept="image/*" multiple style="display:none;"
+      <input type="file" accept="image/*,video/*" multiple style="display:none;"
              data-member-photo-uploader-target="galleryInput"
              data-action="change->member-photo-uploader#fileSelected">
     </label>
@@ -40,19 +40,24 @@
     </select>
   </div>
 
-  <div data-member-photo-uploader-target="progress" style="display: none; margin-top: 18px;">
+  <p style="font-size: 10px; color: var(--impd-muted); margin-top: 14px; line-height: 1.5;">
+    <strong>이미지</strong>: JPG · PNG · WebP · HEIC · HEIF · GIF · AVIF · BMP · 최대 25MB<br>
+    <strong>영상</strong>: MP4 · MOV · M4V · 3GP · WebM · 최대 100MB
+  </p>
+
+  <div data-member-photo-uploader-target="progress" style="display: none; margin-top: 14px;">
     <div style="background: var(--impd-rule); height: 6px; overflow: hidden;">
       <div data-member-photo-uploader-target="progressBar" style="background: var(--impd-accent); height: 100%; width: 0%; transition: width 0.2s ease;"></div>
     </div>
   </div>
 
-  <div data-member-photo-uploader-target="error" style="display: none; margin-top: 14px; padding: 10px; background: rgba(255,90,31,.1); color: var(--impd-accent-2); font-size: 12px; text-align: left; line-height: 1.5;"></div>
+  <div data-member-photo-uploader-target="error" style="display: none; margin-top: 14px; padding: 10px; background: rgba(255,90,31,.1); color: var(--impd-accent-2); font-size: 12px; text-align: left; line-height: 1.5; white-space: pre-wrap;"></div>
   <p data-member-photo-uploader-target="status" class="impd-label-muted" style="margin-top: 12px; min-height: 14px; font-family: var(--impd-font-mono);"></p>
 </div>
 
 <% if photos.any? %>
   <div style="margin-top: 24px;">
-    <p class="impd-label-muted">업로드된 사진 (<%= member.member_photos.count %>)</p>
+    <p class="impd-label-muted">업로드된 사진·영상 (<%= member.member_photos.count %>)</p>
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 12px;">
       <% photos.each do |photo| %>
         <div style="position: relative; aspect-ratio: 1/1; overflow: hidden; border: 1px solid var(--impd-rule); background: var(--impd-rule);"
@@ -61,8 +66,15 @@
              data-member-photo-card-csrf-value="<%= form_authenticity_token %>"
              data-member-photo-card-id-value="<%= photo.id %>">
           <% if photo.image.attached? %>
-            <img src="<%= photo.thumbnail_url %>" alt="<%= photo.caption %>"
-                 style="width: 100%; height: 100%; object-fit: cover; display: block;" loading="lazy">
+            <% if photo.video? %>
+              <video src="<%= photo.display_url %>"
+                     style="width: 100%; height: 100%; object-fit: cover; display: block; background: #000;"
+                     preload="metadata" muted playsinline></video>
+              <span style="position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.7); color: white; font-size: 10px; padding: 1px 5px; border-radius: 2px;">▶ 영상</span>
+            <% else %>
+              <img src="<%= photo.thumbnail_url %>" alt="<%= photo.caption %>"
+                   style="width: 100%; height: 100%; object-fit: cover; display: block;" loading="lazy">
+            <% end %>
           <% end %>
           <button type="button" data-action="click->member-photo-card#destroy"
                   style="position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.65); color: white; border: 0; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 13px; line-height: 1;"
@@ -76,7 +88,7 @@
       <% end %>
     </div>
     <% if member.member_photos.count > 30 %>
-      <p style="margin-top: 10px; font-size: 11px; color: var(--impd-muted);">최근 30장만 표시됩니다.</p>
+      <p style="margin-top: 10px; font-size: 11px; color: var(--impd-muted);">최근 30개만 표시됩니다.</p>
     <% end %>
   </div>
 <% end %>

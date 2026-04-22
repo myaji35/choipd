@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 function errorMessage(data, status) {
   if (data?.message) return data.message
   if (data?.error === "NO_FILE") return "파일 선택 안 됨"
-  if (status === 413) return "파일이 너무 큽니다 (15MB 초과)"
+  if (status === 413) return "파일이 너무 큽니다 (이미지 25MB / 영상 100MB 초과)"
   if (status === 0) return "네트워크 오류"
   return `실패 (HTTP ${status})`
 }

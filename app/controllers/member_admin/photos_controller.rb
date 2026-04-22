@@ -1,7 +1,4 @@
 class MemberAdmin::PhotosController < MemberAdmin::BaseController
-  MAX_BYTES = 15 * 1024 * 1024 # 15MB (모바일 원본 대응)
-  ALLOWED_TYPES = %w[image/jpeg image/png image/webp image/heic image/heif image/gif].freeze
-
   skip_before_action :verify_authenticity_token, only: [ :create, :destroy, :update ]
   before_action :set_photo, only: [ :destroy, :update ]
 
@@ -15,12 +12,22 @@ class MemberAdmin::PhotosController < MemberAdmin::BaseController
     errors  = []
 
     files.each do |uploaded|
-      if !ALLOWED_TYPES.include?(uploaded.content_type)
-        errors << { filename: uploaded.original_filename, message: "지원하지 않는 형식: #{uploaded.content_type}" }
+      ct = uploaded.content_type.to_s
+      is_video = MemberPhoto::VIDEO_TYPES.include?(ct)
+      limit = is_video ? MemberPhoto::VIDEO_MAX_BYTES : MemberPhoto::IMAGE_MAX_BYTES
+
+      unless MemberPhoto::ALLOWED_TYPES.include?(ct)
+        errors << { filename: uploaded.original_filename, message: "지원하지 않는 형식: #{ct}" }
         next
       end
-      if uploaded.size > MAX_BYTES
-        errors << { filename: uploaded.original_filename, message: "#{(uploaded.size / 1024.0 / 1024.0).round(1)}MB — 15MB를 초과합니다" }
+
+      if uploaded.size > limit
+        kind = is_video ? "영상" : "이미지"
+        mb   = (limit / 1024.0 / 1024.0).round
+        errors << {
+          filename: uploaded.original_filename,
+          message: "#{kind} #{(uploaded.size / 1024.0 / 1024.0).round(1)}MB — #{mb}MB를 초과합니다",
+        }
         next
       end
 
@@ -76,6 +83,8 @@ class MemberAdmin::PhotosController < MemberAdmin::BaseController
       caption: photo.caption,
       category: photo.category,
       filename: photo.image.attached? ? photo.image.filename.to_s : nil,
+      content_type: photo.image.attached? ? photo.image.content_type : nil,
+      is_video: photo.video?,
       thumbnail_url: photo.thumbnail_url,
       display_url: photo.display_url,
       file_size: photo.file_size,
