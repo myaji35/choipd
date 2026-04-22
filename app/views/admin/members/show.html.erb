@@ -132,7 +132,8 @@
       </div>
       <% if @member.pending? %>
         <div class="space-y-2">
-          <%= button_to "✓ 승인", approve_admin_member_path(@member), class: "w-full bg-green-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-600" %>
+          <%= button_to "✓ 승인 (소소한 활동 허용)", approve_admin_member_path(@member), class: "w-full bg-green-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-600" %>
+          <p class="text-[11px] text-gray-500 leading-relaxed">본인 페이지 편집·사진 업로드 등 기본 활동을 허용합니다. Townin 파트너 연결은 우측 "Townin 파트너" 카드에서 별도 관리.</p>
           <%= button_to "✗ 거부", reject_admin_member_path(@member), class: "w-full bg-red-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-600" %>
         </div>
       <% elsif @member.approved? %>

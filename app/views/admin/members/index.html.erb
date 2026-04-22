@@ -45,7 +45,14 @@
                 </div>
               <% end %>
               <div>
-                <p class="font-medium text-navy"><%= m.name %></p>
+                <p class="font-medium text-navy flex items-center gap-2">
+                  <%= m.name %>
+                  <% if m.partner_active? %>
+                    <span class="text-[10px] px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded font-semibold" title="Townin 검증 파트너">⭐ 파트너</span>
+                  <% elsif m.partner_pending? %>
+                    <span class="text-[10px] px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded font-semibold" title="Townin 연결됨 · 검증 대기">검증 대기</span>
+                  <% end %>
+                </p>
                 <p class="text-xs text-gray-500"><%= m.email %></p>
                 <p class="text-xs text-gray-400 mt-0.5">/<%= m.slug %></p>
               </div>

@@ -60,6 +60,12 @@
 
     <!-- 우: 직함·지역·CTA -->
     <div>
+      <% if @member.partner_active? %>
+        <%# Townin 파트너 배지 — 히어로 상단 %>
+        <a href="#partner" style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--impd-accent-2); color: #fff; font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 14px; text-decoration: none;">
+          ⭐ Townin <%= @member.partner_display_role || "파트너" %>
+        </a>
+      <% end %>
       <dl style="border-top: 1px solid var(--impd-ink); padding-top: 16px;">
         <% if @member.profession.present? %>
           <div style="margin-bottom: 12px;"><dt class="impd-label-muted">직함</dt><dd style="font-family: var(--impd-font-display); font-size: 20px; margin-top: 4px;"><%= @member.profession %></dd></div>
@@ -188,6 +194,64 @@
           <% end %>
         </figure>
       <% end %>
+    </div>
+  </section>
+<% end %>
+
+<!-- ── §B-3 Townin 파트너 활동 (파트너 승급된 회원만) ───── -->
+<% if @member.partner_active? %>
+  <section class="impd-wrap impd-section" id="partner" style="background: var(--impd-card); margin: 40px calc(-50vw + 50%); padding-left: calc(50vw - 50%); padding-right: calc(50vw - 50%); border-top: 1px solid var(--impd-rule); border-bottom: 1px solid var(--impd-rule);">
+    <div class="impd-wrap" style="padding: 0;">
+      <div class="impd-section-header">
+        <span class="impd-label" style="color: var(--impd-accent-2);">§B-3</span>
+        <span class="impd-display" style="font-size: 36px; flex: 1; display: flex; align-items: baseline; gap: 12px;">
+          Townin 파트너 활동
+          <span style="font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-accent-2); background: rgba(255,90,31,0.1); padding: 4px 10px; border-radius: 3px;">⭐ 검증됨</span>
+        </span>
+        <% if @member.partner_promoted_at %>
+          <span class="impd-label-muted">SINCE <%= @member.partner_promoted_at.strftime("%Y.%m") %></span>
+        <% end %>
+      </div>
+      <p style="font-family: var(--impd-font-serif); font-style: italic; font-size: 17px; color: var(--impd-ink2); line-height: 1.55; max-width: 58ch; margin-bottom: 24px;">
+        <%= @member.name %>님은 <strong>Townin에서 검증된 <%= @member.partner_display_role || "파트너" %></strong>로 활동하고 있습니다.
+        지역 커뮤니티에서의 신뢰와 이력이 연결되어 있습니다.
+      </p>
+
+      <%# Townin 정보 카드 — 현재는 관리자 입력 기반 %>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; background: var(--impd-paper); border: 1px solid var(--impd-ink); padding: 24px;">
+        <div>
+          <div class="impd-label-muted" style="margin-bottom: 6px;">역할</div>
+          <div class="impd-display" style="font-size: 22px;">
+            <%= @member.townin_role.presence || "파트너" %>
+          </div>
+        </div>
+        <% if @member.townin_name.present? %>
+          <div>
+            <div class="impd-label-muted" style="margin-bottom: 6px;">Townin 이름</div>
+            <div class="impd-display" style="font-size: 22px;"><%= @member.townin_name %></div>
+          </div>
+        <% end %>
+        <% if @member.towningraph_user_id.present? %>
+          <div>
+            <div class="impd-label-muted" style="margin-bottom: 6px;">User ID</div>
+            <div style="font-family: var(--impd-font-mono); font-size: 14px; color: var(--impd-ink2);">
+              <%= @member.towningraph_user_id %>
+            </div>
+          </div>
+        <% end %>
+        <% if @member.partner_promoted_at %>
+          <div>
+            <div class="impd-label-muted" style="margin-bottom: 6px;">파트너 승급</div>
+            <div class="impd-display" style="font-size: 22px;">
+              <%= @member.partner_promoted_at.strftime("%Y.%m.%d") %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <p style="margin-top: 16px; font-size: 12px; color: var(--impd-muted); font-family: var(--impd-font-mono);">
+        TOWNIN.NET · partner verification
+      </p>
     </div>
   </section>
 <% end %>
