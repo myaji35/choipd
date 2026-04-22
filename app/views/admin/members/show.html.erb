@@ -261,6 +261,42 @@
           <%= @member.partner_connected? ? "✏️ Townin 정보 수정" : "➕ Townin 정보 등록" %>
         </summary>
 
+        <%# Townin JSON 붙여넣기 — 가장 빠른 경로 (Townin의 "전체 4필드 JSON 복사" 버튼 호환) %>
+        <div class="mt-3 mb-3 p-3 bg-amber-50 border border-amber-200 rounded text-[11px]"
+             data-controller="townin-json">
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-[10px] font-semibold text-amber-700 uppercase tracking-wide">
+              📋 Townin JSON 붙여넣기 <span class="opacity-70 normal-case">· 가장 빠른 방법</span>
+            </label>
+            <button type="button"
+                    data-action="click->townin-json#pasteFromClipboard"
+                    class="text-[10px] px-2 py-1 bg-amber-600 text-white rounded font-semibold hover:bg-amber-700 cursor-pointer">
+              📋 클립보드에서 붙여넣기
+            </button>
+          </div>
+          <p class="text-[10px] text-amber-700 leading-relaxed mb-2">
+            Townin 마스터 화면의 <strong>"전체 4필드 JSON 복사"</strong> 버튼 누른 뒤 여기서 붙여넣기 클릭 →
+            4개 필드 자동 채움.
+          </p>
+          <textarea data-townin-json-target="textarea"
+                    placeholder='{&#10;  "towningraph_user_id": "uuid",&#10;  "townin_email": "user@townin.kr",&#10;  "townin_name": "이름",&#10;  "townin_role": "partner"&#10;}'
+                    rows="4"
+                    class="w-full text-[10px] font-mono px-2 py-1.5 border border-amber-300 rounded resize-y"></textarea>
+          <div class="flex gap-2 mt-2">
+            <button type="button"
+                    data-action="click->townin-json#applyFromTextarea"
+                    class="flex-1 text-[10px] px-2 py-1.5 bg-amber-600 text-white rounded font-semibold hover:bg-amber-700 cursor-pointer">
+              ✓ 이 JSON 적용
+            </button>
+            <button type="button"
+                    data-action="click->townin-json#clearFields"
+                    class="text-[10px] px-2 py-1.5 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 cursor-pointer">
+              필드 비우기
+            </button>
+          </div>
+          <p data-townin-json-target="status" class="mt-1.5 text-[10px] hidden"></p>
+        </div>
+
         <%# ISS-321: 이메일로 Townin 계정 자동 조회 %>
         <div class="mt-3 mb-3 p-3 bg-blue-50 border border-blue-200 rounded text-[11px]">
           <div class="flex items-end gap-2">
