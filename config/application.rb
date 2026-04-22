@@ -23,6 +23,10 @@ module ChoiPdRails
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
 
+    # Active Storage: libvips 미설치 환경(로컬 macOS) 호환을 위해 mini_magick 사용.
+    # 서버(libvips 설치)에서는 ENV["ACTIVE_STORAGE_VARIANT_PROCESSOR"]=vips로 override 가능.
+    config.active_storage.variant_processor = (ENV["ACTIVE_STORAGE_VARIANT_PROCESSOR"] || "mini_magick").to_sym
+
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.

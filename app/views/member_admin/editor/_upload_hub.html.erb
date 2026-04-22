@@ -1,0 +1,50 @@
+<%# 단일 업로드 허브 — 자료·사진·영상을 하나의 카드 UI에서 탭으로 전환 %>
+<% photo_categories = MemberPhoto::CATEGORIES %>
+<% photos = member.member_photos.ordered.limit(24) %>
+<% docs   = member.member_documents.order(uploaded_at: :desc).limit(8) %>
+
+<section data-controller="upload-hub"
+         style="background: var(--impd-card); border: 1px solid var(--impd-ink); border-radius: 0;">
+  <%# Tab bar %>
+  <div style="display: flex; align-items: stretch; border-bottom: 1px solid var(--impd-ink);">
+    <button type="button" data-action="click->upload-hub#switch" data-upload-hub-tab-param="docs"
+            data-upload-hub-target="tab" data-tab-id="docs"
+            style="flex: 1; padding: 18px 20px; background: var(--impd-ink); color: var(--impd-paper); border: 0; cursor: pointer; text-align: left; border-right: 1px solid var(--impd-ink);">
+      <div class="impd-label" style="color: rgba(255,255,255,0.55); margin-bottom: 4px;">§01 · 자료</div>
+      <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 18px; letter-spacing: -0.4px;">이력 · 수료증 · 포트폴리오</div>
+      <div style="font-size: 11px; color: rgba(255,255,255,0.55); font-family: var(--impd-font-mono); margin-top: 6px;"><%= member.member_documents.count %> 파일 · MD · TXT</div>
+    </button>
+    <button type="button" data-action="click->upload-hub#switch" data-upload-hub-tab-param="media"
+            data-upload-hub-target="tab" data-tab-id="media"
+            style="flex: 1; padding: 18px 20px; background: transparent; color: var(--impd-ink); border: 0; cursor: pointer; text-align: left;">
+      <div class="impd-label" style="margin-bottom: 4px;">§01-B · 사진·영상</div>
+      <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 18px; letter-spacing: -0.4px;">일상·작업·후기 장면</div>
+      <div style="font-size: 11px; color: var(--impd-muted); font-family: var(--impd-font-mono); margin-top: 6px;"><%= member.member_photos.count %> 장 · JPG · HEIC · MP4 등</div>
+    </button>
+  </div>
+
+  <%# Tab panels %>
+  <div data-upload-hub-target="panel" data-panel-id="docs" style="padding: 28px 24px;">
+    <%= render "member_admin/editor/dropzone", member: member %>
+  </div>
+
+  <div data-upload-hub-target="panel" data-panel-id="media" style="padding: 28px 24px; display: none;">
+    <%= render "member_admin/editor/photo_dropzone", member: member, categories: photo_categories %>
+
+    <% if photos.any? %>
+      <div style="margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--impd-rule);">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px;">
+          <span class="impd-label-muted">갤러리 · <%= member.member_photos.count %>장</span>
+          <% if member.member_photos.count > 24 %>
+            <span style="font-size: 11px; color: var(--impd-muted);">최근 24개</span>
+          <% end %>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px;">
+          <% photos.each do |photo| %>
+            <%= render "member_admin/editor/photo_card", photo: photo, member: member %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>
