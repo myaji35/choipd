@@ -1,72 +1,330 @@
-<% content_for :title, "로그인" %>
+<% content_for :title, "로그인 · imPD" %>
 
 <style>
-  body { margin: 0; background: #0a0a0a; color: #fff; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; min-height: 100vh; }
-  .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: radial-gradient(circle at 30% 30%, rgba(255,77,28,0.08), transparent 60%), radial-gradient(circle at 70% 70%, rgba(168,255,62,0.05), transparent 50%), #0a0a0a; }
-  .login-card { width: 100%; max-width: 420px; background: rgba(20,20,20,.85); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 48px 40px; box-shadow: 0 24px 64px rgba(0,0,0,.5); }
-  .login-brand { font-family: 'Black Han Sans', sans-serif; font-size: 36px; letter-spacing: -.02em; margin: 0 0 8px; }
-  .login-brand .accent { color: #ff4d1c; }
-  .login-subtitle { color: rgba(255,255,255,.55); font-size: 14px; margin: 0 0 32px; }
-  .login-field { margin-bottom: 18px; }
-  .login-field label { display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.65); margin-bottom: 8px; letter-spacing: .02em; text-transform: uppercase; }
-  .login-field input[type="email"], .login-field input[type="password"] { width: 100%; padding: 12px 16px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); border-radius: 8px; color: #fff; font-size: 15px; transition: border-color .15s, background .15s; box-sizing: border-box; }
-  .login-field input:focus { outline: none; border-color: #ff4d1c; background: rgba(255,77,28,.05); }
-  .login-remember { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; color: rgba(255,255,255,.7); font-size: 13px; }
-  .login-remember input[type="checkbox"] { width: 16px; height: 16px; accent-color: #ff4d1c; cursor: pointer; }
-  .login-submit { width: 100%; padding: 14px 24px; background: #ff4d1c; color: #fff; border: 0; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background .15s, transform .1s; }
-  .login-submit:hover { background: #e0440f; }
-  .login-submit:active { transform: translateY(1px); }
-  .login-hint { margin-top: 24px; padding: 12px 16px; background: rgba(168,255,62,.06); border: 1px solid rgba(168,255,62,.2); border-radius: 8px; font-size: 12px; color: rgba(168,255,62,.85); line-height: 1.6; }
-  .login-hint strong { color: #a8ff3e; }
-  .login-links { margin-top: 20px; text-align: center; font-size: 13px; }
-  .login-links a { color: rgba(255,255,255,.55); text-decoration: none; margin: 0 8px; transition: color .15s; }
-  .login-links a:hover { color: #ff4d1c; }
-  .alert-error { background: rgba(255,77,28,.1); border: 1px solid rgba(255,77,28,.3); color: #ff8866; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
+  body { margin: 0; background: var(--impd-paper, #efece4); color: var(--impd-ink, #0f0d0b); font-family: var(--impd-font-sans, 'Pretendard Variable', 'Pretendard', system-ui, sans-serif); min-height: 100vh; }
+
+  .auth-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    align-items: stretch;
+  }
+  @media (max-width: 860px) {
+    .auth-shell { grid-template-columns: 1fr; }
+    .auth-poster { min-height: 220px; }
+  }
+
+  /* ── 좌측 폼 ─────────────────────────── */
+  .auth-form-col {
+    display: flex;
+    flex-direction: column;
+    padding: 48px 56px;
+    background: var(--impd-paper, #efece4);
+    position: relative;
+  }
+  .auth-form-col::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(15,13,11,0.06) 1px, transparent 1px);
+    background-size: 80px 100%;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  .auth-brand {
+    font-family: var(--impd-font-display, 'Inter Tight', system-ui);
+    font-weight: 800; font-size: 36px; letter-spacing: -1.6px;
+    color: var(--impd-ink, #0f0d0b);
+    margin: 0;
+    position: relative;
+  }
+  .auth-brand .dot { color: var(--impd-accent, #3a2af0); }
+  .auth-strap {
+    font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
+    font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--impd-accent, #3a2af0);
+    margin-top: 4px;
+    position: relative;
+  }
+
+  .auth-form-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 440px;
+    width: 100%;
+    position: relative;
+    padding-top: 48px;
+  }
+
+  .auth-head {
+    border-top: 1px solid var(--impd-ink, #0f0d0b);
+    padding-top: 20px;
+    margin-bottom: 32px;
+  }
+  .auth-section {
+    font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
+    font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--impd-accent, #3a2af0);
+    margin-bottom: 8px;
+  }
+  .auth-headline {
+    font-family: var(--impd-font-display, 'Inter Tight');
+    font-weight: 800;
+    font-size: 44px;
+    letter-spacing: -1.8px;
+    line-height: 1.02;
+    margin: 0;
+  }
+  .auth-headline .serif {
+    font-family: var(--impd-font-serif, 'Noto Serif KR', serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--impd-accent, #3a2af0);
+  }
+  .auth-sub {
+    margin-top: 16px;
+    font-size: 14px;
+    color: rgba(15,13,11,0.65);
+    line-height: 1.6;
+  }
+
+  .auth-field { margin-bottom: 16px; }
+  .auth-field label {
+    display: block;
+    font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
+    font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase;
+    color: rgba(15,13,11,0.55);
+    margin-bottom: 6px;
+  }
+  .auth-field input[type="email"],
+  .auth-field input[type="password"] {
+    width: 100%;
+    padding: 12px 14px;
+    background: #fff;
+    border: 1px solid var(--impd-ink, #0f0d0b);
+    border-radius: 0;
+    color: var(--impd-ink, #0f0d0b);
+    font-size: 15px;
+    font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
+    box-sizing: border-box;
+    transition: background 150ms ease, border-color 150ms ease;
+  }
+  .auth-field input:focus {
+    outline: none;
+    border-color: var(--impd-accent, #3a2af0);
+    background: #fcfaf4;
+    box-shadow: 0 0 0 3px rgba(58,42,240,0.1);
+  }
+
+  .auth-remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    color: rgba(15,13,11,0.65);
+    font-size: 13px;
+  }
+  .auth-remember input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: var(--impd-accent, #3a2af0);
+    cursor: pointer;
+  }
+
+  .auth-submit {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 0 22px;
+    height: 52px;
+    background: var(--impd-ink, #0f0d0b);
+    color: var(--impd-paper, #efece4);
+    border: 0;
+    border-radius: 0;
+    font-family: var(--impd-font-sans, 'Pretendard Variable');
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    cursor: pointer;
+    transition: background 150ms ease;
+  }
+  .auth-submit:hover { background: var(--impd-accent, #3a2af0); }
+
+  .auth-alert {
+    background: rgba(255,90,31,0.08);
+    border-left: 2px solid var(--impd-accent-2, #ff5a1f);
+    color: var(--impd-accent-2, #ff5a1f);
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .auth-demo {
+    margin-top: 28px;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid var(--impd-rule, rgba(15,13,11,0.15));
+    font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
+    font-size: 11px;
+    color: rgba(15,13,11,0.75);
+    line-height: 1.7;
+  }
+  .auth-demo strong { color: var(--impd-ink, #0f0d0b); font-weight: 700; }
+
+  .auth-foot {
+    margin-top: auto;
+    padding-top: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
+    font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase;
+    color: rgba(15,13,11,0.45);
+    position: relative;
+  }
+  .auth-foot a { color: inherit; text-decoration: none; }
+  .auth-foot a:hover { color: var(--impd-accent, #3a2af0); }
+
+  /* ── 우측 포스터 ──────────────────────── */
+  .auth-poster {
+    background: var(--impd-ink, #0f0d0b);
+    color: var(--impd-paper, #efece4);
+    padding: 56px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  .auth-poster::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.04) 0 3px, transparent 3px 10px);
+    pointer-events: none;
+  }
+  .auth-poster-label {
+    font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
+    font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    position: relative;
+  }
+  .auth-poster-title {
+    font-family: var(--impd-font-display, 'Inter Tight');
+    font-weight: 800;
+    font-size: clamp(44px, 5.5vw, 72px);
+    letter-spacing: -2.6px;
+    line-height: 0.95;
+    position: relative;
+    margin-top: 40px;
+  }
+  .auth-poster-title .serif {
+    font-family: var(--impd-font-serif, 'Noto Serif KR', serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--impd-accent-2, #ff5a1f);
+  }
+  .auth-poster-sub {
+    margin-top: 20px;
+    font-family: var(--impd-font-serif, 'Noto Serif KR', serif);
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.75);
+    max-width: 32ch;
+    position: relative;
+  }
+  .auth-poster-meta {
+    font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
+    font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+  }
 </style>
 
-<div class="login-wrap">
-  <div class="login-card">
-    <h1 class="login-brand">imPD<span class="accent">.</span></h1>
-    <p class="login-subtitle">관리자 / PD 계정으로 로그인하세요</p>
+<main class="auth-shell">
+  <!-- 좌측: 폼 -->
+  <section class="auth-form-col">
+    <div style="position: relative;">
+      <h1 class="auth-brand">imPD<span class="dot">.</span></h1>
+      <p class="auth-strap">EST. 2026 · SEOUL</p>
+    </div>
 
-    <% if alert.present? %>
-      <div class="alert-error"><%= alert %></div>
-    <% end %>
-
-    <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-      <div class="login-field">
-        <%= f.label :email, "이메일" %>
-        <%= f.email_field :email,
-              value: "admin@impd.com",
-              autofocus: true,
-              autocomplete: "email",
-              placeholder: "admin@impd.com" %>
+    <div class="auth-form-wrap">
+      <div class="auth-head">
+        <div class="auth-section">§ LOGIN · 운영자 전용</div>
+        <h2 class="auth-headline">
+          돌아오신 걸<br>
+          <span class="serif">환영합니다.</span>
+        </h2>
+        <p class="auth-sub">
+          관리자 · PD 계정으로 접속해 주세요. 회원 계정은 회원 페이지 전용 링크를 이용하세요.
+        </p>
       </div>
 
-      <div class="login-field">
-        <%= f.label :password, "비밀번호" %>
-        <%= f.password_field :password,
-              value: "admin123",
-              autocomplete: "current-password",
-              placeholder: "비밀번호 입력" %>
-      </div>
-
-      <% if devise_mapping.rememberable? %>
-        <div class="login-remember">
-          <%= f.check_box :remember_me %>
-          <%= f.label :remember_me, "로그인 유지" %>
-        </div>
+      <% if alert.present? %>
+        <div class="auth-alert"><%= alert %></div>
       <% end %>
 
-      <%= f.submit "로그인", class: "login-submit" %>
-    <% end %>
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+        <div class="auth-field">
+          <%= f.label :email, "이메일" %>
+          <%= f.email_field :email,
+                value: "admin@impd.com",
+                autofocus: true,
+                autocomplete: "email",
+                placeholder: "admin@impd.com" %>
+        </div>
 
-    <div class="login-hint">
-      💡 데모 계정: <strong>admin@impd.com / admin123</strong> (자동 입력됨)
-    </div>
+        <div class="auth-field">
+          <%= f.label :password, "비밀번호" %>
+          <%= f.password_field :password,
+                value: "admin123",
+                autocomplete: "current-password",
+                placeholder: "비밀번호 입력" %>
+        </div>
 
-    <div class="login-links">
-      <%= link_to "← 메인으로", root_path %>
+        <% if devise_mapping.rememberable? %>
+          <div class="auth-remember">
+            <%= f.check_box :remember_me %>
+            <%= f.label :remember_me, "로그인 유지" %>
+          </div>
+        <% end %>
+
+        <%= f.submit "로그인 →", class: "auth-submit" %>
+      <% end %>
+
+      <div class="auth-demo">
+        <strong>데모 계정 ·</strong> admin@impd.com / admin123 <span style="opacity:.6;">(자동 입력됨)</span>
+      </div>
+
+      <div class="auth-foot">
+        <%= link_to "← 메인으로", root_path %>
+        <span>VOL. 1 · ISSUE 04</span>
+      </div>
     </div>
-  </div>
-</div>
+  </section>
+
+  <!-- 우측: 에디토리얼 포스터 -->
+  <aside class="auth-poster" aria-hidden="true">
+    <div class="auth-poster-label">§ MANIFESTO — OUR QUIET PROMISE</div>
+    <div>
+      <h3 class="auth-poster-title">
+        업로드만<br>
+        하세요.<br>
+        <span class="serif">나머지는<br>저희가.</span>
+      </h3>
+      <p class="auth-poster-sub">
+        사진 몇 장, 수료증 하나, 이력 한 줄. 정리되지 않아도 괜찮습니다. imPD가 당신의 페이지로 만들어 드립니다.
+      </p>
+    </div>
+    <div class="auth-poster-meta">
+      <span>2026 · 봄호</span>
+      <span>AUTH · /login</span>
+    </div>
+  </aside>
+</main>
