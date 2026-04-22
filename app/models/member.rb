@@ -57,6 +57,76 @@ class Member < ApplicationRecord
     status == "approved"
   end
 
+  # ── OAuth ──────────────────────────────────────
+  OAUTH_PROVIDERS = %w[google_oauth2].freeze
+
+  def oauth_connected?
+    provider.present? && uid.present?
+  end
+
+  # OmniAuth 콜백 → Member 조회 또는 신규 생성.
+  # 정책: 신규 가입 허용. provider+uid 매칭 없으면 email 매칭 시도, 없으면 신규 Member 생성.
+  def self.from_omniauth(auth)
+    return nil unless auth && auth.provider && auth.uid
+
+    # 1) provider+uid로 기존 회원 찾기
+    existing = find_by(provider: auth.provider, uid: auth.uid.to_s)
+    return existing if existing
+
+    # 2) email로 기존 회원 찾아 연결
+    info  = auth.info || {}
+    email = info.email.to_s.downcase.presence
+    if email
+      member = find_by("LOWER(email) = ?", email)
+      if member
+        member.update(
+          provider: auth.provider,
+          uid: auth.uid.to_s,
+          oauth_email_verified: info.email_verified ? 1 : 0,
+          oauth_connected_at: Time.current,
+          oauth_raw: auth.extra&.raw_info&.to_json,
+        )
+        return member
+      end
+    end
+
+    # 3) 신규 Member 생성
+    create_from_oauth!(auth)
+  end
+
+  # 신규 Member를 OAuth 콜백으로부터 생성.
+  # status=pending_approval (대표님이 /admin에서 승인 필요).
+  def self.create_from_oauth!(auth)
+    info  = auth.info || {}
+    email = info.email.to_s.downcase
+    name  = info.name.presence || info.first_name.presence || email.split("@").first
+    # slug: name 기반 + 충돌 시 suffix
+    base_slug = name.to_s.downcase.gsub(/[^a-z0-9\-]/, "-").gsub(/-+/, "-").gsub(/^-|-$/, "").presence || "m-#{SecureRandom.hex(3)}"
+    slug = base_slug
+    i = 0
+    while where(slug: slug).exists?
+      i += 1
+      slug = "#{base_slug}-#{i}"
+    end
+
+    create!(
+      tenant_id: 1,
+      name: name,
+      email: email.presence || "oauth-#{auth.uid}@impd.placeholder",
+      slug: slug,
+      profile_image: info.image,
+      provider: auth.provider,
+      uid: auth.uid.to_s,
+      oauth_email_verified: info.email_verified ? 1 : 0,
+      oauth_connected_at: Time.current,
+      oauth_raw: auth.extra&.raw_info&.to_json,
+      business_type: "individual",
+      profession: "custom",
+      status: "pending_approval",
+      impd_status: "none",
+    )
+  end
+
   def pending?
     status == "pending_approval"
   end

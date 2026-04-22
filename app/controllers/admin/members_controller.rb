@@ -69,6 +69,13 @@ class Admin::MembersController < Admin::BaseController
     redirect_to admin_member_path(@member), notice: "#{@member.name} 재활성화 완료"
   end
 
+  # 소셜 로그인(OAuth) 연결 해제 — 회원은 비밀번호 재설정 후 로그인해야 함.
+  def unlink_oauth
+    provider = @member.provider
+    @member.update!(provider: nil, uid: nil, oauth_connected_at: nil, oauth_email_verified: 0, oauth_raw: nil)
+    redirect_to admin_member_path(@member), notice: "#{@member.name} 의 #{provider} 소셜 연결이 해제되었습니다."
+  end
+
   private
 
   def set_member

@@ -5,6 +5,14 @@ Rails.application.routes.draw do
     sign_out: "logout"
   }
 
+  # OAuth (회원 소셜 로그인) — OmniAuth는 전역 /auth/<provider> 경로 사용
+  # request phase: POST /auth/google_oauth2 (omniauth-rails_csrf_protection이 강제)
+  # callback     : GET/POST /auth/google_oauth2/callback
+  get   "/auth/:provider/callback", to: "omniauth_callbacks#google_oauth2", constraints: { provider: /google_oauth2/ }
+  post  "/auth/:provider/callback", to: "omniauth_callbacks#google_oauth2", constraints: { provider: /google_oauth2/ }
+  get   "/auth/failure",            to: "omniauth_callbacks#failure"
+  delete "/auth/member/logout",     to: "omniauth_callbacks#destroy", as: :member_oauth_logout
+
   # ── 공개 사이트 (Chopd) ──────────────────────────────
   root "chopd/home#index"
 
@@ -54,6 +62,7 @@ Rails.application.routes.draw do
         post :reject
         post :suspend
         post :activate
+        post :unlink_oauth
       end
       resources :documents, controller: "member_documents", only: [ :index, :show, :create, :destroy ] do
         member { post :parse }

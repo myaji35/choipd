@@ -71,3 +71,8 @@ group :development do
   # (avoids ed25519 native compile errors in Docker build)
   gem "kamal", require: false
 end
+
+# OAuth (Google)
+gem "omniauth", "~> 2.1"
+gem "omniauth-google-oauth2", "~> 1.1"
+gem "omniauth-rails_csrf_protection", "~> 1.0"

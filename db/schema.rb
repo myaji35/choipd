@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_22_020411) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_22_050500) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -767,10 +767,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_020411) do
     t.integer "is_featured", default: 0
     t.datetime "last_sign_in_at"
     t.string "name", null: false
+    t.datetime "oauth_connected_at"
+    t.integer "oauth_email_verified", default: 0
+    t.text "oauth_raw"
     t.string "password_digest"
     t.string "phone"
     t.string "profession"
     t.string "profile_image"
+    t.string "provider"
     t.string "region"
     t.text "rejection_reason"
     t.string "slug", null: false
@@ -783,10 +787,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_020411) do
     t.string "townin_name"
     t.string "townin_role"
     t.string "towningraph_user_id"
+    t.string "uid"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_members_on_email"
     t.index ["impd_status"], name: "index_members_on_impd_status"
     t.index ["impd_verification_id"], name: "index_members_on_impd_verification_id", unique: true
+    t.index ["provider", "uid"], name: "index_members_on_provider_and_uid", unique: true, where: "provider IS NOT NULL"
     t.index ["slug"], name: "index_members_on_slug", unique: true
     t.index ["tenant_id"], name: "index_members_on_tenant_id"
     t.index ["towningraph_user_id"], name: "index_members_on_towningraph_user_id", unique: true
