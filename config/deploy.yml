@@ -22,6 +22,12 @@ proxy:
     - impd.townin.net               # 메인 도메인 (DNS A → 158.247.235.31)
     - impd.158.247.235.31.nip.io    # nip.io fallback (DNS 안 거치는 직접 접근용)
   app_port: 3000
+  healthcheck:
+    # Rails 8 + SolidQueue 풀부팅 시 /up 200 응답까지 30~45초 소요.
+    # 기본 30s 는 타임아웃 → 컨테이너 강제 종료로 반복 실패.
+    timeout: 90
+    interval: 3
+    path: /up
 
 # ── 레지스트리 (GitHub Container Registry) ──
 registry:
