@@ -33,4 +33,13 @@ class ApplicationController < ActionController::Base
     current_member.present?
   end
   helper_method :member_signed_in?
+
+  # Google OAuth 활성 여부 — CLIENT_ID + SECRET 모두 세팅된 경우만 true.
+  # 현재 프로덕션 Secret 미설정 + CLIENT_ID가 SocialDoctors-Gmail 소유라 버튼 숨김.
+  # 환경변수 채워지면 자동 복원된다.
+  def google_oauth_enabled?
+    ENV["GOOGLE_OAUTH_CLIENT_ID"].to_s.strip.length > 20 &&
+      ENV["GOOGLE_OAUTH_CLIENT_SECRET"].to_s.strip.length > 8
+  end
+  helper_method :google_oauth_enabled?
 end
