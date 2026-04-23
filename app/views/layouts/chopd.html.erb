@@ -109,6 +109,9 @@
 
     <%= render "layouts/chopd_footer" %>
 
+    <%# 홍보 영상 팝업 — chopd 레이아웃 전역 노출. data-promo-popup 트리거 + 첫 방문자 자동 재생 %>
+    <%= render "shared/promo_popup" %>
+
     <script>
       // 스크롤 진행바
       window.addEventListener('scroll', () => {

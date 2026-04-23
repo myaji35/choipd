@@ -1,0 +1,249 @@
+<%# imPD 홍보 영상 팝업 모달 (30초 자동 재생).
+    트리거: 버튼에 data-promo-popup 속성 → 클릭 시 열림.
+           또는 첫 방문자는 자동으로 3초 후 열림(localStorage 'impd_promo_seen' 없으면).
+    닫기:  ESC / 배경 클릭 / X 버튼 / 영상 종료 후 4초.
+    자동재생: muted autoplay (브라우저 정책 준수). 🔊 버튼으로 unmute.
+
+    이 파셜은 layout 하단(footer 뒤)에 한 번만 render 하면 된다.
+%>
+<div id="promo-popup-overlay" class="promo-popup" aria-hidden="true" role="dialog" aria-label="imPD 홍보 영상">
+  <button type="button" class="promo-popup-backdrop" aria-label="팝업 닫기"></button>
+
+  <div class="promo-popup-frame">
+    <button type="button" class="promo-popup-close" aria-label="닫기">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="promo-popup-brand">
+      <span class="promo-popup-logo">imPD<span class="dot">.</span></span>
+      <span class="promo-popup-eyebrow">§ PROMO · 00:30</span>
+    </div>
+
+    <div class="promo-popup-video-wrap">
+      <video id="promo-popup-video"
+             src="/promo/impd-promo.mp4"
+             poster="/promo/shot-profile-hero.png"
+             preload="auto"
+             playsinline
+             muted
+             autoplay>
+        영상을 재생할 수 없습니다.
+      </video>
+
+      <%# 소리 켜기 버튼 (muted autoplay 후 사용자 클릭으로 unmute) %>
+      <button type="button" id="promo-popup-unmute" class="promo-popup-unmute" aria-label="소리 켜기">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+        <span>소리 켜기</span>
+      </button>
+    </div>
+
+    <div class="promo-popup-cta">
+      <a href="/auth/signup" class="promo-popup-btn primary">내 페이지 만들기 →</a>
+      <a href="/promo/watch" class="promo-popup-btn ghost">공유 / 다운로드</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .promo-popup {
+    position: fixed; inset: 0; z-index: 9999;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .promo-popup.open {
+    display: flex;
+    animation: promoFadeIn .22s ease-out;
+  }
+  @keyframes promoFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .promo-popup-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(15, 23, 42, 0.88);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: none; cursor: pointer; padding: 0;
+  }
+
+  .promo-popup-frame {
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+    background: #0a1428;
+    border-radius: 16px;
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    animation: promoSlideUp .3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  @keyframes promoSlideUp {
+    from { transform: translateY(20px) scale(0.98); opacity: 0; }
+    to   { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  .promo-popup-close {
+    position: absolute; top: 12px; right: 12px; z-index: 2;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .promo-popup-close:hover { background: rgba(255, 255, 255, 0.2); }
+
+  .promo-popup-brand {
+    position: absolute; top: 16px; left: 20px; z-index: 2;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .promo-popup-logo {
+    font-family: "Inter", system-ui;
+    font-size: 18px; font-weight: 800; letter-spacing: -0.03em;
+    color: #fff;
+  }
+  .promo-popup-logo .dot { color: #00A1E0; }
+  .promo-popup-eyebrow {
+    font-family: ui-monospace, "JetBrains Mono", monospace;
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .promo-popup-video-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+  }
+  .promo-popup-video-wrap video {
+    width: 100%; height: 100%; display: block;
+    object-fit: cover;
+  }
+
+  .promo-popup-unmute {
+    position: absolute; bottom: 16px; right: 16px; z-index: 3;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    font-family: "Inter", system-ui;
+    font-size: 12px; font-weight: 600;
+    color: #0a1428;
+    background: #00A1E0;
+    border: none; border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 0 24px rgba(34, 211, 238, 0.4);
+    transition: all .15s;
+  }
+  .promo-popup-unmute:hover { background: #22d3ee; transform: translateY(-1px); }
+  .promo-popup-unmute.hidden { display: none; }
+
+  .promo-popup-cta {
+    padding: 18px 20px 22px;
+    display: flex; gap: 10px; flex-wrap: wrap;
+    justify-content: center;
+    background: #0a1428;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .promo-popup-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 20px;
+    font-family: "Inter", system-ui;
+    font-size: 14px; font-weight: 600; letter-spacing: -0.01em;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all .15s;
+  }
+  .promo-popup-btn.primary {
+    background: #00A1E0;
+    color: #0a1428;
+    box-shadow: 0 0 24px rgba(34, 211, 238, 0.35);
+  }
+  .promo-popup-btn.primary:hover { background: #22d3ee; }
+  .promo-popup-btn.ghost {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  .promo-popup-btn.ghost:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+
+  body.promo-open { overflow: hidden; }
+
+  @media (max-width: 600px) {
+    .promo-popup-brand { top: 10px; left: 12px; }
+    .promo-popup-brand .promo-popup-eyebrow { display: none; }
+    .promo-popup-cta { padding: 14px; }
+    .promo-popup-btn { flex: 1; justify-content: center; }
+  }
+</style>
+
+<script>
+  (function () {
+    const overlay = document.getElementById('promo-popup-overlay');
+    if (!overlay) return;
+    const video = document.getElementById('promo-popup-video');
+    const unmuteBtn = document.getElementById('promo-popup-unmute');
+    const closeBtn = overlay.querySelector('.promo-popup-close');
+    const backdrop = overlay.querySelector('.promo-popup-backdrop');
+    const STORAGE_KEY = 'impd_promo_seen';
+
+    function open() {
+      overlay.classList.add('open');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('promo-open');
+      try { video.currentTime = 0; } catch (_) {}
+      const p = video.play();
+      if (p && typeof p.catch === 'function') p.catch(() => {/* autoplay blocked */});
+      try { localStorage.setItem(STORAGE_KEY, Date.now().toString()); } catch (_) {}
+    }
+
+    function close() {
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('promo-open');
+      try { video.pause(); video.currentTime = 0; video.muted = true; } catch (_) {}
+      if (unmuteBtn) unmuteBtn.classList.remove('hidden');
+    }
+
+    // 트리거: data-promo-popup 속성 가진 모든 링크/버튼
+    document.querySelectorAll('[data-promo-popup]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        open();
+      });
+    });
+
+    // 닫기
+    closeBtn?.addEventListener('click', close);
+    backdrop?.addEventListener('click', close);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) close();
+    });
+
+    // 소리 켜기
+    if (unmuteBtn && video) {
+      unmuteBtn.addEventListener('click', () => {
+        video.muted = false;
+        video.volume = 0.9;
+        unmuteBtn.classList.add('hidden');
+      });
+    }
+
+    // 영상 종료 시 4초 후 자동 닫기 (CTA 노출 시간 확보)
+    video?.addEventListener('ended', () => {
+      setTimeout(() => { if (overlay.classList.contains('open')) close(); }, 4000);
+    });
+
+    // 첫 방문자 자동 노출: 3초 후, localStorage에 기록 없으면
+    // 단, autoplay 정책상 사용자 상호작용 없이는 muted로만 재생됨(허용됨)
+    let seen = null;
+    try { seen = localStorage.getItem(STORAGE_KEY); } catch (_) {}
+    if (!seen) {
+      setTimeout(open, 3000);
+    }
+  })();
+</script>
