@@ -53,7 +53,12 @@
         <div style="display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap;">
           <%= link_to "내 페이지 만들기 →", member_login_path,
               class: "impd-btn impd-btn-primary", style: "height: 54px; padding: 0 22px; font-size: 16px;" %>
-          <%= link_to "예시 보기", "/byjreporter",
+          <%
+            # 실제 회원 slug로 연결 — 첫 번째 featured 회원을 "예시"로 노출.
+            # 이름은 노출하지 않고 링크만 slug 기반. anti-pattern(랜딩에 개인 노출) 회피.
+            sample_slug = (@featured_members || []).first&.slug || "byjreporter"
+          %>
+          <%= link_to "예시 보기 →", "/#{sample_slug}",
               class: "impd-btn impd-btn-secondary", style: "height: 54px; padding: 0 22px; font-size: 16px;" %>
           <%= link_to promo_watch_path,
               class: "impd-btn impd-btn-secondary",
@@ -151,34 +156,75 @@
     </div>
   </section>
 
-  <!-- ── §05 Creators ───────────────────────── -->
+  <!-- ── §05 Creators (실제 회원 카드 + 클릭 시 공개 페이지로 이동) ───── -->
+  <%
+    # profession 한글 매핑 (Member::PROFESSIONS 값 → UI 노출)
+    profession_labels = {
+      "insurance_agent" => "보험 설계사",
+      "realtor"         => "공인중개사",
+      "educator"        => "강사",
+      "author"          => "작가",
+      "shopowner"       => "자영업자",
+      "freelancer"      => "프리랜서",
+      "custom"          => "크리에이터",
+    }
+    palette = ["#ff5a1f", "#2a9d8f", "#3a2af0", "#e4b230", "#1a1a1a", "#aa2a6a"]
+    # 실제 회원 < 6명이면 fallback 더미로 보강
+    fallback_cards = [
+      { name: "요가 강사", role: "강사",        region: "성수동", slug: nil },
+      { name: "도예 공방", role: "자영업자",    region: "양평",   slug: nil },
+      { name: "플라워",    role: "강사",        region: "연남동", slug: nil },
+      { name: "목공 장인", role: "자영업자",    region: "파주",   slug: nil },
+      { name: "홈베이킹",  role: "작가",        region: "일산",   slug: nil },
+      { name: "캘리그라피",role: "크리에이터",  region: "대구",   slug: nil },
+    ]
+    real_cards = (@featured_members || []).map do |m|
+      {
+        name:   m.name.to_s,
+        role:   profession_labels[m.profession.to_s] || "크리에이터",
+        region: m.region.presence || "",
+        slug:   m.slug,
+      }
+    end
+    cards = (real_cards + fallback_cards).first(6)
+  %>
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
       <span class="impd-label">§05</span>
       <span class="impd-display" style="font-size: 36px; flex: 1;">imPD를 쓰는 사람들.</span>
-      <span class="impd-label-muted">6 CREATORS</span>
+      <span class="impd-label-muted"><%= cards.size %> CREATORS</span>
     </div>
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
-      <% [
-        ["김다인", "요가 강사",       "성수동",  "#ff5a1f"],
-        ["박민준", "도예 공방",       "양평",    "#2a9d8f"],
-        ["이서연", "플라워 클래스",    "연남동",  "#3a2af0"],
-        ["최지훈", "목공 장인",       "파주",    "#e4b230"],
-        ["정하늘", "홈베이킹 작가",    "일산",    "#1a1a1a"],
-        ["한유리", "캘리그라피",      "대구",    "#aa2a6a"]
-      ].each do |name, role, region, color| %>
-        <div style="background: <%= color %>; color: #fff; padding: 0; aspect-ratio: 1.1; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;">
+      <% cards.each_with_index do |c, i| %>
+        <%
+          color = palette[i % palette.size]
+          clickable = c[:slug].present?
+          tag_name = clickable ? "a" : "div"
+          common_style = "background: #{color}; color: #fff; padding: 0; aspect-ratio: 1.1; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; text-decoration: none; #{clickable ? 'cursor: pointer;' : ''}"
+        %>
+        <%= content_tag(tag_name, href: clickable ? "/#{c[:slug]}" : nil, style: common_style) do %>
           <div class="impd-stripe" style="position: absolute; inset: 0;"></div>
-          <div style="position: relative; padding: 16px; z-index: 1;">
-            <div class="impd-label" style="color: rgba(255,255,255,.7);"><%= region %></div>
+          <div style="position: relative; padding: 16px; z-index: 1; display: flex; justify-content: space-between; align-items: start; gap: 8px;">
+            <div class="impd-label" style="color: rgba(255,255,255,.7);"><%= c[:region] %></div>
+            <% if clickable %>
+              <div style="font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1px; color: rgba(255,255,255,.65); background: rgba(0,0,0,.18); padding: 3px 8px; border-radius: 3px; white-space: nowrap;">LIVE</div>
+            <% end %>
           </div>
           <div style="position: relative; padding: 16px; z-index: 1;">
-            <div class="impd-display" style="font-size: 24px;"><%= name %></div>
-            <div style="font-size: 13px; opacity: 0.85;"><%= role %></div>
+            <div class="impd-display" style="font-size: 24px; line-height: 1.15; word-break: keep-all;"><%= c[:name] %></div>
+            <div style="font-size: 13px; opacity: 0.85; margin-top: 4px;"><%= c[:role] %></div>
+            <% if clickable %>
+              <div style="font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 0.5px; opacity: 0.75; margin-top: 8px; display: inline-flex; align-items: center; gap: 4px;">
+                impd.me/<%= c[:slug] %> <span style="font-size: 13px;">→</span>
+              </div>
+            <% end %>
           </div>
-        </div>
+        <% end %>
       <% end %>
     </div>
+    <p style="margin-top: 16px; font-size: 12px; color: var(--impd-muted); text-align: right;">
+      LIVE 태그가 붙은 카드는 실제 회원 페이지로 이동합니다
+    </p>
   </section>
 
   <!-- ── §05.5 Real Moments (회원들이 올린 실제 장면) ──────────── -->
