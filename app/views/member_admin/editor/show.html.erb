@@ -51,18 +51,230 @@
     </div>
 
   <% elsif @step == 2 %>
-    <div class="impd-section-header"><span class="impd-label">§02</span><span class="impd-display" style="font-size: 36px; flex: 1;">정보 확인 — AI가 추출한 내용을 검토하세요</span></div>
-    <p style="text-align: center; padding: 60px; color: var(--impd-muted);">곧 출시 예정 — Step 1의 업로드 자료를 AI가 분석하여 카테고리/달란트/이력으로 자동 분류합니다.</p>
+    <!-- ── Step 2: 정보 확인 — AI 추출 결과 검토 + 누락 필드 입력 ─ -->
+    <div class="impd-section-header">
+      <span class="impd-label">§02</span>
+      <span class="impd-display" style="font-size: 36px; flex: 1;">정보 확인 — AI 추출 결과 + 누락 필드</span>
+      <span class="impd-label-muted"><%= @skills.size %> TALENTS · <%= @doc_count %> DOCS · <%= @photos_count %> PHOTOS</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px;" class="editor-grid">
+      <%# 좌: 기본 프로필 입력 폼 %>
+      <%= form_with url: slug_admin_editor_update_info_path(slug: @member.slug), method: :patch, local: true, data: { turbo: false } do |f| %>
+        <fieldset style="border: 1px solid var(--impd-ink); padding: 24px; background: var(--impd-paper);">
+          <legend class="impd-label" style="padding: 0 10px; color: var(--impd-accent);">기본 정보</legend>
+
+          <div style="margin-top: 16px;">
+            <label class="impd-label-muted">자기소개 (bio)</label>
+            <textarea name="member[bio]" rows="3" maxlength="200"
+                      placeholder="한 줄로 표현할 수 있나요? (예: 스마트폰 하나로 유튜브 채널 만드는 법을 가르치는 강사)"
+                      style="width: 100%; padding: 10px 12px; border: 1px solid var(--impd-ink); font-family: var(--impd-font-sans); font-size: 14px; margin-top: 6px; resize: vertical;"><%= @member.bio %></textarea>
+          </div>
+
+          <div style="margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <label class="impd-label-muted">직업</label>
+              <select name="member[profession]"
+                      style="width: 100%; padding: 10px 12px; border: 1px solid var(--impd-ink); font-family: var(--impd-font-sans); font-size: 14px; margin-top: 6px; background: #fff;">
+                <% [["직접 입력", "custom"], ["보험 설계사", "insurance_agent"], ["공인중개사", "realtor"], ["강사", "educator"], ["작가", "author"], ["자영업자", "shopowner"], ["프리랜서", "freelancer"]].each do |label, v| %>
+                  <option value="<%= v %>" <%= "selected" if @member.profession == v %>><%= label %></option>
+                <% end %>
+              </select>
+            </div>
+            <div>
+              <label class="impd-label-muted">지역</label>
+              <input type="text" name="member[region]" value="<%= @member.region %>" placeholder="예: 서울 · 성북"
+                     style="width: 100%; padding: 10px 12px; border: 1px solid var(--impd-ink); font-family: var(--impd-font-sans); font-size: 14px; margin-top: 6px;">
+            </div>
+          </div>
+
+          <div style="margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <label class="impd-label-muted">이메일</label>
+              <input type="email" name="member[email]" value="<%= @member.email %>"
+                     style="width: 100%; padding: 10px 12px; border: 1px solid var(--impd-ink); font-family: var(--impd-font-mono); font-size: 13px; margin-top: 6px;">
+            </div>
+            <div>
+              <label class="impd-label-muted">전화</label>
+              <input type="tel" name="member[phone]" value="<%= @member.phone %>" placeholder="010-0000-0000"
+                     style="width: 100%; padding: 10px 12px; border: 1px solid var(--impd-ink); font-family: var(--impd-font-mono); font-size: 13px; margin-top: 6px;">
+            </div>
+          </div>
+
+          <div style="margin-top: 14px;">
+            <label class="impd-label-muted">카카오톡 채널 URL <span style="font-weight: 400; color: var(--impd-muted);">(선택)</span></label>
+            <input type="url" name="member[kakao_channel]" value="<%= @member.social["kakao_channel"] %>" placeholder="https://pf.kakao.com/..."
+                   style="width: 100%; padding: 10px 12px; border: 1px solid var(--impd-ink); font-family: var(--impd-font-mono); font-size: 13px; margin-top: 6px;">
+          </div>
+        </fieldset>
+
+        <button type="submit" class="impd-btn impd-btn-primary" style="margin-top: 20px; height: 52px; padding: 0 28px; font-size: 15px; width: 100%; justify-content: center;">
+          정보 저장하고 다음 →
+        </button>
+      <% end %>
+
+      <%# 우: AI 추출 달란트 요약 %>
+      <div>
+        <div style="background: var(--impd-card); border: 1px solid var(--impd-ink); padding: 24px; margin-bottom: 14px;">
+          <div class="impd-label-muted" style="margin-bottom: 10px;">AI 추출 달란트 · <%= @skills.size %>개</div>
+          <% if @skills.any? %>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <% @skills.each do |ms| %>
+                <span style="display: inline-flex; align-items: center; gap: 3px; padding: 5px 10px; background: <%= ms.weight >= 60 ? 'var(--impd-ink)' : 'var(--impd-paper)' %>; color: <%= ms.weight >= 60 ? 'var(--impd-paper)' : 'var(--impd-ink)' %>; border: 1px solid var(--impd-ink); font-size: 12px;">
+                  <%= ms.skill.canonical_name %>
+                  <% if ms.weight >= 60 %><span style="font-family: var(--impd-font-mono); font-size: 9px; opacity: 0.7;">· <%= ms.weight %></span><% end %>
+                </span>
+              <% end %>
+            </div>
+            <p style="margin-top: 14px; font-size: 11px; color: var(--impd-muted); font-family: var(--impd-font-mono);">
+              <%= @doc_count %>개 문서에서 자동 추출됨 · weight ≥ 60 은 대표 역량
+            </p>
+          <% else %>
+            <p style="font-size: 13px; color: var(--impd-muted); margin: 12px 0;">
+              Step 1에서 이력·수료증 MD/TXT를 업로드하면 달란트가 자동 추출됩니다.
+            </p>
+            <a href="?step=1" class="impd-btn impd-btn-secondary" style="margin-top: 6px; height: 36px; font-size: 12px;">← 문서 올리러 가기</a>
+          <% end %>
+        </div>
+
+        <div style="background: var(--impd-card); border: 1px solid var(--impd-ink); padding: 24px;">
+          <div class="impd-label-muted" style="margin-bottom: 10px;">올린 자산</div>
+          <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--impd-font-mono); font-size: 12px; color: var(--impd-ink);">
+            <li style="padding: 6px 0; border-bottom: 1px dashed var(--impd-rule);">📄 문서 <strong><%= @doc_count %></strong>개</li>
+            <li style="padding: 6px 0; border-bottom: 1px dashed var(--impd-rule);">📷 사진 <strong><%= @photos_count %></strong>장</li>
+            <li style="padding: 6px 0; border-bottom: 1px dashed var(--impd-rule);">🛍 서비스 <strong><%= @services_count %></strong>개</li>
+            <li style="padding: 6px 0;">📁 포트폴리오 <strong><%= @portfolio_count %></strong>개</li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
   <% elsif @step == 3 %>
-    <div class="impd-section-header"><span class="impd-label">§03</span><span class="impd-display" style="font-size: 36px; flex: 1;">스타일 선택</span></div>
-    <p style="text-align: center; padding: 60px; color: var(--impd-muted);">곧 출시 예정 — 다크/크림/매거진/카드 4개 테마 중 선택.</p>
+    <!-- ── Step 3: 스타일 선택 (5개 프리셋) ───────────── -->
+    <div class="impd-section-header">
+      <span class="impd-label">§03</span>
+      <span class="impd-display" style="font-size: 36px; flex: 1;">스타일 선택</span>
+      <span class="impd-label-muted">현재: <%= @member.theme_preset.presence&.upcase || "미설정" %></span>
+    </div>
+
+    <p style="font-family: var(--impd-font-serif); font-style: italic; font-size: 16px; color: var(--impd-ink2); margin-bottom: 24px; max-width: 60ch;">
+      페이지의 분위기를 바꾸는 5가지 프리셋. 언제든 다시 고칠 수 있습니다.
+    </p>
+
+    <%= form_with url: slug_admin_editor_update_style_path(slug: @member.slug), method: :patch, local: true, data: { turbo: false } do |f| %>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+        <% @presets.each do |p| %>
+          <label style="cursor: pointer; display: block;">
+            <input type="radio" name="theme_preset" value="<%= p[:key] %>" <%= "checked" if @member.theme_preset == p[:key] %> style="display: none;" class="theme-radio">
+            <div class="theme-card" style="background: <%= p[:paper] %>; color: <%= p[:ink] %>; border: 2px solid transparent; padding: 20px; min-height: 180px; display: flex; flex-direction: column; justify-content: space-between; transition: all .15s;">
+              <div>
+                <div style="font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: <%= p[:accent] %>;">
+                  <%= p[:key].upcase %>
+                </div>
+                <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 28px; letter-spacing: -0.5px; line-height: 1; margin-top: 8px;">
+                  <%= p[:name] %>
+                </div>
+                <div style="font-family: var(--impd-font-serif); font-style: italic; font-size: 16px; color: <%= p[:accent] %>; margin-top: 2px;">
+                  작가.
+                </div>
+              </div>
+              <div style="font-size: 11px; opacity: 0.75; line-height: 1.5;">
+                <%= p[:desc] %>
+              </div>
+            </div>
+          </label>
+        <% end %>
+      </div>
+
+      <style>
+        .theme-radio:checked + .theme-card { border-color: var(--impd-accent) !important; box-shadow: 0 0 0 4px rgba(58, 42, 240, 0.15); }
+      </style>
+
+      <button type="submit" class="impd-btn impd-btn-primary" style="margin-top: 28px; height: 52px; padding: 0 28px; font-size: 15px;">
+        스타일 적용하고 발행 →
+      </button>
+    <% end %>
 
   <% else %>
-    <div class="impd-section-header"><span class="impd-label">§04</span><span class="impd-display" style="font-size: 36px; flex: 1;">발행 — 공개 페이지를 활성화합니다</span></div>
-    <div style="text-align: center; padding: 60px;">
-      <p style="font-size: 18px; color: var(--impd-ink2);">최종 검토 후 발행 버튼을 누르면 <strong style="color: var(--impd-accent);">/<%= @member.slug %></strong> 가 공개됩니다.</p>
-      <a href="/<%= @member.slug %>" target="_blank" class="impd-btn impd-btn-primary" style="margin-top: 32px; height: 54px; padding: 0 28px; font-size: 16px;">예시 보기 →</a>
+    <!-- ── Step 4: 발행 체크리스트 + 공개 ─────────────── -->
+    <div class="impd-section-header">
+      <span class="impd-label">§04</span>
+      <span class="impd-display" style="font-size: 36px; flex: 1;">발행 — 공개 페이지 활성화</span>
+      <% if @member.published_at %>
+        <span class="impd-label-muted" style="color: #16a34a;">● 발행됨 · <%= @member.published_at.strftime("%Y.%m.%d") %></span>
+      <% end %>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px;" class="editor-grid">
+      <%# 좌: 체크리스트 %>
+      <div style="background: var(--impd-paper); border: 1px solid var(--impd-ink); padding: 24px;">
+        <% done_count = @checklist.count { |c| c[:done] } %>
+        <% pct = (done_count * 100.0 / @checklist.size).round %>
+
+        <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px;">
+          <span class="impd-display" style="font-size: 36px; letter-spacing: -1px;"><%= done_count %><span style="color: var(--impd-muted); font-weight: 400;">/<%= @checklist.size %></span></span>
+          <span class="impd-label-muted">완료 <%= pct %>%</span>
+        </div>
+        <div style="height: 6px; background: var(--impd-card); border: 1px solid var(--impd-ink); margin-bottom: 18px;">
+          <div style="height: 100%; width: <%= pct %>%; background: var(--impd-accent); transition: width .3s;"></div>
+        </div>
+
+        <ul style="list-style: none; padding: 0; margin: 0;">
+          <% @checklist.each_with_index do |c, i| %>
+            <li style="display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--impd-rule); font-size: 14px; color: <%= c[:done] ? 'var(--impd-ink)' : 'var(--impd-muted)' %>;">
+              <span style="width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border: 1.5px solid <%= c[:done] ? 'var(--impd-accent)' : 'var(--impd-rule)' %>; color: <%= c[:done] ? 'var(--impd-accent)' : 'transparent' %>; font-weight: 700; font-size: 13px;">✓</span>
+              <span style="flex: 1;"><%= c[:label] %></span>
+              <% unless c[:done] %>
+                <a href="?step=<%= %w[bio profession region email phone].include?(c[:key]) ? 2 : (c[:key] == 'theme' ? 3 : 1) %>"
+                   style="font-family: var(--impd-font-mono); font-size: 11px; color: var(--impd-accent); text-decoration: none; border-bottom: 1px solid currentColor;">완성 →</a>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+
+      <%# 우: 발행 카드 %>
+      <div>
+        <div style="background: var(--impd-ink); color: var(--impd-paper); padding: 28px; margin-bottom: 14px; position: relative;">
+          <div class="impd-stripe" style="position: absolute; inset: 0; opacity: 0.15;"></div>
+          <div style="position: relative;">
+            <div class="impd-label" style="color: var(--impd-accent);">공개 URL</div>
+            <div class="impd-display" style="font-size: 28px; margin-top: 10px; letter-spacing: -0.5px; word-break: break-all;">
+              impd.townin.net/<%= @member.slug %>
+            </div>
+            <div style="margin-top: 14px; font-size: 12px; color: rgba(239,236,228,.7); line-height: 1.55;">
+              발행 후 누구나 이 주소로 당신의 페이지를 볼 수 있습니다.
+              OG 메타 자동 적용되어 카톡/SNS 공유 시 명함 이미지가 자동 노출됩니다.
+            </div>
+          </div>
+        </div>
+
+        <%# 발행 버튼 (이미 발행된 상태면 재발행) %>
+        <%= form_with url: slug_admin_editor_publish_path(slug: @member.slug), method: :patch, local: true, data: { turbo: false } do %>
+          <button type="submit" class="impd-btn impd-btn-primary"
+                  style="width: 100%; height: 56px; font-size: 16px; justify-content: center;"
+                  <%= "disabled" if done_count < 4 %>>
+            <% if @member.published_at %>
+              ↻ 다시 발행하기
+            <% else %>
+              ✓ 지금 발행하기 →
+            <% end %>
+          </button>
+        <% end %>
+
+        <% if done_count < 4 %>
+          <p style="margin-top: 12px; font-size: 12px; color: var(--impd-accent-2); line-height: 1.55;">
+            최소 4개 항목 완료 시 발행 가능합니다. 체크리스트를 확인해 주세요.
+          </p>
+        <% end %>
+
+        <% if @member.published_at %>
+          <a href="/<%= @member.slug %>" target="_blank" class="impd-btn impd-btn-secondary"
+             style="width: 100%; height: 44px; margin-top: 10px; font-size: 13px; justify-content: center;">
+            공개 페이지 열기 →
+          </a>
+        <% end %>
+      </div>
     </div>
   <% end %>
 

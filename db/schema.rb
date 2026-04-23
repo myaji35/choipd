@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_23_060700) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_23_070645) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -778,6 +778,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_23_060700) do
     t.string "profession"
     t.string "profile_image"
     t.string "provider"
+    t.datetime "published_at"
     t.string "region"
     t.text "rejection_reason"
     t.string "slug", null: false
@@ -788,6 +789,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_23_060700) do
     t.string "subscription_plan", default: "basic"
     t.integer "tenant_id", default: 1, null: false
     t.text "theme_config", default: "{}"
+    t.string "theme_preset"
     t.string "townin_email"
     t.string "townin_name"
     t.string "townin_role"

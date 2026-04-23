@@ -287,6 +287,10 @@ Rails.application.routes.draw do
       get "/",          to: redirect { |params, _req| "/#{params[:slug]}/admin/dashboard" }, as: :root
       get "/dashboard", to: "dashboard#show", as: :dashboard
       get "/editor",    to: "editor#show",    as: :editor
+      # Step 2/3/4 저장
+      patch "/editor/info",    to: "editor#update_info",   as: :editor_update_info
+      patch "/editor/style",   to: "editor#update_style",  as: :editor_update_style
+      patch "/editor/publish", to: "editor#publish",       as: :editor_publish
 
       resources :documents, only: [ :create, :update, :destroy ] do
         member { post :reparse }

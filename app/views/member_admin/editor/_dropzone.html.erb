@@ -1,40 +1,16 @@
 <% doc_categories = MemberDocument::CATEGORIES %>
-<div style="border: 2px dashed var(--impd-ink); padding: 48px 24px; text-align: center; background: var(--impd-card);"
-     data-controller="member-doc-uploader"
-     data-member-doc-uploader-create-url-value="<%= slug_admin_documents_path(slug: member.slug, format: :json) %>"
-     data-member-doc-uploader-csrf-value="<%= form_authenticity_token %>"
-     data-action="dragover->member-doc-uploader#dragover dragleave->member-doc-uploader#dragleave drop->member-doc-uploader#drop">
-  <!-- Feather upload-cloud icon -->
-  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--impd-ink)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px;" aria-hidden="true">
-    <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
-    <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/>
-  </svg>
-  <p style="font-family: var(--impd-font-display); font-size: 22px; font-weight: 800;">파일을 여기에 끌어다 놓으세요</p>
-  <p style="font-size: 14px; color: var(--impd-muted); margin-top: 8px;">또는 클릭해서 선택 — 여러 개 한 번에 OK</p>
-  <label style="margin-top: 20px; display: inline-block; cursor: pointer;">
-    <span class="impd-btn impd-btn-primary">파일 선택</span>
-    <input type="file" multiple class="hidden" style="display:none;" accept=".md,.markdown,.txt"
-           data-member-doc-uploader-target="fileInput"
-           data-action="change->member-doc-uploader#fileSelected">
-  </label>
-  <input type="hidden" data-member-doc-uploader-target="title" value="">
-  <select data-member-doc-uploader-target="category" style="display:none;"><option value="other">other</option></select>
-  <p style="font-size: 11px; color: var(--impd-muted); margin-top: 12px;">파일명에 <strong>이력 / 수료 / 후기 / 강의 / 언론 / 작품</strong> 키워드가 있으면 자동 분류됩니다.</p>
+<% has_docs = member.member_documents.any? %>
 
-  <div data-member-doc-uploader-target="progress" style="display: none; margin-top: 20px;">
-    <div style="background: var(--impd-rule); height: 6px; overflow: hidden;">
-      <div data-member-doc-uploader-target="progressBar" style="background: var(--impd-accent); height: 100%; width: 0%; transition: width 0.2s ease;"></div>
+<%# 파일이 이미 있으면 목록을 먼저 표시. 드롭존은 컴팩트 모드. %>
+<% if has_docs %>
+  <!-- 업로드된 자료 리스트 (먼저) -->
+  <div>
+    <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px;">
+      <p class="impd-label-muted">업로드된 자료 (<%= member.member_documents.count %>)</p>
+      <span style="font-family: var(--impd-font-mono); font-size: 11px; color: var(--impd-muted);">
+        파일명에 이력/수료/후기/강의/언론/작품 있으면 자동 분류
+      </span>
     </div>
-  </div>
-
-  <div data-member-doc-uploader-target="error" style="display: none; margin-top: 16px; padding: 12px; background: rgba(255,90,31,.1); color: var(--impd-accent-2); font-size: 13px; text-align: left; line-height: 1.5;"></div>
-  <p data-member-doc-uploader-target="status" class="impd-label-muted" style="margin-top: 16px; min-height: 16px; font-family: var(--impd-font-mono);"></p>
-</div>
-
-<!-- 업로드된 자료 리스트 -->
-<% if member.member_documents.any? %>
-  <div style="margin-top: 32px;">
-    <p class="impd-label-muted">업로드된 자료 (<%= member.member_documents.count %>)</p>
     <table style="width: 100%; margin-top: 12px; border-collapse: collapse;">
       <thead style="border-bottom: 1px solid var(--impd-ink);">
         <tr>
@@ -84,13 +60,44 @@
       </tbody>
     </table>
   </div>
-<% else %>
-  <!-- F14 빈 상태 -->
-  <div style="margin-top: 32px; padding: 32px; border: 1px solid var(--impd-rule); background: var(--impd-card); text-align: center;">
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--impd-soft-muted)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px;">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-    </svg>
-    <p style="font-family: var(--impd-font-display); font-size: 18px; font-weight: 800;">첫 파일을 올려 보세요</p>
-    <p style="font-size: 13px; color: var(--impd-muted); margin-top: 6px;">이력서 · 포트폴리오 · 수료증 무엇이든 OK. imPD가 달란트를 자동 추출합니다.</p>
-  </div>
 <% end %>
+
+<%# 드롭존 — 파일 있으면 컴팩트, 없으면 full %>
+<div style="border: <%= has_docs ? '1px' : '2px' %> dashed var(--impd-ink); padding: <%= has_docs ? '20px 24px' : '48px 24px' %>; text-align: center; background: var(--impd-card); margin-top: <%= has_docs ? '18px' : '0' %>;"
+     data-controller="member-doc-uploader"
+     data-member-doc-uploader-create-url-value="<%= slug_admin_documents_path(slug: member.slug, format: :json) %>"
+     data-member-doc-uploader-csrf-value="<%= form_authenticity_token %>"
+     data-action="dragover->member-doc-uploader#dragover dragleave->member-doc-uploader#dragleave drop->member-doc-uploader#drop">
+  <% unless has_docs %>
+    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--impd-ink)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px;" aria-hidden="true">
+      <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+      <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/>
+    </svg>
+  <% end %>
+  <p style="font-family: var(--impd-font-display); font-size: <%= has_docs ? '15px' : '22px' %>; font-weight: <%= has_docs ? '600' : '800' %>;">
+    <%= has_docs ? "+ 새 파일 추가" : "파일을 여기에 끌어다 놓으세요" %>
+  </p>
+  <% unless has_docs %>
+    <p style="font-size: 14px; color: var(--impd-muted); margin-top: 8px;">또는 클릭해서 선택 — 여러 개 한 번에 OK</p>
+  <% end %>
+  <label style="margin-top: <%= has_docs ? '10px' : '20px' %>; display: inline-block; cursor: pointer;">
+    <span class="<%= has_docs ? 'impd-btn impd-btn-secondary' : 'impd-btn impd-btn-primary' %>" style="<%= 'height: 36px; font-size: 12px;' if has_docs %>">파일 선택</span>
+    <input type="file" multiple class="hidden" style="display:none;" accept=".md,.markdown,.txt"
+           data-member-doc-uploader-target="fileInput"
+           data-action="change->member-doc-uploader#fileSelected">
+  </label>
+  <input type="hidden" data-member-doc-uploader-target="title" value="">
+  <select data-member-doc-uploader-target="category" style="display:none;"><option value="other">other</option></select>
+  <% unless has_docs %>
+    <p style="font-size: 11px; color: var(--impd-muted); margin-top: 12px;">파일명에 <strong>이력 / 수료 / 후기 / 강의 / 언론 / 작품</strong> 키워드가 있으면 자동 분류됩니다.</p>
+  <% end %>
+
+  <div data-member-doc-uploader-target="progress" style="display: none; margin-top: 14px;">
+    <div style="background: var(--impd-rule); height: 4px; overflow: hidden;">
+      <div data-member-doc-uploader-target="progressBar" style="background: var(--impd-accent); height: 100%; width: 0%; transition: width 0.2s ease;"></div>
+    </div>
+  </div>
+
+  <div data-member-doc-uploader-target="error" style="display: none; margin-top: 12px; padding: 10px; background: rgba(255,90,31,.1); color: var(--impd-accent-2); font-size: 12px; text-align: left; line-height: 1.5;"></div>
+  <p data-member-doc-uploader-target="status" class="impd-label-muted" style="margin-top: 10px; min-height: 14px; font-family: var(--impd-font-mono);"></p>
+</div>
