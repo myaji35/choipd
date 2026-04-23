@@ -118,5 +118,8 @@
     <main>
       <%= yield %>
     </main>
+
+    <%# 홍보 영상 팝업 (data-promo-popup 트리거 + 첫 방문자 자동 재생) %>
+    <%= render "shared/promo_popup" %>
   </body>
 </html>
