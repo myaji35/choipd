@@ -141,7 +141,7 @@
 <%
   card_svg_url  = "/card/#{@member.slug}.svg"
   qr_svg_url    = "/qr/#{@member.slug}.svg"
-  short_link    = ShortLink.resolve_or_create(target_path: "/#{@member.slug}", member: @member)
+  short_link    = ShortLink.resolve_or_create(target_path: "/#{@member.slug}/card", member: @member)
   short_full    = "#{request.host_with_port}/s/#{short_link&.hash_code}"
   profile_full  = "#{request.protocol}#{request.host_with_port}/#{@member.slug}"
 %>
@@ -362,8 +362,9 @@
     tenure_months = ((Time.current - @member.partner_promoted_at) / 1.month).to_i if tenure_months.zero? && @member.partner_promoted_at
     activities = Array(s["recent_activities"]).first(3)
   %>
-  <section class="impd-wrap impd-section" id="partner" style="background: var(--impd-card); margin: 40px calc(-50vw + 50%); padding-left: calc(50vw - 50%); padding-right: calc(50vw - 50%); border-top: 1px solid var(--impd-rule); border-bottom: 1px solid var(--impd-rule);">
-    <div class="impd-wrap" style="padding: 0;">
+  <%# §B-3 full-bleed: section 자체를 풀폭 배경으로, 내부 impd-wrap 가 1200px 중앙정렬 %>
+  <section id="partner" style="background: var(--impd-card); margin: 28px 0; padding: 40px 0; border-top: 1px solid var(--impd-rule); border-bottom: 1px solid var(--impd-rule);">
+    <div class="impd-wrap" style="padding-left: 40px; padding-right: 40px;">
       <!-- 섹션 헤더 -->
       <div class="impd-section-header">
         <span class="impd-label" style="color: var(--impd-accent-2);">§B-3</span>

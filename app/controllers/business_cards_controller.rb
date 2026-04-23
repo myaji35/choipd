@@ -98,7 +98,8 @@ class BusinessCardsController < ApplicationController
   end
 
   def short_url_for(member)
-    sl = ShortLink.resolve_or_create(target_path: "/#{member.slug}", member: member)
+    # 짧은 URL 기본 타겟 = 요약 카드 뷰. 사용자는 명함부터 보고 원할 때만 전체 프로필.
+    sl = ShortLink.resolve_or_create(target_path: "/#{member.slug}/card", member: member)
     host = request.host_with_port.presence || "impd.townin.net"
     proto = request.protocol.presence || "http://"
     sl ? "#{proto}#{host}/s/#{sl.hash_code}" : "#{proto}#{host}/#{member.slug}"

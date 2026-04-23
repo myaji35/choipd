@@ -295,6 +295,16 @@ Rails.application.routes.draw do
     end
   end
 
+  # 요약 카드 뷰 — 짧은 URL /s/:hash 기본 타겟. 한 화면 안에 이름·직함·명함·QR·연락 3버튼.
+  # "전체 프로필 보기 →" 클릭해야 /:slug 풀 페이지로 이동.
+  get "/:slug/card",
+      to: "public_profile#card",
+      as: :public_profile_card,
+      constraints: lambda { |req|
+        slug = req.path_parameters[:slug].to_s
+        slug.match?(/\A[a-z0-9][a-z0-9\-]{1,}\z/) && !SlugValidation::RESERVED_SLUGS.include?(slug)
+      }
+
   # ── Vanity URL: /<slug> → 회원 또는 분양사 공개 페이지 (가장 마지막) ───
   # CRIT-4: SlugValidation::RESERVED_SLUGS 단일 source of truth.
   # 모델 검증과 라우트 차단이 동일 목록을 사용하므로 충돌 불가.

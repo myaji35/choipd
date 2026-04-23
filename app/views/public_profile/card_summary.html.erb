@@ -1,0 +1,238 @@
+<% content_for :title, "#{@member.name} | imPD" %>
+<% content_for :description, @member.bio.to_s.first(160).presence || "imPD · #{@member.name}" %>
+
+<%# OG/Twitter 카드 — SVG 명함을 썸네일로 %>
+<% content_for :head do %>
+  <%
+    card_svg_url = "#{request.protocol}#{request.host_with_port}/card/#{@member.slug}.svg"
+    share_url    = "#{request.protocol}#{request.host_with_port}/s/#{@short_link&.hash_code}"
+  %>
+  <meta property="og:type" content="profile">
+  <meta property="og:title" content="<%= @member.name %> — imPD">
+  <meta property="og:description" content="<%= @member.bio.to_s.first(160).presence || '흩어진 내 일, 하나의 주소로.' %>">
+  <meta property="og:url" content="<%= share_url %>">
+  <meta property="og:image" content="<%= card_svg_url %>">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+<% end %>
+
+<%
+  profession_label_kr = {
+    "insurance_agent" => "보험 설계사",
+    "realtor"         => "공인중개사",
+    "educator"        => "강사",
+    "author"          => "작가",
+    "shopowner"       => "자영업자",
+    "freelancer"      => "프리랜서",
+    "custom"          => "크리에이터",
+  }
+  role_kr    = profession_label_kr[@member.profession.to_s] || "크리에이터"
+  short_abs  = "#{request.host_with_port}/s/#{@short_link&.hash_code}"
+  social     = @member.social
+  kakao_ch   = social["kakao_channel"].presence
+%>
+
+<style>
+  .card-wrap { max-width: 1100px; margin: 0 auto; padding: 28px 24px 40px; }
+  .card-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    align-items: stretch;
+  }
+  @media (max-width: 820px) { .card-summary-grid { grid-template-columns: 1fr; } }
+
+  .cs-left {
+    display: flex; flex-direction: column; gap: 14px;
+    background: var(--impd-paper);
+    border: 1px solid var(--impd-ink);
+    padding: 28px 24px;
+    position: relative;
+  }
+  .cs-eyebrow {
+    font-family: var(--impd-font-mono);
+    font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase;
+    color: var(--impd-accent);
+  }
+  .cs-name {
+    font-family: var(--impd-font-display);
+    font-weight: 800;
+    font-size: clamp(40px, 5.5vw, 68px);
+    letter-spacing: -2px; line-height: 0.95;
+    color: var(--impd-ink);
+  }
+  .cs-name .italic { font-family: var(--impd-font-serif); font-style: italic; font-weight: 400; color: var(--impd-accent); display: block; margin-top: 4px; }
+  .cs-meta { font-size: 13px; color: var(--impd-ink2); line-height: 1.5; }
+  .cs-meta dt { display: inline; font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted); margin-right: 6px; }
+  .cs-meta dd { display: inline; margin: 0 14px 0 0; }
+
+  .cs-bio {
+    font-family: var(--impd-font-serif); font-style: italic;
+    font-size: 15px; line-height: 1.6;
+    color: var(--impd-ink2);
+    padding-top: 14px;
+    border-top: 1px solid var(--impd-rule);
+    max-width: 48ch;
+  }
+
+  .cs-skills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .cs-skill-tag {
+    padding: 4px 10px;
+    font-size: 11px;
+    font-family: var(--impd-font-sans);
+    background: var(--impd-card);
+    border: 1px solid var(--impd-ink);
+    color: var(--impd-ink);
+    letter-spacing: -0.1px;
+  }
+
+  .cs-contacts { display: flex; flex-direction: column; gap: 6px; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--impd-rule); }
+  .cs-contact-btn {
+    display: inline-flex; align-items: center; justify-content: space-between;
+    height: 42px; padding: 0 14px;
+    font-family: var(--impd-font-sans); font-size: 13px; font-weight: 600;
+    color: var(--impd-ink); background: var(--impd-card);
+    border: 1px solid var(--impd-ink); text-decoration: none;
+    transition: all .15s;
+  }
+  .cs-contact-btn:hover { background: var(--impd-ink); color: var(--impd-paper); }
+  .cs-contact-btn .label { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; opacity: 0.55; font-weight: 500; }
+
+  .cs-full {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; height: 48px;
+    margin-top: 12px;
+    background: var(--impd-ink);
+    color: var(--impd-paper);
+    font-family: var(--impd-font-sans); font-size: 14px; font-weight: 700; letter-spacing: -0.2px;
+    text-decoration: none;
+    transition: all .15s;
+  }
+  .cs-full:hover { background: var(--impd-accent); color: #fff; }
+
+  .cs-right {
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .cs-card-preview {
+    background: var(--impd-ink);
+    border: 1px solid var(--impd-ink);
+    padding: 16px;
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cs-card-preview img { width: 100%; height: auto; display: block; background: var(--impd-paper); }
+
+  .cs-share-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  }
+  .cs-share-row .item {
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 12px 14px; background: var(--impd-paper); border: 1px solid var(--impd-ink);
+  }
+  .cs-share-row .item .lbl { font-family: var(--impd-font-mono); font-size: 9px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-muted); }
+  .cs-share-row .item code { font-family: var(--impd-font-mono); font-size: 11px; color: var(--impd-ink); word-break: break-all; }
+  .cs-share-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .cs-share-btn {
+    height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+    font-family: var(--impd-font-sans); font-size: 12px; font-weight: 600;
+    color: var(--impd-ink); background: transparent;
+    border: 1px solid var(--impd-ink);
+    cursor: pointer; text-decoration: none;
+    transition: all .15s;
+  }
+  .cs-share-btn:hover { background: var(--impd-ink); color: var(--impd-paper); }
+</style>
+
+<main class="card-wrap" data-controller="card-share"
+      data-card-share-short-url-value="<%= "#{request.protocol}#{short_abs}" %>"
+      data-card-share-profile-url-value="<%= "#{request.protocol}#{request.host_with_port}/#{@member.slug}" %>">
+
+  <div class="card-summary-grid">
+
+    <!-- 좌: 회원 요약 명함 (텍스트 기반, 네이티브 접근성) -->
+    <section class="cs-left">
+      <div>
+        <p class="cs-eyebrow">imPD 검증 회원 · 요약 명함</p>
+        <h1 class="cs-name">
+          <%= @member.name %>
+          <span class="italic"><%= role_kr %>.</span>
+        </h1>
+      </div>
+
+      <dl class="cs-meta">
+        <% if @member.region.present? %>
+          <dt>지역</dt><dd><%= @member.region %></dd>
+        <% end %>
+        <% if @member.partner_active? %>
+          <dt>Townin</dt><dd>⭐ <%= @member.partner_display_role || "파트너" %></dd>
+        <% end %>
+        <% if @skills_top.any? %>
+          <dt>달란트</dt><dd><%= @skills_top.size %>개</dd>
+        <% end %>
+      </dl>
+
+      <% if @member.bio.present? %>
+        <p class="cs-bio">"<%= truncate(@member.bio.to_s, length: 140) %>"</p>
+      <% end %>
+
+      <% if @skills_top.any? %>
+        <div class="cs-skills">
+          <% @skills_top.each do |ms| %>
+            <span class="cs-skill-tag"><%= ms.skill.canonical_name %></span>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div class="cs-contacts">
+        <% if @member.email.present? %>
+          <a href="mailto:<%= @member.email %>" class="cs-contact-btn">
+            <span class="label">이메일</span>
+            <span><%= @member.email %> →</span>
+          </a>
+        <% end %>
+        <% if @member.phone.present? %>
+          <a href="tel:<%= @member.phone %>" class="cs-contact-btn">
+            <span class="label">전화</span>
+            <span><%= @member.phone %> →</span>
+          </a>
+        <% end %>
+        <% if kakao_ch %>
+          <a href="<%= kakao_ch %>" target="_blank" rel="noopener" class="cs-contact-btn">
+            <span class="label">카카오톡</span>
+            <span>1:1 채널 →</span>
+          </a>
+        <% end %>
+      </div>
+
+      <a href="/<%= @member.slug %>" class="cs-full">전체 프로필 보기 →</a>
+    </section>
+
+    <!-- 우: 명함 SVG + 짧은 URL + 공유 -->
+    <aside class="cs-right">
+      <div class="cs-card-preview">
+        <img src="/card/<%= @member.slug %>.svg" alt="<%= @member.name %> 디지털 명함" loading="eager">
+      </div>
+
+      <div class="cs-share-row">
+        <div class="item">
+          <span class="lbl">짧은 주소</span>
+          <code><%= short_abs %></code>
+        </div>
+        <div class="item">
+          <span class="lbl">스캔 QR</span>
+          <img src="/qr/<%= @member.slug %>.svg" alt="QR" style="width: 48px; height: 48px;">
+        </div>
+      </div>
+
+      <div class="cs-share-btns">
+        <button type="button" class="cs-share-btn" data-action="click->card-share#copyShort">🔗 주소 복사</button>
+        <a class="cs-share-btn" href="/card/<%= @member.slug %>.svg" download="<%= @member.slug %>-card.svg">💾 명함 저장</a>
+        <button type="button" class="cs-share-btn" data-action="click->card-share#shareNative">공유 →</button>
+      </div>
+
+      <p data-card-share-target="flash"
+         style="margin-top: 4px; font-size: 11px; color: var(--impd-accent); opacity: 0; transition: opacity .2s; text-align: center; font-family: var(--impd-font-mono);"></p>
+    </aside>
+  </div>
+</main>

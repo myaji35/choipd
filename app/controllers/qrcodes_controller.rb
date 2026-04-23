@@ -30,7 +30,8 @@ class QrcodesController < ApplicationController
 
   # 회원 공개 페이지로 직행하는 짧은 URL 을 발급하고 절대 URL 반환.
   def short_link_for(member)
-    sl = ShortLink.resolve_or_create(target_path: "/#{member.slug}", member: member)
+    # QR 스캔 기본 타겟 = 요약 카드 뷰. 긴 페이지 스크롤 없이 즉각 명함부터.
+    sl = ShortLink.resolve_or_create(target_path: "/#{member.slug}/card", member: member)
     host = request.host_with_port.presence || "impd.townin.net"
     proto = request.protocol.presence || "http://"
     sl ? "#{proto}#{host}/s/#{sl.hash_code}" : "#{proto}#{host}/#{member.slug}"
