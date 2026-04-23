@@ -79,51 +79,57 @@
     .s5 { animation: showS5 var(--duration) linear forwards; }
     .s6 { animation: showS6 var(--duration) linear forwards; }
 
-    /* 각 씬 visibility on/off. %는 초 단위 기반 (30s 기준):
-       5s=16.667%, 10s=33.333%, 15s=50%, 22s=73.333%, 27s=90%, 30s=100% */
+    /* 각 씬 visibility on/off. %는 초 단위 기반 (30s 기준).
+       재분배 2026-04-23:
+         S1 0-3s  (0-10%)     이전 0-5s 였음. 플랫폼 칩 드리프트 단축.
+         S2 3-8s  (10-26.67%) 흩어진 내 일 그대로 5s.
+         S3 8-13s (26.67-43.33%) impd.me 타이핑 그대로 5s.
+         S4 13-20s (43.33-66.67%) 3D 플립 목업 그대로 7s.
+         S5 20-24s (66.67-80%) LIVE 지표 4s.
+         S6 24-30s (80-100%)  엔딩 CTA 6s (2배 확장). */
     @keyframes showS1 {
       0%       { opacity: 0; visibility: visible; }
-      1%       { opacity: 1; }
-      15%      { opacity: 1; }
-      16.667%  { opacity: 0; visibility: hidden; }
+      2%       { opacity: 1; }
+      8%       { opacity: 1; }
+      10%      { opacity: 0; visibility: hidden; }
       100%     { opacity: 0; visibility: hidden; }
     }
     @keyframes showS2 {
-      0%, 15%     { opacity: 0; visibility: hidden; }
-      16.666%     { opacity: 0; visibility: visible; }
-      17.5%       { opacity: 1; }
-      32%         { opacity: 1; }
-      33.333%     { opacity: 0; visibility: hidden; }
+      0%, 8%      { opacity: 0; visibility: hidden; }
+      10%         { opacity: 0; visibility: visible; }
+      11.5%       { opacity: 1; }
+      25%         { opacity: 1; }
+      26.667%     { opacity: 0; visibility: hidden; }
       100%        { opacity: 0; visibility: hidden; }
     }
     @keyframes showS3 {
-      0%, 32%     { opacity: 0; visibility: hidden; }
-      33.333%     { opacity: 0; visibility: visible; }
-      34.5%       { opacity: 1; }
-      48%         { opacity: 1; }
-      50%         { opacity: 0; visibility: hidden; }
+      0%, 25%     { opacity: 0; visibility: hidden; }
+      26.667%     { opacity: 0; visibility: visible; }
+      28%         { opacity: 1; }
+      41%         { opacity: 1; }
+      43.333%     { opacity: 0; visibility: hidden; }
       100%        { opacity: 0; visibility: hidden; }
     }
     @keyframes showS4 {
-      0%, 48%     { opacity: 0; visibility: hidden; }
-      50%         { opacity: 0; visibility: visible; }
-      51.5%       { opacity: 1; }
-      71%         { opacity: 1; }
-      73.333%     { opacity: 0; visibility: hidden; }
+      0%, 41%     { opacity: 0; visibility: hidden; }
+      43.333%     { opacity: 0; visibility: visible; }
+      45%         { opacity: 1; }
+      64%         { opacity: 1; }
+      66.667%     { opacity: 0; visibility: hidden; }
       100%        { opacity: 0; visibility: hidden; }
     }
     @keyframes showS5 {
-      0%, 71%     { opacity: 0; visibility: hidden; }
-      73.333%     { opacity: 0; visibility: visible; }
-      74.5%       { opacity: 1; }
-      88%         { opacity: 1; }
-      90%         { opacity: 0; visibility: hidden; }
+      0%, 64%     { opacity: 0; visibility: hidden; }
+      66.667%     { opacity: 0; visibility: visible; }
+      68%         { opacity: 1; }
+      78%         { opacity: 1; }
+      80%         { opacity: 0; visibility: hidden; }
       100%        { opacity: 0; visibility: hidden; }
     }
     @keyframes showS6 {
-      0%, 88%     { opacity: 0; visibility: hidden; }
-      90%         { opacity: 0; visibility: visible; }
-      91.5%       { opacity: 1; }
+      0%, 78%     { opacity: 0; visibility: hidden; }
+      80%         { opacity: 0; visibility: visible; }
+      82%         { opacity: 1; }
       100%        { opacity: 1; }
     }
 
@@ -422,7 +428,7 @@
       display: inline-block;
       max-width: 0;
       animation: typeSlug 1.4s steps(4, end) forwards;
-      animation-delay: calc(var(--duration) * 0.355);
+      animation-delay: calc(var(--duration) * 0.30); /* 9s ← S3 8-13s */
     }
     .url-caret {
       display: inline-block;
@@ -445,8 +451,8 @@
       animation: fadeUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
       opacity: 0;
     }
-    .s3 .h1 { animation-delay: calc(var(--duration) * 0.345); }
-    .s3 .subline { animation-delay: calc(var(--duration) * 0.40); }
+    .s3 .h1 { animation-delay: calc(var(--duration) * 0.29); } /* 8.7s */
+    .s3 .subline { animation-delay: calc(var(--duration) * 0.34); } /* 10.2s */
 
     /* ═══════════════════════════════════════════════
        씬 4 — 3D 플립 목업 카드
@@ -504,15 +510,15 @@
     }
     .mockup-1 {
       animation: flipIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-      animation-delay: calc(var(--duration) * 0.52);
+      animation-delay: calc(var(--duration) * 0.455); /* 13.65s ← S4 13-20s 시작 직후 */
     }
     .mockup-2 {
       animation: flipIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-      animation-delay: calc(var(--duration) * 0.56);
+      animation-delay: calc(var(--duration) * 0.49);  /* 14.7s */
     }
     .mockup-3 {
       animation: flipIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-      animation-delay: calc(var(--duration) * 0.60);
+      animation-delay: calc(var(--duration) * 0.525); /* 15.75s */
     }
     @keyframes flipIn {
       from { transform: rotateY(90deg) translateY(30px); opacity: 0; }
@@ -899,15 +905,16 @@
       transform: translateY(24px);
       animation: fadeUpDelay 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     }
-    .s5 .live-panel .eyebrow-live { animation-delay: calc(var(--duration) * 0.745); }
-    .s5 .live-panel .h2           { animation-delay: calc(var(--duration) * 0.755); }
-    .s5 .stacked .card:nth-child(1) { animation-delay: calc(var(--duration) * 0.745); }
-    .s5 .stacked .card:nth-child(2) { animation-delay: calc(var(--duration) * 0.76); }
-    .s5 .stacked .card:nth-child(3) { animation-delay: calc(var(--duration) * 0.775); }
-    .s5 .stream .metric:nth-child(1) { animation-delay: calc(var(--duration) * 0.78); }
-    .s5 .stream .metric:nth-child(2) { animation-delay: calc(var(--duration) * 0.795); }
-    .s5 .stream .metric:nth-child(3) { animation-delay: calc(var(--duration) * 0.81); }
-    .s5 .stream .metric:nth-child(4) { animation-delay: calc(var(--duration) * 0.825); }
+    /* 재분배 후 S5 20-24s → delay 당겨서 제 시간에 등장 */
+    .s5 .live-panel .eyebrow-live { animation-delay: calc(var(--duration) * 0.685); } /* 20.55s */
+    .s5 .live-panel .h2           { animation-delay: calc(var(--duration) * 0.695); } /* 20.85s */
+    .s5 .stacked .card:nth-child(1) { animation-delay: calc(var(--duration) * 0.685); }
+    .s5 .stacked .card:nth-child(2) { animation-delay: calc(var(--duration) * 0.705); }
+    .s5 .stacked .card:nth-child(3) { animation-delay: calc(var(--duration) * 0.72); } /* 21.6s */
+    .s5 .stream .metric:nth-child(1) { animation-delay: calc(var(--duration) * 0.70); } /* 21s */
+    .s5 .stream .metric:nth-child(2) { animation-delay: calc(var(--duration) * 0.715); }
+    .s5 .stream .metric:nth-child(3) { animation-delay: calc(var(--duration) * 0.73); }
+    .s5 .stream .metric:nth-child(4) { animation-delay: calc(var(--duration) * 0.745); }
 
     .s5 .stacked .card:nth-child(1) {
       animation-name: fadeUpDeck1;
@@ -959,7 +966,7 @@
       letter-spacing: -0.04em;
       color: var(--ink-paper);
       animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-      animation-delay: calc(var(--duration) * 0.905);
+      animation-delay: calc(var(--duration) * 0.82); /* 24.6s ← 재분배 후 S6 24-30s */
       opacity: 0;
     }
     .s6 .logo .accent { color: var(--hero); }
@@ -972,7 +979,7 @@
       letter-spacing: -0.02em;
       margin-top: 1.5rem;
       animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-      animation-delay: calc(var(--duration) * 0.925);
+      animation-delay: calc(var(--duration) * 0.84); /* 25.2s */
       opacity: 0;
     }
     .s6 .cta {
@@ -989,7 +996,7 @@
       letter-spacing: -0.005em;
       box-shadow: 0 0 40px rgba(0, 161, 224, 0.45), 0 20px 40px rgba(0, 161, 224, 0.2);
       animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, ctaGlow 2s ease-in-out infinite alternate;
-      animation-delay: calc(var(--duration) * 0.945), calc(var(--duration) * 0.96);
+      animation-delay: calc(var(--duration) * 0.88), calc(var(--duration) * 0.90); /* 26.4s, 27s */
       opacity: 0;
     }
     .s6 .cta .arrow {
@@ -1008,7 +1015,7 @@
       color: rgba(0, 0, 0, 0.45);
       margin-top: 3rem;
       animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-      animation-delay: calc(var(--duration) * 0.965);
+      animation-delay: calc(var(--duration) * 0.92); /* 27.6s */
       opacity: 0;
     }
 
@@ -1216,7 +1223,7 @@
         gap: 1vw;
         flex-wrap: wrap;
         max-width: 90vw;
-        animation: stripUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 28.4s both;
+        animation: stripUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 28s both; /* 재분배 후 S6 24-30s, 썸네일은 마지막 2s에 */
       }
       @keyframes stripUp {
         from { opacity: 0; transform: translateY(24px); }
@@ -1300,7 +1307,7 @@
     requestAnimationFrame(tick);
 
     // ─── S5 카운트업 ───────────────────────────────
-    const S5_START = 22_000; // ms
+    const S5_START = 20_000; // ms (재분배 후: S5가 20-24s)
     const S5_DUR = 1_800;
     const counters = document.querySelectorAll('[data-counter]');
     let counted = false;

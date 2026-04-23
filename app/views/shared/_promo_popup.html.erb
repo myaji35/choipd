@@ -30,11 +30,18 @@
         영상을 재생할 수 없습니다.
       </video>
 
-      <%# 소리 켜기 버튼 (muted autoplay 후 사용자 클릭으로 unmute) %>
-      <button type="button" id="promo-popup-unmute" class="promo-popup-unmute" aria-label="소리 켜기">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-        <span>소리 켜기</span>
-      </button>
+      <%# 소리 켜기 버튼 (muted autoplay 후 사용자 클릭으로 unmute).
+          "못 찾는 문제" 방지: 중앙 대형 버튼 + 펄스 애니메이션 + 화살표 힌트. %>
+      <div class="promo-popup-unmute-center" id="promo-popup-unmute-wrap">
+        <button type="button" id="promo-popup-unmute" class="promo-popup-unmute-big" aria-label="소리 켜기">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          <span class="label">소리 켜기</span>
+          <span class="hint">음악도 함께 들어보세요</span>
+        </button>
+      </div>
     </div>
 
     <div class="promo-popup-cta">
@@ -123,21 +130,46 @@
     object-fit: cover;
   }
 
-  .promo-popup-unmute {
-    position: absolute; bottom: 16px; right: 16px; z-index: 3;
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 14px;
+  /* 중앙 대형 "소리 켜기" 버튼 — autoplay muted 상태에서 눈에 띄게 노출.
+     버튼이 안 보여서 BGM 못 듣는 케이스 방지. */
+  .promo-popup-unmute-center {
+    position: absolute; inset: 0; z-index: 3;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  .promo-popup-unmute-center.hidden { display: none; }
+  .promo-popup-unmute-big {
+    pointer-events: auto;
+    display: inline-flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 18px 28px;
     font-family: "Inter", system-ui;
-    font-size: 12px; font-weight: 600;
     color: #0a1428;
     background: #00A1E0;
-    border: none; border-radius: 999px;
+    border: none; border-radius: 16px;
     cursor: pointer;
-    box-shadow: 0 0 24px rgba(34, 211, 238, 0.4);
+    box-shadow: 0 0 40px rgba(34, 211, 238, 0.6), 0 20px 60px rgba(0,0,0,0.3);
     transition: all .15s;
+    animation: unmutePulse 1.6s ease-in-out infinite;
   }
-  .promo-popup-unmute:hover { background: #22d3ee; transform: translateY(-1px); }
-  .promo-popup-unmute.hidden { display: none; }
+  .promo-popup-unmute-big:hover {
+    background: #22d3ee;
+    transform: translateY(-2px) scale(1.03);
+    animation: none;
+  }
+  .promo-popup-unmute-big svg { display: block; }
+  .promo-popup-unmute-big .label {
+    font-size: 16px; font-weight: 700; letter-spacing: -0.02em;
+    margin-top: 2px;
+  }
+  .promo-popup-unmute-big .hint {
+    font-size: 11px; font-weight: 500;
+    color: rgba(10, 20, 40, 0.65);
+    letter-spacing: 0.02em;
+  }
+  @keyframes unmutePulse {
+    0%, 100% { box-shadow: 0 0 40px rgba(34, 211, 238, 0.6), 0 20px 60px rgba(0,0,0,0.3); }
+    50%      { box-shadow: 0 0 70px rgba(34, 211, 238, 0.9), 0 20px 60px rgba(0,0,0,0.3); }
+  }
 
   .promo-popup-cta {
     padding: 18px 20px 22px;
@@ -187,6 +219,7 @@
     if (!overlay) return;
     const video = document.getElementById('promo-popup-video');
     const unmuteBtn = document.getElementById('promo-popup-unmute');
+    const unmuteWrap = document.getElementById('promo-popup-unmute-wrap');
     const closeBtn = overlay.querySelector('.promo-popup-close');
     const backdrop = overlay.querySelector('.promo-popup-backdrop');
     const STORAGE_KEY = 'impd_promo_seen';
@@ -206,7 +239,7 @@
       overlay.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('promo-open');
       try { video.pause(); video.currentTime = 0; video.muted = true; } catch (_) {}
-      if (unmuteBtn) unmuteBtn.classList.remove('hidden');
+      if (unmuteWrap) unmuteWrap.classList.remove('hidden');
     }
 
     // 트리거: data-promo-popup 속성 가진 모든 링크/버튼
@@ -228,8 +261,11 @@
     if (unmuteBtn && video) {
       unmuteBtn.addEventListener('click', () => {
         video.muted = false;
-        video.volume = 0.9;
-        unmuteBtn.classList.add('hidden');
+        video.volume = 1.0; // 최대 볼륨 — mp4 자체 BGM 볼륨이 0.55 수준이라 브라우저에선 작게 들림
+        // play() 재호출해서 확실히 재생 상태 유지
+        const p = video.play();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+        if (unmuteWrap) unmuteWrap.classList.add('hidden');
       });
     }
 
