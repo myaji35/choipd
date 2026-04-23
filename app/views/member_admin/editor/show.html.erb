@@ -1,23 +1,42 @@
 <% content_for :title, "에디터 — #{@member.name}" %>
 
 <div style="max-width: 1200px; margin: 0 auto; padding: 40px;">
-  <!-- 4단계 progress rail -->
+  <!-- 4단계 progress rail — 모두 클릭 가능. 각 단계별 완료 상태 표시. -->
+  <%
+    # 각 Step 완료 기준 (build_checklist 의 key 매핑)
+    step1_done = @photos_count.to_i > 0 || @doc_count.to_i > 0
+    step2_done = @member.bio.to_s.length >= 20 && @member.profession.present? && @member.email.present?
+    step3_done = @member.theme_preset.present?
+    step4_done = @member.published_at.present?
+
+    steps = [
+      [1, "업로드",     "자료 올리기",   step1_done],
+      [2, "정보 확인",  "AI 추출 검토",  step2_done],
+      [3, "스타일 선택", "테마/레이아웃", step3_done],
+      [4, "발행",      "공개",         step4_done],
+    ]
+  %>
   <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--impd-ink); margin-bottom: 48px;">
-    <% steps = [
-      [1, "업로드", "자료 올리기"],
-      [2, "정보 확인", "AI 추출 검토"],
-      [3, "스타일 선택", "테마/레이아웃"],
-      [4, "발행", "공개"]
-    ] %>
-    <% steps.each_with_index do |(n, label, desc), i| %>
-      <% active = @step >= n %>
+    <% steps.each_with_index do |(n, label, desc, done), i| %>
       <% current = @step == n %>
-      <div style="padding: 16px 20px; <%= 'border-left: 1px solid var(--impd-rule);' if i > 0 %> position: relative;">
-        <% if current %><div style="position: absolute; top: -2px; left: 0; right: 0; height: 3px; background: var(--impd-accent);"></div><% end %>
-        <div class="impd-label" style="color: <%= active ? 'var(--impd-accent)' : 'var(--impd-soft-muted)' %>;">§0<%= n %></div>
-        <p style="font-family: var(--impd-font-display); font-weight: 800; font-size: 20px; margin-top: 6px; color: <%= active ? 'var(--impd-ink)' : 'var(--impd-soft-muted)' %>;"><%= label %></p>
+      <a href="?step=<%= n %>"
+         style="display: block; padding: 16px 20px; text-decoration: none; <%= 'border-left: 1px solid var(--impd-rule);' if i > 0 %> position: relative; background: <%= current ? 'var(--impd-card)' : 'transparent' %>; transition: background .15s;"
+         onmouseover="if(!<%= current %>)this.style.background='var(--impd-card)';"
+         onmouseout="if(!<%= current %>)this.style.background='transparent';">
+        <% if current %>
+          <div style="position: absolute; top: -2px; left: 0; right: 0; height: 3px; background: var(--impd-accent);"></div>
+        <% end %>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <div class="impd-label" style="color: <%= current ? 'var(--impd-accent)' : (done ? 'var(--impd-ink)' : 'var(--impd-muted)') %>;">§0<%= n %></div>
+          <% if done %>
+            <span style="width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; background: #16a34a; color: #fff; font-size: 11px; font-weight: 700; border-radius: 50%;">✓</span>
+          <% elsif current %>
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--impd-accent);"></span>
+          <% end %>
+        </div>
+        <p style="font-family: var(--impd-font-display); font-weight: 800; font-size: 20px; margin-top: 6px; color: var(--impd-ink);"><%= label %></p>
         <p style="font-size: 12px; color: var(--impd-muted); margin-top: 4px;"><%= desc %></p>
-      </div>
+      </a>
     <% end %>
   </div>
 
