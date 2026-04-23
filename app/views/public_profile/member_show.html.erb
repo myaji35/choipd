@@ -23,8 +23,9 @@
 
 <style>
   .impd-wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
-  .impd-section { padding: 64px 0; }
-  @media (max-width: 768px) { .impd-wrap { padding: 0 20px; } .impd-section { padding: 40px 0; } }
+  .impd-section { padding: 40px 0; }  /* 64 → 40: 섹션간 세로 여백 축소 */
+  .impd-section-header { margin-bottom: 20px; }
+  @media (max-width: 768px) { .impd-wrap { padding: 0 20px; } .impd-section { padding: 28px 0; } }
 </style>
 
 <!-- ── Masthead (3컬럼) ───────────────────────── -->
@@ -293,11 +294,21 @@
       작업 현장, 수강생의 환한 표정, 손끝의 순간들. 한 장의 사진이 한 줄의 카피보다 많은 것을 전합니다.
     </p>
 
-    <%# 에디토리얼 마소나리: 첫 장은 크게, 나머지는 정방형 그리드 %>
-    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;">
+    <%# 에디토리얼 마소나리.
+        사진 1장 = 4/3 풀폭, 2장 = 각 1/1 2열, 3장+ = 마소나리 (첫 크게 + 나머지 정방형) %>
+    <% photo_count = (@moments.select { |p| p.image.attached? }.size rescue @moments.size) %>
+    <% cols = photo_count == 1 ? "1fr" : (photo_count == 2 ? "1fr 1fr" : "repeat(6, 1fr)") %>
+    <div style="display: grid; grid-template-columns: <%= cols %>; gap: 8px;">
       <% @moments.each_with_index do |photo, i| %>
-        <% span = (i == 0 ? 3 : (i == 1 || i == 2 ? 2 : 1)) %>
-        <% aspect = (i == 0 ? "4/3" : "1/1") %>
+        <% if photo_count == 1
+             span = 1; aspect = "16/9"
+           elsif photo_count == 2
+             span = 1; aspect = "4/3"
+           else
+             span = (i == 0 ? 3 : (i == 1 || i == 2 ? 2 : 1))
+             aspect = (i == 0 ? "4/3" : "1/1")
+           end
+        %>
         <% next unless photo.image.attached? %>
         <a href="/p/<%= @member.slug %>/<%= photo.id %>"
            title="이 사진 자세히 보기 · 공유"
@@ -886,21 +897,51 @@
   </div>
 </section>
 
-<!-- ── Contact CTA ───────────────────────── -->
+<!-- ── Contact CTA — 3열 그리드, 빈 공간 최소화 ──────── -->
 <section class="impd-wrap impd-section" id="contact">
-  <div style="background: var(--impd-card); border: 1px solid var(--impd-ink); padding: 60px 40px; text-align: center;">
-    <p class="impd-label">§E · 함께 일하실 분</p>
-    <h2 class="impd-display" style="font-size: clamp(36px, 5vw, 64px); margin-top: 16px;">
-      <%= @member.name %>님께<br>
-      <span style="color: var(--impd-accent); font-style: italic;">직접 문의</span>하세요.
-    </h2>
-    <% if @member.email.present? %>
-      <a href="mailto:<%= @member.email %>" class="impd-btn impd-btn-primary" style="margin-top: 32px; height: 54px; padding: 0 28px; font-size: 16px;">이메일 보내기 →</a>
-    <% end %>
-    <% if @member.phone.present? %>
-      <a href="tel:<%= @member.phone %>" class="impd-btn impd-btn-secondary" style="margin-top: 32px; margin-left: 12px; height: 54px; padding: 0 28px; font-size: 16px;">전화 <%= @member.phone %></a>
-    <% end %>
+  <%
+    social_e = @member.social
+    kakao_ch_e = social_e["kakao_channel"].presence
+    contact_options = []
+    contact_options << { label: "이메일", value: @member.email,              href: "mailto:#{@member.email}" }       if @member.email.present?
+    contact_options << { label: "전화",   value: @member.phone,              href: "tel:#{@member.phone}" }          if @member.phone.present?
+    contact_options << { label: "카톡 채널", value: "카톡 1:1 문의",          href: kakao_ch_e }                       if kakao_ch_e
+  %>
+  <div style="background: var(--impd-card); border: 1px solid var(--impd-ink); padding: 36px 32px;">
+    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 28px; align-items: center;">
+      <div>
+        <p class="impd-label">§E · 함께 일하실 분</p>
+        <h2 class="impd-display" style="font-size: clamp(28px, 3.8vw, 48px); margin-top: 12px; line-height: 1.1;">
+          <%= @member.name %>님께<br>
+          <span style="color: var(--impd-accent); font-style: italic;">직접 문의</span>하세요.
+        </h2>
+        <p style="margin-top: 14px; font-size: 13px; color: var(--impd-ink2); line-height: 1.55; max-width: 32ch;">
+          어떤 채널로 연락하셔도 됩니다. 보통 24시간 안에 답장드립니다.
+        </p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <% if contact_options.any? %>
+          <% contact_options.each_with_index do |o, i| %>
+            <a href="<%= o[:href] %>"
+               class="impd-btn <%= i == 0 ? 'impd-btn-primary' : 'impd-btn-secondary' %>"
+               style="width: 100%; justify-content: space-between; height: 46px; padding: 0 18px; font-size: 14px;">
+              <span style="font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.3px; opacity: 0.65;"><%= o[:label] %></span>
+              <span style="font-weight: 600;"><%= o[:value] %> →</span>
+            </a>
+          <% end %>
+        <% else %>
+          <p style="font-size: 12px; color: var(--impd-muted);">연락처 준비 중</p>
+        <% end %>
+      </div>
+    </div>
   </div>
+
+  <style>
+    @media (max-width: 768px) {
+      section#contact > div > div { grid-template-columns: 1fr !important; }
+    }
+  </style>
 </section>
 
 <!-- Footer -->
