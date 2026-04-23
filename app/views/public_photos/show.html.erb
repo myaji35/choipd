@@ -1,0 +1,166 @@
+<% content_for :title, (@photo.caption.presence || "#{@member.name} 사진") %>
+<% content_for :description, (@photo.caption.presence || "imPD · #{@member.name} · #{@photo.category.to_s.upcase}").first(160) %>
+
+<%# OG/Twitter — 공유 시 사진 자체가 썸네일 %>
+<% content_for :head do %>
+  <%
+    # 사진 원본을 OG 이미지로 직접 사용 (1200x630 권장이지만 원본 그대로도 대부분 채널에서 크롭)
+    photo_url = url_for(@photo.image)
+    photo_abs = photo_url.start_with?("http") ? photo_url : "#{request.protocol}#{request.host_with_port}#{photo_url}"
+    page_url  = "#{request.protocol}#{request.host_with_port}/p/#{@member.slug}/#{@photo.id}"
+  %>
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="<%= @photo.caption.presence || "#{@member.name} · #{@photo.category.to_s.upcase}" %>">
+  <meta property="og:description" content="<%= "imPD · #{@member.name}" %>">
+  <meta property="og:url" content="<%= page_url %>">
+  <meta property="og:image" content="<%= photo_abs %>">
+  <meta property="article:author" content="<%= @member.name %>">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<%= @photo.caption.presence || @member.name %>">
+  <meta name="twitter:image" content="<%= photo_abs %>">
+<% end %>
+
+<style>
+  .photo-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px 64px; }
+  .photo-meta-top {
+    display: flex; align-items: center; gap: 14px;
+    font-family: var(--impd-font-mono);
+    font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--impd-muted);
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--impd-rule);
+    margin-bottom: 20px;
+  }
+  .photo-meta-top a { color: var(--impd-ink); text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 1px; }
+  .photo-meta-top .spacer { flex: 1; }
+
+  .photo-frame {
+    position: relative;
+    background: var(--impd-ink);
+    padding: 24px;
+    border: 1px solid var(--impd-ink);
+    box-shadow: 0 40px 80px rgba(15,13,11,0.15);
+  }
+  .photo-frame img,
+  .photo-frame video { display: block; width: 100%; max-height: 75vh; object-fit: contain; background: #000; }
+
+  .photo-caption-row {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: end;
+  }
+  .photo-caption {
+    font-family: var(--impd-font-serif);
+    font-style: italic;
+    font-size: clamp(22px, 3vw, 32px);
+    line-height: 1.35;
+    color: var(--impd-ink);
+    max-width: 56ch;
+  }
+  .photo-caption-byline {
+    margin-top: 12px;
+    font-family: var(--impd-font-mono);
+    font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--impd-muted);
+  }
+  .photo-caption-byline a { color: var(--impd-ink); text-decoration: none; border-bottom: 1px solid currentColor; }
+
+  .photo-share-box {
+    min-width: 240px;
+    background: var(--impd-card);
+    border: 1px solid var(--impd-ink);
+    padding: 18px 16px;
+  }
+  .photo-share-box .label { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-muted); margin-bottom: 8px; }
+  .photo-share-box code { font-family: var(--impd-font-mono); font-size: 12px; word-break: break-all; display: block; background: var(--impd-paper); border: 1px solid var(--impd-rule); padding: 8px 10px; }
+  .photo-share-box .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
+  .photo-share-box button,
+  .photo-share-box a {
+    height: 34px; display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-family: var(--impd-font-mono); letter-spacing: 1px;
+    border: 1px solid var(--impd-ink); background: transparent; color: var(--impd-ink);
+    cursor: pointer; text-decoration: none; transition: all .15s;
+  }
+  .photo-share-box button:hover,
+  .photo-share-box a:hover { background: var(--impd-ink); color: var(--impd-paper); }
+
+  .photo-nav {
+    display: flex; justify-content: space-between; gap: 12px;
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--impd-rule);
+    font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
+  }
+  .photo-nav a { color: var(--impd-muted); text-decoration: none; padding: 10px 14px; border: 1px solid var(--impd-rule); }
+  .photo-nav a:hover { background: var(--impd-ink); color: var(--impd-paper); border-color: var(--impd-ink); }
+  .photo-nav .placeholder { visibility: hidden; }
+
+  @media (max-width: 768px) {
+    .photo-caption-row { grid-template-columns: 1fr; }
+  }
+</style>
+
+<main class="photo-wrap" data-controller="card-share"
+      data-card-share-short-url-value="<%= "#{request.protocol}#{request.host_with_port}/s/#{@short_link&.hash_code}" %>"
+      data-card-share-profile-url-value="<%= "#{request.protocol}#{request.host_with_port}/p/#{@member.slug}/#{@photo.id}" %>">
+
+  <!-- 상단 메타 -->
+  <div class="photo-meta-top">
+    <span><%= @photo.category.to_s.upcase.presence || "MOMENT" %></span>
+    <% if @photo.uploaded_at %><span>· <%= @photo.uploaded_at.strftime("%Y.%m.%d") %></span><% end %>
+    <span>· <%= @photo_position %> / <%= @photos_total %></span>
+    <span class="spacer"></span>
+    <%= link_to "← #{@member.name} 페이지로", "/#{@member.slug}" %>
+  </div>
+
+  <!-- 프레임 + 사진 -->
+  <figure class="photo-frame" style="margin: 0;">
+    <% if @photo.video? %>
+      <video src="<%= @photo.display_url %>" controls playsinline preload="metadata"
+             <% if @photo.thumbnail_url.present? %>poster="<%= @photo.thumbnail_url %>"<% end %>></video>
+    <% else %>
+      <img src="<%= @photo.display_url %>" alt="<%= @photo.caption || @member.name %>" loading="eager">
+    <% end %>
+  </figure>
+
+  <!-- 캡션 + 공유 -->
+  <div class="photo-caption-row">
+    <div>
+      <% if @photo.caption.present? %>
+        <p class="photo-caption">"<%= @photo.caption %>"</p>
+      <% else %>
+        <p class="photo-caption">— <%= @member.name %>의 <%= @photo.category || "작품" %></p>
+      <% end %>
+      <p class="photo-caption-byline">
+        <%= link_to @member.name, "/#{@member.slug}" %>
+        <% if @member.profession.present? %> · <%= @member.profession %><% end %>
+        <% if @member.region.present? %> · <%= @member.region %><% end %>
+      </p>
+    </div>
+
+    <div class="photo-share-box">
+      <div class="label">이 사진 공유 링크</div>
+      <code><%= "#{request.host_with_port}/s/#{@short_link&.hash_code}" %></code>
+      <div class="actions">
+        <button type="button" data-action="click->card-share#copyShort">🔗 복사</button>
+        <button type="button" data-action="click->card-share#shareNative">공유 →</button>
+      </div>
+      <p data-card-share-target="flash" style="margin-top: 8px; font-size: 10px; color: var(--impd-accent); opacity: 0; transition: opacity .2s; font-family: var(--impd-font-mono);"></p>
+    </div>
+  </div>
+
+  <!-- 이전/다음 네비 -->
+  <nav class="photo-nav">
+    <% if @prev_photo %>
+      <%= link_to "← 이전 사진", "/p/#{@member.slug}/#{@prev_photo.id}" %>
+    <% else %>
+      <span class="placeholder"></span>
+    <% end %>
+    <% if @next_photo %>
+      <%= link_to "다음 사진 →", "/p/#{@member.slug}/#{@next_photo.id}" %>
+    <% else %>
+      <span class="placeholder"></span>
+    <% end %>
+  </nav>
+
+</main>

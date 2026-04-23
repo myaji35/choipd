@@ -39,6 +39,10 @@ Rails.application.routes.draw do
   # 회원별 카톡/SNS 공유용 OG 이미지 (SVG 1200x630)
   get "/card/:slug.svg", to: "business_cards#show", as: :member_card,
       constraints: { slug: /[a-z0-9][a-z0-9\-]+/, format: "svg" }
+  # 사진 1장 전용 에디토리얼 공개 페이지 (SNS 공유 시 이 URL 만 붙여넣어도 OG 자동)
+  # /p/:slug/:photo_id → MemberPhoto 에디토리얼 뷰
+  get "/p/:slug/:photo_id", to: "public_photos#show", as: :public_photo,
+      constraints: { slug: /[a-z0-9][a-z0-9\-]+/, photo_id: /\d+/ }
 
   scope module: :chopd do
     get "/education",        to: "education#index",  as: :education
