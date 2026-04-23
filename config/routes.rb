@@ -30,6 +30,16 @@ Rails.application.routes.draw do
   get "/promo",       to: "promo#show",  as: :promo
   get "/promo/watch", to: "promo#watch", as: :promo_watch
 
+  # ── 짧은 URL (/s/:hash_code → 내부 경로 리다이렉트) + QR + OG 이미지 ─────
+  get "/s/:hash_code", to: "short_links#show", as: :short_link,
+      constraints: { hash_code: /[a-zA-Z0-9]{4,12}/ }
+  # 회원별 QR (SVG) — 공개. e-name.kr 의 quickchart 방식 대체, 서버 자체 생성.
+  get "/qr/:slug.svg", to: "qrcodes#show", as: :member_qr,
+      constraints: { slug: /[a-z0-9][a-z0-9\-]+/, format: "svg" }
+  # 회원별 카톡/SNS 공유용 OG 이미지 (SVG 1200x630)
+  get "/card/:slug.svg", to: "business_cards#show", as: :member_card,
+      constraints: { slug: /[a-z0-9][a-z0-9\-]+/, format: "svg" }
+
   scope module: :chopd do
     get "/education",        to: "education#index",  as: :education
     get "/media",            to: "media#index",      as: :media

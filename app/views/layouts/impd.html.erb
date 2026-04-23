@@ -66,6 +66,8 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= javascript_importmap_tags %>
+    <%# 공개 프로필/명함 등에서 OG 메타 주입 가능 %>
+    <%= yield(:head) if content_for?(:head) %>
   </head>
   <body>
     <!-- imPD TopNav -->

@@ -1,6 +1,26 @@
 <% content_for :title, "#{@member.name} | imPD" %>
 <% content_for :description, @member.bio.to_s.first(160) %>
 
+<%# OG/Twitter 카드 — 카톡/페북/슬랙 공유 시 디지털 명함 이미지 노출. %>
+<% content_for :head do %>
+  <%
+    card_url  = "#{request.protocol}#{request.host_with_port}/card/#{@member.slug}.svg"
+    share_url = "#{request.protocol}#{request.host_with_port}/#{@member.slug}"
+  %>
+  <meta property="og:type" content="profile">
+  <meta property="og:title" content="<%= @member.name %> — imPD">
+  <meta property="og:description" content="<%= @member.bio.to_s.first(160).presence || '흩어진 내 일, 하나의 주소로.' %>">
+  <meta property="og:url" content="<%= share_url %>">
+  <meta property="og:image" content="<%= card_url %>">
+  <meta property="og:image:type" content="image/svg+xml">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<%= @member.name %> — imPD">
+  <meta name="twitter:description" content="<%= @member.bio.to_s.first(160).presence || '흩어진 내 일, 하나의 주소로.' %>">
+  <meta name="twitter:image" content="<%= card_url %>">
+<% end %>
+
 <style>
   .impd-wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
   .impd-section { padding: 64px 0; }
@@ -87,7 +107,84 @@
   </style>
 </section>
 
-<!-- ── §B Gallery (포트폴리오 + 일상 사진 자동 보강) ───────── -->
+<!-- ── §A-Card 디지털 명함 ────────────────────────────
+     카톡/SNS 공유 시 이 섹션의 SVG 명함이 OG 이미지로 노출되고,
+     본인이 "명함 저장" / QR 복사 / 짧은 링크 복사 가능.
+     e-name.kr의 '모바일 명함' 개념을 impd 에디토리얼 톤으로 재해석. -->
+<%
+  card_svg_url  = "/card/#{@member.slug}.svg"
+  qr_svg_url    = "/qr/#{@member.slug}.svg"
+  short_link    = ShortLink.resolve_or_create(target_path: "/#{@member.slug}", member: @member)
+  short_full    = "#{request.host_with_port}/s/#{short_link&.hash_code}"
+  profile_full  = "#{request.protocol}#{request.host_with_port}/#{@member.slug}"
+%>
+<section class="impd-wrap impd-section" id="card" style="padding-top: 24px;">
+  <div class="impd-section-header">
+    <span class="impd-label">§A-CARD</span>
+    <span class="impd-display" style="font-size: 28px; flex: 1;">디지털 명함</span>
+    <span class="impd-label-muted">공유·저장·QR</span>
+  </div>
+
+  <div class="impd-card-grid">
+    <!-- 왼쪽: 실제 SVG 명함 미리보기 (OG 이미지와 동일) -->
+    <div class="impd-card-preview">
+      <img src="<%= card_svg_url %>" alt="<%= @member.name %> 디지털 명함"
+           style="width: 100%; height: auto; display: block; border: 1px solid var(--impd-ink); background: var(--impd-paper);">
+    </div>
+
+    <!-- 오른쪽: 공유 액션 -->
+    <aside class="impd-card-actions" data-controller="card-share"
+           data-card-share-short-url-value="<%= "#{request.protocol}#{short_full}" %>"
+           data-card-share-profile-url-value="<%= profile_full %>">
+      <div class="impd-label-muted" style="margin-bottom: 12px;">짧은 주소</div>
+      <div class="impd-shorturl-box">
+        <code style="font-family: var(--impd-font-mono); font-size: 13px; letter-spacing: 0.3px; word-break: break-all;"><%= short_full %></code>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px;">
+        <button type="button" data-action="click->card-share#copyShort"
+                class="impd-btn impd-btn-secondary" style="height: 40px; font-size: 12px; justify-content: center;">
+          🔗 짧은 주소 복사
+        </button>
+        <a href="<%= card_svg_url %>" download="<%= @member.slug %>-card.svg"
+           class="impd-btn impd-btn-secondary" style="height: 40px; font-size: 12px; justify-content: center;">
+          💾 명함 저장
+        </a>
+        <a href="<%= qr_svg_url %>" download="<%= @member.slug %>-qr.svg"
+           class="impd-btn impd-btn-secondary" style="height: 40px; font-size: 12px; justify-content: center;">
+          ▣ QR 저장
+        </a>
+        <button type="button" data-action="click->card-share#shareNative"
+                class="impd-btn impd-btn-primary" style="height: 40px; font-size: 12px; justify-content: center;">
+          공유하기 →
+        </button>
+      </div>
+
+      <p style="margin-top: 14px; font-size: 11px; color: var(--impd-muted); line-height: 1.6; font-family: var(--impd-font-mono);">
+        카톡·SNS에 짧은 주소를 붙여넣으면 위 명함 이미지가 자동으로 미리보기에 뜹니다.
+      </p>
+
+      <div data-card-share-target="flash"
+           style="margin-top: 10px; font-size: 12px; color: var(--impd-accent); opacity: 0; transition: opacity .2s;">
+      </div>
+    </aside>
+  </div>
+
+  <style>
+    .impd-card-grid {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+    .impd-shorturl-box {
+      background: var(--impd-card); border: 1px solid var(--impd-ink); padding: 12px 14px;
+    }
+    @media (max-width: 768px) {
+      .impd-card-grid { grid-template-columns: 1fr; gap: 20px; }
+    }
+  </style>
+</section>
 <%
   # 갤러리 우선순위:
   #   1) 업로드된 사진·영상 (실제 데이터)

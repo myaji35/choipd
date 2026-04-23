@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_22_224956) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_23_060700) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -904,6 +904,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_224956) do
     t.index ["tenant_id", "key"], name: "idx_settings_tenant_key", unique: true
   end
 
+  create_table "short_links", force: :cascade do |t|
+    t.integer "click_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.string "hash_code", limit: 12, null: false
+    t.datetime "last_clicked_at"
+    t.integer "member_id"
+    t.string "target_path", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hash_code"], name: "index_short_links_on_hash_code", unique: true
+    t.index ["member_id"], name: "index_short_links_on_member_id"
+  end
+
   create_table "skills", force: :cascade do |t|
     t.text "aliases", default: "[]", null: false
     t.string "axis"
@@ -1086,6 +1098,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_224956) do
   add_foreign_key "member_skills", "members", on_delete: :cascade
   add_foreign_key "member_skills", "skills", on_delete: :cascade
   add_foreign_key "payments", "distributors"
+  add_foreign_key "short_links", "members"
   add_foreign_key "sns_post_histories", "sns_scheduled_posts"
   add_foreign_key "webhook_logs", "webhooks", on_delete: :cascade
   add_foreign_key "workflow_executions", "workflows", on_delete: :cascade

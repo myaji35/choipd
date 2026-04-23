@@ -79,3 +79,7 @@ end
 gem "omniauth", "~> 2.1"
 gem "omniauth-google-oauth2", "~> 1.1"
 gem "omniauth-rails_csrf_protection", "~> 1.0"
+
+# QR 코드 생성 — 디지털 명함·짧은 URL·공유 이미지에 사용.
+# rqrcode: 순수 Ruby, 외부 바이너리 0. SVG 출력으로 ImageMagick 의존 없음.
+gem "rqrcode", "~> 2.2"
