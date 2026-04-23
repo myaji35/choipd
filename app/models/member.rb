@@ -76,9 +76,21 @@ class Member < ApplicationRecord
     towningraph_user_id.present?
   end
 
+  # Townin role(영문 코드) → 공개 페이지용 한국어 라벨.
+  # brand-dna anti-pattern: "영어 first 단어 금지" 준수.
+  TOWNIN_ROLE_LABELS = {
+    "partner"           => "파트너",
+    "merchant"          => "점주",
+    "fp"                => "금융 설계사",
+    "citizen_reporter"  => "시민 기자",
+    "citizen_journalist"=> "시민 기자",
+    "user"              => "회원",
+  }.freeze
+
   def partner_display_role
     return nil unless partner_active?
-    townin_role.presence || "파트너"
+    raw = townin_role.to_s.downcase.presence
+    TOWNIN_ROLE_LABELS[raw] || raw&.humanize.presence || "파트너"
   end
 
   def promote_to_partner!(notes: nil)

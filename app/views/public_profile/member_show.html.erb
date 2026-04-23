@@ -82,7 +82,7 @@
     <div>
       <% if @member.partner_active? %>
         <%# Townin 파트너 배지 — 히어로 상단 %>
-        <a href="#partner" style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--impd-accent-2); color: #fff; font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 14px; text-decoration: none;">
+        <a href="#partner" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--impd-accent-2); color: #fff; font-family: var(--impd-font-sans); font-weight: 600; font-size: 12px; letter-spacing: -0.2px; margin-bottom: 14px; text-decoration: none;">
           ⭐ Townin <%= @member.partner_display_role || "파트너" %>
         </a>
       <% end %>
@@ -364,7 +364,7 @@
               LIVE · 오늘도 활동 중
             </span>
           <% else %>
-            <span style="font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-accent-2); background: rgba(255,90,31,0.1); padding: 4px 10px; border-radius: 3px;">⭐ 검증된 파트너</span>
+            <span style="font-family: var(--impd-font-sans); font-weight: 600; font-size: 12px; letter-spacing: -0.1px; color: var(--impd-accent-2); background: rgba(255,90,31,0.1); padding: 4px 10px; border-radius: 3px;">⭐ 검증된 파트너</span>
           <% end %>
         </span>
         <% if tenure_months > 0 %>
@@ -386,7 +386,11 @@
         <% else %>
           <strong><%= @member.name %></strong>님은 Townin에서
           <strong>검증된 <%= @member.partner_display_role || "파트너" %></strong>로 활동하고 있습니다.
-          지역 커뮤니티에서 쌓은 신뢰가 이 페이지와 연결되어 있습니다.
+          <% if @member.partner_promoted_at %>
+            <%= @member.partner_promoted_at.strftime("%Y년 %-m월") %>부터 지역 비즈니스를 연결해 왔습니다.
+          <% else %>
+            지역 비즈니스를 이웃에게 연결하며, 정책·캠페인·광고 기획을 돕고 있습니다.
+          <% end %>
         <% end %>
       </p>
 
@@ -489,13 +493,56 @@
           </div>
         <% end %>
       <% else %>
-        <!-- 스냅샷 없음: 활동 이력이 없어도 "검증" 자체는 유지 -->
-        <div style="background: var(--impd-paper); border: 1px dashed var(--impd-rule); padding: 32px 24px; text-align: center;">
-          <p style="font-family: var(--impd-font-serif); font-style: italic; font-size: 16px; color: var(--impd-ink2); line-height: 1.6; margin: 0;">
-            Townin에서 검증된 <%= @member.partner_display_role || "파트너" %>입니다.
-            <% if @member.partner_promoted_at %>
-              <br><%= @member.partner_promoted_at.strftime("%Y년 %m월") %>부터 지역 커뮤니티에서 활동하고 있습니다.
+        <%# 스냅샷 없음: 실수치 대신 "파트너가 하는 일"을 카드 4장으로 소개
+            → 빈 박스 대신 지역 비즈니스에서 파트너 역할을 구체화한 풍성한 섹션. %>
+        <%
+          role_kit = case @member.townin_role.to_s.downcase
+          when "merchant"
+            [
+              { k: "매장 관리",  v: "오늘의 영업·이벤트·쿠폰을 Townin 에서 한 번에 운영" },
+              { k: "이웃 연결",  v: "반경 내 이웃에게 자연스러운 광고 노출" },
+              { k: "실시간 알림", v: "예약·문의·주문 알림을 앱으로 즉시 수신" },
+              { k: "전단·콘텐츠", v: "사진 한 장이면 AI 가 전단·배너까지 생성" },
+            ]
+          when "fp", "financial_planner"
+            [
+              { k: "설계 상담",  v: "고객 상황별 맞춤 재무·보장 제안" },
+              { k: "구독 리워드", v: "성과 기반 수수료 + 지속 성장 포인트" },
+              { k: "네트워크",   v: "지역 자영업자·주민과의 정기 접점" },
+              { k: "데이터",     v: "매출·응답·전환 지표 실시간 대시보드" },
+            ]
+          when "citizen_reporter", "citizen_journalist"
+            [
+              { k: "동네 취재",  v: "이웃에게 필요한 소식을 현장에서" },
+              { k: "콘텐츠 게시", v: "사진·영상·글을 Townin 피드에 직행" },
+              { k: "리워드",     v: "좋은 기사는 포인트와 신뢰로 되돌아옴" },
+              { k: "공공 이슈",  v: "지역 정책·안전·생활 제안" },
+            ]
+          else # partner 기본
+            [
+              { k: "사장님 영입", v: "지역 가게와 파트너 관계를 맺고 온라인화 지원" },
+              { k: "광고 제안",   v: "이웃에게 자연스럽게 닿는 제안 설계" },
+              { k: "수익 공유",   v: "성과 기반 지속 수수료 + 파트너 리워드" },
+              { k: "지역 활성",   v: "캠페인·행사·공공 프로젝트 연결" },
+            ]
+          end
+        %>
+        <div style="background: var(--impd-paper); border: 1px solid var(--impd-ink); padding: 24px;">
+          <p style="font-family: var(--impd-font-serif); font-style: italic; font-size: 15px; color: var(--impd-ink2); line-height: 1.55; margin: 0 0 16px;">
+            Townin <strong><%= @member.partner_display_role || "파트너" %></strong>는 이런 일을 합니다.
+            <%= @member.name %>님도 같은 방식으로 지역과 연결되어 있습니다.
+          </p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+            <% role_kit.each_with_index do |item, i| %>
+              <div style="background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 16px 14px;">
+                <div class="impd-label-muted" style="margin-bottom: 6px;">0<%= i + 1 %></div>
+                <div class="impd-display" style="font-size: 16px; letter-spacing: -0.2px;"><%= item[:k] %></div>
+                <p style="margin-top: 6px; font-size: 12px; color: var(--impd-ink2); line-height: 1.5;"><%= item[:v] %></p>
+              </div>
             <% end %>
+          </div>
+          <p style="margin-top: 12px; font-size: 11px; color: var(--impd-muted); font-family: var(--impd-font-mono); text-align: right;">
+            실 매출·고객 수치는 Townin 연동 후 이 자리에 자동 표시됩니다
           </p>
         </div>
       <% end %>
@@ -506,7 +553,7 @@
           <% if @member.towningraph_user_id.present? %>
             <a href="https://townin.net/partners/<%= @member.towningraph_user_id %>"
                target="_blank" rel="noopener"
-               style="display: inline-flex; align-items: center; gap: 6px; font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-accent-2); text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 2px;">
+               style="display: inline-flex; align-items: center; gap: 6px; font-family: var(--impd-font-sans); font-size: 12px; letter-spacing: -0.1px; color: var(--impd-accent-2); text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 2px;">
               Townin 공개 프로필 보기 →
             </a>
           <% end %>
@@ -517,7 +564,7 @@
           <% end %>
         </div>
         <a href="/auth/login"
-           style="display: inline-flex; align-items: center; gap: 8px; font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-ink); background: transparent; border: 1px solid var(--impd-ink); padding: 10px 16px; text-decoration: none; transition: all .15s;"
+           style="display: inline-flex; align-items: center; gap: 8px; font-family: var(--impd-font-sans); font-weight: 600; font-size: 13px; letter-spacing: -0.2px; color: var(--impd-ink); background: transparent; border: 1px solid var(--impd-ink); padding: 10px 16px; text-decoration: none; transition: all .15s;"
            onmouseover="this.style.background='var(--impd-ink)'; this.style.color='var(--impd-paper)';"
            onmouseout="this.style.background='transparent'; this.style.color='var(--impd-ink)';">
           나도 imPD 파트너 되기 →
