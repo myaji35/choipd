@@ -10,6 +10,15 @@ class PublicProfileController < ApplicationController
       @reviews = @member.member_reviews.public_visible.recent.limit(4)
       @posts = @member.member_posts.published.recent.limit(3)
       @moments = @member.member_photos.ordered.limit(12)
+      # 달란트 — .md/.txt 문서 자동 추출 결과를 공개 페이지에 반영.
+      # weight desc, category별 그룹 가능. 상위 12개까지.
+      @skills = @member.member_skills
+                       .includes(:skill)
+                       .joins(:skill)
+                       .where.not(skills: { canonical_name: nil })
+                       .order(weight: :desc, created_at: :desc)
+                       .limit(12)
+      @doc_count = @member.member_documents.count
       # 파트너 스냅샷: 6시간 캐시. 백그라운드 새로고침 (실패해도 UI는 그대로).
       if @member.partner_active? && !@member.stats_fresh?
         TowninSnapshotFetcher.fetch!(@member) rescue nil

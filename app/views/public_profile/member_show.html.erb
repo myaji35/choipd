@@ -242,7 +242,10 @@
     }
   end
 %>
-<% if gallery_tiles.any? %>
+<%# §B 갤러리: §B-2 모먼트와 중복 방지.
+    사진이 3장 이상이거나 포트폴리오가 있을 때만 노출.
+    1~2장은 §B-2 에디토리얼 그리드에서 충분히 큼직하게 보여줌. %>
+<% if gallery_tiles.any? && ((@moments || []).size >= 3 || @portfolio.any?) %>
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
       <span class="impd-label">§B</span>
@@ -612,6 +615,93 @@
   </section>
 <% end %>
 
+<!-- ── §X "검증된 달란트" — 업로드된 이력·수료증 문서에서 자동 추출된 역량 ─ -->
+<%# imPD 핵심 차별점: 회원이 MD/TXT 이력을 올리면 "달란트"가 자동 추출.
+    이걸 공개 페이지에 노출해서 "이 사람이 실제로 뭘 잘하는가"를 풍성하게 전달. %>
+<% if @skills.present? && @skills.any? %>
+  <%
+    # category 별 묶기 (hard/soft/tool/domain)
+    cat_labels = { "hard" => "전문 기술", "soft" => "협업·태도", "tool" => "사용 도구", "domain" => "전문 분야" }
+    by_cat = @skills.group_by { |ms| ms.skill.category.to_s }
+    cat_order = %w[hard domain tool soft]
+    # source 이모지(한글 fallback 안전성 위해 유니코드 별문자/체크 사용)
+    source_tag = {
+      "document"  => "문서 추출",
+      "admin"     => "운영자 확인",
+      "manual"    => "본인 등록",
+      "verified"  => "검증 완료",
+    }
+    # weight top-1 은 "대표 달란트" 강조
+    top_skill = @skills.first
+  %>
+  <section class="impd-wrap impd-section">
+    <div class="impd-section-header">
+      <span class="impd-label">§X</span>
+      <span class="impd-display" style="font-size: 36px; flex: 1;">검증된 달란트</span>
+      <span class="impd-label-muted"><%= @skills.size %> TALENTS · <%= @doc_count %> DOCS</span>
+    </div>
+
+    <% if @member.bio.present? %>
+      <p style="font-family: var(--impd-font-serif); font-style: italic; font-size: 17px; color: var(--impd-ink2); line-height: 1.55; max-width: 58ch; margin-bottom: 24px;">
+        "<%= truncate(@member.bio.to_s, length: 160) %>"
+      </p>
+    <% end %>
+
+    <%# 대표 달란트 1개 — 크게 %>
+    <% if top_skill %>
+      <div style="background: var(--impd-ink); color: var(--impd-paper); padding: 32px 28px; margin-bottom: 14px; position: relative; overflow: hidden;">
+        <div class="impd-stripe" style="position: absolute; inset: 0; opacity: 0.3;"></div>
+        <div style="position: relative;">
+          <div class="impd-label" style="color: var(--impd-accent);">대표 달란트</div>
+          <div class="impd-display" style="font-size: clamp(32px, 5vw, 56px); letter-spacing: -1.5px; line-height: 1.05; margin-top: 10px;">
+            <%= top_skill.skill.canonical_name %>
+          </div>
+          <div style="margin-top: 14px; display: flex; gap: 14px; flex-wrap: wrap; font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(239,236,228,.7);">
+            <span>· 가중치 <%= top_skill.weight %>/100</span>
+            <span>· <%= cat_labels[top_skill.skill.category.to_s] || top_skill.skill.category %></span>
+            <span>· <%= source_tag[top_skill.source] || top_skill.source %></span>
+            <% if top_skill.level.present? %><span>· <%= top_skill.level.upcase %></span><% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <%# 카테고리별 달란트 그룹 %>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+      <% cat_order.each do |cat| %>
+        <% items = by_cat[cat] %>
+        <% next unless items&.any? %>
+        <div style="background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 20px 18px;">
+          <div class="impd-label-muted" style="margin-bottom: 12px;">
+            <%= cat_labels[cat] || cat %>
+            <span style="opacity: 0.55;">· <%= items.size %></span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <% items.first(8).each do |ms| %>
+              <%
+                # weight 50~100 스케일 → 배경 농도
+                w = ms.weight.to_i
+                bg = w >= 60 ? "var(--impd-ink)" : "var(--impd-paper)"
+                fg = w >= 60 ? "var(--impd-paper)" : "var(--impd-ink)"
+              %>
+              <span style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; background: <%= bg %>; color: <%= fg %>; border: 1px solid var(--impd-ink); font-size: 12px; font-family: var(--impd-font-sans); letter-spacing: -0.2px;">
+                <%= ms.skill.canonical_name %>
+                <% if w >= 60 %>
+                  <span style="font-family: var(--impd-font-mono); font-size: 9px; opacity: 0.7; letter-spacing: 1px;">· <%= w %></span>
+                <% end %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <p style="margin-top: 14px; font-size: 11px; color: var(--impd-muted); font-family: var(--impd-font-mono); text-align: right;">
+      위 달란트는 업로드된 이력·수료증 <%= @doc_count %>개에서 자동 추출 · 가중치는 빈도·맥락 분석 결과
+    </p>
+  </section>
+<% end %>
+
 <!-- ── §Y "제공 가능한 가치" — 포트폴리오 없어도 자동 생성되는 가치 카드 4종 ─ -->
 <%
   # profession 기반 표준 가치 제안 (포트폴리오·서비스 없어도 이 회원이 "뭐 하는 사람"인지 즉시 전달)
@@ -659,7 +749,32 @@
       { head: "지속 지원", desc: "끝이 아닌 시작" },
     ],
   }
-  kit = profession_kits[@member.profession.to_s] || profession_kits["custom"]
+  base_kit = profession_kits[@member.profession.to_s] || profession_kits["custom"]
+
+  # 개인화: 회원 고유 데이터 우선, 부족분을 직종 fallback 로 채움.
+  personal = []
+  # 1) bio 첫 문장을 첫 카드로 (35자 이상일 때만)
+  if @member.bio.to_s.length > 35
+    first_sent = @member.bio.to_s.split(/[.。!?]/).first&.strip
+    personal << { head: "나의 방식", desc: first_sent[0, 90] } if first_sent&.length.to_i > 15
+  end
+  # 2) 포트폴리오 제목들 (최대 2개)
+  @portfolio.first(2).each do |p|
+    personal << { head: p.title.to_s[0, 30], desc: (p.category.presence || "PORTFOLIO").to_s.upcase }
+  end
+  # 3) 서비스 제목들 (최대 2개)
+  @services.first(2).each do |s|
+    personal << { head: s.title.to_s[0, 30], desc: (s.price_label.presence || s.description.to_s[0, 60] || "문의") }
+  end
+  # 4) 달란트 상위 2개 (skills, 아래 §Skills 섹션에서 풀 노출되므로 여기는 2개만)
+  @member.member_skills.includes(:skill).order(weight: :desc).limit(2).each do |ms|
+    name = ms.skill&.canonical_name.to_s
+    personal << { head: name[0, 20], desc: "검증된 역량 · #{ms.source}" } if name.present?
+  end rescue nil
+
+  # 개인 데이터 + 직종 fallback 섞어 최종 4개 카드
+  kit = (personal + base_kit).first(4)
+  kit_personalized = personal.any?
 %>
 <section class="impd-wrap impd-section">
   <div class="impd-section-header">
@@ -677,7 +792,11 @@
     <% end %>
   </div>
   <p style="margin-top: 14px; font-size: 11px; color: var(--impd-muted); font-family: var(--impd-font-mono); text-align: right;">
-    위 항목은 직종별 일반 가치 제안입니다 · 정확한 서비스는 문의 후 상담
+    <% if kit_personalized %>
+      <%= @member.name %>님의 기록에서 자동 구성 · 상세는 문의 후 상담
+    <% else %>
+      직종별 기본 제안 · 상세는 문의 후 상담
+    <% end %>
   </p>
 </section>
 
