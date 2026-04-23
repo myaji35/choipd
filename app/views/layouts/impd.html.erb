@@ -70,23 +70,34 @@
     <%= yield(:head) if content_for?(:head) %>
   </head>
   <body>
-    <!-- imPD TopNav -->
-    <div style="position: sticky; top: 0; z-index: 20; background: var(--impd-paper); border-bottom: 1px solid var(--impd-rule); padding: 14px 40px; display: flex; align-items: center; gap: 32px;">
-      <%= link_to root_path, style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 20px; letter-spacing: -0.8px; color: var(--impd-ink);" do %>
+    <!-- imPD TopNav — 모바일에서 중앙 nav 숨기고 로고+세션만 -->
+    <div class="impd-topnav" style="position: sticky; top: 0; z-index: 20; background: var(--impd-paper); border-bottom: 1px solid var(--impd-rule); padding: 14px 24px; display: flex; align-items: center; gap: 20px;">
+      <%= link_to root_path, style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 20px; letter-spacing: -0.8px; color: var(--impd-ink); white-space: nowrap;" do %>
         imPD<span style="color: var(--impd-accent);">.</span>
       <% end %>
-      <div style="display: flex; gap: 22px; flex: 1;">
+      <nav class="impd-topnav-links" style="display: flex; gap: 22px; flex: 1;">
         <% [["홈", root_path], ["교육", education_path], ["미디어", media_path], ["작품", works_path], ["커뮤니티", community_path]].each do |label, path| %>
-          <%= link_to label, path, style: "color: var(--impd-muted); font-size: 13px; font-weight: 500;" %>
+          <%= link_to label, path, style: "color: var(--impd-muted); font-size: 13px; font-weight: 500; white-space: nowrap;" %>
         <% end %>
-      </div>
+      </nav>
+      <style>
+        @media (max-width: 768px) {
+          .impd-topnav { padding: 12px 16px !important; gap: 12px !important; }
+          .impd-topnav-links { display: none !important; }
+        }
+      </style>
       <%# 로그인 상태에 따른 우측 액션 영역 %>
       <% if member_signed_in? %>
         <%# 로그인됨: 이름 / 내 페이지 / 로그아웃. button_to form 이 줄바꿈 되지 않도록 display: inline-flex. %>
         <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
-          <span style="font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted); white-space: nowrap;">
-            <%= truncate(current_member.name.to_s, length: 12) %>
-          </span>
+          <div title="<%= current_member.email %>" style="display: inline-flex; flex-direction: column; align-items: flex-end; gap: 1px; white-space: nowrap; line-height: 1;">
+            <span style="font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted);">
+              <%= truncate(current_member.name.to_s, length: 12) %>
+            </span>
+            <span style="font-family: var(--impd-font-mono); font-size: 10px; color: var(--impd-ink); letter-spacing: -0.1px;">
+              <%= truncate(current_member.email.to_s, length: 24) %>
+            </span>
+          </div>
           <%= link_to "내 페이지", "/#{current_member.slug}",
                 class: "impd-btn impd-btn-secondary",
                 style: "height: 36px; padding: 0 14px; font-size: 13px; white-space: nowrap;" %>

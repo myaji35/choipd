@@ -41,7 +41,18 @@
     gap: 28px;
     align-items: stretch;
   }
-  @media (max-width: 820px) { .card-summary-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 820px) {
+    .card-summary-grid { grid-template-columns: 1fr; gap: 14px; }
+    .card-wrap { padding: 16px 14px 32px !important; }
+    .cs-left   { padding: 20px 18px !important; gap: 10px !important; }
+    .cs-name   { font-size: 38px !important; letter-spacing: -1.4px !important; }
+    .cs-bio    { font-size: 13px !important; padding-top: 10px !important; }
+    .cs-contacts { padding-top: 10px !important; }
+    .cs-full   { height: 44px !important; font-size: 13px !important; margin-top: 8px !important; }
+    /* 모바일은 SVG 명함 카드 축소 — 첫 뷰포트에서 덜 밀리도록 */
+    .cs-card-preview { padding: 10px !important; min-height: 0 !important; }
+    .cs-card-preview img { max-width: 100%; aspect-ratio: 16/9; object-fit: contain; }
+  }
 
   .cs-left {
     display: flex; flex-direction: column; gap: 14px;

@@ -77,6 +77,22 @@
       <span class="impd-label-muted"><%= @skills.size %> TALENTS · <%= @doc_count %> DOCS · <%= @photos_count %> PHOTOS</span>
     </div>
 
+    <%# 현재 로그인 세션 표시 — 대표님 지적: "로그인한 이메일 정보 표시할 수 없나?" %>
+    <div style="display: flex; align-items: center; gap: 14px; padding: 12px 18px; background: var(--impd-card); border: 1px solid var(--impd-ink); margin-bottom: 18px; font-family: var(--impd-font-mono); font-size: 12px;">
+      <span style="display: inline-flex; align-items: center; gap: 6px; color: var(--impd-muted); letter-spacing: 1.3px; text-transform: uppercase;">
+        <span style="width: 6px; height: 6px; background: #16a34a; border-radius: 50%; display: inline-block;"></span>
+        로그인 중
+      </span>
+      <span style="color: var(--impd-ink); font-weight: 600; letter-spacing: -0.2px;">
+        <%= current_member&.email || @member.email %>
+      </span>
+      <% if current_member && current_member.id != @member.id %>
+        <span style="color: var(--impd-accent-2); font-size: 11px; padding: 2px 8px; background: rgba(255,90,31,0.1); border-radius: 3px;">관리자로 대리 접속 중</span>
+      <% end %>
+      <span style="flex: 1;"></span>
+      <%= link_to "로그아웃", member_logout_path, data: { turbo_method: :delete, turbo_confirm: "로그아웃하시겠습니까?" }, style: "color: var(--impd-accent-2); text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 1px;" %>
+    </div>
+
     <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px;" class="editor-grid">
       <%# 좌: 기본 프로필 입력 폼 %>
       <%= form_with url: slug_admin_editor_update_info_path(slug: @member.slug), method: :patch, local: true, data: { turbo: false } do |f| %>
