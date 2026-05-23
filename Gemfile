@@ -24,7 +24,7 @@ gem "tailwindcss-rails"
 gem "devise"
 
 # Pagination
-gem "pagy", "~> 9.3"
+gem "pagy", "~> 43.5"
 
 # Use Active Model has_secure_password
 gem "bcrypt", "~> 3.1.7"
