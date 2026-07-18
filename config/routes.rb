@@ -315,10 +315,32 @@ Rails.application.routes.draw do
       resources :inquiries, only: [ :index ] do
         member { post :toggle_read }
       end
+      resources :reviews, only: [ :index, :update, :destroy ] do
+        member do
+          post :approve
+          post :reject
+        end
+      end
       get "/withdraw", to: "withdrawals#show", as: :withdraw
       delete "/withdraw", to: "withdrawals#destroy", as: :withdraw_destroy
     end
   end
+
+  # 공개 후기 작성 — vanity URL보다 먼저 매칭한다.
+  get "/:slug/review",
+      to: "member_reviews#new",
+      as: :member_review_new,
+      constraints: lambda { |req|
+        slug = req.path_parameters[:slug].to_s
+        slug.match?(/\A[a-z0-9][a-z0-9\-]{1,}\z/) && !SlugValidation::RESERVED_SLUGS.include?(slug)
+      }
+  post "/:slug/review",
+       to: "member_reviews#create",
+       as: :member_reviews,
+       constraints: lambda { |req|
+         slug = req.path_parameters[:slug].to_s
+         slug.match?(/\A[a-z0-9][a-z0-9\-]{1,}\z/) && !SlugValidation::RESERVED_SLUGS.include?(slug)
+       }
 
   # 공개 프로필 문의 접수 — vanity URL보다 먼저 매칭한다.
   post "/:slug/inquiries",

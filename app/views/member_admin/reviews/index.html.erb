@@ -1,0 +1,62 @@
+<% content_for :title, "후기 관리 — #{@member.name}" %>
+
+<main style="max-width: 1100px; margin: 0 auto; padding: 40px;">
+  <div class="impd-section-header">
+    <span class="impd-label" style="font-size: 12px;">REVIEWS</span>
+    <h1 class="impd-display" style="font-size: 42px; flex: 1;">후기 관리</h1>
+    <span style="padding: 6px 10px; background: <%= @pending_count.positive? ? 'var(--impd-accent-2)' : 'var(--impd-rule)' %>; color: <%= @pending_count.positive? ? '#fff' : 'var(--impd-muted)' %>; font-size: 12px; font-weight: 700;">승인 대기 <%= @pending_count %>건</span>
+  </div>
+
+  <section class="impd-card" style="margin-bottom: 28px;">
+    <p class="impd-label" style="font-size: 12px;">요청 링크</p>
+    <h2 style="margin-top: 10px; font-size: 20px;">고객에게 이 링크를 공유하세요</h2>
+    <p style="margin-top: 8px; font-size: 13px; line-height: 1.7; color: var(--impd-muted);">고객이 작성한 후기는 승인하기 전까지 공개되지 않습니다.</p>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;">
+      <input id="review-request-url" type="text" readonly value="<%= @review_request_url %>" style="flex: 1 1 420px; min-width: 0; border: 1px solid #d1d5db; padding: 10px 12px; font-size: 14px; color: var(--impd-ink); background: #fff;">
+      <button type="button" class="impd-btn impd-btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('review-request-url').value); this.textContent='복사됨';">링크 복사</button>
+      <%= link_to "작성 화면 열기", member_review_new_path(slug: @member.slug), target: "_blank", class: "impd-btn impd-btn-primary" %>
+    </div>
+  </section>
+
+  <% if @reviews.any? %>
+    <div style="display: grid; gap: 32px;">
+      <% @review_groups.each do |group_label, reviews| %>
+        <% next if reviews.empty? %>
+        <section>
+          <div class="impd-section-header" style="margin-bottom: 14px;">
+            <h2 style="font-size: 20px; flex: 1;"><%= group_label %></h2>
+            <span style="font-size: 12px; color: var(--impd-muted);"><%= reviews.size %>건</span>
+          </div>
+          <div style="display: grid; gap: 14px;">
+      <% reviews.each do |review| %>
+        <% status_label = { "new" => "대기", "triaged" => "공개", "responded" => "공개", "archived" => "보관" }.fetch(review.status, review.status) %>
+        <% status_color = review.status == "new" ? "var(--impd-accent-2)" : (review.status.in?(%w[triaged responded]) ? "var(--impd-accent)" : "var(--impd-muted)") %>
+        <article style="background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 24px;">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+            <strong style="font-size: 15px;"><%= review.reviewer_name %></strong>
+            <span aria-label="별점 <%= review.rating %>점" style="color: #9a6b00; letter-spacing: 1px; font-size: 14px;"><%= "★" * review.rating %></span>
+            <span style="padding: 4px 8px; border: 1px solid <%= status_color %>; color: <%= status_color %>; font-size: 12px; font-weight: 700;"><%= status_label %></span>
+            <time datetime="<%= review.created_at.iso8601 %>" style="margin-left: auto; font-size: 12px; color: var(--impd-muted);"><%= review.created_at.strftime("%Y.%m.%d %H:%M") %></time>
+          </div>
+          <p style="margin-top: 14px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.75; color: var(--impd-ink2);"><%= review.content.presence || "후기 내용이 없습니다." %></p>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--impd-rule);">
+            <% unless review.status.in?(%w[triaged responded]) %>
+              <%= button_to "승인", approve_slug_admin_review_path(slug: @member.slug, id: review), method: :post, class: "impd-btn impd-btn-primary" %>
+            <% end %>
+            <% unless review.status == "archived" %>
+              <%= button_to "거절", reject_slug_admin_review_path(slug: @member.slug, id: review), method: :post, class: "impd-btn impd-btn-secondary" %>
+            <% end %>
+            <%= button_to "삭제", slug_admin_review_path(slug: @member.slug, id: review), method: :delete, class: "impd-btn impd-btn-secondary", form: { data: { turbo_confirm: "이 후기를 삭제할까요? 삭제 후 복구할 수 없습니다." } } %>
+          </div>
+        </article>
+      <% end %>
+          </div>
+        </section>
+      <% end %>
+    </div>
+  <% else %>
+    <div style="padding: 56px 24px; background: var(--impd-card); border: 1px solid var(--impd-rule); text-align: center;">
+      <p style="font-size: 15px; line-height: 1.8; color: var(--impd-muted);">아직 받은 후기가 없어요. 위 리뷰 요청 링크를 고객에게 공유해보세요.</p>
+    </div>
+  <% end %>
+</main>

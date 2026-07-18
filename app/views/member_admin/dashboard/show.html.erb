@@ -122,6 +122,7 @@
         <a href="<%= slug_admin_editor_path(slug: @member.slug) %>" class="impd-btn impd-btn-secondary" style="width: 100%; justify-content: center; margin-top: 16px;">에디터로 가기 →</a>
         <%= link_to "서비스 관리", slug_admin_services_path(slug: @member.slug), class: "impd-btn impd-btn-primary", style: "width: 100%; justify-content: center; margin-top: 8px;" %>
         <%= link_to "문의함", slug_admin_inquiries_path(slug: @member.slug), class: "impd-btn impd-btn-secondary", style: "width: 100%; justify-content: center; margin-top: 8px;" %>
+        <%= link_to "후기 관리", slug_admin_reviews_path(slug: @member.slug), class: "impd-btn impd-btn-secondary", style: "width: 100%; justify-content: center; margin-top: 8px;" %>
       </div>
     </div>
   </div>
