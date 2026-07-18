@@ -8,19 +8,9 @@
 # - 파일 크기 작음 (PNG 대비 1/5 ~ 1/10)
 # - 브라우저/카톡 OG 이미지로 동작 확인 필요. SVG 미지원 채널은 PNG 변환 후속 과제(P1).
 class BusinessCardsController < ApplicationController
-  PROFESSION_LABELS = {
-    "insurance_agent" => "보험 설계사",
-    "realtor"         => "공인중개사",
-    "educator"        => "강사",
-    "author"          => "작가",
-    "shopowner"       => "자영업자",
-    "freelancer"      => "프리랜서",
-    "custom"          => "크리에이터",
-  }.freeze
-
   def show
     member = Member.find_by(slug: params[:slug])
-    head :not_found and return if member.blank? || member.status != "approved"
+    head :not_found and return if member.blank?
 
     svg = render_card_svg(member)
 
@@ -36,7 +26,7 @@ class BusinessCardsController < ApplicationController
 
   def render_card_svg(member)
     name       = escape(member.name.to_s)
-    profession = escape(PROFESSION_LABELS[member.profession.to_s] || "크리에이터")
+    profession = escape(member.profession_label)
     region     = escape(member.region.presence || "")
     bio        = escape(member.bio.to_s.gsub(/\s+/, " ").strip[0, 80])
     short_url  = short_url_for(member)

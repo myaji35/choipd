@@ -14,11 +14,22 @@ class Member < ApplicationRecord
   has_many :member_documents,       dependent: :destroy
   has_many :member_photos,          dependent: :destroy
   has_many :member_gap_reports,     dependent: :destroy
+  has_many :identity_probes,        dependent: :destroy
 
   STATUSES = %w[pending_approval approved rejected suspended].freeze
   IMPD_STATUSES = %w[none in_progress completed rejected].freeze
   BUSINESS_TYPES = %w[individual company organization].freeze
   PROFESSIONS = %w[insurance_agent realtor educator author shopowner freelancer custom].freeze
+  PROFESSION_LABELS = {
+    "insurance_agent" => "보험 설계사",
+    "realtor"         => "공인중개사",
+    "educator"        => "강사",
+    "author"          => "작가",
+    "shopowner"       => "자영업자",
+    "freelancer"      => "프리랜서",
+    "creator"         => "크리에이터",
+    "custom"          => "크리에이터",
+  }.freeze
 
   validates :name, :email, :slug, presence: true
   validates :slug, uniqueness: { case_sensitive: false }
@@ -37,6 +48,16 @@ class Member < ApplicationRecord
 
   def display_url
     "/#{slug}"
+  end
+
+  # profession 필드에 enum 코드 또는 한글 자유텍스트가 섞여 들어온다.
+  # 코드면 라벨로 변환, 매핑에 없는 자유텍스트(예 "1인 사업가")면 그대로 표시,
+  # 완전 비어 있으면 "크리에이터".
+  def profession_label
+    raw = profession.to_s.strip
+    return "크리에이터" if raw.blank?
+
+    PROFESSION_LABELS[raw] || raw
   end
 
   def social

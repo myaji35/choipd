@@ -4,8 +4,8 @@
 <%# OG/Twitter 카드 — SVG 명함을 썸네일로 %>
 <% content_for :head do %>
   <%
-    card_svg_url = "#{request.protocol}#{request.host_with_port}/card/#{@member.slug}.svg"
-    share_url    = "#{request.protocol}#{request.host_with_port}/s/#{@short_link&.hash_code}"
+    card_svg_url = "#{public_base_url}/card/#{@member.slug}.svg"
+    share_url    = "#{public_base_url}/s/#{@short_link&.hash_code}"
   %>
   <meta property="og:type" content="profile">
   <meta property="og:title" content="<%= @member.name %> — imPD">
@@ -18,17 +18,7 @@
 <% end %>
 
 <%
-  profession_label_kr = {
-    "insurance_agent" => "보험 설계사",
-    "realtor"         => "공인중개사",
-    "educator"        => "강사",
-    "author"          => "작가",
-    "shopowner"       => "자영업자",
-    "freelancer"      => "프리랜서",
-    "custom"          => "크리에이터",
-  }
-  role_kr    = profession_label_kr[@member.profession.to_s] || "크리에이터"
-  short_abs  = "#{request.host_with_port}/s/#{@short_link&.hash_code}"
+  short_abs  = "#{public_host}/s/#{@short_link&.hash_code}"
   social     = @member.social
   kakao_ch   = social["kakao_channel"].presence
 %>
@@ -72,8 +62,9 @@
     font-size: clamp(40px, 5.5vw, 68px);
     letter-spacing: -2px; line-height: 0.95;
     color: var(--impd-ink);
+    word-break: keep-all;
   }
-  .cs-name .italic { font-family: var(--impd-font-serif); font-style: italic; font-weight: 400; color: var(--impd-accent); display: block; margin-top: 4px; }
+  .cs-name .italic { font-family: var(--impd-font-serif); font-style: italic; font-weight: 400; color: var(--impd-accent); display: block; margin-top: 4px; word-break: keep-all; }
   .cs-meta { font-size: 13px; color: var(--impd-ink2); line-height: 1.5; }
   .cs-meta dt { display: inline; font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted); margin-right: 6px; }
   .cs-meta dd { display: inline; margin: 0 14px 0 0; }
@@ -145,7 +136,7 @@
   .cs-share-row .item code { font-family: var(--impd-font-mono); font-size: 11px; color: var(--impd-ink); word-break: break-all; }
   .cs-share-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
   .cs-share-btn {
-    height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+    height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     font-family: var(--impd-font-sans); font-size: 12px; font-weight: 600;
     color: var(--impd-ink); background: transparent;
     border: 1px solid var(--impd-ink);
@@ -156,8 +147,8 @@
 </style>
 
 <main class="card-wrap" data-controller="card-share"
-      data-card-share-short-url-value="<%= "#{request.protocol}#{short_abs}" %>"
-      data-card-share-profile-url-value="<%= "#{request.protocol}#{request.host_with_port}/#{@member.slug}" %>">
+      data-card-share-short-url-value="<%= "#{public_base_url}/s/#{@short_link&.hash_code}" %>"
+      data-card-share-profile-url-value="<%= "#{public_base_url}/#{@member.slug}" %>">
 
   <div class="card-summary-grid">
 
@@ -167,7 +158,7 @@
         <p class="cs-eyebrow">imPD 검증 회원 · 요약 명함</p>
         <h1 class="cs-name">
           <%= @member.name %>
-          <span class="italic"><%= role_kr %>.</span>
+          <span class="italic"><%= @member.profession_label %>.</span>
         </h1>
       </div>
 
@@ -237,8 +228,8 @@
       </div>
 
       <div class="cs-share-btns">
-        <button type="button" class="cs-share-btn" data-action="click->card-share#copyShort">🔗 주소 복사</button>
-        <a class="cs-share-btn" href="/card/<%= @member.slug %>.svg" download="<%= @member.slug %>-card.svg">💾 명함 저장</a>
+        <button type="button" class="cs-share-btn" data-action="click->card-share#copyShort"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" x2="16" y1="12" y2="12"/></svg>주소 복사</button>
+        <a class="cs-share-btn" href="/card/<%= @member.slug %>.svg" download="<%= @member.slug %>-card.svg"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>명함 저장</a>
         <button type="button" class="cs-share-btn" data-action="click->card-share#shareNative">공유 →</button>
       </div>
 
