@@ -45,9 +45,33 @@ class MemberSignupsController < ApplicationController
       ),
     )
 
+    unless params[:terms_agree].to_s == "1"
+      flash.now[:alert] = "이용약관 및 개인정보처리방침 동의가 필요합니다."
+      render :new, status: :unprocessable_entity and return
+    end
+
+    # ISS-401: Identity Probe 동의 체크박스 처리. 체크 안 해도 기존 플로우 유지.
+    if params[:identity_probe_consent].to_s == "1" && @member.respond_to?(:identity_probe_consent_at=)
+      @member.identity_probe_consent_at = Time.current
+    end
+
+    @member.terms_agreed_at = Time.current
+
     if @member.save
-      # pending_approval 이므로 세션 생성하지 않음. 승인 후 로그인하라는 안내.
-      redirect_to member_login_path, notice: "회원가입 완료. 관리자 승인 후 로그인할 수 있습니다. (이메일: #{email})"
+      session[:member_id] = @member.id
+      @member.update(last_sign_in_at: Time.current) if @member.respond_to?(:last_sign_in_at)
+
+      # ISS-401: 동의한 회원은 백그라운드로 identity probe 수행 + 대기 페이지로 이동.
+      if @member.respond_to?(:identity_probe_consent_at) && @member.identity_probe_consent_at.present?
+        begin
+          IdentityProbeJob.perform_later(@member.id)
+        rescue => e
+          Rails.logger.warn("[MemberSignups] probe enqueue failed: #{e.class}: #{e.message}")
+        end
+        redirect_to "/welcome/probe", notice: "환영합니다, #{@member.name}님. 잠시만요..." and return
+      end
+
+      redirect_to "/#{@member.slug}", notice: "환영합니다, #{@member.name}님. 이제 페이지를 편집할 수 있어요."
     else
       render :new, status: :unprocessable_entity
     end
@@ -56,6 +80,6 @@ class MemberSignupsController < ApplicationController
   private
 
   def signup_defaults
-    { tenant_id: 1, status: "pending_approval", impd_status: "none" }
+    { tenant_id: 1, status: "approved", impd_status: "none" }
   end
 end

@@ -1,0 +1,203 @@
+<% content_for :title, "이용약관" %>
+<% content_for :description, "imPD 서비스 이용약관" %>
+
+<style>
+  .terms-page { padding: 72px 24px 104px; }
+  .terms-page .impd-wrap { width: min(100%, 960px); margin: 0 auto; }
+  .terms-header { margin-bottom: 56px; }
+  .terms-header h1 { margin-top: 12px; font-family: var(--impd-font-display); font-size: clamp(34px, 6vw, 58px); line-height: 1.08; letter-spacing: -0.035em; color: var(--impd-green); }
+  .terms-header p { margin-top: 20px; max-width: 760px; color: var(--impd-muted); font-size: 15px; line-height: 1.8; }
+  .terms-article { padding: 34px 0; border-top: 1px solid var(--impd-rule); }
+  .terms-article h2 { margin-bottom: 18px; font-family: var(--impd-font-display); font-size: 23px; line-height: 1.35; color: var(--impd-green-house); }
+  .terms-article h3 { margin: 25px 0 10px; font-size: 17px; line-height: 1.5; color: var(--impd-ink); }
+  .terms-article p, .terms-article li { font-size: 14px; line-height: 1.85; color: var(--impd-ink2); word-break: keep-all; overflow-wrap: anywhere; }
+  .terms-article p + p { margin-top: 10px; }
+  .terms-article ol, .terms-article ul { margin: 10px 0 0 22px; }
+  .terms-article li + li { margin-top: 6px; }
+  .terms-note { margin-top: 16px; padding: 16px 18px; border-left: 3px solid var(--impd-green-accent); background: var(--impd-card); border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.8; }
+  .terms-company { padding-top: 28px; border-top: 1px solid var(--impd-rule); color: var(--impd-muted); font-size: 13px; line-height: 1.8; }
+  .terms-page a { color: var(--impd-green-accent); text-decoration: underline; text-underline-offset: 3px; }
+  @media (max-width: 640px) {
+    .terms-page { padding: 48px 18px 80px; }
+    .terms-header { margin-bottom: 40px; }
+    .terms-article { padding: 28px 0; }
+    .terms-article h2 { font-size: 20px; }
+  }
+</style>
+
+<div class="terms-page">
+  <div class="impd-wrap">
+    <header class="terms-header">
+      <span class="impd-label">Terms of Service</span>
+      <h1>이용약관</h1>
+      <p>이 약관은 imPD가 제공하는 프리랜서 프로필·홍보 페이지와 이에 부수하는 서비스의 이용 조건을 정합니다.</p>
+    </header>
+
+    <section class="terms-article">
+      <h2>제1조 (목적)</h2>
+      <p>이 약관은 {{상호}}(이하 “회사”)가 운영하는 imPD(이하 “서비스”)를 이용함에 있어 회사와 이용자의 권리·의무 및 책임사항, 그 밖에 필요한 사항을 규정함을 목적으로 합니다.</p>
+    </section>
+
+    <section class="terms-article">
+      <h2>제2조 (정의)</h2>
+      <ol>
+        <li>“서비스”란 프리랜서, 강사, 작가, 소상공인 등 이용자가 자신의 경력·작업물·연락처 등을 구성하여 프로필 및 홍보 페이지로 공개·관리할 수 있도록 회사가 제공하는 imPD와 부수 기능을 말합니다.</li>
+        <li>“이용자”란 이 약관에 따라 서비스를 이용하는 회원과 비회원을 말합니다.</li>
+        <li>“회원”이란 회원가입을 완료하고 계정을 부여받은 사람을 말합니다.</li>
+        <li>“콘텐츠”란 회원이 서비스에 입력하거나 업로드한 글, 이미지, 링크, 문서 및 그 밖의 자료를 말합니다.</li>
+        <li>“유료서비스”란 향후 제공될 수 있는 Pro 요금제, 구독 상품 등 회사가 대가를 받고 제공하는 기능을 말합니다.</li>
+      </ol>
+    </section>
+
+    <section class="terms-article">
+      <h2>제3조 (약관의 게시와 개정)</h2>
+      <ol>
+        <li>회사는 이 약관을 서비스 화면 또는 연결 화면에 게시하여 이용자가 쉽게 확인할 수 있도록 합니다.</li>
+        <li>회사는 관련 법령을 위반하지 않는 범위에서 약관을 개정할 수 있습니다.</li>
+        <li>개정 시 적용일과 개정 사유를 명시하여 원칙적으로 적용일 7일 전부터 공지합니다. 회원에게 불리하거나 중요한 변경은 30일 전부터 공지하고 이메일 또는 서비스 내 알림 등으로 개별 통지합니다.</li>
+        <li>회원은 개정 약관에 동의하지 않으면 적용일 전까지 이용계약을 해지할 수 있습니다. 회사가 개정 내용을 공지·통지하면서 거부 의사를 표시하지 않으면 동의한 것으로 본다는 뜻을 명확히 알렸음에도 회원이 거부하지 않은 경우 개정 약관에 동의한 것으로 봅니다.</li>
+      </ol>
+    </section>
+
+    <section class="terms-article">
+      <h2>제4조 (서비스의 제공 및 변경)</h2>
+      <ol>
+        <li>회사는 회원 계정 관리, 프로필·홍보 페이지 생성 및 공개, 콘텐츠 관리, 링크·공유 기능과 그 밖에 회사가 정하는 기능을 제공합니다.</li>
+        <li>기본 서비스는 무료로 제공될 수 있으며, 회사는 별도의 Pro 유료서비스를 도입할 수 있습니다. 유료서비스의 요금과 조건은 결제 전에 명확히 안내합니다.</li>
+        <li>회사는 운영상·기술상 필요에 따라 서비스 내용을 변경할 수 있으며, 중요한 변경은 사전에 공지합니다. 불가피한 경우 변경 후 지체 없이 알릴 수 있습니다.</li>
+      </ol>
+    </section>
+
+    <section class="terms-article">
+      <h2>제5조 (서비스의 중단)</h2>
+      <ol>
+        <li>회사는 설비 점검·교체·고장, 통신 장애, 재난, 보안상 긴급상황 또는 그 밖의 불가피한 사유가 있는 경우 서비스 전부 또는 일부를 일시 중단할 수 있습니다.</li>
+        <li>예정된 중단은 사전에 일시와 사유를 공지하며, 긴급한 경우 사후에 공지할 수 있습니다.</li>
+        <li>사업 종료 등으로 서비스를 계속 제공할 수 없게 되는 경우 회사는 회원에게 통지하고, 유료서비스의 미사용 기간에 해당하는 금액은 관련 법령과 환급정책에 따라 처리합니다.</li>
+      </ol>
+    </section>
+
+    <section class="terms-article">
+      <h2>제6조 (회원가입과 계정 관리)</h2>
+      <ol>
+        <li>이용자는 회사가 정한 가입 양식에 정확한 정보를 입력하고 이 약관 및 <%= link_to "개인정보처리방침", privacy_path %>에 동의하여 회원가입을 신청합니다.</li>
+        <li>회사는 허위 정보를 입력한 경우, 타인의 정보를 도용한 경우, 만 14세 미만인 경우, 기술상 또는 운영상 현저한 지장이 있는 경우 가입을 거절하거나 사후에 이용을 제한할 수 있습니다.</li>
+        <li>회원은 계정과 비밀번호를 안전하게 관리해야 하며, 도용 또는 무단 사용을 알게 된 경우 즉시 회사에 알려야 합니다.</li>
+        <li>회원정보가 변경된 경우 회원은 지체 없이 이를 수정해야 합니다.</li>
+      </ol>
+    </section>
+
+    <section class="terms-article">
+      <h2>제7조 (회원 탈퇴 및 이용 제한·자격 상실)</h2>
+      <ol>
+        <li>회원은 언제든지 서비스에서 탈퇴를 요청할 수 있으며 회사는 관련 법령과 개인정보처리방침에 따라 처리합니다.</li>
+        <li>회원이 다음 각 호에 해당하는 경우 회사는 게시물 비공개·삭제, 기능 제한, 계정 정지 또는 이용계약 해지 조치를 할 수 있습니다.
+          <ol>
+            <li>가입 또는 정보 변경 시 허위 내용을 등록하거나 타인의 정보를 도용한 경우</li>
+            <li>법령, 이 약관, 공서양속을 위반하거나 타인의 권리·명예·개인정보를 침해한 경우</li>
+            <li>악성코드, 자동화 수단, 비정상 요청 등으로 서비스 운영 또는 보안을 방해한 경우</li>
+            <li>유료서비스 대금을 지급하지 않거나 결제수단을 부정하게 사용한 경우</li>
+            <li>회사의 사전 동의 없이 계정이나 서비스를 재판매·대여하거나 부정한 영리 목적으로 이용한 경우</li>
+            <li>동일하거나 유사한 위반을 반복하거나 회사의 시정 요구에 응하지 않은 경우</li>
+          </ol>
+        </li>
+        <li>회사는 위반의 내용과 정도, 반복 여부, 이용자 및 제3자에게 미치는 영향을 고려하여 조치 수준과 기간을 정합니다. 긴급한 보안 위험 또는 중대한 권리 침해가 있는 경우 즉시 임시 제한할 수 있습니다.</li>
+        <li>회사는 원칙적으로 조치 사유, 내용, 기간 및 이의제기 방법을 회원에게 통지하고 소명 기회를 제공합니다. 회원은 통지받은 날부터 30일 이내에 이의를 제기할 수 있으며, 회사는 정당한 이의를 확인하면 지체 없이 조치를 해제하거나 정정합니다.</li>
+      </ol>
+      <div class="terms-note">이 조항은 서비스의 안전과 다른 이용자의 권리를 보호하기 위한 회원 정지 및 이용 제한의 계약상 근거입니다.</div>
+    </section>
+
+    <section class="terms-article">
+      <h2>제8조 (유료서비스 및 구독)</h2>
+      <ol>
+        <li>Pro 등 유료서비스가 도입되면 회사는 상품 내용, 이용요금, 결제주기, 자동갱신 여부, 해지 및 환급 조건을 결제 화면에 표시합니다.</li>
+        <li>회원은 회사가 정한 결제수단으로 유료서비스를 신청할 수 있으며, 정기 구독은 회원이 해지하기 전까지 고지된 주기에 따라 갱신될 수 있습니다.</li>
+        <li>회원은 언제든지 구독 해지를 신청할 수 있고 해지는 다음 결제주기부터 적용됩니다. 이미 결제한 기간은 원칙적으로 만료일까지 이용할 수 있습니다.</li>
+        <li>청약철회와 환급은 관련 법령 및 결제 시 안내한 환급정책에 따릅니다. 회사의 귀책사유로 서비스를 이용하지 못한 경우 해당 기간에 상응하는 환급 또는 이용기간 연장을 제공할 수 있습니다.</li>
+      </ol>
+    </section>
+
+    <section class="terms-article">
+      <h2>제9조 (회원에 대한 통지)</h2>
+      <ol>
+        <li>회사는 회원이 등록한 이메일, 서비스 내 알림 또는 그 밖의 합리적인 방법으로 통지할 수 있습니다.</li>
+        <li>다수 회원에게 공통되는 사항은 7일 이상 서비스에 게시함으로써 개별 통지를 갈음할 수 있습니다. 다만 회원의 거래나 권리에 중대한 영향을 미치는 사항은 개별 통지합니다.</li>
+        <li>회원이 연락처를 갱신하지 않아 통지를 받지 못한 경우 회사는 회사의 고의 또는 중대한 과실이 없는 한 책임을 지지 않습니다.</li>
+      </ol>
+    </section>
+
+    <section class="terms-article">
+      <h2>제10조 (개인정보 보호)</h2>
+      <p>회사는 관련 법령에 따라 개인정보를 보호하며, 개인정보의 수집·이용, 보유·파기, 처리위탁 및 이용자의 권리에 관한 구체적인 사항은 <%= link_to "개인정보처리방침", privacy_path %>에 따릅니다.</p>
+    </section>
+
+    <section class="terms-article">
+      <h2>제11조 (회사의 의무)</h2>
+      <ol>
+        <li>회사는 관련 법령과 이 약관을 준수하고 안정적인 서비스 제공을 위해 노력합니다.</li>
+        <li>회사는 회원의 개인정보와 계정 정보를 보호하기 위한 보안조치를 시행합니다.</li>
+        <li>회사는 회원의 정당한 의견이나 불만을 처리하고 그 진행상황과 결과를 안내하기 위해 노력합니다.</li>
+      </ol>
+    </section>
+
+    <section class="terms-article">
+      <h2>제12조 (회원의 의무와 금지행위)</h2>
+      <p>회원은 관계 법령, 이 약관 및 서비스 안내를 준수해야 하며 다음 행위를 해서는 안 됩니다.</p>
+      <ol>
+        <li>허위 정보 등록, 타인 사칭 또는 계정·결제수단 도용</li>
+        <li>타인의 저작권, 상표권, 초상권, 개인정보, 명예 등 권리 침해</li>
+        <li>불법·폭력적·음란하거나 차별·혐오를 조장하는 콘텐츠의 게시</li>
+        <li>스팸, 피싱, 악성코드 배포 또는 서비스의 정상 운영을 방해하는 행위</li>
+        <li>회사 또는 제3자의 정보를 무단 변경·복제·수집하거나 기술적 보호조치를 우회하는 행위</li>
+        <li>그 밖에 법령 또는 공서양속에 반하는 행위</li>
+      </ol>
+    </section>
+
+    <section class="terms-article">
+      <h2>제13조 (콘텐츠와 지식재산권)</h2>
+      <ol>
+        <li>서비스 자체와 회사가 제작한 콘텐츠의 지식재산권은 회사 또는 정당한 권리자에게 귀속됩니다.</li>
+        <li>회원이 게시한 콘텐츠의 권리는 회원 또는 원권리자에게 귀속됩니다. 회원은 콘텐츠를 게시할 적법한 권한이 있음을 보증합니다.</li>
+        <li>회원은 회사에 서비스 제공, 저장, 전송, 화면 표시, 백업 및 기술적 변환에 필요한 범위에서 콘텐츠를 이용할 수 있는 권한을 부여합니다. 공개 프로필 콘텐츠는 회원이 설정한 공개 범위에서 이용자에게 표시됩니다.</li>
+        <li>회사는 콘텐츠가 법령이나 이 약관을 위반하거나 권리 침해 신고가 접수된 경우 임시조치, 비공개 또는 삭제할 수 있으며 가능한 경우 사유와 이의제기 방법을 알립니다.</li>
+      </ol>
+    </section>
+
+    <section class="terms-article">
+      <h2>제14조 (책임 및 면책)</h2>
+      <ol>
+        <li>회사는 고의 또는 과실로 이용자에게 손해를 발생시킨 경우 관련 법령에 따라 책임을 부담합니다.</li>
+        <li>회사는 천재지변, 통신망 장애 등 합리적으로 통제하기 어려운 사유로 서비스를 제공하지 못한 경우 책임을 지지 않습니다. 다만 회사의 고의 또는 과실이 있는 경우는 제외합니다.</li>
+        <li>회원이 게시한 콘텐츠와 이를 바탕으로 회원과 제3자 사이에 이루어진 상담·거래의 책임은 해당 당사자에게 있습니다. 회사는 거래의 당사자 또는 회원의 자격·능력·성과를 보증하지 않습니다.</li>
+        <li>무료서비스는 관련 법령이 허용하는 범위에서 서비스의 계속성, 특정 목적 적합성 또는 성과를 보증하지 않습니다.</li>
+      </ol>
+    </section>
+
+    <section class="terms-article">
+      <h2>제15조 (분쟁 해결)</h2>
+      <ol>
+        <li>회사와 회원은 서비스 이용과 관련한 분쟁을 원만하게 해결하기 위해 성실히 협의합니다.</li>
+        <li>회원은 소비자상담 또는 분쟁조정이 필요한 경우 한국소비자원 등 관계 기관에 도움을 요청할 수 있습니다.</li>
+        <li>전자우편 {{이메일}}을 통해 서비스 이용 관련 문의와 이의를 제기할 수 있습니다.</li>
+      </ol>
+    </section>
+
+    <section class="terms-article">
+      <h2>제16조 (준거법 및 관할)</h2>
+      <ol>
+        <li>이 약관과 서비스 이용계약에는 대한민국 법령을 적용합니다.</li>
+        <li>회사와 회원 사이의 소송은 관련 법령에서 정한 관할법원에 제기합니다.</li>
+      </ol>
+    </section>
+
+    <section class="terms-article">
+      <h2>부칙</h2>
+      <p>이 약관은 <strong>{{시행일}}</strong>부터 시행합니다.</p>
+    </section>
+
+    <div class="terms-company">
+      <strong>{{상호}}</strong> · 대표자 {{대표자}} · 사업자등록번호 {{사업자등록번호}}<br>
+      {{주소}} · {{연락처}} · {{이메일}}
+    </div>
+  </div>
+</div>

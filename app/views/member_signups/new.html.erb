@@ -80,6 +80,16 @@
   .auth-alt strong { color: var(--impd-ink, #0f0d0b); }
   .auth-alt a { color: var(--impd-accent, #3a2af0); text-decoration: underline; }
 
+  .probe-consent { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; background: #fff; border: 1px solid var(--impd-rule, rgba(15,13,11,0.15)); margin: 8px 0 4px; cursor: pointer; }
+  .probe-consent input[type=checkbox] { flex-shrink: 0; margin-top: 3px; width: 16px; height: 16px; accent-color: var(--impd-accent, #3a2af0); }
+  .probe-consent strong { display: block; font-size: 13px; font-weight: 600; color: var(--impd-ink, #0f0d0b); margin-bottom: 4px; letter-spacing: -0.1px; }
+  .probe-consent p { margin: 0; font-size: 11px; color: rgba(15,13,11,0.6); line-height: 1.55; }
+  .probe-consent .probe-tag { display: inline-block; margin-left: 6px; padding: 1px 6px; font-family: var(--impd-font-mono, 'JetBrains Mono', monospace); font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-accent, #3a2af0); border: 1px solid var(--impd-accent, #3a2af0); }
+
+  .terms-consent { display: flex; gap: 12px; align-items: flex-start; margin: 12px 0 4px; padding: 14px 16px; background: #fff; border: 1px solid var(--impd-rule, rgba(15,13,11,0.15)); font-size: 13px; line-height: 1.65; color: var(--impd-ink, #0f0d0b); cursor: pointer; }
+  .terms-consent input[type=checkbox] { flex-shrink: 0; width: 16px; height: 16px; margin-top: 3px; accent-color: var(--impd-accent, #3a2af0); }
+  .terms-consent a { color: var(--impd-accent, #3a2af0); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+
   .auth-foot { margin-top: auto; padding-top: 32px; display: flex; align-items: center; justify-content: space-between; font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(15,13,11,0.45); position: relative; }
   .auth-foot a { color: inherit; text-decoration: none; }
   .auth-foot a:hover { color: var(--impd-accent, #3a2af0); }
@@ -109,7 +119,7 @@
         </h2>
         <p class="auth-sub">
           이름과 이메일만 있으면 충분합니다.
-          가입 후 관리자 승인을 거쳐 본인 공개 페이지(/이름)가 열리고 편집을 시작할 수 있습니다.
+          가입 즉시 본인 공개 페이지(/이름)가 열리고 바로 편집을 시작할 수 있습니다.
         </p>
       </div>
 
@@ -195,6 +205,19 @@
           </div>
         </div>
 
+        <label class="probe-consent">
+          <%= check_box_tag "identity_probe_consent", "1", false %>
+          <div>
+            <strong>imPD가 저를 대신 찾아볼게요<span class="probe-tag">Optional</span></strong>
+            <p>이름과 이메일을 바탕으로 공개된 웹/SNS에서 제 프로필 단서를 자동 수집하는 데 동의합니다. 체크 안 하셔도 가입은 진행돼요.</p>
+          </div>
+        </label>
+
+        <label class="terms-consent" for="terms_agree">
+          <%= check_box_tag "terms_agree", "1", params[:terms_agree].to_s == "1", required: true, id: "terms_agree" %>
+          <span><%= link_to "이용약관", terms_path, target: "_blank", rel: "noopener noreferrer" %>과 <%= link_to "개인정보처리방침", privacy_path, target: "_blank", rel: "noopener noreferrer" %>에 동의합니다 (필수)</span>
+        </label>
+
         <button type="submit" class="submit-btn">이메일로 가입하기 →</button>
       <% end %>
 
@@ -213,8 +236,7 @@
       <% end %>
 
       <p class="auth-fine">
-        가입과 함께 서비스 이용 약관 및 개인정보 처리 방침에 동의합니다.
-        가입 직후 상태는 <strong>관리자 승인 대기</strong>이며, 승인 완료 시 안내 메일을 보내드립니다.
+        가입 후 바로 본인 공개 페이지(<strong>/이름</strong>)가 열립니다.
       </p>
 
       <div class="auth-alt">

@@ -26,6 +26,7 @@ Rails.application.routes.draw do
   # ── 공개 사이트 (Chopd) ──────────────────────────────
   root "chopd/home#index"
   get "/privacy", to: "legal#privacy", as: :privacy
+  get "/terms", to: "legal#terms", as: :terms
 
   # ── imPD 프로모 시네마틱 (30s HTML 영상) ─────────────
   get "/promo",       to: "promo#show",  as: :promo
