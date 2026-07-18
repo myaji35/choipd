@@ -1,0 +1,50 @@
+<% content_for :title, "문의함 — #{@member.name}" %>
+
+<div class="inquiries-wrap" style="max-width: 1040px; margin: 0 auto; padding: 40px;">
+  <header style="margin-bottom: 32px;">
+    <p class="impd-label-muted">INBOX · /<%= @member.slug %></p>
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px;">
+      <h1 class="impd-display" style="font-size: 44px;">문의함</h1>
+      <span style="background: <%= @unread_count.positive? ? 'var(--impd-accent)' : 'var(--impd-rule)' %>; color: <%= @unread_count.positive? ? '#fff' : 'var(--impd-muted)' %>; padding: 5px 9px; font-size: 12px; font-weight: 700;">
+        안읽음 <%= @unread_count %>건
+      </span>
+    </div>
+  </header>
+
+  <% if @inquiries.any? %>
+    <div style="display: grid; gap: 14px;">
+      <% @inquiries.each do |inquiry| %>
+        <% unread = inquiry.is_read.to_i.zero? %>
+        <article class="impd-card" style="border-left: 4px solid <%= unread ? 'var(--impd-accent)' : 'var(--impd-rule)' %>; background: <%= unread ? '#fff' : 'var(--impd-card)' %>;">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: flex-start;">
+            <div>
+              <div style="display: flex; flex-wrap: wrap; gap: 9px; align-items: center;">
+                <h2 style="font-size: 17px; line-height: 1.45;"><%= inquiry.sender_name %></h2>
+                <span style="border: 1px solid <%= unread ? 'var(--impd-accent)' : 'var(--impd-rule)' %>; color: <%= unread ? 'var(--impd-accent)' : 'var(--impd-muted)' %>; padding: 3px 7px; font-size: 12px; font-weight: 600;"><%= unread ? "안읽음" : "읽음" %></span>
+              </div>
+              <%= mail_to inquiry.sender_email, inquiry.sender_email, style: "display: inline-block; margin-top: 6px; color: var(--impd-accent); font-size: 13px; word-break: break-all;" %>
+            </div>
+            <time class="impd-label-muted" datetime="<%= inquiry.created_at.iso8601 %>"><%= l inquiry.created_at, format: :long %></time>
+          </div>
+
+          <p style="white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 18px; color: var(--impd-ink2); font-size: 14px; line-height: 1.75;"><%= inquiry.message %></p>
+
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--impd-rule);">
+            <%= button_to(unread ? "읽음 처리" : "안읽음 처리", toggle_read_slug_admin_inquiry_path(slug: @member.slug, id: inquiry), method: :post, class: "impd-btn impd-btn-secondary", style: "height: 38px; padding: 0 14px; font-size: 13px;") %>
+            <%= mail_to inquiry.sender_email, "답장", class: "impd-btn impd-btn-primary", style: "height: 38px; padding: 0 18px; font-size: 13px;" %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="impd-card" style="padding: 56px 24px; text-align: center;">
+      <p style="font-size: 14px; color: var(--impd-ink2);">아직 받은 문의가 없어요.</p>
+    </div>
+  <% end %>
+</div>
+
+<style>
+  @media (max-width: 720px) {
+    .inquiries-wrap { padding: 28px 20px !important; }
+  }
+</style>

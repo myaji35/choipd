@@ -312,10 +312,19 @@ Rails.application.routes.draw do
       resources :services, controller: "services", only: [ :index, :create, :update, :destroy ] do
         collection { post :reorder }
       end
+      resources :inquiries, only: [ :index ] do
+        member { post :toggle_read }
+      end
       get "/withdraw", to: "withdrawals#show", as: :withdraw
       delete "/withdraw", to: "withdrawals#destroy", as: :withdraw_destroy
     end
   end
+
+  # 공개 프로필 문의 접수 — vanity URL보다 먼저 매칭한다.
+  post "/:slug/inquiries",
+       to: "member_inquiries#create",
+       as: :member_inquiries,
+       constraints: { slug: /[a-z0-9][a-z0-9\-]{1,}/ }
 
   # 요약 카드 뷰 — 짧은 URL /s/:hash 기본 타겟. 한 화면 안에 이름·직함·명함·QR·연락 3버튼.
   # "전체 프로필 보기 →" 클릭해야 /:slug 풀 페이지로 이동.

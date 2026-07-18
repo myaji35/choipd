@@ -939,11 +939,37 @@
         <% end %>
       </div>
     </div>
+
+    <div style="border-top: 1px solid var(--impd-rule); margin-top: 28px; padding-top: 28px;">
+      <div class="impd-section-header" style="margin-bottom: 20px;">
+        <span class="impd-label">문의 보내기</span>
+        <span class="impd-label-muted">CONTACT FORM</span>
+      </div>
+      <%= form_with model: MemberInquiry.new, url: member_inquiries_path(slug: @member.slug), method: :post, class: "contact-inquiry-form" do |form| %>
+        <div class="contact-inquiry-fields" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div>
+            <%= form.label :sender_name, "이름", style: "display: block; margin-bottom: 6px; color: var(--impd-muted); font-size: 13px; font-weight: 600;" %>
+            <%= form.text_field :sender_name, required: true, autocomplete: "name", style: "width: 100%; border: 1px solid #d1d5db; background: #fff; padding: 10px 12px; color: var(--impd-ink); font-family: var(--impd-font-sans); font-size: 14px;" %>
+          </div>
+          <div>
+            <%= form.label :sender_email, "이메일", style: "display: block; margin-bottom: 6px; color: var(--impd-muted); font-size: 13px; font-weight: 600;" %>
+            <%= form.email_field :sender_email, required: true, autocomplete: "email", style: "width: 100%; border: 1px solid #d1d5db; background: #fff; padding: 10px 12px; color: var(--impd-ink); font-family: var(--impd-font-sans); font-size: 14px;" %>
+          </div>
+        </div>
+        <div style="margin-top: 16px;">
+          <%= form.label :message, "문의내용", style: "display: block; margin-bottom: 6px; color: var(--impd-muted); font-size: 13px; font-weight: 600;" %>
+          <%= form.text_area :message, required: true, minlength: 5, maxlength: 2000, rows: 6, style: "width: 100%; border: 1px solid #d1d5db; background: #fff; padding: 10px 12px; color: var(--impd-ink); font-family: var(--impd-font-sans); font-size: 14px; line-height: 1.65; resize: vertical;" %>
+        </div>
+        <%= hidden_field_tag :website, "", autocomplete: "off", tabindex: -1 %>
+        <%= form.submit "문의 전송", class: "impd-btn impd-btn-primary", style: "margin-top: 16px; min-width: 140px; justify-content: center;" %>
+      <% end %>
+    </div>
   </div>
 
   <style>
     @media (max-width: 768px) {
       section#contact > div > div { grid-template-columns: 1fr !important; }
+      .contact-inquiry-fields { grid-template-columns: 1fr !important; }
     }
   </style>
 </section>

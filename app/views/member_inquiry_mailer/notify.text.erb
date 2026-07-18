@@ -1,0 +1,7 @@
+새 문의가 도착했습니다
+
+문의자: <%= @inquiry.sender_name %> (<%= @inquiry.sender_email %>)
+
+<%= @inquiry.message %>
+
+문의함에서 확인하기: <%= slug_admin_inquiries_url(slug: @member.slug) %>

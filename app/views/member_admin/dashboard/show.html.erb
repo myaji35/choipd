@@ -57,6 +57,7 @@
           <span class="impd-label">§02</span>
           <span class="impd-display" style="font-size: 24px; flex: 1;">최근 문의</span>
           <span class="impd-label-muted"><%= @recent_inquiries.size %>건</span>
+          <%= link_to "문의함 보기", slug_admin_inquiries_path(slug: @member.slug), style: "color: var(--impd-accent); font-size: 13px; font-weight: 600;" %>
         </div>
         <% if @recent_inquiries.any? %>
           <div style="display: grid; gap: 12px;">
@@ -117,6 +118,7 @@
         <p style="font-size: 12px; color: var(--impd-muted); margin-top: 4px;">현재 활성 플랜</p>
         <a href="<%= slug_admin_editor_path(slug: @member.slug) %>" class="impd-btn impd-btn-secondary" style="width: 100%; justify-content: center; margin-top: 16px;">에디터로 가기 →</a>
         <%= link_to "서비스 관리", slug_admin_services_path(slug: @member.slug), class: "impd-btn impd-btn-primary", style: "width: 100%; justify-content: center; margin-top: 8px;" %>
+        <%= link_to "문의함", slug_admin_inquiries_path(slug: @member.slug), class: "impd-btn impd-btn-secondary", style: "width: 100%; justify-content: center; margin-top: 8px;" %>
       </div>
     </div>
   </div>

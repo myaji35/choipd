@@ -1,0 +1,7 @@
+<h1>새 문의가 도착했습니다</h1>
+
+<p><strong>문의자</strong>: <%= @inquiry.sender_name %> (<%= mail_to @inquiry.sender_email %>)</p>
+
+<p style="white-space: pre-wrap;"><%= @inquiry.message %></p>
+
+<p><%= link_to "문의함에서 확인하기", slug_admin_inquiries_url(slug: @member.slug) %></p>
