@@ -1,0 +1,41 @@
+<main style="max-width: 760px; margin: 0 auto; padding: 48px 24px 72px; color: var(--impd-ink);">
+  <header style="padding-bottom: 24px; border-bottom: 1px solid var(--impd-ink);">
+    <p class="impd-label" style="color: var(--impd-accent-2);">계정 관리</p>
+    <h1 style="margin-top: 10px; font-family: var(--impd-font-display); font-size: 36px; font-weight: 800; letter-spacing: -0.8px;">회원 탈퇴</h1>
+    <p style="margin-top: 12px; color: var(--impd-ink2); font-size: 14px; line-height: 1.7;">탈퇴 전에 아래 처리 내용을 반드시 확인해 주세요.</p>
+  </header>
+
+  <section style="margin-top: 28px; background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 24px;">
+    <h2 style="font-family: var(--impd-font-display); font-size: 20px; font-weight: 800;">탈퇴 시 처리되는 내용</h2>
+    <ul style="margin-top: 18px; padding-left: 20px; color: var(--impd-ink2); font-size: 14px; line-height: 1.8;">
+      <li>이름, 연락처 등 개인정보는 복구할 수 없도록 익명화됩니다.</li>
+      <li>업로드한 문서 <strong><%= @counts[:documents] %>개</strong>와 사진 <strong><%= @counts[:photos] %>개</strong>는 파기됩니다.</li>
+      <li>등록한 서비스 <strong><%= @counts[:services] %>개</strong>를 포함한 공개 프로필 페이지는 비공개로 전환됩니다.</li>
+      <li>거래, 문의, 리뷰 기록은 관련 법령에 따른 기간 동안 보존될 수 있습니다.</li>
+    </ul>
+  </section>
+
+  <section style="margin-top: 20px; border-left: 3px solid var(--impd-accent-2); background: rgba(255, 90, 31, 0.08); padding: 18px 20px;">
+    <h2 style="font-size: 15px; font-weight: 800; color: var(--impd-accent-2);">이 작업은 되돌릴 수 없습니다.</h2>
+    <p style="margin-top: 6px; color: var(--impd-ink2); font-size: 13px; line-height: 1.65;">탈퇴가 완료되면 계정과 삭제된 자료를 복구할 수 없습니다.</p>
+  </section>
+
+  <section style="margin-top: 32px;">
+    <div style="background: #fff; border: 1px solid var(--impd-rule); padding: 24px;">
+      <label for="confirm_name" style="display: block; font-size: 14px; font-weight: 700; color: var(--impd-ink);">
+        확인을 위해 이름 <strong style="color: var(--impd-accent-2);"><%= @member.name %></strong>을(를) 정확히 입력해 주세요.
+      </label>
+      <input id="confirm_name" name="confirm_name" type="text" autocomplete="off" required
+             form="member-withdrawal-form"
+             class="border-gray-300 px-3 py-2.5 text-sm"
+             style="display: block; width: 100%; margin-top: 10px; background: #fff; color: var(--impd-ink); font-family: var(--impd-font-sans);">
+      <%= button_to "회원 탈퇴", slug_admin_withdraw_destroy_path(slug: @member.slug), method: :delete,
+            form: { id: "member-withdrawal-form", style: "margin-top: 18px;" },
+            data: { turbo_confirm: "정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다." },
+            style: "width: 100%; padding: 11px 18px; border: 1px solid var(--impd-accent-2); background: var(--impd-accent-2); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer;" %>
+    </div>
+
+    <%= link_to "취소하고 대시보드로 돌아가기", slug_admin_dashboard_path(slug: @member.slug),
+          style: "display: block; margin-top: 16px; text-align: center; color: var(--impd-ink2); font-size: 13px; text-decoration: underline; text-underline-offset: 3px;" %>
+  </section>
+</main>

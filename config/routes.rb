@@ -271,6 +271,17 @@ Rails.application.routes.draw do
     end
   end
 
+  # ── Identity Probe Wizard (ISS-402) ─────────────────
+  # /welcome/probe — S0~S6 회원 정체성 확인 위자드
+  scope "/welcome/probe", as: :probe_wizard do
+    get   "/",           to: "identity_probes#show",         as: :show
+    get   "/status",     to: "identity_probes#status",       as: :status
+    patch "/step/:n",    to: "identity_probes#update_step",  as: :step
+    post  "/finish",     to: "identity_probes#finish",       as: :finish
+    post  "/skip",       to: "identity_probes#skip",         as: :skip
+    post  "/rewrite_bio", to: "identity_probes#rewrite_bio", as: :rewrite_bio
+  end
+
   # ── 외부 webhook (인증 없음) ───────────────────────
   post "/webhooks/kakao/message", to: "webhooks/kakao#message"
 
@@ -296,6 +307,8 @@ Rails.application.routes.draw do
         member { post :reparse }
       end
       resources :photos, only: [ :create, :update, :destroy ]
+      get "/withdraw", to: "withdrawals#show", as: :withdraw
+      delete "/withdraw", to: "withdrawals#destroy", as: :withdraw_destroy
     end
   end
 

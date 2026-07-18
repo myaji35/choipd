@@ -2,7 +2,7 @@ class PublicProfileController < ApplicationController
   layout "impd"
 
   def show
-    @member = Member.find_by(slug: params[:slug])
+    @member = Member.active.find_by(slug: params[:slug])
     if @member
       @awards = []  # talent 도메인에서 확장 예정
       @services = @member.member_services.active.sorted
