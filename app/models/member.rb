@@ -6,11 +6,14 @@ class Member < ApplicationRecord
   has_many :member_portfolio_items, dependent: :destroy
   has_many :member_services,        dependent: :destroy
   has_many :member_posts,           dependent: :destroy
-  has_many :member_inquiries,       dependent: :destroy
-  has_many :member_reviews,         dependent: :destroy
-  has_many :member_bookings,        dependent: :destroy
+  # 거래·리뷰·문의는 법정 보존/타인 작성물 — 회원 물리삭제 시 연쇄삭제 금지.
+  # 탈퇴는 소프트삭제+익명화로 처리하고, 물리 destroy 시도는 막는다(ISS-112).
+  has_many :member_inquiries,       dependent: :restrict_with_error
+  has_many :member_reviews,         dependent: :restrict_with_error
+  has_many :member_bookings,        dependent: :restrict_with_error
   has_many :member_skills,          dependent: :destroy
   has_many :skills, through: :member_skills
+  # 업로드 문서(개인정보)는 탈퇴 익명화 서비스에서만 파기 (ISS-113 예정)
   has_many :member_documents,       dependent: :destroy
   has_many :member_photos,          dependent: :destroy
   has_many :member_gap_reports,     dependent: :destroy
