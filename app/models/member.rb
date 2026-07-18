@@ -274,4 +274,11 @@ class Member < ApplicationRecord
     "₩#{(value / 1_000_000).floor}백만원대"
   end
   private :revenue_range_label
+
+  scope :active,    -> { where(withdrawn_at: nil) }
+  scope :withdrawn, -> { where.not(withdrawn_at: nil) }
+
+  def withdrawn?
+    withdrawn_at.present?
+  end
 end
