@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_23_070645) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_19_000002) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -394,6 +394,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_23_070645) do
     t.index ["tenant_id"], name: "index_hero_images_on_tenant_id"
   end
 
+  create_table "identity_probes", force: :cascade do |t|
+    t.float "confidence"
+    t.datetime "created_at", null: false
+    t.datetime "decided_at"
+    t.datetime "expires_at"
+    t.text "identity"
+    t.integer "last_step", default: 0, null: false
+    t.integer "member_id", null: false
+    t.datetime "raw_purged_at"
+    t.text "raw_signals"
+    t.text "sources_hit"
+    t.text "sources_queried"
+    t.string "status", default: "pending", null: false
+    t.text "step_payloads"
+    t.datetime "updated_at", null: false
+    t.string "user_decision"
+    t.index ["expires_at"], name: "index_identity_probes_on_expires_at"
+    t.index ["member_id", "status"], name: "index_identity_probes_on_member_id_and_status"
+    t.index ["member_id"], name: "index_identity_probes_on_member_id"
+    t.index ["status"], name: "index_identity_probes_on_status"
+  end
+
   create_table "image_auto_tags", force: :cascade do |t|
     t.boolean "adult_content", default: false
     t.text "categories", null: false
@@ -759,6 +781,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_23_070645) do
     t.string "email", null: false
     t.text "enabled_modules", default: "[]"
     t.integer "featured_order", default: 0
+    t.datetime "identity_probe_consent_at"
     t.datetime "impd_completed_at"
     t.datetime "impd_started_at"
     t.string "impd_status", default: "none", null: false
@@ -788,6 +811,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_23_070645) do
     t.string "status", default: "pending_approval", null: false
     t.string "subscription_plan", default: "basic"
     t.integer "tenant_id", default: 1, null: false
+    t.datetime "terms_agreed_at"
     t.text "theme_config", default: "{}"
     t.string "theme_preset"
     t.string "townin_email"
@@ -797,14 +821,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_23_070645) do
     t.string "towningraph_user_id"
     t.string "uid"
     t.datetime "updated_at", null: false
+    t.datetime "withdrawn_at"
     t.index ["email"], name: "index_members_on_email"
+    t.index ["identity_probe_consent_at"], name: "index_members_on_identity_probe_consent_at"
     t.index ["impd_status"], name: "index_members_on_impd_status"
     t.index ["impd_verification_id"], name: "index_members_on_impd_verification_id", unique: true
     t.index ["partner_status"], name: "index_members_on_partner_status"
     t.index ["provider", "uid"], name: "index_members_on_provider_and_uid", unique: true, where: "provider IS NOT NULL"
     t.index ["slug"], name: "index_members_on_slug", unique: true
     t.index ["tenant_id"], name: "index_members_on_tenant_id"
+    t.index ["terms_agreed_at"], name: "index_members_on_terms_agreed_at"
     t.index ["towningraph_user_id"], name: "index_members_on_towningraph_user_id", unique: true
+    t.index ["withdrawn_at"], name: "index_members_on_withdrawn_at"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -1080,6 +1108,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_23_070645) do
   add_foreign_key "cohort_users", "cohorts", on_delete: :cascade
   add_foreign_key "distributor_activity_logs", "distributors"
   add_foreign_key "enrollments", "courses", on_delete: :cascade
+  add_foreign_key "identity_probes", "members"
   add_foreign_key "invoices", "distributors"
   add_foreign_key "invoices", "payments"
   add_foreign_key "kakao_alerts", "kakao_channels", on_delete: :cascade
