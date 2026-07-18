@@ -19,6 +19,33 @@
   <meta name="twitter:title" content="<%= @member.name %> — imPD">
   <meta name="twitter:description" content="<%= @member.bio.to_s.first(160).presence || '흩어진 내 일, 하나의 주소로.' %>">
   <meta name="twitter:image" content="<%= card_url %>">
+  <%
+    social_urls = case (social = @member.social)
+    when Hash
+      social.values
+    when Array
+      social.map { |entry| entry.is_a?(Hash) ? (entry["url"] || entry[:url]) : entry }
+    else
+      []
+    end.filter_map { |value| value.to_s.presence }
+
+    person_schema = {
+      "@context" => "https://schema.org",
+      "@type" => "Person",
+      "name" => @member.name,
+      "url" => share_url,
+      "jobTitle" => @member.profession_label,
+      "description" => @member.bio.presence,
+      "image" => @member.profile_image.presence,
+      "address" => (@member.region.present? ? {
+        "@type" => "PostalAddress",
+        "addressLocality" => @member.region
+      } : nil),
+      "sameAs" => social_urls.presence
+    }.compact
+    person_schema_json = person_schema.to_json.gsub("</", "<\\/").html_safe
+  %>
+  <script type="application/ld+json"><%= person_schema_json %></script>
 <% end %>
 
 <style>

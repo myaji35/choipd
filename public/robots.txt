@@ -1,1 +1,7 @@
-# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+# 도메인 변경 시 아래 Sitemap 절대 URL도 함께 수정하세요.
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /pd
+Disallow: /*/admin
+Sitemap: https://impd.townin.net/sitemap.xml

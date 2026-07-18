@@ -27,6 +27,7 @@ Rails.application.routes.draw do
   root "chopd/home#index"
   get "/privacy", to: "legal#privacy", as: :privacy
   get "/terms", to: "legal#terms", as: :terms
+  get "/sitemap.xml", to: "sitemaps#show", defaults: { format: "xml" }, as: :sitemap
 
   # ── imPD 프로모 시네마틱 (30s HTML 영상) ─────────────
   get "/promo",       to: "promo#show",  as: :promo
