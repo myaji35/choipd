@@ -247,6 +247,10 @@ class Member < ApplicationRecord
   # 부러움 유발의 핵심: "지금 살아 움직이고 있다"는 신호.
   # 활동 기록이 있고 최근 7일 내 업데이트됐으면 LIVE 배지.
   def activity_live?
+    # 최근 7일 내 발행한 소식이 있으면 살아있는 활동으로 간주
+    recent_post = member_posts.published.where("published_at > ?", 7.days.ago).exists?
+    return true if recent_post
+
     last = stats["last_activity_at"]
     return false if last.blank?
     Time.parse(last.to_s) > 7.days.ago rescue false

@@ -321,6 +321,9 @@ Rails.application.routes.draw do
           post :reject
         end
       end
+      resources :posts, only: [ :index, :create, :update, :destroy ] do
+        member { post :toggle_publish }
+      end
       get "/withdraw", to: "withdrawals#show", as: :withdraw
       delete "/withdraw", to: "withdrawals#destroy", as: :withdraw_destroy
     end

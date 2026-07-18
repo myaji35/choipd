@@ -1,0 +1,92 @@
+<% content_for :title, "소식 관리 — #{@member.name}" %>
+
+<main style="max-width: 1100px; margin: 0 auto; padding: 40px;">
+  <div class="impd-section-header" style="margin-bottom: 24px;">
+    <span class="impd-label" style="font-size: 12px;">POSTS</span>
+    <h1 class="impd-display" style="font-size: 42px; flex: 1;">소식 관리</h1>
+  </div>
+
+  <section class="impd-card" style="margin-bottom: 32px;">
+    <h2 style="font-size: 22px;">새 소식 작성</h2>
+    <p style="margin-top: 8px; font-size: 13px; line-height: 1.7; color: var(--impd-muted);">발행한 소식은 공개 페이지에 표시되며 최근 7일 동안 LIVE 배지를 켭니다.</p>
+
+    <%= form_with model: MemberPost.new, url: slug_admin_posts_path(slug: @member.slug), style: "margin-top: 20px;" do |form| %>
+      <div style="display: grid; gap: 16px;">
+        <div>
+          <%= form.label :title, "제목", style: "display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700;" %>
+          <%= form.text_field :title, required: true, style: "width: 100%; border: 1px solid #d1d5db; padding: 10px 12px; font-size: 14px; color: var(--impd-ink); background: #fff;" %>
+        </div>
+        <div>
+          <%= form.label :content, "내용", style: "display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700;" %>
+          <%= form.text_area :content, required: true, rows: 7, style: "width: 100%; border: 1px solid #d1d5db; padding: 10px 12px; font-size: 14px; line-height: 1.7; color: var(--impd-ink); background: #fff; resize: vertical;" %>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;" class="post-fields-grid">
+          <div>
+            <%= form.label :category, "카테고리 (선택)", style: "display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700;" %>
+            <%= form.text_field :category, style: "width: 100%; border: 1px solid #d1d5db; padding: 10px 12px; font-size: 14px; color: var(--impd-ink); background: #fff;" %>
+          </div>
+          <div>
+            <%= form.label :thumbnail_url, "썸네일 URL (선택)", style: "display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700;" %>
+            <%= form.url_field :thumbnail_url, style: "width: 100%; border: 1px solid #d1d5db; padding: 10px 12px; font-size: 14px; color: var(--impd-ink); background: #fff;" %>
+          </div>
+        </div>
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--impd-ink2);">
+          <%= form.check_box :is_published, { style: "width: 16px; height: 16px; accent-color: var(--impd-accent);" }, 1, 0 %>
+          바로 발행
+        </label>
+        <div><%= form.submit "소식 등록", class: "impd-btn impd-btn-primary" %></div>
+      </div>
+    <% end %>
+  </section>
+
+  <% if @posts.any? %>
+    <div style="display: grid; gap: 16px;">
+      <% @posts.each do |post| %>
+        <% published = post.is_published.to_i == 1 %>
+        <article style="background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 24px;">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+            <h2 style="font-size: 20px; flex: 1 1 280px;"><%= post.title %></h2>
+            <span style="padding: 4px 8px; border: 1px solid <%= published ? 'var(--impd-accent)' : 'var(--impd-muted)' %>; color: <%= published ? 'var(--impd-accent)' : 'var(--impd-muted)' %>; font-size: 12px; font-weight: 700;"><%= published ? "발행" : "비공개" %></span>
+            <span style="font-size: 12px; color: var(--impd-muted);"><%= post.published_at&.strftime("%Y.%m.%d %H:%M") || "발행 이력 없음" %></span>
+          </div>
+
+          <%= form_with model: post, url: slug_admin_post_path(slug: @member.slug, id: post), method: :patch, style: "margin-top: 18px;" do |form| %>
+            <div style="display: grid; gap: 14px;">
+              <div>
+                <%= form.label :title, "제목", style: "display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700;" %>
+                <%= form.text_field :title, required: true, style: "width: 100%; border: 1px solid #d1d5db; padding: 10px 12px; font-size: 14px; color: var(--impd-ink); background: #fff;" %>
+              </div>
+              <div>
+                <%= form.label :content, "내용", style: "display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700;" %>
+                <%= form.text_area :content, required: true, rows: 5, style: "width: 100%; border: 1px solid #d1d5db; padding: 10px 12px; font-size: 14px; line-height: 1.7; color: var(--impd-ink); background: #fff; resize: vertical;" %>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;" class="post-fields-grid">
+                <div>
+                  <%= form.label :category, "카테고리 (선택)", style: "display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700;" %>
+                  <%= form.text_field :category, style: "width: 100%; border: 1px solid #d1d5db; padding: 10px 12px; font-size: 14px; color: var(--impd-ink); background: #fff;" %>
+                </div>
+                <div>
+                  <%= form.label :thumbnail_url, "썸네일 URL (선택)", style: "display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700;" %>
+                  <%= form.url_field :thumbnail_url, style: "width: 100%; border: 1px solid #d1d5db; padding: 10px 12px; font-size: 14px; color: var(--impd-ink); background: #fff;" %>
+                </div>
+              </div>
+              <div><%= form.submit "수정", class: "impd-btn impd-btn-primary" %></div>
+            </div>
+          <% end %>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+            <%= button_to(published ? "비공개로 전환" : "발행", toggle_publish_slug_admin_post_path(slug: @member.slug, id: post), method: :post, class: "impd-btn impd-btn-secondary") %>
+            <%= button_to "삭제", slug_admin_post_path(slug: @member.slug, id: post), method: :delete, class: "impd-btn impd-btn-secondary", form: { data: { turbo_confirm: "이 소식을 삭제할까요? 삭제 후 복구할 수 없습니다." } } %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div style="padding: 56px 24px; background: var(--impd-card); border: 1px solid var(--impd-rule); text-align: center;">
+      <p style="font-size: 15px; line-height: 1.8; color: var(--impd-muted);">아직 소식이 없어요. 근황을 올리면 공개 페이지에 '살아있는 활동'으로 표시되고 LIVE 배지가 켜집니다.</p>
+    </div>
+  <% end %>
+</main>
+
+<style>
+  @media (max-width: 640px) { .post-fields-grid { grid-template-columns: 1fr !important; } }
+</style>
