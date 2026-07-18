@@ -1,0 +1,11 @@
+{
+  "code": "shopowner",
+  "label": "자영업자",
+  "value_cards": [
+    {"head": "상품 추천", "desc": "고객 니즈 맞춰 큐레이션"},
+    {"head": "주문·배송", "desc": "빠른 픽업과 정확한 배송"},
+    {"head": "A/S 지원", "desc": "구매 후에도 책임"},
+    {"head": "단골 혜택", "desc": "재방문 고객 혜택"}
+  ],
+  "cta": {"primary": "문의하기", "secondary": "서비스 보기"}
+}

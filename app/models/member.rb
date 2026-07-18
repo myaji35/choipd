@@ -60,7 +60,9 @@ class Member < ApplicationRecord
     raw = profession.to_s.strip
     return "크리에이터" if raw.blank?
 
-    PROFESSION_LABELS[raw] || raw
+    preset = ProfessionPreset.for(raw)
+    preset_label = preset["label"].presence if preset["code"] == raw
+    preset_label || PROFESSION_LABELS[raw] || raw
   end
 
   def social

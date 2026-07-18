@@ -1,0 +1,11 @@
+{
+  "code": "custom",
+  "label": "크리에이터",
+  "value_cards": [
+    {"head": "문제 진단", "desc": "상황 듣고 핵심부터 정리"},
+    {"head": "실행", "desc": "계획을 결과로"},
+    {"head": "투명 보고", "desc": "과정도 결과도 공유"},
+    {"head": "지속 지원", "desc": "끝이 아닌 시작"}
+  ],
+  "cta": {"primary": "문의하기", "secondary": "서비스 보기"}
+}

@@ -791,51 +791,8 @@
 <!-- ── §Y "제공 가능한 가치" — 포트폴리오 없어도 자동 생성되는 가치 카드 4종 ─ -->
 <%
   # profession 기반 표준 가치 제안 (포트폴리오·서비스 없어도 이 회원이 "뭐 하는 사람"인지 즉시 전달)
-  profession_kits = {
-    "insurance_agent" => [
-      { head: "맞춤 상담", desc: "가족 구성·라이프스타일 기반 보장 설계" },
-      { head: "재무 점검", desc: "보장 중복/공백 무료 진단" },
-      { head: "청구 대행", desc: "사고·진단 시 서류 대행과 지원" },
-      { head: "정기 리뷰", desc: "연 1회 자동 재점검" },
-    ],
-    "realtor" => [
-      { head: "시세 분석", desc: "실거래 + 호가 정리해 드려요" },
-      { head: "매물 투어", desc: "원하는 조건 3~5곳 사전 조율" },
-      { head: "계약 지원", desc: "서류·특약까지 꼼꼼히" },
-      { head: "이사 파트너", desc: "청소·이사 업체 추천" },
-    ],
-    "educator" => [
-      { head: "맞춤 수업", desc: "수준·목표에 맞춘 1:1 / 그룹" },
-      { head: "학습 피드백", desc: "매 수업 후 요약 노트" },
-      { head: "자료 제공", desc: "수업 녹화·정리 자료 공유" },
-      { head: "진도 관리", desc: "주간 체크인 + 목표 조정" },
-    ],
-    "author" => [
-      { head: "콘텐츠 기획", desc: "주제·톤·분량까지 함께 설계" },
-      { head: "집필", desc: "마감에 맞춘 안정적 품질" },
-      { head: "감수·교정", desc: "팩트·가독성 양쪽 다듬기" },
-      { head: "출판 지원", desc: "표지·목차·편집 컨설팅" },
-    ],
-    "shopowner" => [
-      { head: "상품 추천", desc: "고객 니즈 맞춰 큐레이션" },
-      { head: "주문·배송", desc: "빠른 픽업과 정확한 배송" },
-      { head: "A/S 지원", desc: "구매 후에도 책임" },
-      { head: "단골 혜택", desc: "재방문 고객 혜택" },
-    ],
-    "freelancer" => [
-      { head: "프로젝트", desc: "기획·실행·마무리까지 올인원" },
-      { head: "빠른 대응", desc: "1일 내 초안, 당일 회신" },
-      { head: "가격 투명", desc: "스코프별 명확한 견적" },
-      { head: "지속 파트너", desc: "재의뢰·장기 계약 환영" },
-    ],
-    "custom" => [
-      { head: "문제 진단", desc: "상황 듣고 핵심부터 정리" },
-      { head: "실행", desc: "계획을 결과로" },
-      { head: "투명 보고", desc: "과정도 결과도 공유" },
-      { head: "지속 지원", desc: "끝이 아닌 시작" },
-    ],
-  }
-  base_kit = profession_kits[@member.profession.to_s] || profession_kits["custom"]
+  base_kit = ProfessionPreset.value_cards(@member.profession).map { |card| { head: card["head"], desc: card["desc"] } }.presence ||
+             ProfessionPreset.value_cards("custom").map { |card| { head: card["head"], desc: card["desc"] } }
 
   # 개인화: 회원 고유 데이터 우선, 부족분을 직종 fallback 로 채움.
   personal = []
