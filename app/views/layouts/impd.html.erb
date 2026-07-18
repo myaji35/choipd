@@ -6,27 +6,54 @@
     <title><%= content_for?(:title) ? yield(:title) + " | imPD" : "imPD — 강사·공방·아티스트의 홍보 페이지" %></title>
     <meta name="description" content="<%= content_for?(:description) ? yield(:description) : '사진과 수료증만 올리면 자동으로 홍보 페이지가 완성됩니다.' %>">
 
-    <!-- imPD 디자인 시스템 폰트 -->
+    <!-- imPD 디자인 시스템 폰트 — C2 Starbucks-inspired retail tone -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@700;800&family=Noto+Serif+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&family=Caveat:wght@400;500;700&family=Nanum+Pen+Script&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter+Tight:wght@700;800&family=Lora:ital@1&family=Noto+Serif+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&family=Caveat:wght@400;500;700&family=Nanum+Pen+Script&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
 
     <style>
       :root {
-        --impd-paper: #efece4;
-        --impd-card: #fbf8f1;
-        --impd-ink: #0f0d0b;
-        --impd-ink2: rgba(15,13,11,0.85);
-        --impd-muted: rgba(15,13,11,0.55);
-        --impd-soft-muted: rgba(15,13,11,0.35);
-        --impd-rule: rgba(15,13,11,0.15);
-        --impd-accent: #3a2af0;
-        --impd-accent-2: #ff5a1f;
-        --impd-font-display: "Inter Tight", "Pretendard Variable", "Pretendard", system-ui, sans-serif;
-        --impd-font-sans: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
-        --impd-font-serif: "Noto Serif KR", serif;
+        /* C2 palette (Starbucks-inspired warm retail) */
+        --impd-paper: #f2f0eb;         /* Neutral Warm canvas */
+        --impd-ceramic: #edebe9;       /* section separator */
+        --impd-card: #ffffff;          /* card/white surface */
+        --impd-gold-light: #faf6ee;
+
+        --impd-ink: rgba(0,0,0,0.87);
+        --impd-ink2: rgba(0,0,0,0.75);
+        --impd-muted: rgba(0,0,0,0.58);
+        --impd-soft-muted: rgba(0,0,0,0.38);
+        --impd-rule: rgba(0,0,0,0.10);
+
+        /* 4-tier green — Starbucks system */
+        --impd-green: #006241;         /* headline / brand */
+        --impd-green-accent: #00754A;  /* primary CTA */
+        --impd-green-house: #1E3932;   /* dark feature band / footer */
+        --impd-green-uplift: #2b5148;  /* secondary dark */
+        --impd-green-mint: #d4e9e2;    /* pale wash */
+
+        /* Gold reserved for ceremony (credentials, ratings, pro plan) */
+        --impd-gold: #cba258;
+        --impd-gold-soft: #dfc49d;
+
+        /* 하위 호환: 기존 accent 이름을 C2 Green Accent로 재매핑 (부품 교체 최소화) */
+        --impd-accent: #00754A;
+        --impd-accent-2: #cba258;      /* was orange, now gold */
+
+        --impd-on-dark: #ffffff;
+        --impd-on-dark-soft: rgba(255,255,255,0.70);
+
+        /* Fonts — Manrope = SoDoSans substitute, Lora italic ceremony */
+        --impd-font-display: "Manrope", "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+        --impd-font-sans: "Manrope", "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+        --impd-font-serif: "Lora", "Noto Serif KR", serif;
         --impd-font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+        /* C2 shadows — whisper-soft */
+        --impd-shadow-card: 0 0 0.5px rgba(0,0,0,0.14), 0 1px 1px rgba(0,0,0,0.24);
+        --impd-shadow-nav: 0 1px 3px rgba(0,0,0,0.10), 0 2px 2px rgba(0,0,0,0.06), 0 0 2px rgba(0,0,0,0.07);
+        --impd-shadow-frap: 0 0 6px rgba(0,0,0,0.24), 0 8px 12px rgba(0,0,0,0.14);
       }
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html { scroll-behavior: smooth; }
@@ -35,24 +62,69 @@
         color: var(--impd-ink);
         font-family: var(--impd-font-sans);
         font-feature-settings: "ss01" on, "ss02" on;
+        letter-spacing: -0.01em;
         -webkit-font-smoothing: antialiased;
         overflow-x: hidden;
       }
       a { color: inherit; text-decoration: none; }
 
-      /* 핵심 클래스 (Tailwind 빌드 의존도 제거) */
-      .impd-label { font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-accent); }
+      /* 핵심 클래스 */
+      .impd-label { font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-green); }
       .impd-label-muted { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted); }
-      .impd-display { font-family: var(--impd-font-display); font-weight: 800; letter-spacing: -1.6px; line-height: 1.05; }
-      .impd-hero { font-family: var(--impd-font-display); font-weight: 800; font-size: clamp(56px, 11vw, 128px); letter-spacing: -3px; line-height: 0.88; }
-      .impd-serif { font-family: var(--impd-font-serif); font-style: italic; }
-      .impd-section-header { display: flex; align-items: baseline; gap: 16px; border-top: 1px solid var(--impd-ink); padding-top: 14px; margin-bottom: 24px; }
-      .impd-btn { display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; height: 44px; font-family: var(--impd-font-sans); font-size: 14px; font-weight: 600; letter-spacing: -0.2px; cursor: pointer; border: none; border-radius: 0; transition: all 150ms ease; }
-      .impd-btn-primary { background: var(--impd-ink); color: var(--impd-paper); }
-      .impd-btn-primary:hover { background: var(--impd-accent); }
+      .impd-display { font-family: var(--impd-font-display); font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; }
+      .impd-hero { font-family: var(--impd-font-display); font-weight: 800; font-size: clamp(56px, 11vw, 128px); letter-spacing: -0.03em; line-height: 0.9; color: var(--impd-green); }
+      .impd-serif { font-family: var(--impd-font-serif); font-style: italic; color: var(--impd-green); }
+      .impd-section-header { display: flex; align-items: baseline; gap: 16px; border-top: 1px solid var(--impd-rule); padding-top: 14px; margin-bottom: 24px; }
+
+      /* C2 full-pill button geometry — radius 50px, scale(0.95) active signature */
+      .impd-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 0 22px; height: 44px; min-width: 120px;
+        font-family: var(--impd-font-sans); font-size: 14px; font-weight: 600; letter-spacing: -0.01em;
+        cursor: pointer; border: 1px solid transparent; border-radius: 50px;
+        transition: transform .2s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
+      }
+      .impd-btn:active { transform: scale(0.95); }
+      .impd-btn-primary { background: var(--impd-green-accent); color: var(--impd-on-dark); border-color: var(--impd-green-accent); }
+      .impd-btn-primary:hover { background: var(--impd-green); border-color: var(--impd-green); }
       .impd-btn-secondary { background: transparent; color: var(--impd-ink); border: 1px solid var(--impd-ink); }
       .impd-btn-secondary:hover { background: var(--impd-ink); color: var(--impd-paper); }
-      .impd-btn-accent { background: var(--impd-accent); color: #fff; }
+      .impd-btn-accent { background: var(--impd-green-accent); color: var(--impd-on-dark); border-color: var(--impd-green-accent); }
+      .impd-btn-accent:hover { background: var(--impd-green); border-color: var(--impd-green); }
+      .impd-btn-outlined { background: transparent; color: var(--impd-green-accent); border: 1.5px solid var(--impd-green-accent); }
+      .impd-btn-outlined:hover { background: var(--impd-green-accent); color: var(--impd-on-dark); }
+      .impd-btn-dark { background: #000; color: var(--impd-on-dark); border-color: #000; }
+      .impd-btn-lg { height: 48px; padding: 0 26px; font-size: 16px; }
+      .impd-btn-sm { height: 32px; padding: 0 14px; font-size: 13px; min-width: 80px; }
+
+      /* C2 card — whisper-soft shadow, 12px radius */
+      .impd-c2-card { background: var(--impd-card); border-radius: 12px; box-shadow: var(--impd-shadow-card); padding: 20px; }
+      .impd-c2-band { background: var(--impd-green-house); color: var(--impd-on-dark); padding: 72px 40px; }
+      .impd-c2-band .impd-label { color: var(--impd-gold); }
+      .impd-c2-band .impd-display, .impd-c2-band h2, .impd-c2-band h3 { color: var(--impd-on-dark); }
+
+      /* C2 Frap — floating CTA */
+      .impd-frap {
+        position: fixed; bottom: 24px; right: 24px; z-index: 50;
+        width: 56px; height: 56px; border-radius: 50%;
+        background: var(--impd-green-accent); color: var(--impd-on-dark);
+        border: none; cursor: pointer;
+        box-shadow: var(--impd-shadow-frap);
+        display: flex; align-items: center; justify-content: center;
+        transition: transform .2s ease, box-shadow .2s ease;
+      }
+      .impd-frap:hover { background: var(--impd-green); }
+      .impd-frap:active { transform: scale(0.95); box-shadow: 0 0 6px rgba(0,0,0,0.24); }
+
+      /* C2 Reward/credential top bar — colored accent */
+      .impd-credential-card { background: var(--impd-card); border-radius: 12px; box-shadow: var(--impd-shadow-card); padding: 24px 20px; position: relative; overflow: hidden; }
+      .impd-credential-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--impd-gold); }
+      .impd-credential-card.tier-green::before { background: var(--impd-green-accent); }
+      .impd-credential-card.tier-house::before { background: var(--impd-green-house); }
+      .impd-credential-card.tier-uplift::before { background: var(--impd-green-uplift); }
+
+      /* C2 stripe / pattern */
+      .impd-stripe { background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.08) 0 3px, transparent 3px 10px); }
 
       @keyframes c1FadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes c1Marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
@@ -60,7 +132,11 @@
       .impd-fade-in { animation: c1FadeIn 700ms ease-out both; }
       .impd-marquee { animation: c1Marquee 28s linear infinite; }
       .impd-pulse { animation: c1Pulse 2s infinite; }
-      .impd-stripe { background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.15) 0 3px, transparent 3px 8px); }
+
+      @media (prefers-reduced-motion: reduce) {
+        .impd-fade-in, .impd-marquee, .impd-pulse { animation: none !important; }
+        .impd-btn, .impd-frap { transition: none !important; }
+      }
     </style>
 
     <%= csrf_meta_tags %>
@@ -70,13 +146,22 @@
     <%= yield(:head) if content_for?(:head) %>
   </head>
   <body>
-    <!-- imPD TopNav — 모바일에서 중앙 nav 숨기고 로고+세션만 -->
-    <div class="impd-topnav" style="position: sticky; top: 0; z-index: 20; background: var(--impd-paper); border-bottom: 1px solid var(--impd-rule); padding: 14px 24px; display: flex; align-items: center; gap: 20px;">
-      <%= link_to root_path, style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 20px; letter-spacing: -0.8px; color: var(--impd-ink); white-space: nowrap;" do %>
-        imPD<span style="color: var(--impd-accent);">.</span>
+    <!-- C2 Join Strip — 최상단 검정 bar (비로그인에만) -->
+    <% unless member_signed_in? %>
+      <div class="impd-joinstrip" style="background: #000; color: #fff; padding: 10px 24px; display: flex; align-items: center; gap: 14px; font-size: 13px; letter-spacing: -0.01em;">
+        <span style="opacity: 0.9;">지금 가입하면 첫 페이지 제작 무료 · 수수료 없이 3개월</span>
+        <span style="flex: 1;"></span>
+        <%= link_to "자세히 보기 →", member_signup_path, style: "color: #fff; text-decoration: underline; font-weight: 600; white-space: nowrap;" %>
+      </div>
+    <% end %>
+
+    <!-- imPD TopNav — C2 whisper-soft shadow -->
+    <div class="impd-topnav" style="position: sticky; top: 0; z-index: 20; background: var(--impd-card); box-shadow: var(--impd-shadow-nav); padding: 18px 24px; display: flex; align-items: center; gap: 20px;">
+      <%= link_to root_path, style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; color: var(--impd-green); white-space: nowrap;" do %>
+        imPD
       <% end %>
       <nav class="impd-topnav-links" style="display: flex; gap: 22px; flex: 1;">
-        <% [["홈", root_path], ["교육", education_path], ["미디어", media_path], ["작품", works_path], ["커뮤니티", community_path]].each do |label, path| %>
+        <% [["홈", root_path], ["예시", "/choi-pd"], ["가격", root_path(anchor: "pricing")], ["도움말", root_path(anchor: "faq")]].each do |label, path| %>
           <%= link_to label, path, style: "color: var(--impd-muted); font-size: 13px; font-weight: 500; white-space: nowrap;" %>
         <% end %>
       </nav>
@@ -132,7 +217,27 @@
       <%= yield %>
     </main>
 
+    <div style="padding: 16px 24px 22px; text-align: center; font-family: var(--impd-font-sans); font-size: 12px; color: var(--impd-soft-muted);">
+      <%= link_to "개인정보처리방침", privacy_path, style: "color: inherit; text-decoration: underline; text-underline-offset: 3px;" %>
+    </div>
+
     <%# 홍보 영상 팝업 (data-promo-popup 트리거 + 첫 방문자 자동 재생) %>
     <%= render "shared/promo_popup" %>
+
+    <%# C2 Frap — 플로팅 CTA. 로그인 상태에 따라 목적지 분기.
+        로그인 회원 → 이메일로 자동 채우기 위자드(/welcome/probe)로 직행.
+        비로그인 → 가입 페이지. %>
+    <% frap_href = member_signed_in? ? "/welcome/probe" : member_signup_path %>
+    <% frap_label = member_signed_in? ? "이메일로 자동 채우기" : "내 페이지 만들기" %>
+    <%= link_to frap_href, class: "impd-frap", "aria-label": frap_label, title: frap_label do %>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <% if member_signed_in? %>
+          <%# sparkle 아이콘 — AI 자동 채우기 %>
+          <path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z M18 14l1 2 2 1-2 1-1 2-1-2-2-1 2-1z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <% else %>
+          <path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        <% end %>
+      </svg>
+    <% end %>
   </body>
 </html>

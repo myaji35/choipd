@@ -1,0 +1,231 @@
+<% content_for :title, "개인정보처리방침" %>
+<% content_for :description, "imPD 개인정보처리방침" %>
+
+<style>
+  .privacy-page { padding: 72px 24px 104px; }
+  .privacy-page .impd-wrap { width: min(100%, 960px); margin: 0 auto; }
+  .privacy-header { margin-bottom: 56px; }
+  .privacy-header h1 { margin-top: 12px; font-family: var(--impd-font-display); font-size: clamp(34px, 6vw, 58px); line-height: 1.08; letter-spacing: -0.035em; color: var(--impd-green); }
+  .privacy-header p { margin-top: 20px; max-width: 760px; color: var(--impd-muted); font-size: 15px; line-height: 1.8; }
+  .privacy-article { padding: 34px 0; border-top: 1px solid var(--impd-rule); }
+  .privacy-article h2 { margin-bottom: 18px; font-family: var(--impd-font-display); font-size: 23px; line-height: 1.35; color: var(--impd-green-house); }
+  .privacy-article h3 { margin: 25px 0 10px; font-size: 17px; line-height: 1.5; color: var(--impd-ink); }
+  .privacy-article p, .privacy-article li { font-size: 14px; line-height: 1.85; color: var(--impd-ink2); word-break: keep-all; overflow-wrap: anywhere; }
+  .privacy-article p + p { margin-top: 10px; }
+  .privacy-article ol, .privacy-article ul { margin: 10px 0 0 22px; }
+  .privacy-article li + li { margin-top: 6px; }
+  .privacy-table-wrap { margin: 16px 0 8px; overflow-x: auto; border: 1px solid var(--impd-rule); border-radius: 12px; background: var(--impd-card); }
+  .privacy-table { width: 100%; min-width: 680px; border-collapse: collapse; font-size: 13px; line-height: 1.65; }
+  .privacy-table th, .privacy-table td { padding: 14px 16px; border-right: 1px solid var(--impd-rule); border-bottom: 1px solid var(--impd-rule); text-align: left; vertical-align: top; word-break: keep-all; overflow-wrap: anywhere; }
+  .privacy-table th:last-child, .privacy-table td:last-child { border-right: 0; }
+  .privacy-table tr:last-child td { border-bottom: 0; }
+  .privacy-table th { background: var(--impd-green-mint); color: var(--impd-green-house); font-weight: 700; white-space: nowrap; }
+  .privacy-note { margin-top: 16px; padding: 16px 18px; border-left: 3px solid var(--impd-green-accent); background: var(--impd-card); border-radius: 0 8px 8px 0; }
+  .privacy-company { padding-top: 28px; border-top: 1px solid var(--impd-rule); color: var(--impd-muted); font-size: 13px; line-height: 1.8; }
+  .privacy-page a { color: var(--impd-green-accent); text-decoration: underline; text-underline-offset: 3px; }
+  @media (max-width: 640px) {
+    .privacy-page { padding: 48px 18px 80px; }
+    .privacy-header { margin-bottom: 40px; }
+    .privacy-article { padding: 28px 0; }
+    .privacy-article h2 { font-size: 20px; }
+    .privacy-table th, .privacy-table td { padding: 12px; }
+  }
+</style>
+
+<div class="privacy-page">
+  <div class="impd-wrap">
+    <header class="privacy-header">
+      <span class="impd-label">Privacy Policy</span>
+      <h1>개인정보처리방침</h1>
+      <p>{{상호}}(이하 “회사”)는 「개인정보 보호법」 제30조에 따라 정보주체의 개인정보를 보호하고 관련 고충을 신속하고 원활하게 처리하기 위하여 다음과 같이 개인정보처리방침을 수립·공개합니다.</p>
+    </header>
+
+    <section class="privacy-article">
+      <h2>제1조 (개인정보의 처리 목적)</h2>
+      <p>회사는 다음 목적을 위하여 개인정보를 처리합니다. 처리 중인 개인정보는 다음 목적 이외의 용도로 이용하지 않으며, 이용 목적이 변경되는 경우에는 「개인정보 보호법」 제18조에 따라 별도 동의를 받는 등 필요한 조치를 이행합니다.</p>
+      <div class="privacy-table-wrap"><table class="privacy-table">
+        <thead><tr><th>처리 목적</th><th>세부 내용</th></tr></thead>
+        <tbody>
+          <tr><td>회원 가입 및 관리</td><td>본인 식별·인증, 회원자격 유지·관리, 부정 이용 방지, 고지·통지 및 고충처리</td></tr>
+          <tr><td>프로필 및 홍보 서비스 제공</td><td>프로필·홍보 페이지 생성과 공개, 이미지·소개·지역·SNS 링크 등 회원이 입력한 콘텐츠 제공</td></tr>
+          <tr><td>AI 기능 제공</td><td>Identity Probe를 통한 공개정보 수집 및 프로필 초안 자동 생성, 업로드 문서의 텍스트 파싱·분석</td></tr>
+          <tr><td>요금 결제·정산</td><td>유료서비스 도입 후 요금 결제, 정산, 환급 및 거래기록 관리</td></tr>
+          <tr><td>고충처리</td><td>민원인 확인, 민원사항 조사, 연락·통지 및 처리결과 안내</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제2조 (처리하는 개인정보의 항목 및 수집 방법)</h2>
+      <div class="privacy-table-wrap"><table class="privacy-table">
+        <thead><tr><th>구분</th><th>수집·처리 항목</th></tr></thead>
+        <tbody>
+          <tr><td>회원 가입·관리(필수)</td><td>이메일, 이름, OAuth 가입 시 제공자(provider) 및 이용자 식별자(uid)</td></tr>
+          <tr><td>회원 가입·관리(선택)</td><td>비밀번호(암호화된 비밀번호 해시로 저장), 휴대전화번호</td></tr>
+          <tr><td>프로필 구성(선택)</td><td>프로필 이미지, 커버 이미지, 소개(bio), 지역(region), SNS 링크(social_links)</td></tr>
+          <tr><td>Google OAuth 이용 시</td><td>Google이 제공하는 인증 정보(provider, uid, oauth_raw)</td></tr>
+          <tr><td>AI 기능 이용 시</td><td>이메일, 이름, Identity Probe 처리 결과, 회원이 업로드한 문서 및 문서에서 추출한 텍스트</td></tr>
+          <tr><td>유료서비스 이용 시(도입 예정)</td><td>결제수단 정보, 결제기록</td></tr>
+          <tr><td>서비스 이용 과정</td><td>IP 주소, 쿠키, 접속·이용 기록, 방문 일시, 기기 및 브라우저 정보, 부정 이용 기록</td></tr>
+        </tbody>
+      </table></div>
+      <p>개인정보는 홈페이지의 회원가입·프로필 작성·문서 업로드·서비스 이용 과정, Google OAuth, 고객 문의, 결제대행사를 통해 수집하거나 서비스 이용 과정에서 자동으로 생성·수집합니다. 회사는 비밀번호 원문을 저장하지 않습니다.</p>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제3조 (개인정보의 처리 및 보유 기간)</h2>
+      <p>회사는 법령에 따른 보유·이용기간 또는 수집 시 동의받은 기간 내에서 개인정보를 처리·보유합니다.</p>
+      <div class="privacy-table-wrap"><table class="privacy-table">
+        <thead><tr><th>처리 정보</th><th>보유 기간</th><th>근거</th></tr></thead>
+        <tbody>
+          <tr><td>회원정보, 프로필 및 업로드 문서</td><td>회원 탈퇴 시까지. 탈퇴 처리 시 식별정보를 즉시 익명화하고 업로드 문서를 파기</td><td>회원 동의 및 서비스 이용계약</td></tr>
+          <tr><td>계약 또는 청약철회에 관한 기록</td><td>5년</td><td>전자상거래 등에서의 소비자보호에 관한 법률</td></tr>
+          <tr><td>대금결제 및 재화 등의 공급에 관한 기록</td><td>5년</td><td>전자상거래 등에서의 소비자보호에 관한 법률</td></tr>
+          <tr><td>소비자의 불만 또는 분쟁처리에 관한 기록</td><td>3년</td><td>전자상거래 등에서의 소비자보호에 관한 법률</td></tr>
+          <tr><td>표시·광고에 관한 기록</td><td>6개월</td><td>전자상거래 등에서의 소비자보호에 관한 법률</td></tr>
+        </tbody>
+      </table></div>
+      <p>법령에 따라 탈퇴 후에도 보존해야 하는 거래기록은 다른 개인정보와 분리하여 해당 법정기간 동안 보존한 뒤 파기합니다.</p>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제4조 (개인정보의 제3자 제공)</h2>
+      <p>회사는 정보주체의 개인정보를 제1조의 범위에서만 처리하며, 정보주체의 동의 또는 법률의 특별한 규정 등 「개인정보 보호법」 제17조 및 제18조에 해당하는 경우에만 제3자에게 제공합니다. 현재 개인정보를 제3자에게 제공하지 않습니다.</p>
+      <p>개인정보 처리위탁과 국외 이전에 관한 사항은 각각 제5조 및 제6조에서 확인할 수 있습니다.</p>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제5조 (개인정보 처리업무의 위탁)</h2>
+      <p>회사는 원활한 서비스 제공을 위하여 다음과 같이 개인정보 처리업무를 위탁하거나 위탁할 예정입니다.</p>
+      <div class="privacy-table-wrap"><table class="privacy-table">
+        <thead><tr><th>수탁자</th><th>위탁 업무</th><th>위탁 기간</th></tr></thead>
+        <tbody>
+          <tr><td>토스페이먼츠 주식회사(도입 예정)</td><td>결제 처리, 결제수단 인증 및 결제기록 관리</td><td>위탁계약 종료 또는 법정 보유기간 만료 시까지</td></tr>
+          <tr><td>OpenAI, L.L.C.</td><td>Identity Probe의 프로필 초안 생성 및 업로드 문서 텍스트 분석</td><td>API 처리 완료 시까지(API 무학습·미보관 옵션 적용)</td></tr>
+          <tr><td>Anthropic PBC</td><td>Identity Probe의 프로필 초안 생성 및 업로드 문서 텍스트 분석</td><td>API 처리 완료 시까지(API 무학습·미보관 옵션 적용)</td></tr>
+        </tbody>
+      </table></div>
+      <p>회사는 위탁계약 체결 시 「개인정보 보호법」 제26조에 따라 목적 외 처리 금지, 안전성 확보조치, 재위탁 제한, 관리·감독 및 손해배상 책임 등을 문서에 명시하고 수탁자를 감독합니다. 수탁자나 위탁업무가 변경되면 본 방침을 통해 공개합니다.</p>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제6조 (개인정보의 국외 이전)</h2>
+      <p>회사는 정보주체와 체결한 이용계약을 이행하고 AI 기능을 제공하기 위하여 「개인정보 보호법」 제28조의8 제1항 제3호 가목에 따라 다음 개인정보를 국외로 이전합니다.</p>
+      <div class="privacy-table-wrap"><table class="privacy-table">
+        <thead><tr><th>이전받는 자</th><th>이전 항목</th><th>국가·시기·방법</th><th>이용 목적·보유기간</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>OpenAI, L.L.C.</strong><br>연락처: {{OpenAI 연락처}}<br>미국</td>
+            <td>회원 이메일, 이름, 업로드 문서에서 추출한 텍스트</td>
+            <td><strong>국가:</strong> 미국<br><strong>시기:</strong> Identity Probe 또는 문서 분석 기능 이용 시점<br><strong>방법:</strong> 암호화된 통신구간을 통한 API 전송</td>
+            <td><strong>목적:</strong> 공개정보 수집을 바탕으로 한 프로필 초안 자동 생성 및 업로드 문서 분석<br><strong>보유기간:</strong> 처리 완료 후 미보관(API 무학습 옵션 적용)</td>
+          </tr>
+          <tr>
+            <td><strong>Anthropic PBC</strong><br>연락처: {{Anthropic 연락처}}<br>미국</td>
+            <td>회원 이메일, 이름, 업로드 문서에서 추출한 텍스트</td>
+            <td><strong>국가:</strong> 미국<br><strong>시기:</strong> Identity Probe 또는 문서 분석 기능 이용 시점<br><strong>방법:</strong> 암호화된 통신구간을 통한 API 전송</td>
+            <td><strong>목적:</strong> 공개정보 수집을 바탕으로 한 프로필 초안 자동 생성 및 업로드 문서 분석<br><strong>보유기간:</strong> 처리 완료 후 미보관(API 무학습 옵션 적용)</td>
+          </tr>
+        </tbody>
+      </table></div>
+      <div class="privacy-note">
+        <h3>국외 이전 거부 방법·절차 및 거부의 효과</h3>
+        <p><strong>거부 방법 및 절차:</strong> 정보주체는 Identity Probe 이용 전 제공되는 동의 단계에서 국외 이전 동의를 거부할 수 있으며, 동의한 뒤에도 개인정보 보호책임자({{개인정보보호책임자 이메일}} / {{연락처}})에게 국외 이전 거부 의사를 밝혀 철회할 수 있습니다.</p>
+        <p><strong>거부의 효과:</strong> Identity Probe 동의를 거부하면 이메일과 이름을 OpenAI 또는 Anthropic에 이전하지 않으며, Identity Probe를 통한 프로필 자동 생성 기능만 제공되지 않습니다. 그 밖의 기본 프로필 작성·홍보 서비스는 이용할 수 있습니다.</p>
+      </div>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제7조 (개인정보의 파기 절차 및 방법)</h2>
+      <ol>
+        <li>회사는 보유기간 경과, 처리목적 달성 등 개인정보가 불필요해진 때에는 지체 없이 파기합니다.</li>
+        <li>다른 법령에 따라 계속 보존해야 하는 정보는 별도의 데이터베이스 또는 보관장소에 분리하여 보존합니다.</li>
+        <li>회원은 자신의 프로필 관리 화면 <strong>/:slug/admin/withdraw</strong>에서 탈퇴할 수 있습니다. 탈퇴 즉시 회원 식별정보는 복원하기 어렵게 익명화되고, 프로필·커버 이미지 및 업로드 문서는 파기됩니다. 다만 법령상 보존 의무가 있는 거래기록은 제3조의 기간 동안 분리 보존합니다.</li>
+        <li>전자적 파일은 복구·재생할 수 없는 방법으로 영구 삭제하고, 종이 문서는 분쇄하거나 소각합니다.</li>
+      </ol>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제8조 (정보주체와 법정대리인의 권리·의무 및 행사방법)</h2>
+      <ol>
+        <li>정보주체는 언제든지 개인정보 열람, 정정, 삭제, 처리정지 및 동의 철회를 요구할 수 있습니다.</li>
+        <li>권리 행사는 서면, 전자우편 등으로 할 수 있으며 회사는 지체 없이 조치합니다. 프로필 정보는 서비스의 프로필 관리 화면에서 직접 열람·정정할 수 있고, 회원 탈퇴는 <strong>/:slug/admin/withdraw</strong>에서 신청할 수 있습니다.</li>
+        <li>법정대리인이나 위임받은 자를 통해 권리를 행사할 수 있으며, 이 경우 관계 법령에 따른 위임장을 제출해야 합니다.</li>
+        <li>관련 법령에 따라 열람·처리정지·정정·삭제 요구가 제한될 수 있으며, 회사는 권리 행사자가 본인 또는 정당한 대리인인지 확인할 수 있습니다.</li>
+      </ol>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제9조 (민감정보의 처리)</h2>
+      <p>회사는 사상·신념, 건강, 성생활, 유전정보, 범죄경력자료 등 「개인정보 보호법」상 민감정보를 필수 항목으로 수집하지 않습니다. 이용자는 공개 프로필이나 업로드 문서에 민감정보를 입력하지 않아야 합니다.</p>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제10조 (가명정보의 처리)</h2>
+      <p>회사는 통계작성, 과학적 연구, 공익적 기록보존 등을 위한 가명정보를 처리하고 있지 않습니다.</p>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제11조 (개인정보의 안전성 확보 조치)</h2>
+      <p>회사는 개인정보의 안전성 확보를 위하여 개인정보 취급 범위와 접근권한을 최소화하고, 비밀번호를 단방향 암호화하여 저장하며, 개인정보 전송 구간을 암호화하는 등 접근통제 및 기술적 보호조치를 적용합니다. 또한 개인정보 처리 시스템의 접근권한을 관리하고 관련 법령에 따른 관리적 보호조치를 시행합니다.</p>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제12조 (개인정보 자동 수집 장치의 설치·운영 및 거부)</h2>
+      <p>회사는 로그인 상태 유지와 안정적인 서비스 제공을 위해 쿠키(cookie)를 사용할 수 있습니다. 이용자는 브라우저 설정에서 쿠키 저장을 허용하거나 차단할 수 있습니다. 다만 필수 쿠키를 차단하면 로그인 등 일부 기능을 이용하기 어려울 수 있습니다.</p>
+      <ul>
+        <li>Chrome: 설정 &gt; 개인정보 및 보안 &gt; 서드 파티 쿠키</li>
+        <li>Edge: 설정 &gt; 쿠키 및 사이트 권한 &gt; 쿠키 및 사이트 데이터 관리</li>
+        <li>Safari: 설정 &gt; 개인정보 보호</li>
+        <li>Firefox: 설정 &gt; 개인 정보 및 보안 &gt; 쿠키와 사이트 데이터</li>
+      </ul>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제13조 (자동화된 결정에 관한 사항)</h2>
+      <p>Identity Probe와 문서 분석 기능은 프로필 초안 작성 등을 보조하는 기능이며, 회사는 이를 이용해 정보주체의 권리 또는 의무에 중대한 영향을 미치는 완전히 자동화된 결정을 하지 않습니다.</p>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제14조 (만 14세 미만 아동의 개인정보 처리)</h2>
+      <p>회사는 만 14세 미만 아동을 대상으로 서비스를 제공하지 않으며, 만 14세 미만 아동의 개인정보를 법정대리인의 동의 없이 수집한 사실을 알게 된 경우 지체 없이 파기합니다. 관련 사실을 알게 된 경우 {{개인정보보호책임자 이메일}}로 알려주시기 바랍니다.</p>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제15조 (개인정보 보호책임자)</h2>
+      <p>회사는 개인정보 처리 업무를 총괄하고 개인정보 관련 불만처리와 피해구제를 위하여 다음과 같이 개인정보 보호책임자를 지정합니다.</p>
+      <div class="privacy-table-wrap"><table class="privacy-table">
+        <tbody>
+          <tr><th>성명</th><td>{{개인정보 보호책임자}}</td><th>직책</th><td>{{직책}}</td></tr>
+          <tr><th>연락처</th><td>{{연락처}}</td><th>전자우편</th><td>{{개인정보보호책임자 이메일}}</td></tr>
+        </tbody>
+      </table></div>
+      <p>정보주체는 서비스 이용 중 발생한 개인정보 보호 관련 문의, 불만 및 피해구제 사항을 위 연락처로 문의할 수 있으며, 회사는 지체 없이 답변하고 처리하겠습니다.</p>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제16조 (권익침해 구제방법)</h2>
+      <p>정보주체는 개인정보 침해에 대한 상담 또는 피해구제를 다음 기관에 신청할 수 있습니다.</p>
+      <div class="privacy-table-wrap"><table class="privacy-table">
+        <thead><tr><th>기관</th><th>홈페이지</th><th>전화</th></tr></thead>
+        <tbody>
+          <tr><td>개인정보분쟁조정위원회</td><td><a href="https://www.kopico.go.kr" rel="noopener noreferrer">www.kopico.go.kr</a></td><td>1833-6972</td></tr>
+          <tr><td>개인정보침해신고센터</td><td><a href="https://privacy.kisa.or.kr" rel="noopener noreferrer">privacy.kisa.or.kr</a></td><td>국번 없이 118</td></tr>
+          <tr><td>대검찰청</td><td><a href="https://www.spo.go.kr" rel="noopener noreferrer">www.spo.go.kr</a></td><td>국번 없이 1301</td></tr>
+          <tr><td>경찰청</td><td><a href="https://ecrm.police.go.kr" rel="noopener noreferrer">ecrm.police.go.kr</a></td><td>국번 없이 182</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="privacy-article">
+      <h2>제17조 (개인정보처리방침의 변경)</h2>
+      <p>이 개인정보처리방침은 <strong>{{시행일}}</strong>부터 시행합니다. 방침을 변경하는 경우 변경 내용과 시행 시기를 서비스에 지속적으로 공개하며, 정보주체에게 불리하거나 중요한 변경은 시행 전에 공지하고 필요한 경우 개별 통지합니다. 국외 이전 관련 사항이 변경되는 경우 제6조의 내용을 갱신하여 공개합니다.</p>
+      <p><strong>공고일:</strong> {{공고일}}<br><strong>시행일:</strong> {{시행일}}</p>
+    </section>
+
+    <div class="privacy-company">
+      <strong>{{상호}}</strong> · 대표자 {{대표자}} · 사업자등록번호 {{사업자등록번호}}<br>
+      {{주소}} · {{연락처}} · {{이메일}}
+    </div>
+  </div>
+</div>
