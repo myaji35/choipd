@@ -6,9 +6,12 @@ class MemberAdmin::DashboardController < MemberAdmin::BaseController
                                 .where(event_name: "page_view", page_path: "/#{@member.slug}")
                                 .where(user_type: "anonymous")
     @today_visits = visit_scope.where(created_at: today.beginning_of_day..today.end_of_day).count
+    @week_visits = visit_scope.where(created_at: 7.days.ago.beginning_of_day..Time.current).count
+    @month_visits = visit_scope.where(created_at: 30.days.ago.beginning_of_day..Time.current).count
     @inquiries_count = @member.member_inquiries.count
+    @unread_inquiries = @member.member_inquiries.unread.count
     @services_count = @member.member_services.count
-    @revenue = (@today_visits * 7000) # stub: 방문자당 평균
+    @link_clicks = ShortLink.where(member_id: @member.id).sum(:click_count)
 
     # 14일 방문 추이 (owner 제외)
     @bar_data = (0..13).map { |i|

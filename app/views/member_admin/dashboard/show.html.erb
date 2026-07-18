@@ -10,6 +10,9 @@
     <p style="margin-top: 12px; font-size: 16px; color: var(--impd-ink2);">
       오늘 <strong><%= @today_visits %>명</strong>이 방문했어요.
     </p>
+    <p style="margin-top: 6px; font-size: 12px; color: var(--impd-muted);">
+      최근 7일 <%= @week_visits %>명 · 링크 <%= @link_clicks %>회 열림
+    </p>
   </div>
 
   <div style="display: grid; grid-template-columns: 1fr 320px; gap: 40px;" class="dashboard-grid">
@@ -18,15 +21,15 @@
       <!-- Stats 4 카드 -->
       <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--impd-ink); margin-bottom: 40px;">
         <% [
-          ["방문자", @today_visits, "오늘", "var(--impd-accent)"],
-          ["문의", @inquiries_count, "총합", "var(--impd-accent-2)"],
-          ["서비스", @services_count, "활성", "#2a9d8f"],
-          ["수익(추정)", "₩#{number_with_delimiter(@revenue)}", "오늘", "#e4b230"]
+          ["방문", @week_visits, "최근 7일", "var(--impd-accent)"],
+          ["문의", @inquiries_count, @unread_inquiries.positive? ? "안읽음 #{@unread_inquiries}" : "총합", @unread_inquiries.positive? ? "var(--impd-accent-2)" : "var(--impd-ink)"],
+          ["링크 클릭", @link_clicks, "QR·공유 누적", "#e4b230"],
+          ["서비스", @services_count, "활성", "#2a9d8f"]
         ].each_with_index do |(label, val, sub, color), i| %>
           <div style="padding: 24px 20px; <%= 'border-left: 1px solid var(--impd-rule);' if i > 0 %>">
             <p class="impd-label-muted"><%= label %></p>
             <p style="font-family: var(--impd-font-display); font-size: 48px; font-weight: 800; line-height: 1; margin-top: 8px; color: <%= color %>;"><%= val %></p>
-            <p style="font-size: 11px; color: var(--impd-muted); margin-top: 6px;"><%= sub %></p>
+            <p style="font-size: 12px; color: <%= label == "문의" && @unread_inquiries.positive? ? color : "var(--impd-muted)" %>; margin-top: 6px;"><%= sub %></p>
           </div>
         <% end %>
       </div>
