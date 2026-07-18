@@ -309,6 +309,9 @@ Rails.application.routes.draw do
         member { post :reparse }
       end
       resources :photos, only: [ :create, :update, :destroy ]
+      resources :services, controller: "services", only: [ :index, :create, :update, :destroy ] do
+        collection { post :reorder }
+      end
       get "/withdraw", to: "withdrawals#show", as: :withdraw
       delete "/withdraw", to: "withdrawals#destroy", as: :withdraw_destroy
     end

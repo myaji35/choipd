@@ -1,0 +1,79 @@
+<% content_for :title, "서비스 / 가격 관리 — #{@member.name}" %>
+
+<div class="impd-wrap" style="max-width: 1120px; margin: 0 auto; padding: 40px;">
+  <header style="margin-bottom: 32px;">
+    <p class="impd-label-muted">SERVICES · /<%= @member.slug %></p>
+    <h1 class="impd-display" style="font-size: 44px; margin-top: 12px;">서비스 / 가격 관리</h1>
+    <p style="margin-top: 12px; color: var(--impd-ink2); font-size: 14px; line-height: 1.7;">
+      공개 페이지(/<%= @member.slug %>)의 '서비스/수업' 섹션에 표시됩니다.
+    </p>
+  </header>
+
+  <div class="services-layout" style="display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 32px; align-items: start;">
+    <section>
+      <div class="impd-section-header">
+        <span class="impd-label">§01</span>
+        <h2 class="impd-display" style="font-size: 24px; flex: 1;">등록된 서비스</h2>
+        <span class="impd-label-muted"><%= @services.size %>개</span>
+      </div>
+
+      <% if @services.any? %>
+        <div style="display: grid; gap: 14px;">
+          <% @services.each do |service| %>
+            <article class="impd-card" style="padding: 20px;">
+              <div style="display: flex; justify-content: space-between; gap: 20px; align-items: flex-start;">
+                <div style="min-width: 0;">
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+                    <h3 style="font-size: 17px; line-height: 1.45;"><%= service.title %></h3>
+                    <span style="border: 1px solid <%= service.is_active.to_i == 1 ? 'var(--impd-accent)' : 'var(--impd-rule)' %>; color: <%= service.is_active.to_i == 1 ? 'var(--impd-accent)' : 'var(--impd-muted)' %>; padding: 3px 7px; font-size: 12px; font-weight: 600;">
+                      <%= service.is_active.to_i == 1 ? "활성" : "비활성" %>
+                    </span>
+                  </div>
+                  <p style="margin-top: 8px; color: var(--impd-ink2); font-size: 14px;">
+                    <%= [service.price_label.presence, service.price.presence].compact.join(" · ").presence || "가격 미정" %>
+                  </p>
+                </div>
+                <%= button_to "삭제", slug_admin_service_path(slug: @member.slug, id: service), method: :delete,
+                      form: { data: { turbo_confirm: "이 서비스를 삭제하시겠습니까?" } },
+                      class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 12px; font-size: 12px; color: var(--impd-accent-2); border-color: var(--impd-accent-2);" %>
+              </div>
+
+              <details style="margin-top: 16px; border-top: 1px solid var(--impd-rule); padding-top: 14px;">
+                <summary style="cursor: pointer; color: var(--impd-accent); font-size: 13px; font-weight: 600;">수정</summary>
+                <%= form_with model: service, url: slug_admin_service_path(slug: @member.slug, id: service), method: :patch, style: "margin-top: 18px;" do |form| %>
+                  <%= render "service_fields", form: form, submit_label: "변경사항 저장" %>
+                <% end %>
+              </details>
+            </article>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="impd-card" style="padding: 40px 24px; text-align: center;">
+          <p style="font-size: 14px; color: var(--impd-ink2); line-height: 1.7;">아직 등록한 서비스가 없어요. 첫 서비스를 추가하면 공개 페이지에 바로 노출됩니다.</p>
+        </div>
+      <% end %>
+    </section>
+
+    <section class="impd-card" style="position: sticky; top: 88px;">
+      <div class="impd-section-header" style="margin-bottom: 20px;">
+        <span class="impd-label">§02</span>
+        <h2 class="impd-display" style="font-size: 24px;">신규 등록</h2>
+      </div>
+      <%= form_with model: MemberService.new, url: slug_admin_services_path(slug: @member.slug) do |form| %>
+        <%= render "service_fields", form: form, submit_label: "서비스 저장" %>
+      <% end %>
+    </section>
+  </div>
+</div>
+
+<style>
+  .service-field { margin-top: 15px; }
+  .service-field:first-child { margin-top: 0; }
+  .service-field label { display: block; margin-bottom: 6px; color: var(--impd-muted); font-size: 13px; font-weight: 600; }
+  .service-input { width: 100%; border: 1px solid #d1d5db; background: #fff; padding: 10px 12px; color: var(--impd-ink); font-family: var(--impd-font-sans); font-size: 14px; }
+  @media (max-width: 820px) {
+    .impd-wrap { padding: 28px 20px !important; }
+    .services-layout { grid-template-columns: 1fr !important; }
+    .services-layout > section:last-child { position: static !important; }
+  }
+</style>

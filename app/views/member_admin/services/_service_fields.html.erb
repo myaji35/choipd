@@ -1,0 +1,31 @@
+<div class="service-field">
+  <%= form.label :title, "서비스명 (필수)" %>
+  <%= form.text_field :title, required: true, class: "service-input" %>
+</div>
+<div class="service-field">
+  <%= form.label :description, "설명" %>
+  <%= form.text_area :description, rows: 4, class: "service-input", style: "resize: vertical;" %>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+  <div class="service-field">
+    <%= form.label :price, "가격" %>
+    <%= form.text_field :price, placeholder: "50,000원", class: "service-input" %>
+  </div>
+  <div class="service-field">
+    <%= form.label :price_label, "가격 기준" %>
+    <%= form.text_field :price_label, placeholder: "1회, 월", class: "service-input" %>
+  </div>
+</div>
+<div class="service-field">
+  <%= form.label :cta_label, "신청 버튼 문구" %>
+  <%= form.text_field :cta_label, placeholder: "상담 신청", class: "service-input" %>
+</div>
+<div class="service-field">
+  <%= form.label :cta_url, "신청 링크" %>
+  <%= form.url_field :cta_url, placeholder: "https://", class: "service-input" %>
+</div>
+<div class="service-field" style="display: flex; align-items: center; gap: 9px;">
+  <%= form.check_box :is_active, style: "width: 16px; height: 16px; accent-color: var(--impd-accent);" %>
+  <%= form.label :is_active, "공개 페이지에 활성 상태로 표시", style: "margin: 0; color: var(--impd-ink2);" %>
+</div>
+<%= form.submit submit_label, class: "impd-btn impd-btn-primary", style: "width: 100%; justify-content: center; margin-top: 20px;" %>
