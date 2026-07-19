@@ -10,5 +10,6 @@ class SnsScheduledPost < ApplicationRecord
   validates :scheduled_at, presence: true
 
   scope :upcoming, -> { where(status: "scheduled").where("scheduled_at > ?", Time.current).order(:scheduled_at) }
+  scope :due, -> { where(status: "scheduled").where("scheduled_at <= ?", Time.current) }
   scope :recent, -> { order(created_at: :desc) }
 end
