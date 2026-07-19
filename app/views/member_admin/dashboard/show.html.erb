@@ -90,8 +90,8 @@
           impd.townin.net/<%= @member.slug %>
         </div>
         <div style="display: flex; gap: 8px; margin-top: 12px;">
-          <a href="/<%= @member.slug %>" target="_blank" style="flex: 1; background: var(--impd-accent); color: #fff; padding: 10px; text-align: center; font-size: 13px; font-weight: 600;">↗ 열기</a>
-          <button onclick="navigator.clipboard.writeText('https://impd.townin.net/<%= @member.slug %>'); alert('링크 복사됨')" style="flex: 1; background: rgba(255,255,255,.1); color: #fff; padding: 10px; text-align: center; font-size: 13px; font-weight: 600; border: none; cursor: pointer;">📋 복사</button>
+          <a href="/<%= @member.slug %>" target="_blank" style="flex: 1; background: var(--impd-accent); color: #fff; padding: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 600;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>열기</a>
+          <button onclick="navigator.clipboard.writeText('https://impd.townin.net/<%= @member.slug %>'); this.querySelector('span').textContent='복사됨'" style="flex: 1; background: rgba(255,255,255,.1); color: #fff; padding: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 600; border: none; cursor: pointer;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>복사</span></button>
         </div>
       </div>
 
