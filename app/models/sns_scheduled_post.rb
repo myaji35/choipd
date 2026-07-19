@@ -1,4 +1,5 @@
 class SnsScheduledPost < ApplicationRecord
+  belongs_to :member, optional: true
   belongs_to :sns_account, optional: true
   has_many :sns_post_histories, dependent: :destroy
 

@@ -18,6 +18,8 @@ class Member < ApplicationRecord
   has_many :member_photos,          dependent: :destroy
   has_many :member_gap_reports,     dependent: :destroy
   has_many :identity_probes,        dependent: :destroy
+  has_many :sns_accounts,           dependent: :destroy
+  has_many :sns_scheduled_posts,    dependent: :destroy
 
   STATUSES = %w[pending_approval approved rejected suspended].freeze
   IMPD_STATUSES = %w[none in_progress completed rejected].freeze
