@@ -70,6 +70,14 @@
         <span class="impd-label">§02</span>
         <h2 class="impd-display" style="font-size: 24px;">신규 연결</h2>
       </div>
+      <div style="padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--impd-rule);">
+        <p style="color: var(--impd-ink2); font-size: 13px; line-height: 1.7;">페이스북에서 관리 중인 페이지를 안전하게 불러옵니다.</p>
+        <% if FacebookOauth.configured? %>
+          <%= link_to "페이스북 페이지 연결", slug_admin_facebook_connect_path(slug: @member.slug), class: "impd-btn impd-btn-primary", style: "width: 100%; margin-top: 12px; justify-content: center;" %>
+        <% else %>
+          <span class="impd-btn impd-btn-secondary" aria-disabled="true" style="width: 100%; margin-top: 12px; justify-content: center; cursor: not-allowed; opacity: 0.55;">페이스북 페이지 연결 · 설정 예정</span>
+        <% end %>
+      </div>
       <%= form_with model: @new_account, url: slug_admin_sns_accounts_path(slug: @member.slug) do |form| %>
         <div class="sns-field">
           <%= form.label :platform, "플랫폼" %>
