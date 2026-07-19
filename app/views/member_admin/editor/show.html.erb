@@ -213,8 +213,12 @@
                   작가.
                 </div>
               </div>
-              <div style="font-size: 11px; opacity: 0.75; line-height: 1.5;">
-                <%= p[:desc] %>
+              <div style="font-size: 11px; opacity: 0.75; line-height: 1.5; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                <span><%= p[:desc] %></span>
+                <span style="display: inline-flex; flex-shrink: 0; gap: 4px;" aria-label="강조색과 배경색">
+                  <span style="width: 14px; height: 14px; border-radius: 50%; background: <%= p[:accent] %>; border: 1px solid rgba(0,0,0,0.16);"></span>
+                  <span style="width: 14px; height: 14px; border-radius: 50%; background: <%= p[:paper] %>; border: 1px solid rgba(0,0,0,0.16);"></span>
+                </span>
               </div>
             </div>
           </label>

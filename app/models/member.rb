@@ -79,6 +79,10 @@ class Member < ApplicationRecord
     JSON.parse(theme_config || "{}") rescue {}
   end
 
+  def theme_colors
+    ThemePreset.find(theme_preset)
+  end
+
   def impd_completed?
     impd_status == "completed"
   end

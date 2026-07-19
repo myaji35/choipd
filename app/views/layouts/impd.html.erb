@@ -139,6 +139,16 @@
       }
     </style>
 
+    <% if defined?(@member) && @member.respond_to?(:theme_preset) && (tp = ThemePreset.find(@member.theme_preset)) %>
+      <style>
+        :root {
+          --impd-accent: <%= tp[:accent] %>;
+          --impd-ink: <%= tp[:ink] %>;
+          --impd-paper: <%= tp[:paper] %>;
+        }
+      </style>
+    <% end %>
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= javascript_importmap_tags %>

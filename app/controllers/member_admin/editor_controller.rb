@@ -4,14 +4,6 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
   # PATCH /<slug>/admin/editor/update_info   (Step 2 저장)
   # PATCH /<slug>/admin/editor/update_style  (Step 3 저장)
   # PATCH /<slug>/admin/editor/publish       (Step 4 발행)
-  THEME_PRESETS = [
-    { key: "editorial",  name: "에디토리얼",   desc: "기본값 · Inter Tight + 세리프 이탤릭", accent: "#3a2af0", ink: "#0f0d0b", paper: "#efece4" },
-    { key: "clean",      name: "클린",         desc: "명료한 사업용 · 시안 포인트",              accent: "#00A1E0", ink: "#16325C", paper: "#ffffff" },
-    { key: "warm",       name: "따뜻한",       desc: "공방/강사 · 크림 베이지",                   accent: "#ff5a1f", ink: "#1a1a1a", paper: "#fbf8f1" },
-    { key: "nightlab",   name: "나이트랩",     desc: "크리에이터 다크 · 네온 포인트",           accent: "#22d3ee", ink: "#efece4", paper: "#0f172a" },
-    { key: "polaroid",   name: "폴라로이드",   desc: "일상 사진 중심 · 부드러운 그린",          accent: "#2a9d8f", ink: "#0f0d0b", paper: "#fff8e7" },
-  ].freeze
-
   def show
     @step = (params[:step] || 1).to_i.clamp(1, 4)
     @documents = @member.member_documents.order(uploaded_at: :desc)
@@ -20,7 +12,7 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
     @photos_count    = @member.member_photos.count
     @skills          = @member.member_skills.includes(:skill).joins(:skill).order(weight: :desc).limit(12)
     @doc_count       = @documents.size
-    @presets         = THEME_PRESETS
+    @presets         = ThemePreset::THEME_PRESETS
     @checklist       = build_checklist
   end
 
@@ -44,7 +36,7 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
 
   def update_style
     key = params[:theme_preset].to_s
-    preset = THEME_PRESETS.find { |p| p[:key] == key }
+    preset = ThemePreset.find(key)
     if preset
       @member.update!(theme_preset: key)
       redirect_to action: :show, params: { slug: @member.slug, step: 4 }, notice: "스타일 '#{preset[:name]}' 적용됨"
