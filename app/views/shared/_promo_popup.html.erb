@@ -274,12 +274,6 @@
       setTimeout(() => { if (overlay.classList.contains('open')) close(); }, 4000);
     });
 
-    // 첫 방문자 자동 노출: 3초 후, localStorage에 기록 없으면
-    // 단, autoplay 정책상 사용자 상호작용 없이는 muted로만 재생됨(허용됨)
-    let seen = null;
-    try { seen = localStorage.getItem(STORAGE_KEY); } catch (_) {}
-    if (!seen) {
-      setTimeout(open, 3000);
-    }
+    // 자동 노출 제거(ISS-102): 첫인상(히어로) 침범 방지. '홍보 영상' 버튼 클릭 시에만 열림.
   })();
 </script>
