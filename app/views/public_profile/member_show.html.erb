@@ -916,6 +916,24 @@
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 8px;">
+        <% if @bookings.any? %>
+          <div style="margin-bottom: 10px; padding-bottom: 18px; border-bottom: 1px solid var(--impd-rule);">
+            <p class="impd-label-muted" style="margin-bottom: 8px;">예약하기</p>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <% @bookings.each do |booking| %>
+                <%= link_to booking.external_url,
+                      target: "_blank",
+                      rel: "noopener",
+                      class: "impd-btn impd-btn-primary",
+                      style: "width: 100%; justify-content: space-between; height: 46px; padding: 0 18px; font-size: 14px;" do %>
+                  <span style="font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.3px; opacity: 0.65;">예약</span>
+                  <span style="font-weight: 600;"><%= booking.booking_type.presence || "예약하기" %> →</span>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
         <% if contact_options.any? %>
           <% contact_options.each_with_index do |o, i| %>
             <a href="<%= o[:href] %>"

@@ -6,6 +6,7 @@ class PublicProfileController < ApplicationController
     if @member
       @awards = []  # talent 도메인에서 확장 예정
       @services = @member.member_services.active.sorted
+      @bookings = @member.member_bookings.recent
       @portfolio = @member.member_portfolio_items.sorted
       @reviews = @member.member_reviews.public_visible.recent.limit(4)
       @posts = @member.member_posts.published.recent.limit(3)

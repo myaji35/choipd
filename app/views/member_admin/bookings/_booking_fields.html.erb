@@ -1,0 +1,16 @@
+<div class="booking-field">
+  <%= form.label :booking_type, "예약 채널명" %>
+  <%= form.text_field :booking_type, class: "booking-input", placeholder: "예: 네이버 예약, 캘린들리" %>
+</div>
+
+<div class="booking-field">
+  <%= form.label :description, "설명 (선택)" %>
+  <%= form.text_area :description, class: "booking-input", rows: 3, placeholder: "예약 전에 확인할 내용을 입력하세요." %>
+</div>
+
+<div class="booking-field">
+  <%= form.label :external_url, "외부 예약 URL (필수)" %>
+  <%= form.url_field :external_url, class: "booking-input", required: true, placeholder: "https://booking.example.com/..." %>
+</div>
+
+<%= form.submit submit_label, class: "impd-btn impd-btn-primary", style: "width: 100%; justify-content: center; margin-top: 20px;" %>
