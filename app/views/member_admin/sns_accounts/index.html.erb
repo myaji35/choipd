@@ -99,6 +99,32 @@
       <% end %>
     </section>
   </div>
+
+  <% facebook_account = @sns_accounts.find { |account| account.platform == "facebook" && account.is_active? } %>
+  <section class="impd-card" style="margin-top: 32px; padding: 24px;">
+    <div class="impd-section-header" style="margin-bottom: 20px;">
+      <span class="impd-label">§03</span>
+      <h2 class="impd-display" style="font-size: 24px;">지금 발행</h2>
+    </div>
+
+    <% if facebook_account&.external_id.present? %>
+      <%= form_with url: slug_admin_publish_facebook_path(slug: @member.slug), method: :post do |form| %>
+        <div class="sns-field">
+          <%= form.label :message, "발행 내용" %>
+          <%= form.text_area :message, class: "sns-input", required: true, rows: 6, placeholder: "페이스북 페이지에 발행할 내용을 입력하세요" %>
+        </div>
+        <div class="sns-field">
+          <%= form.label :link, "링크 (선택)" %>
+          <%= form.url_field :link, class: "sns-input", placeholder: "https://example.com" %>
+        </div>
+        <%= form.submit "페이스북에 발행", class: "impd-btn impd-btn-primary", style: "margin-top: 18px;" %>
+      <% end %>
+    <% elsif facebook_account %>
+      <p style="color: var(--impd-ink2); font-size: 14px; line-height: 1.7;">페이지 정보가 없어 발행할 수 없습니다. 페이스북 페이지 재연결이 필요합니다.</p>
+    <% else %>
+      <p style="color: var(--impd-ink2); font-size: 14px; line-height: 1.7;">먼저 활성 페이스북 페이지를 연결해주세요.</p>
+    <% end %>
+  </section>
 </div>
 
 <style>

@@ -54,6 +54,31 @@ class FacebookOauth
       []
     end
 
+    def publish_to_page(page_id:, page_access_token:, message:, link: nil)
+      uri = URI("#{GRAPH_API_BASE}/#{page_id}/feed")
+      params = { message: message, access_token: page_access_token }
+      params[:link] = link if link.present?
+
+      request = Net::HTTP::Post.new(uri)
+      request.set_form_data(params)
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.open_timeout = TIMEOUT
+      http.read_timeout = TIMEOUT
+      response = http.request(request)
+      payload = JSON.parse(response.body)
+
+      if response.is_a?(Net::HTTPSuccess) && payload["id"].present?
+        { success: true, post_id: payload["id"] }
+      else
+        { success: false, error: payload.dig("error", "message").presence || "페이스북 발행에 실패했습니다." }
+      end
+    rescue StandardError => error
+      log_error("publish_to_page", error)
+      { success: false, error: "페이스북 발행 중 오류가 발생했습니다." }
+    end
+
     private
 
     def app_id

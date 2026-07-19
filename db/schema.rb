@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_19_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_19_000004) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -962,6 +962,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_19_000003) do
     t.text "access_token_encrypted"
     t.string "account_name"
     t.datetime "created_at", null: false
+    t.string "external_id"
     t.boolean "is_active"
     t.integer "member_id"
     t.string "platform"
@@ -991,10 +992,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_19_000003) do
     t.text "message"
     t.string "platform"
     t.datetime "scheduled_at"
+    t.integer "sns_account_id"
     t.string "status"
     t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
     t.index ["member_id"], name: "index_sns_scheduled_posts_on_member_id"
+    t.index ["sns_account_id"], name: "index_sns_scheduled_posts_on_sns_account_id"
     t.index ["tenant_id"], name: "index_sns_scheduled_posts_on_tenant_id"
   end
 
@@ -1137,6 +1140,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_19_000003) do
   add_foreign_key "sns_accounts", "members"
   add_foreign_key "sns_post_histories", "sns_scheduled_posts"
   add_foreign_key "sns_scheduled_posts", "members"
+  add_foreign_key "sns_scheduled_posts", "sns_accounts"
   add_foreign_key "webhook_logs", "webhooks", on_delete: :cascade
   add_foreign_key "workflow_executions", "workflows", on_delete: :cascade
 end

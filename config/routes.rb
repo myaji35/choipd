@@ -317,6 +317,7 @@ Rails.application.routes.draw do
       get "/sns_accounts/facebook/connect", to: "facebook_connections#connect", as: :facebook_connect
       get "/sns_accounts/facebook/callback", to: "facebook_connections#callback", as: :facebook_callback
       post "/sns_accounts/facebook/save_page", to: "facebook_connections#save_page", as: :facebook_save_page
+      post "/publish/facebook", to: "sns_publishes#facebook", as: :publish_facebook
       resources :inquiries, only: [ :index ] do
         member { post :toggle_read }
       end
