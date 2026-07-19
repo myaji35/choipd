@@ -314,6 +314,7 @@ Rails.application.routes.draw do
       resources :services, controller: "services", only: [ :index, :create, :update, :destroy ] do
         collection { post :reorder }
       end
+      resources :faqs, controller: "faqs", only: [ :index, :create, :update, :destroy ]
       resources :bookings, only: [ :index, :create, :update, :destroy ]
       resources :sns_accounts, only: [ :index, :create, :update, :destroy ]
       resources :scheduled_posts, only: [ :index, :create, :destroy ], controller: "sns_scheduled_posts"

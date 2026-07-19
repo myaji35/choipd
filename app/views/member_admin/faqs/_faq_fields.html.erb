@@ -1,0 +1,19 @@
+<div class="faq-field">
+  <%= form.label :question, "질문 (필수)" %>
+  <%= form.text_field :question, required: true, class: "faq-input", placeholder: "예: 작업은 어떤 순서로 진행되나요?" %>
+</div>
+<div class="faq-field">
+  <%= form.label :answer, "답변 (필수)" %>
+  <%= form.text_area :answer, required: true, rows: 6, class: "faq-input", placeholder: "방문자가 이해하기 쉽게 구체적으로 작성해 주세요." %>
+</div>
+<div class="faq-field">
+  <%= form.label :sort_order, "표시 순서" %>
+  <%= form.number_field :sort_order, class: "faq-input", min: 0 %>
+</div>
+<div class="faq-field">
+  <label style="display: flex; align-items: center; gap: 8px; color: var(--impd-ink2);">
+    <%= form.check_box :is_published, { checked: form.object.new_record? ? true : form.object.is_published.to_i == 1 }, 1, 0 %>
+    공개 페이지에 발행
+  </label>
+</div>
+<%= form.submit submit_label, class: "impd-btn impd-btn-primary", style: "width: 100%; justify-content: center; margin-top: 20px;" %>

@@ -46,6 +46,26 @@
     person_schema_json = person_schema.to_json.gsub("</", "<\\/").html_safe
   %>
   <script type="application/ld+json"><%= person_schema_json %></script>
+  <% if @faqs.any? %>
+    <%
+      faq_schema = {
+        "@context" => "https://schema.org",
+        "@type" => "FAQPage",
+        "mainEntity" => @faqs.map do |faq|
+          {
+            "@type" => "Question",
+            "name" => faq.question,
+            "acceptedAnswer" => {
+              "@type" => "Answer",
+              "text" => faq.answer
+            }
+          }
+        end
+      }
+      faq_schema_json = faq_schema.to_json.gsub("</", "<\\/").html_safe
+    %>
+    <script type="application/ld+json"><%= faq_schema_json %></script>
+  <% end %>
 <% end %>
 
 <style>
@@ -632,6 +652,28 @@
             <%= s.price_label.presence || (s.price.present? ? "₩#{s.price}" : "문의") %>
           </p>
         </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+
+<!-- ── §C-2 FAQ ──────────────────────────────────────── -->
+<% if @faqs.any? %>
+  <section class="impd-wrap impd-section" id="faq">
+    <div class="impd-section-header">
+      <span class="impd-label">§C-2</span>
+      <h2 class="impd-display" style="font-size: 36px; flex: 1;">자주 묻는 질문</h2>
+      <span class="impd-label-muted"><%= @faqs.size %> QUESTIONS</span>
+    </div>
+    <div style="border-top: 1px solid var(--impd-ink);">
+      <% @faqs.each_with_index do |faq, index| %>
+        <article style="display: grid; grid-template-columns: minmax(56px, .15fr) minmax(0, 1fr); gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--impd-rule);">
+          <span class="impd-label-muted" aria-hidden="true">Q<%= format("%02d", index + 1) %></span>
+          <div>
+            <h3 class="impd-display" style="font-size: 22px; line-height: 1.45; word-break: keep-all;"><%= faq.question %></h3>
+            <p style="margin-top: 10px; color: var(--impd-ink2); font-size: 15px; line-height: 1.8; white-space: pre-line; overflow-wrap: anywhere;"><%= faq.answer %></p>
+          </div>
+        </article>
       <% end %>
     </div>
   </section>

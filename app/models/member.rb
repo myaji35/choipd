@@ -5,6 +5,7 @@ class Member < ApplicationRecord
 
   has_many :member_portfolio_items, dependent: :destroy
   has_many :member_services,        dependent: :destroy
+  has_many :member_faqs,            dependent: :destroy
   has_many :member_posts,           dependent: :destroy
   # 거래·리뷰·문의는 법정 보존/타인 작성물 — 회원 물리삭제 시 연쇄삭제 금지.
   # 탈퇴는 소프트삭제+익명화로 처리하고, 물리 destroy 시도는 막는다(ISS-112).

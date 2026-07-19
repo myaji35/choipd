@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_19_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_19_000005) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -649,6 +649,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_19_000004) do
     t.index ["member_id"], name: "index_member_documents_on_member_id"
   end
 
+  create_table "member_faqs", force: :cascade do |t|
+    t.text "answer", null: false
+    t.datetime "created_at", null: false
+    t.integer "is_published", default: 1
+    t.integer "member_id", null: false
+    t.string "question", null: false
+    t.integer "sort_order", default: 0
+    t.datetime "updated_at", null: false
+    t.index ["member_id"], name: "index_member_faqs_on_member_id"
+  end
+
   create_table "member_gap_reports", force: :cascade do |t|
     t.integer "completeness_score", default: 0
     t.text "gaps_json", default: "[]", null: false
@@ -1126,6 +1137,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_19_000004) do
   add_foreign_key "kanban_tasks", "kanban_columns"
   add_foreign_key "member_bookings", "members", on_delete: :cascade
   add_foreign_key "member_documents", "members", on_delete: :cascade
+  add_foreign_key "member_faqs", "members"
   add_foreign_key "member_gap_reports", "members", on_delete: :cascade
   add_foreign_key "member_inquiries", "members", on_delete: :cascade
   add_foreign_key "member_photos", "members"
