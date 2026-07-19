@@ -42,4 +42,28 @@ class ApplicationController < ActionController::Base
       ENV["GOOGLE_OAUTH_CLIENT_SECRET"].to_s.strip.length > 8
   end
   helper_method :google_oauth_enabled?
+
+  def public_host
+    ENV["IMPD_PUBLIC_HOST"].presence || "impd.townin.net"
+  end
+  helper_method :public_host
+
+  def public_base_url
+    scheme = Rails.env.production? ? "https" : "http"
+    "#{scheme}://#{public_host}"
+  end
+  helper_method :public_base_url
+
+  # 공개 프로필을 방문자가 본인인지 판별. 두 경로 중 하나라도 맞으면 owner-view.
+  # (1) 회원 세션(session[:member_id])의 회원이 본인
+  # (2) Devise admin_user 세션에서 이메일이 회원 이메일과 일치 (admin이 자기 회원 페이지 방문)
+  def viewing_as_owner?(member)
+    return false if member.blank?
+    return true if current_member.present? && current_member.id == member.id
+    if defined?(current_admin_user) && current_admin_user.present?
+      return true if current_admin_user.email.to_s.downcase == member.email.to_s.downcase
+    end
+    false
+  end
+  helper_method :viewing_as_owner?
 end

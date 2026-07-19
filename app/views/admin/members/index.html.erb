@@ -70,12 +70,26 @@
           </td>
           <td class="px-4 py-3 text-xs text-gray-400"><%= m.created_at.strftime("%Y.%m.%d") %></td>
           <td class="px-4 py-3 text-right">
-            <% if m.slug.present? %>
-              <%= link_to "공개페이지 ↗", "/#{m.slug}",
-                  target: "_blank", rel: "noopener noreferrer",
-                  class: "text-xs text-blue-600 hover:text-blue-800" %>
-            <% end %>
-            <%= link_to "보기", admin_member_path(m), class: "text-xs text-primary ml-2" %>
+            <div class="inline-flex items-center gap-1.5">
+              <% if m.slug.present? %>
+                <%= link_to "/#{m.slug}",
+                    target: "_blank", rel: "noopener noreferrer",
+                    title: "#{m.name}님의 공개 페이지를 새 탭에서 열기",
+                    class: "inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-green-700 text-green-700 hover:bg-green-700 hover:text-white text-xs font-semibold transition" do %>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  공개 페이지
+                <% end %>
+                <%= link_to "/#{m.slug}/card",
+                    target: "_blank", rel: "noopener noreferrer",
+                    title: "#{m.name}님의 명함 상세 페이지",
+                    class: "inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-gray-400 text-gray-700 hover:bg-gray-900 hover:text-white text-xs font-semibold transition" do %>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h6M6 14h4M16 10h2v4h-2z"/></svg>
+                  명함
+                <% end %>
+              <% end %>
+              <%= link_to "보기", admin_member_path(m),
+                  class: "inline-flex items-center px-2.5 py-1 rounded-full bg-primary text-white text-xs font-semibold hover:opacity-90 transition" %>
+            </div>
           </td>
         </tr>
       <% end %>

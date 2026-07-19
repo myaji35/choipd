@@ -6,7 +6,9 @@ class QrcodesController < ApplicationController
   def show
     slug = params[:slug]
     member = Member.find_by(slug: slug)
-    if member.blank? || member.status != "approved"
+    # 공개 프로필(#show)과 동일한 접근성 — status 게이트는 회원 자체가 존재하면 QR 제공.
+    # (profile 뷰가 렌더되면 QR도 렌더되어야 공유 경로가 깨지지 않음)
+    if member.blank?
       head :not_found and return
     end
 
