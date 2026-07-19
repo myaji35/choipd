@@ -313,6 +313,7 @@ Rails.application.routes.draw do
       resources :services, controller: "services", only: [ :index, :create, :update, :destroy ] do
         collection { post :reorder }
       end
+      resources :sns_accounts, only: [ :index, :create, :update, :destroy ]
       resources :inquiries, only: [ :index ] do
         member { post :toggle_read }
       end

@@ -1,0 +1,110 @@
+<% content_for :title, "SNS 계정 연결 — #{@member.name}" %>
+
+<div class="impd-wrap" style="max-width: 1120px; margin: 0 auto; padding: 40px;">
+  <header style="margin-bottom: 32px;">
+    <p class="impd-label-muted">SNS ACCOUNTS · /<%= @member.slug %></p>
+    <h1 class="impd-display" style="font-size: 44px; margin-top: 12px;">SNS 계정 연결</h1>
+    <p style="margin-top: 12px; color: var(--impd-ink2); font-size: 14px; line-height: 1.7;">
+      발행 기능은 다음 단계에서 활성화됩니다. 지금은 계정 정보를 안전하게 저장합니다.<br>
+      입력한 액세스 토큰은 암호화하여 저장하며 화면에 다시 표시하지 않습니다.
+    </p>
+  </header>
+
+  <div class="sns-accounts-layout" style="display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 32px; align-items: start;">
+    <section>
+      <div class="impd-section-header">
+        <span class="impd-label">§01</span>
+        <h2 class="impd-display" style="font-size: 24px; flex: 1;">연결된 계정</h2>
+        <span class="impd-label-muted"><%= @sns_accounts.size %>개</span>
+      </div>
+
+      <% if @sns_accounts.any? %>
+        <div style="display: grid; gap: 14px;">
+          <% @sns_accounts.each do |account| %>
+            <article class="impd-card" style="padding: 20px;">
+              <div style="display: flex; justify-content: space-between; gap: 20px; align-items: flex-start;">
+                <div style="min-width: 0;">
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+                    <h3 style="font-size: 17px; line-height: 1.45;"><%= account.platform_label %> · <%= account.account_name %></h3>
+                    <span class="sns-status-badge <%= account.is_active? ? 'is-active' : '' %>"><%= account.is_active? ? "활성" : "비활성" %></span>
+                  </div>
+                  <p style="margin-top: 8px; color: var(--impd-ink2); font-size: 13px;">
+                    액세스 토큰: <strong><%= account.access_token_encrypted.present? ? "연결됨" : "미연결" %></strong>
+                  </p>
+                </div>
+                <%= button_to "삭제", slug_admin_sns_account_path(slug: @member.slug, id: account), method: :delete,
+                      form: { data: { turbo_confirm: "이 SNS 계정을 삭제하시겠습니까?" } },
+                      class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 12px; font-size: 12px; color: var(--impd-accent-2); border-color: var(--impd-accent-2);" %>
+              </div>
+
+              <details style="margin-top: 16px; border-top: 1px solid var(--impd-rule); padding-top: 14px;">
+                <summary style="cursor: pointer; color: var(--impd-accent); font-size: 13px; font-weight: 600;">수정</summary>
+                <%= form_with(model: account, url: slug_admin_sns_account_path(slug: @member.slug, id: account), method: :patch, style: "margin-top: 18px;") do |form| %>
+                  <div class="sns-field">
+                    <%= form.label :account_name, "계정 이름" %>
+                    <%= form.text_field :account_name, class: "sns-input", required: true, autocomplete: "username" %>
+                  </div>
+                  <div class="sns-field">
+                    <%= form.label :access_token, "새 액세스 토큰" %>
+                    <%= form.password_field :access_token, class: "sns-input", value: nil, autocomplete: "new-password", placeholder: "변경할 토큰을 입력하세요" %>
+                  </div>
+                  <div class="sns-field sns-checkbox-field">
+                    <%= form.check_box :is_active %>
+                    <%= form.label :is_active, "활성 계정" %>
+                  </div>
+                  <%= form.submit "변경사항 저장", class: "impd-btn impd-btn-primary", style: "margin-top: 18px;" %>
+                <% end %>
+              </details>
+            </article>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="impd-card" style="padding: 40px 24px; text-align: center;">
+          <p style="font-size: 14px; color: var(--impd-ink2); line-height: 1.7;">아직 연결한 SNS 계정이 없습니다. 오른쪽 양식에서 첫 계정을 연결하세요.</p>
+        </div>
+      <% end %>
+    </section>
+
+    <section class="impd-card sns-new-account" style="position: sticky; top: 88px;">
+      <div class="impd-section-header" style="margin-bottom: 20px;">
+        <span class="impd-label">§02</span>
+        <h2 class="impd-display" style="font-size: 24px;">신규 연결</h2>
+      </div>
+      <%= form_with model: @new_account, url: slug_admin_sns_accounts_path(slug: @member.slug) do |form| %>
+        <div class="sns-field">
+          <%= form.label :platform, "플랫폼" %>
+          <%= form.select :platform, SnsAccount::PLATFORMS.map { |platform| [platform.capitalize, platform] }, { prompt: "플랫폼 선택" }, class: "sns-input", required: true %>
+        </div>
+        <div class="sns-field">
+          <%= form.label :account_name, "계정 이름" %>
+          <%= form.text_field :account_name, class: "sns-input", required: true, autocomplete: "username", placeholder: "계정 이름" %>
+        </div>
+        <div class="sns-field">
+          <%= form.label :access_token, "액세스 토큰" %>
+          <%= form.password_field :access_token, class: "sns-input", autocomplete: "new-password", placeholder: "토큰을 직접 입력하세요" %>
+        </div>
+        <div class="sns-field sns-checkbox-field">
+          <%= form.check_box :is_active %>
+          <%= form.label :is_active, "활성 계정" %>
+        </div>
+        <%= form.submit "계정 연결", class: "impd-btn impd-btn-primary", style: "margin-top: 18px; width: 100%; justify-content: center;" %>
+      <% end %>
+    </section>
+  </div>
+</div>
+
+<style>
+  .sns-field { margin-top: 15px; }
+  .sns-field:first-child { margin-top: 0; }
+  .sns-field label { display: block; margin-bottom: 6px; color: var(--impd-muted); font-size: 13px; font-weight: 600; }
+  .sns-input { width: 100%; border: 1px solid var(--impd-rule); background: var(--impd-paper); padding: 10px 12px; color: var(--impd-ink); font-family: var(--impd-font-sans); font-size: 14px; }
+  .sns-checkbox-field { display: flex; gap: 8px; align-items: center; }
+  .sns-checkbox-field label { margin-bottom: 0; color: var(--impd-ink2); }
+  .sns-status-badge { border: 1px solid var(--impd-rule); color: var(--impd-muted); padding: 3px 7px; font-size: 12px; font-weight: 600; }
+  .sns-status-badge.is-active { border-color: var(--impd-accent); color: var(--impd-accent); }
+  @media (max-width: 820px) {
+    .impd-wrap { padding: 28px 20px !important; }
+    .sns-accounts-layout { grid-template-columns: 1fr !important; }
+    .sns-new-account { position: static !important; }
+  }
+</style>
