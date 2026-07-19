@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= @member.name %> 인쇄용 명함</title>
+    <style>
+      :root {
+        --impd-deep-green: #1e3932;
+        --impd-cream: #faf8f3;
+        --impd-ink: #0f0d0b;
+        --impd-muted: #645f57;
+        --impd-rule: #d8d2c7;
+      }
+
+      * { box-sizing: border-box; }
+
+      @page { size: 90mm 50mm; margin: 0; }
+
+      body {
+        margin: 0;
+        color: var(--impd-ink);
+        background: #e8e5df;
+        font-family: "Pretendard Variable", "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .screen-tools {
+        width: min(90mm, calc(100vw - 32px));
+        margin: 32px auto 20px;
+        color: var(--impd-ink);
+      }
+
+      .screen-tools h1 { margin: 0 0 8px; font-size: 20px; letter-spacing: -0.4px; }
+      .screen-tools p { margin: 0 0 14px; color: var(--impd-muted); font-size: 13px; line-height: 1.6; }
+      .print-button {
+        width: 100%;
+        min-height: 44px;
+        border: 1px solid var(--impd-deep-green);
+        background: var(--impd-deep-green);
+        color: var(--impd-cream);
+        font: inherit;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .cards { padding-bottom: 32px; }
+      .card {
+        position: relative;
+        width: 90mm;
+        height: 50mm;
+        margin: 0 auto 20px;
+        overflow: hidden;
+      }
+
+      .card-front {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 24mm;
+        gap: 7mm;
+        align-items: center;
+        padding: 8mm;
+        background: var(--impd-deep-green);
+        color: var(--impd-cream);
+      }
+
+      .identity { min-width: 0; }
+      .brand {
+        margin: 0 0 6mm;
+        font-size: 7pt;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+      }
+      .name {
+        margin: 0;
+        font-size: 23pt;
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: -0.06em;
+        word-break: keep-all;
+      }
+      .profession { margin: 2.2mm 0 0; font-size: 9pt; line-height: 1.35; }
+      .profile-address { margin: 5mm 0 0; font-size: 7.5pt; letter-spacing: 0.01em; }
+      .qr-frame {
+        width: 24mm;
+        height: 24mm;
+        padding: 2mm;
+        background: var(--impd-cream);
+      }
+      .qr-frame img { display: block; width: 100%; height: 100%; }
+
+      .card-back {
+        padding: 8mm;
+        background: var(--impd-cream);
+        color: var(--impd-ink);
+      }
+      .back-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding-bottom: 4mm;
+        border-bottom: 0.25mm solid var(--impd-deep-green);
+      }
+      .back-name { margin: 0; font-size: 13pt; font-weight: 800; letter-spacing: -0.04em; }
+      .back-role { margin: 0; color: var(--impd-deep-green); font-size: 8pt; font-weight: 700; }
+      .contact-list { margin: 4mm 0 0; padding: 0; list-style: none; }
+      .contact-row {
+        display: grid;
+        grid-template-columns: 18mm minmax(0, 1fr);
+        gap: 3mm;
+        align-items: baseline;
+        margin-top: 2.2mm;
+        font-size: 8pt;
+        line-height: 1.3;
+      }
+      .contact-label { color: var(--impd-muted); font-size: 6.5pt; font-weight: 700; letter-spacing: 0.08em; }
+      .contact-value { overflow-wrap: anywhere; }
+      .back-address {
+        position: absolute;
+        right: 8mm;
+        bottom: 6mm;
+        margin: 0;
+        color: var(--impd-deep-green);
+        font-size: 7.5pt;
+        font-weight: 700;
+      }
+
+      @media screen and (max-width: 380px) {
+        .card {
+          transform: scale(calc((100vw - 32px) / 340.1575));
+          transform-origin: top center;
+          margin-bottom: calc(20px - (50mm * (1 - ((100vw - 32px) / 340.1575))));
+        }
+      }
+
+      @media print {
+        body { background: transparent; }
+        .screen-tools { display: none; }
+        .cards { padding: 0; }
+        .card { margin: 0; }
+        .card-back { break-before: page; page-break-before: always; }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="screen-tools" aria-label="인쇄 안내">
+      <h1>인쇄용 명함 미리보기</h1>
+      <p>인쇄 창에서 대상 프린터를 PDF 저장으로 선택하고, 배율은 100%, 여백은 없음으로 설정하세요.</p>
+      <button type="button" class="print-button" onclick="window.print()">인쇄하기(Ctrl+P로 PDF 저장)</button>
+    </section>
+
+    <main class="cards">
+      <section class="card card-front" aria-label="명함 앞면">
+        <div class="identity">
+          <p class="brand">imPD</p>
+          <h2 class="name"><%= @member.name %></h2>
+          <p class="profession"><%= @member.profession_label %></p>
+          <p class="profile-address"><%= public_host %>/<%= @member.slug %></p>
+        </div>
+        <div class="qr-frame">
+          <img src="/qr/<%= @member.slug %>.svg" alt="<%= @member.name %> 프로필 QR 코드">
+        </div>
+      </section>
+
+      <section class="card card-back" aria-label="명함 뒷면">
+        <header class="back-header">
+          <h2 class="back-name"><%= @member.name %></h2>
+          <p class="back-role"><%= @member.profession_label %></p>
+        </header>
+        <ul class="contact-list">
+          <% if @member.phone.present? %>
+            <li class="contact-row"><span class="contact-label">전화</span><span class="contact-value"><%= @member.phone %></span></li>
+          <% end %>
+          <% if @member.email.present? %>
+            <li class="contact-row"><span class="contact-label">이메일</span><span class="contact-value"><%= @member.email %></span></li>
+          <% end %>
+          <% if @member.social["kakao_channel"].present? %>
+            <li class="contact-row"><span class="contact-label">카톡채널</span><span class="contact-value"><%= @member.social["kakao_channel"] %></span></li>
+          <% end %>
+        </ul>
+        <p class="back-address"><%= public_host %>/<%= @member.slug %></p>
+      </section>
+    </main>
+  </body>
+</html>

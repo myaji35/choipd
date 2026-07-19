@@ -362,6 +362,15 @@ Rails.application.routes.draw do
         slug.match?(/\A[a-z0-9][a-z0-9\-]{1,}\z/) && !SlugValidation::RESERVED_SLUGS.include?(slug)
       }
 
+  # 브라우저 인쇄용 양면 명함 — vanity URL보다 먼저 매칭한다.
+  get "/:slug/print-card",
+      to: "print_cards#show",
+      as: :print_card,
+      constraints: lambda { |req|
+        slug = req.path_parameters[:slug].to_s
+        slug.match?(/\A[a-z0-9][a-z0-9\-]{1,}\z/) && !SlugValidation::RESERVED_SLUGS.include?(slug)
+      }
+
   # ── Vanity URL: /<slug> → 회원 또는 분양사 공개 페이지 (가장 마지막) ───
   # CRIT-4: SlugValidation::RESERVED_SLUGS 단일 source of truth.
   # 모델 검증과 라우트 차단이 동일 목록을 사용하므로 충돌 불가.
