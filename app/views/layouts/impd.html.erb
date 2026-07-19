@@ -161,7 +161,7 @@
         imPD
       <% end %>
       <nav class="impd-topnav-links" style="display: flex; gap: 22px; flex: 1;">
-        <% [["홈", root_path], ["예시", "/choi-pd"], ["가격", root_path(anchor: "pricing")], ["도움말", root_path(anchor: "faq")]].each do |label, path| %>
+        <% [["홈", root_path], ["둘러보기", explore_path], ["예시", "/choi-pd"], ["가격", root_path(anchor: "pricing")], ["도움말", root_path(anchor: "faq")]].each do |label, path| %>
           <%= link_to label, path, style: "color: var(--impd-muted); font-size: 13px; font-weight: 500; white-space: nowrap;" %>
         <% end %>
       </nav>
