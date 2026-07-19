@@ -1,0 +1,43 @@
+<%# S4: Bio 초안 — 제시된 카피 수락/재작성/직접 수정 %>
+<% draft = identity["bio_draft"].to_s %>
+
+<div data-probe-wizard-target="s4" data-step-index="4">
+  <div class="probe-eyebrow">§ S4 · 한 줄 소개</div>
+  <h1 class="probe-title">당신을 소개하는 한 줄.</h1>
+  <p class="probe-subtitle">
+    매니페스토 톤으로 준비했어요. 마음에 들면 그대로, 아니면 다시 쓰거나 직접 수정할 수 있어요.
+  </p>
+
+  <div style="padding: 18px 20px; background: #fff; border-left: 3px solid var(--impd-accent); border-radius: 4px; font-family: var(--impd-font-serif); font-size: 16px; line-height: 1.6; color: var(--impd-ink); margin-bottom: 16px;"
+       data-probe-wizard-target="bioQuote">
+    “<span data-probe-wizard-target="bioText"><%= draft %></span>”
+  </div>
+
+  <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+    <button type="button"
+            class="probe-nav-btn"
+            data-action="click->probe-wizard#rewriteBio"
+            style="min-height: 44px; padding: 0 16px; font-size: 13px;">
+      ↻ 다른 표현으로 다시 써줘
+    </button>
+    <button type="button"
+            class="probe-nav-btn"
+            data-action="click->probe-wizard#toggleBioManual"
+            data-probe-wizard-target="bioManualBtn"
+            style="min-height: 44px; padding: 0 16px; font-size: 13px;">
+      직접 쓰기
+    </button>
+  </div>
+
+  <textarea class="probe-text-area"
+            data-probe-wizard-target="bioManualInput"
+            placeholder="직접 한 줄을 써주세요."
+            maxlength="180"
+            style="display: none;"><%= draft %></textarea>
+
+  <div style="padding-top: 10px; font-family: var(--impd-font-mono); font-size: 10px; color: var(--impd-soft-muted);" data-probe-wizard-target="bioStatus">
+    variation 1 / 3 · 180자 이하
+  </div>
+
+  <input type="hidden" data-probe-wizard-target="s4Bio" value="<%= draft %>">
+</div>

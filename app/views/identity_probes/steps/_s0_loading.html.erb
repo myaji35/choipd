@@ -1,0 +1,46 @@
+<%# S0: 15초 로딩 화면 — imPD가 당신을 대신 찾아보는 중 %>
+<div data-probe-wizard-target="s0" class="probe-step">
+  <div class="probe-eyebrow">§ S0 · 정체성 조회</div>
+  <h1 class="probe-title">잠시만요, 당신을 대신 찾아보고 있어요.</h1>
+  <p class="probe-subtitle">
+    imPD가 공개된 정보만 모아서 프로필 초안을 준비합니다. 결정은 당신이, 입력은 imPD가 합니다.
+    <span style="display: inline-block; margin-left: 6px;">
+      <span class="probe-loading-dot"></span>
+      <span class="probe-loading-dot"></span>
+      <span class="probe-loading-dot"></span>
+    </span>
+  </p>
+
+  <ul style="list-style: none; padding: 0; margin: 0 0 24px;" data-probe-wizard-target="s0Sources">
+    <% [
+      { key: "gravatar",  label: "Gravatar — 아바타·bio" },
+      { key: "google",    label: "Google CSE — 블로그·기사" },
+      { key: "naver",     label: "네이버 검색 — 한국어 블로그·카페" },
+      { key: "instagram", label: "Instagram oEmbed — 공개 프로필" },
+    ].each do |source| %>
+      <li data-source-key="<%= source[:key] %>"
+          style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-top: 1px solid var(--impd-rule); font-size: 14px; color: var(--impd-muted);">
+        <span data-source-icon
+              style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--impd-rule); flex-shrink: 0; background: transparent; display: inline-flex; align-items: center; justify-content: center;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0; color: #10B981;">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </span>
+        <span><%= source[:label] %></span>
+      </li>
+    <% end %>
+  </ul>
+
+  <div style="padding-top: 12px; border-top: 1px solid var(--impd-rule); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+    <span style="font-family: var(--impd-font-mono); font-size: 11px; color: var(--impd-soft-muted);" data-probe-wizard-target="s0Hint">
+      평균 소요 15초 · 지금까지 <span data-probe-wizard-target="s0Elapsed">0</span>초
+    </span>
+    <%= button_to "건너뛰고 직접 입력하기 →",
+          probe_wizard_step_path(n: 1),
+          method: :patch,
+          params: { payload: { manual: "1" } },
+          form: { style: "display:inline; margin:0;" },
+          class: "probe-skip-mid",
+          style: "background: transparent; border: none; cursor: pointer; font-family: inherit; text-decoration: underline;" %>
+  </div>
+</div>

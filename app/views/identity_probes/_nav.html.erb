@@ -1,0 +1,23 @@
+<%# 위자드 하단 네비 (이전 / 건너뛰기 / 다음) %>
+<nav class="probe-nav" aria-label="위자드 단계 이동">
+  <% if current_step > 1 %>
+    <%= link_to "← 이전", probe_wizard_show_path(step: current_step - 1),
+          class: "probe-nav-btn",
+          data: { action: "probe-wizard#prev" } %>
+  <% else %>
+    <span class="probe-nav-btn is-disabled" aria-hidden="true">← 이전</span>
+  <% end %>
+
+  <%= button_to "건너뛰기", probe_wizard_skip_path,
+        method: :post,
+        form: { data: { turbo_confirm: "프로필 자동 채우기를 건너뛰고 바로 내 페이지로 이동할까요?" }, style: "display:inline; margin:0;" },
+        class: "probe-skip-mid",
+        style: "background: transparent; border: none; padding: 10px 12px; cursor: pointer; font-family: inherit;" %>
+
+  <button type="button"
+          class="probe-nav-btn is-primary"
+          data-action="probe-wizard#next"
+          data-probe-wizard-target="nextBtn">
+    다음 →
+  </button>
+</nav>

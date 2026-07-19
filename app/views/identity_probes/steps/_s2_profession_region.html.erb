@@ -1,0 +1,92 @@
+<%# S2: 직업·지역 — 칩 선택 또는 직접 입력 %>
+<% professions = (identity["professions"] || [])[0, 4] %>
+<% regions     = (identity["regions"]     || [])[0, 3] %>
+
+<div data-probe-wizard-target="s2" data-step-index="2">
+  <div class="probe-eyebrow">§ S2 · 직업·지역</div>
+  <h1 class="probe-title">당신을 한 줄로 소개한다면?</h1>
+  <p class="probe-subtitle">
+    직업과 지역을 각각 하나씩 골라주세요. 원하는 게 없으면 직접 입력 버튼으로 쓸 수 있어요.
+  </p>
+
+  <!-- 직업 -->
+  <div style="margin-bottom: 20px;">
+    <div style="font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted); margin-bottom: 10px;">
+      직업
+    </div>
+    <div class="probe-chip-group" role="radiogroup" aria-label="직업 선택">
+      <% professions.each_with_index do |p, idx| %>
+        <button type="button"
+                class="probe-chip"
+                role="radio"
+                aria-checked="false"
+                data-action="click->probe-wizard#toggleChip"
+                data-probe-wizard-target="professionChip"
+                data-chip-group="profession"
+                data-chip-value="<%= p["label"] %>">
+          <%= p["label"] %>
+          <span style="margin-left: 6px; font-family: var(--impd-font-mono); font-size: 10px; opacity: 0.6;"><%= p["confidence"].to_i %>%</span>
+        </button>
+      <% end %>
+      <button type="button"
+              class="probe-chip"
+              data-action="click->probe-wizard#toggleManualProfession"
+              data-probe-wizard-target="professionManualBtn"
+              style="border-style: dashed;">
+        + 직접 입력
+      </button>
+    </div>
+
+    <input type="text"
+           class="probe-text-input"
+           data-probe-wizard-target="professionManualInput"
+           placeholder="예: 요가 지도사, 카페 사장, 영상 편집자"
+           style="display: none; margin-top: 8px;"
+           maxlength="40">
+
+    <% if professions.any? && professions.first["quote"].present? %>
+      <div class="probe-quote" style="margin-top: 4px;">
+        출처 — <%= professions.first["source"] %>: “<%= professions.first["quote"] %>”
+      </div>
+    <% end %>
+  </div>
+
+  <!-- 지역 -->
+  <div style="margin-bottom: 8px;">
+    <div style="font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted); margin-bottom: 10px;">
+      지역
+    </div>
+    <div class="probe-chip-group" role="radiogroup" aria-label="지역 선택">
+      <% regions.each_with_index do |r, idx| %>
+        <button type="button"
+                class="probe-chip"
+                role="radio"
+                aria-checked="false"
+                data-action="click->probe-wizard#toggleChip"
+                data-probe-wizard-target="regionChip"
+                data-chip-group="region"
+                data-chip-value="<%= r["label"] %>">
+          <%= r["label"] %>
+          <span style="margin-left: 6px; font-family: var(--impd-font-mono); font-size: 10px; opacity: 0.6;"><%= r["confidence"].to_i %>%</span>
+        </button>
+      <% end %>
+      <button type="button"
+              class="probe-chip"
+              data-action="click->probe-wizard#toggleManualRegion"
+              data-probe-wizard-target="regionManualBtn"
+              style="border-style: dashed;">
+        + 직접 입력
+      </button>
+    </div>
+
+    <input type="text"
+           class="probe-text-input"
+           data-probe-wizard-target="regionManualInput"
+           placeholder="예: 서울 종로구, 부산 해운대"
+           style="display: none; margin-top: 8px;"
+           maxlength="40">
+  </div>
+
+  <input type="hidden" data-probe-wizard-target="s2Profession" value="">
+  <input type="hidden" data-probe-wizard-target="s2Region" value="">
+</div>

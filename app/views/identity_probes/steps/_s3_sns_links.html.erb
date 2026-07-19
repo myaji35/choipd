@@ -1,0 +1,67 @@
+<%# S3: SNS 링크 — 체크박스로 본인 소유 링크 확정 %>
+<% links = identity["sns_links"] || [] %>
+
+<div data-probe-wizard-target="s3" data-step-index="3">
+  <div class="probe-eyebrow">§ S3 · SNS 링크</div>
+  <h1 class="probe-title">이 링크들, 당신 것인가요?</h1>
+  <p class="probe-subtitle">
+    본인 것만 체크해주세요. 신뢰도가 낮은 항목은 기본값이 꺼져 있어요.
+  </p>
+
+  <div role="group" aria-label="SNS 링크 확인" style="margin-bottom: 12px;">
+    <% if links.empty? %>
+      <div style="padding: 24px; border: 1px dashed var(--impd-rule); border-radius: 6px; text-align: center; color: var(--impd-muted); font-size: 13px;">
+        자동으로 찾은 SNS 링크가 없어요. 아래 직접 추가를 사용해주세요.
+      </div>
+    <% end %>
+
+    <% links.each_with_index do |link, idx| %>
+      <% confidence = link["confidence"].to_i %>
+      <% default_on = confidence >= 80 %>
+      <% low_trust  = confidence < 70 %>
+      <label class="probe-check-row <%= 'is-checked' if default_on %> <%= 'is-low-trust' if low_trust %>"
+             data-probe-wizard-target="snsRow"
+             data-action="click->probe-wizard#toggleCheck"
+             data-sns-payload="<%= link.to_json %>">
+        <span class="probe-check-box" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </span>
+        <div class="probe-check-body">
+          <div class="probe-check-title">
+            <%= link["handle"].presence || link["url"] %>
+            <span style="font-family: var(--impd-font-mono); font-size: 10px; color: <%= low_trust ? 'var(--impd-accent-2)' : 'var(--impd-muted)' %>; margin-left: 6px;">
+              <%= link["platform"].to_s.upcase %> · 신뢰도 <%= confidence %>%
+              <% if low_trust %>· 확인 필요<% end %>
+            </span>
+          </div>
+          <div class="probe-check-url"><%= link["url"] %></div>
+        </div>
+        <input type="checkbox"
+               data-probe-wizard-target="snsCheckbox"
+               <%= "checked" if default_on %>
+               style="display: none;">
+      </label>
+    <% end %>
+  </div>
+
+  <div style="padding: 12px 14px; border: 1px dashed var(--impd-rule); border-radius: 6px; background: rgba(15,13,11,0.02);">
+    <div style="font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted); margin-bottom: 8px;">직접 추가</div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <input type="text"
+             class="probe-text-input"
+             data-probe-wizard-target="snsManualUrl"
+             placeholder="https://instagram.com/..."
+             style="flex: 1; min-width: 180px;">
+      <button type="button"
+              class="probe-nav-btn"
+              data-action="click->probe-wizard#addSnsLink"
+              style="min-height: 44px; padding: 0 16px; font-size: 13px;">
+        추가
+      </button>
+    </div>
+  </div>
+
+  <input type="hidden" data-probe-wizard-target="s3Links" value="[]">
+</div>

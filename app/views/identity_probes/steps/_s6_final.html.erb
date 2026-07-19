@@ -1,0 +1,105 @@
+<%# S6: 최종 동의 — 주소 + 미리보기 + 4개 마이크로 동의 + 발행 %>
+<% page_url = "#{public_base_url}/#{member.slug}" %>
+
+<div data-probe-wizard-target="s6" data-step-index="6">
+  <div class="probe-eyebrow">§ S6 · 최종 확인</div>
+  <h1 class="probe-title">당신의 공개 페이지가 준비됐어요.</h1>
+  <p class="probe-subtitle">
+    아래 주소로 공개됩니다. 두 개의 필수 동의에 체크해주세요.
+  </p>
+
+  <!-- 주소 + 미리보기 -->
+  <div style="display: flex; gap: 14px; align-items: center; padding: 14px 16px; background: #fff; border: 1px solid var(--impd-rule); border-radius: 6px; margin-bottom: 20px;">
+    <div style="width: 56px; height: 56px; border-radius: 6px; background: var(--impd-paper); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--impd-rule); overflow: hidden;">
+      <% if member.profile_image.present? %>
+        <img src="<%= member.profile_image %>" alt="" style="width:100%;height:100%;object-fit:cover;">
+      <% else %>
+        <span style="font-family: var(--impd-font-display); font-weight: 800; color: var(--impd-accent);">
+          <%= (member.name.presence || member.email.to_s).chars.first(2).join.upcase %>
+        </span>
+      <% end %>
+    </div>
+    <div style="flex: 1; min-width: 0;">
+      <div style="font-family: var(--impd-font-mono); font-size: 11px; color: var(--impd-muted); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 4px;">
+        내 공개 주소
+      </div>
+      <div style="font-family: var(--impd-font-mono); font-size: 14px; color: var(--impd-ink); word-break: break-all;">
+        <%= page_url %>
+      </div>
+    </div>
+  </div>
+
+  <!-- 마이크로 동의 4개 -->
+  <div data-probe-wizard-target="s6Consents" style="margin-bottom: 20px;">
+    <label class="probe-check-row is-checked" data-action="click->probe-wizard#toggleConsent" data-consent-key="publish" data-consent-required="true" data-probe-wizard-target="consentRow">
+      <span class="probe-check-box" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <div class="probe-check-body">
+        <div class="probe-check-title">
+          <span style="color: var(--impd-accent-2); font-weight: 700;">필수</span>
+          위 초안을 제 공개 페이지로 게시합니다.
+        </div>
+      </div>
+    </label>
+
+    <label class="probe-check-row is-checked" data-action="click->probe-wizard#toggleConsent" data-consent-key="share" data-consent-required="true" data-probe-wizard-target="consentRow">
+      <span class="probe-check-box" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <div class="probe-check-body">
+        <div class="probe-check-title">
+          <span style="color: var(--impd-accent-2); font-weight: 700;">필수</span>
+          imPD가 이 정보를 표시·공유하는 데 동의합니다.
+        </div>
+      </div>
+    </label>
+
+    <label class="probe-check-row" data-action="click->probe-wizard#toggleConsent" data-consent-key="auto_sync" data-probe-wizard-target="consentRow">
+      <span class="probe-check-box" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <div class="probe-check-body">
+        <div class="probe-check-title">
+          <span style="color: var(--impd-muted); font-weight: 500;">선택</span>
+          새 SNS 게시물을 자동으로 반영합니다.
+        </div>
+      </div>
+    </label>
+
+    <label class="probe-check-row" data-action="click->probe-wizard#toggleConsent" data-consent-key="sample_use" data-probe-wizard-target="consentRow">
+      <span class="probe-check-box" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <div class="probe-check-body">
+        <div class="probe-check-title">
+          <span style="color: var(--impd-muted); font-weight: 500;">선택</span>
+          다른 회원에게 추천할 때 샘플로 사용해도 좋아요.
+        </div>
+      </div>
+    </label>
+  </div>
+
+  <!-- 발행 CTA -->
+  <%= form_with url: probe_wizard_finish_path, method: :post, data: { probe_wizard_target: "finishForm" }, html: { style: "display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between;" } do |f| %>
+    <%= hidden_field_tag "consents[publish]",    "1", data: { probe_wizard_target: "consentPublish" } %>
+    <%= hidden_field_tag "consents[share]",      "1", data: { probe_wizard_target: "consentShare" } %>
+    <%= hidden_field_tag "consents[auto_sync]",  "0", data: { probe_wizard_target: "consentAutoSync" } %>
+    <%= hidden_field_tag "consents[sample_use]", "0", data: { probe_wizard_target: "consentSampleUse" } %>
+
+    <%= link_to "← 이전", probe_wizard_show_path(step: 5),
+          class: "probe-nav-btn",
+          data: { turbo: "false" } %>
+
+    <button type="submit"
+            class="probe-nav-btn is-celebrate"
+            data-action="click->probe-wizard#confirmFinal"
+            data-probe-wizard-target="finishBtn">
+      🎉 내 페이지 열기
+    </button>
+  <% end %>
+
+  <div style="margin-top: 12px; font-family: var(--impd-font-mono); font-size: 10px; color: var(--impd-soft-muted);">
+    발행 후에도 프로필 관리에서 언제든 수정할 수 있어요.
+  </div>
+</div>

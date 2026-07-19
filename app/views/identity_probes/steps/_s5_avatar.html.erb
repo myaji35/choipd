@@ -1,0 +1,64 @@
+<%# S5: 프로필 사진 — 후보 카드 선택 또는 직접 업로드/이니셜 %>
+<% avatars = identity["avatars"] || [] %>
+<% initials = (member.name.presence || member.email.to_s).to_s.chars.first(2).join.upcase %>
+
+<div data-probe-wizard-target="s5" data-step-index="5">
+  <div class="probe-eyebrow">§ S5 · 프로필 사진</div>
+  <h1 class="probe-title">어떤 사진을 프로필로 쓸까요?</h1>
+  <p class="probe-subtitle">
+    공개된 출처에서 가져왔어요. 저작권이 본인에게 있는지 꼭 확인해주세요.
+  </p>
+
+  <div role="radiogroup" aria-label="프로필 사진 선택"
+       style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;">
+    <% avatars.each_with_index do |av, idx| %>
+      <button type="button"
+              role="radio"
+              aria-checked="false"
+              class="probe-avatar-card"
+              data-action="click->probe-wizard#selectAvatar"
+              data-probe-wizard-target="avatarCard"
+              data-avatar-source="<%= av["source"] %>"
+              data-avatar-url="<%= av["url"] %>"
+              style="font-family: inherit;">
+        <div class="probe-avatar-preview">
+          <% if av["url"].present? %>
+            <img src="<%= av["url"] %>" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
+          <% elsif av["source"] == "initials" %>
+            <%= initials %>
+          <% else %>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="4"/>
+              <path d="M4 21v-1a8 8 0 0 1 16 0v1"/>
+            </svg>
+          <% end %>
+        </div>
+        <div class="probe-avatar-label"><%= av["label"] %></div>
+      </button>
+    <% end %>
+
+    <!-- 직접 업로드 -->
+    <label class="probe-avatar-card" style="cursor: pointer; border-style: dashed;" data-probe-wizard-target="avatarCard" role="radio" aria-checked="false" data-avatar-source="upload">
+      <div class="probe-avatar-preview" style="background: rgba(58,42,240,0.08); color: var(--impd-accent);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+      </div>
+      <div class="probe-avatar-label">직접 업로드</div>
+      <input type="file"
+             accept="image/*"
+             data-probe-wizard-target="avatarFileInput"
+             data-action="change->probe-wizard#uploadAvatar"
+             style="display: none;">
+    </label>
+  </div>
+
+  <div style="padding: 10px 12px; font-family: var(--impd-font-mono); font-size: 10px; color: var(--impd-soft-muted); border-top: 1px solid var(--impd-rule); line-height: 1.5;">
+    저작권 고지 — 공개된 출처에서 수집했지만, 본인 사진이 맞는지 · 상업적 이용 권리가 있는지 확인해주세요.
+    이니셜은 항상 안전한 대안입니다.
+  </div>
+
+  <input type="hidden" data-probe-wizard-target="s5Avatar" value="">
+</div>

@@ -1,0 +1,63 @@
+<%# S1: 인물 확인 — 최대 3 후보 중 본인 선택 %>
+<% candidates = (identity["candidates"] || [])[0, 3] %>
+
+<div data-probe-wizard-target="s1" data-step-index="1">
+  <div class="probe-eyebrow">§ S1 · 인물 확인</div>
+  <h1 class="probe-title">이 중에서, 어느 분이 당신인가요?</h1>
+  <p class="probe-subtitle">
+    공개 정보로 찾아본 후보입니다. 탭해서 선택해주세요. 기본 선택은 없습니다.
+  </p>
+
+  <% if candidates.empty? %>
+    <div style="padding: 24px; border: 1px dashed var(--impd-rule); border-radius: 6px; text-align: center; color: var(--impd-muted); font-size: 13px; margin-bottom: 16px;">
+      일치하는 후보를 찾지 못했어요. 다음 스텝에서 직접 알려주세요.
+    </div>
+  <% else %>
+    <div role="radiogroup" aria-label="본인 후보" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+      <% candidates.each_with_index do |cand, idx| %>
+        <% initials = (cand["name"] || "?").to_s.chars.first(2).join.upcase %>
+        <button type="button"
+                role="radio"
+                aria-checked="false"
+                class="probe-candidate"
+                data-action="click->probe-wizard#selectCandidate"
+                data-probe-wizard-target="candidate"
+                data-candidate-id="<%= cand["id"] %>"
+                data-candidate-payload="<%= cand.to_json %>"
+                tabindex="<%= idx == 0 ? 0 : -1 %>"
+                style="width: 100%; text-align: left; font-family: inherit;">
+          <div class="probe-candidate-avatar">
+            <% if cand["avatar_url"].present? %>
+              <img src="<%= cand["avatar_url"] %>" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
+            <% else %>
+              <%= initials %>
+            <% end %>
+          </div>
+          <div class="probe-candidate-body">
+            <div class="probe-candidate-name"><%= cand["name"] %></div>
+            <div class="probe-candidate-meta">
+              <%= [cand["title"], cand["region"]].compact.reject(&:blank?).join(" · ") %>
+            </div>
+            <% if cand["source_quote"].present? %>
+              <div class="probe-quote"><%= cand["source_quote"] %></div>
+            <% end %>
+          </div>
+          <div class="probe-candidate-confidence">
+            신뢰도 <%= cand["confidence"].to_i %>%
+          </div>
+        </button>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div style="padding-top: 14px; border-top: 1px solid var(--impd-rule); display: flex; justify-content: flex-end;">
+    <button type="button"
+            class="probe-skip-mid"
+            data-action="click->probe-wizard#rejectAll"
+            style="background: transparent; border: none; font-family: inherit; cursor: pointer;">
+      제가 아닌 사람들이에요 →
+    </button>
+  </div>
+
+  <input type="hidden" data-probe-wizard-target="s1Selected" value="">
+</div>
