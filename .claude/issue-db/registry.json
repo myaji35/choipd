@@ -198,7 +198,9 @@
       "production_impact": "개인정보보호법상 회원탈퇴(파기) 요구를 이행할 수 없는 상태. 관리자 회원 삭제도 500 발생.",
       "created_at": "2026-07-20T13:20:45",
       "completed_at": "2026-07-20T13:20:45",
-      "assign_to": "opus"
+      "assign_to": "opus",
+      "deployed_at": "2026-07-20T13:39:31",
+      "deploy_verification": "fbe35b6 프로덕션 반영 확인(컨테이너 실측). dependent :destroy 반영, 프로덕션 7명 전원 short_link 보유(=이전엔 전원 삭제불가), demo-pd-a 롤백 dry-run 삭제 성공. choi-pd는 문의 7건으로 restrict_with_error 정상 차단(의도된 정책)."
     },
     {
       "id": "ISS-407",
@@ -216,13 +218,15 @@
       "production_impact": "모바일에서 가로 스크롤 발생 — 첫인상 훼손. 사용자 테스트 개방 전 차단 요인이었음.",
       "created_at": "2026-07-20T13:20:45",
       "completed_at": "2026-07-20T13:20:45",
-      "assign_to": "opus"
+      "assign_to": "opus",
+      "deployed_at": "2026-07-20T13:39:31",
+      "deploy_verification": "fbe35b6 프로덕션 반영 확인(컨테이너 실측). 375px overflow 0 / stats 2열 / wrap padding 20px / topnav-identity 규칙 서빙 확인"
     },
     {
       "id": "ISS-408",
       "type": "UX_FIX",
       "priority": "P2",
-      "status": "READY",
+      "status": "BLOCKED",
       "parent": null,
       "title": "신규 가입 직후 회원페이지 히어로 하단 504px 여백 (빈 프로필 한정)",
       "description": "가입 직후 masthead-grid 좌측 컬럼은 제목만 있고 우측 사이드바(QR/명함)는 665px 라 좌측 하단에 504px 공백이 생김. 콘텐츠가 있는 회원(bumhee-choi)은 424/360/679 로 균형 정상 → 빈 프로필 전용 문제. 빈 상태용 안내 카드(예: '사진을 올리면 이 자리가 채워집니다' + 에디터 CTA)로 채우는 방안 권장. 오버플로 등 기능 결함 아님 — 레이아웃/디자인 판단 필요하여 별도 이슈로 분리.",
@@ -233,7 +237,8 @@
       "production_impact": "신규 가입자가 첫 화면에서 '미완성' 인상을 받음. 이탈 요인 가능.",
       "created_at": "2026-07-20T13:20:45",
       "completed_at": null,
-      "assign_to": "check-harness"
+      "assign_to": "check-harness",
+      "blocked_reason": "배포(fbe35b6) 진행 중 — 프로덕션 검증 완료 전 UI 변경 금지. 또한 빈 상태 히어로를 무엇으로 채울지는 브랜드 표현 판단이라 방향 확인 후 착수. 보류 시각 2026-07-20T13:29:59"
     }
   ],
   "hooks": {
@@ -886,6 +891,70 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 41,
+        "timestamp": "2026-07-20T13:28:08.977428",
+        "findings": [
+          "✅ 정상 운영 — 완료율 88% (7/8)"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 8,
+          "done": 7,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 42,
+        "timestamp": "2026-07-20T13:29:21.964768",
+        "findings": [
+          "✅ 정상 운영 — 완료율 88% (7/8)"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 8,
+          "done": 7,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 43,
+        "timestamp": "2026-07-20T13:30:26.068654",
+        "findings": [
+          "✅ 정상 운영 — 완료율 88% (7/8)"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 8,
+          "done": 7,
+          "in_progress": 0,
+          "ready": 0,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 44,
+        "timestamp": "2026-07-20T13:33:31.827926",
+        "findings": [
+          "✅ 정상 운영 — 완료율 88% (7/8)"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 8,
+          "done": 7,
+          "in_progress": 0,
+          "ready": 0,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
@@ -893,6 +962,6 @@
     "total_issues": 3,
     "completed": 0,
     "failed": 0,
-    "evolved": 40
+    "evolved": 44
   }
 }
