@@ -6,8 +6,12 @@
   .impd-wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
   .impd-section { padding: 80px 0; }
   @media (max-width: 768px) {
-    .impd-wrap { padding: 0 20px; }
+    /* 섹션들이 인라인 style 로 padding 을 지정해 이 규칙을 이긴다.
+       좌우만 !important 로 되돌려 375px 뷰포트 가로 오버플로(22px)를 막는다. */
+    .impd-wrap { padding-left: 20px !important; padding-right: 20px !important; }
     .impd-section { padding: 48px 0; }
+    /* 통계 4열은 375px 에서 열당 44px 밖에 안 남아 숫자가 눌리고 3px 넘친다. 2x2 로 전환. */
+    .impd-stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
   }
 </style>
 
@@ -73,7 +77,7 @@
       </div>
 
       <!-- 우: Polaroid Stack (340x400) -->
-      <div style="display: flex; justify-content: center; padding-top: 20px;">
+      <div class="impd-polaroid-slot" style="display: flex; justify-content: center; padding-top: 20px;">
         <%= render "shared/polaroid_stack", width: 340, height: 400, items: [
           { color: "#ff5a1f", kind: "활동 사진", date: "26.04",   caption: "수강생 환한 표정." },
           { color: "#3a2af0", kind: "수료증",    date: "23.07",   caption: "요가 지도자 자격." },
@@ -88,6 +92,14 @@
     <style>
       @media (max-width: 768px) {
         .impd-hero-grid { grid-template-columns: 1fr !important; }
+        /* 폴라로이드 스택은 340px 고정폭이라 좁은 화면에서 부모를 넘친다.
+           슬롯 기준으로 축소해 오버플로를 막는다(비율 340:400 유지). */
+        .impd-polaroid-slot > [data-controller="polaroid-stack"] {
+          width: 100% !important;
+          max-width: 340px;
+          height: auto !important;
+          aspect-ratio: 340 / 400;
+        }
       }
     </style>
   </section>
@@ -98,7 +110,7 @@
     featured_count    = (@featured_members || []).size
   %>
   <section class="impd-wrap" style="padding: 40px 40px 80px;">
-    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--impd-ink);">
+    <div class="impd-stats-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--impd-ink);">
       <% [
         ["BETA",                "지금 초대 시작",  "제한 회원 대상 오픈"],
         ["#{live_member_count}", "공개 중인 페이지", "실제 운영 중"],

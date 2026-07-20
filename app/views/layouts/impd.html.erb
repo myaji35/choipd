@@ -179,13 +179,17 @@
         @media (max-width: 768px) {
           .impd-topnav { padding: 12px 16px !important; gap: 12px !important; }
           .impd-topnav-links { display: none !important; }
+          /* 로그인 시 우측 영역(이름·이메일 + 버튼 2개)이 flex-shrink:0 라 375px 에서 109px 넘쳤다.
+             이메일 줄은 숨기고 버튼을 좁혀 한 줄에 들어오게 한다. */
+          .impd-topnav-identity { display: none !important; }
+          .impd-topnav .impd-btn { padding: 0 10px !important; min-width: 0 !important; font-size: 12px !important; }
         }
       </style>
       <%# 로그인 상태에 따른 우측 액션 영역 %>
       <% if member_signed_in? %>
         <%# 로그인됨: 이름 / 내 페이지 / 로그아웃. button_to form 이 줄바꿈 되지 않도록 display: inline-flex. %>
         <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
-          <div title="<%= current_member.email %>" style="display: inline-flex; flex-direction: column; align-items: flex-end; gap: 1px; white-space: nowrap; line-height: 1;">
+          <div class="impd-topnav-identity" title="<%= current_member.email %>" style="display: inline-flex; flex-direction: column; align-items: flex-end; gap: 1px; white-space: nowrap; line-height: 1;">
             <span style="font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted);">
               <%= truncate(current_member.name.to_s, length: 12) %>
             </span>
