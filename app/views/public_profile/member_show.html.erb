@@ -155,13 +155,13 @@
       <% end %>
       <dl style="border-top: 1px solid var(--impd-ink); padding-top: 16px;">
         <% if @member.profession.present? %>
-          <div style="margin-bottom: 8px;"><dt class="impd-label-muted">직함</dt><dd style="font-family: var(--impd-font-display); font-size: 20px; margin-top: 4px;"><%= @member.profession_label %></dd></div>
+          <div class="impd-field-spacing"><dt class="impd-label-muted">직함</dt><dd class="impd-profile-value"><%= @member.profession_label %></dd></div>
         <% end %>
         <% if @member.region.present? %>
-          <div style="margin-bottom: 8px;"><dt class="impd-label-muted">지역</dt><dd style="font-family: var(--impd-font-display); font-size: 20px; margin-top: 4px;"><%= @member.region %></dd></div>
+          <div class="impd-field-spacing"><dt class="impd-label-muted">지역</dt><dd class="impd-profile-value"><%= @member.region %></dd></div>
         <% end %>
         <% if @services.any? %>
-          <div style="margin-bottom: 8px;"><dt class="impd-label-muted">서비스</dt><dd style="font-family: var(--impd-font-display); font-size: 20px; margin-top: 4px;"><%= @services.first.title %></dd></div>
+          <div class="impd-field-spacing"><dt class="impd-label-muted">서비스</dt><dd class="impd-profile-value"><%= @services.first.title %></dd></div>
         <% end %>
       </dl>
       <a href="#contact" class="impd-btn impd-btn-primary" style="width: 100%; justify-content: center; margin-top: 14px;">문의하기 →</a>
@@ -177,8 +177,8 @@
         quick_links << { label: "카톡",   href: kakao_ch,                      emoji: "💬" } if kakao_ch
       %>
       <% if quick_links.any? %>
-        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--impd-rule);">
-          <div class="impd-label-muted" style="margin-bottom: 6px; font-size: 12px;">바로 연결</div>
+        <div class="impd-quick-panel">
+          <div class="impd-label-muted impd-quick-label">바로 연결</div>
           <div style="display: grid; grid-template-columns: repeat(<%= quick_links.size %>, 1fr); gap: 6px;">
             <% quick_links.each do |q| %>
               <a href="<%= q[:href] %>"
@@ -200,11 +200,11 @@
         hero_short_link   = ShortLink.resolve_or_create(target_path: "/#{@member.slug}/card", member: @member)
         hero_short_url    = "#{public_base_url}/s/#{hero_short_link&.hash_code}"
       %>
-      <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--impd-rule);"
+      <div class="impd-quick-panel"
            data-controller="card-share"
            data-card-share-short-url-value="<%= hero_short_url %>"
            data-card-share-profile-url-value="<%= public_base_url %>/<%= @member.slug %>">
-        <div class="impd-label-muted" style="margin-bottom: 6px; font-size: 12px;">디지털 명함</div>
+        <div class="impd-label-muted impd-quick-label">디지털 명함</div>
 
         <%# QR 실 이미지 — 스캔 가능한 큰 블록 %>
         <a href="<%= hero_qr_svg_url %>" download="<%= @member.slug %>-qr.svg"
@@ -289,7 +289,7 @@
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
       <span class="impd-label">§B</span>
-      <span class="impd-display" style="font-size: 36px; flex: 1;">갤러리</span>
+      <span class="impd-display impd-stat-num">갤러리</span>
       <span class="impd-label-muted"><%= gallery_tiles.size %> ITEMS</span>
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
@@ -299,14 +299,14 @@
           <% if t[:media_url].present? %>
             <% if t[:is_video] %>
               <video src="<%= t[:media_url] %>"
-                     style="width: 100%; height: 100%; object-fit: cover; display: block; background: #000;"
+                     class="impd-video-cover"
                      preload="metadata" muted playsinline loop
                      onmouseover="this.play()" onmouseout="this.pause(); this.currentTime=0;"></video>
             <% else %>
               <img src="<%= t[:media_url] %>"
                    alt="<%= t[:title] %>"
                    onerror="this.style.display='none'"
-                   style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                   class="impd-media-cover"
                    loading="lazy">
             <% end %>
             <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%);"></div>
@@ -326,7 +326,7 @@
   <section class="impd-wrap impd-section" id="moments">
     <div class="impd-section-header">
       <span class="impd-label">§B-2</span>
-      <span class="impd-display" style="font-size: 36px; flex: 1;">일상 장면</span>
+      <span class="impd-display impd-stat-num">일상 장면</span>
       <span class="impd-label-muted"><%= @member.member_photos.count %> MOMENTS</span>
     </div>
     <p style="font-family: var(--impd-font-serif); font-size: 17px; color: var(--impd-ink2); line-height: 1.55; max-width: 58ch; margin-bottom: 28px;">
@@ -355,7 +355,7 @@
         <figure style="aspect-ratio: <%= aspect %>; position: relative; overflow: hidden; background: var(--impd-ink); margin: 0; border: 1px solid var(--impd-rule); cursor: pointer;">
           <% if photo.video? %>
             <video src="<%= photo.display_url %>"
-                   style="width: 100%; height: 100%; object-fit: cover; display: block; background: #000;"
+                   class="impd-video-cover"
                    preload="metadata" muted playsinline loop
                    onmouseover="this.play()" onmouseout="this.pause(); this.currentTime=0;"></video>
             <div style="position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); color: var(--impd-ink); font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.2px; padding: 3px 8px;">▶ VIDEO</div>
@@ -364,7 +364,7 @@
                  data-fallback="<%= photo.display_url %>"
                  onerror="if(this.dataset.fallback && this.src !== this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}"
                  alt="<%= photo.caption || @member.name %> 일상"
-                 style="width: 100%; height: 100%; object-fit: cover; display: block;" loading="lazy">
+                 class="impd-media-cover" loading="lazy">
           <% end %>
           <% if photo.caption.present? %>
             <figcaption style="position: absolute; bottom: 0; left: 0; right: 0; padding: 10px 12px; background: linear-gradient(to top, rgba(15,13,11,0.75), transparent); color: #fff; font-size: 12px; font-family: var(--impd-font-serif);">
@@ -410,8 +410,8 @@
         <span class="impd-display" style="font-size: 36px; flex: 1; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;">
           Townin에서 일하는 중
           <% if live %>
-            <span class="impd-live-badge" style="display: inline-flex; align-items: center; gap: 6px; font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; color: #fff; background: #16a34a; padding: 4px 10px; border-radius: 3px;">
-              <span style="width: 7px; height: 7px; background: #fff; border-radius: 50%; display: inline-block; animation: impd-pulse 1.8s ease-in-out infinite;"></span>
+            <span class="impd-live-badge">
+              <span class="impd-live-dot"></span>
               LIVE · 오늘도 활동 중
             </span>
           <% else %>
@@ -429,7 +429,7 @@
       <p style="font-family: var(--impd-font-serif); font-size: 19px; color: var(--impd-ink); line-height: 1.55; max-width: 62ch; margin-bottom: 28px;">
         <% if s["customer_count"].to_i > 0 %>
           <strong><%= @member.name %></strong>님은 지금
-          <strong style="color: var(--impd-accent);"><%= s["customer_count"] %>명의 고객</strong>을
+          <strong class="impd-accent-text"><%= s["customer_count"] %>명의 고객</strong>을
           Townin에서 돌보고 있습니다.
           <% if s["issues_resolved_week"].to_i > 0 %>
             이번주에만 <strong><%= s["issues_resolved_week"] %>건</strong>의 요청을 해결했습니다.
@@ -451,12 +451,12 @@
 
           <!-- 매출 카드 -->
           <% if revenue %>
-            <div style="background: var(--impd-paper); padding: 28px 24px;">
-              <div class="impd-label-muted" style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+            <div class="impd-panel-paper">
+              <div class="impd-label-muted impd-row-icon">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 이번달 매출
               </div>
-              <div class="impd-display" style="font-size: 30px; line-height: 1; color: var(--impd-ink);"><%= revenue %></div>
+              <div class="impd-display impd-kpi-value"><%= revenue %></div>
               <% if s["monthly_revenue_delta_pct"].to_f.abs >= 1 && @member.stats_display_mode != "revenue_hidden" %>
                 <% delta = s["monthly_revenue_delta_pct"].to_f %>
                 <div style="margin-top: 8px; font-family: var(--impd-font-mono); font-size: 12px; color: <%= delta >= 0 ? '#16a34a' : 'var(--impd-muted)' %>;">
@@ -468,12 +468,12 @@
 
           <!-- 고객사 카드 -->
           <% if s["customer_count"].to_i > 0 %>
-            <div style="background: var(--impd-paper); padding: 28px 24px;">
-              <div class="impd-label-muted" style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+            <div class="impd-panel-paper">
+              <div class="impd-label-muted impd-row-icon">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 돌보는 고객
               </div>
-              <div class="impd-display" style="font-size: 30px; line-height: 1; color: var(--impd-ink);"><%= s["customer_count"] %>명</div>
+              <div class="impd-display impd-kpi-value"><%= s["customer_count"] %>명</div>
               <% if s["customer_delta"].to_i > 0 %>
                 <div style="margin-top: 8px; font-family: var(--impd-font-mono); font-size: 12px; color: #16a34a;">▲ 이번달 +<%= s["customer_delta"] %>명</div>
               <% end %>
@@ -482,31 +482,31 @@
 
           <!-- 이번주 처리 건수 -->
           <% if s["issues_resolved_week"].to_i > 0 %>
-            <div style="background: var(--impd-paper); padding: 28px 24px;">
-              <div class="impd-label-muted" style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+            <div class="impd-panel-paper">
+              <div class="impd-label-muted impd-row-icon">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 이번주 처리
               </div>
-              <div class="impd-display" style="font-size: 30px; line-height: 1; color: var(--impd-ink);"><%= s["issues_resolved_week"] %>건</div>
+              <div class="impd-display impd-kpi-value"><%= s["issues_resolved_week"] %>건</div>
               <% if s["active_days_streak"].to_i > 0 %>
-                <div style="margin-top: 8px; font-family: var(--impd-font-mono); font-size: 12px; color: var(--impd-ink2);">🔥 <%= s["active_days_streak"] %>일 연속 활동</div>
+                <div class="impd-kpi-meta">🔥 <%= s["active_days_streak"] %>일 연속 활동</div>
               <% end %>
             </div>
           <% end %>
 
           <!-- 평점 카드 -->
           <% if s["rating"].to_f > 0 %>
-            <div style="background: var(--impd-paper); padding: 28px 24px;">
-              <div class="impd-label-muted" style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+            <div class="impd-panel-paper">
+              <div class="impd-label-muted impd-row-icon">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                 고객 평점
               </div>
-              <div class="impd-display" style="font-size: 30px; line-height: 1; color: var(--impd-ink);">
+              <div class="impd-display impd-kpi-value">
                 <%= s["rating"].to_f.round(1) %>
                 <span style="color: var(--impd-accent); font-size: 18px;">★</span>
               </div>
               <% if s["review_count"].to_i > 0 %>
-                <div style="margin-top: 8px; font-family: var(--impd-font-mono); font-size: 12px; color: var(--impd-ink2);">리뷰 <%= s["review_count"] %>건 기반</div>
+                <div class="impd-kpi-meta">리뷰 <%= s["review_count"] %>건 기반</div>
               <% end %>
             </div>
           <% end %>
@@ -583,7 +583,7 @@
             Townin <strong><%= @member.partner_display_role || "파트너" %></strong>는 이런 일을 합니다.
             <%= @member.name %>님도 같은 방식으로 지역과 연결되어 있습니다.
           </p>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+          <div class="impd-card-grid">
             <% role_kit.each_with_index do |item, i| %>
               <div style="background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 16px 14px;">
                 <div class="impd-label-muted" style="margin-bottom: 6px;">0<%= i + 1 %></div>
@@ -637,7 +637,7 @@
   <section class="impd-wrap impd-section" id="classes">
     <div class="impd-section-header">
       <span class="impd-label">§C</span>
-      <span class="impd-display" style="font-size: 36px; flex: 1;">서비스 / 수업</span>
+      <span class="impd-display impd-stat-num">서비스 / 수업</span>
       <span class="impd-label-muted"><%= @services.size %> ITEMS</span>
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
@@ -662,7 +662,7 @@
   <section class="impd-wrap impd-section" id="faq">
     <div class="impd-section-header">
       <span class="impd-label">§C-2</span>
-      <h2 class="impd-display" style="font-size: 36px; flex: 1;">자주 묻는 질문</h2>
+      <h2 class="impd-display impd-stat-num">자주 묻는 질문</h2>
       <span class="impd-label-muted"><%= @faqs.size %> QUESTIONS</span>
     </div>
     <div style="border-top: 1px solid var(--impd-ink);">
@@ -682,12 +682,12 @@
 <!-- ── Testimonial (인용) ───────────────────────── -->
 <% if @reviews.any? && @reviews.first.content.present? %>
   <section style="background: var(--impd-ink); color: var(--impd-paper); padding: 80px 0; margin: 64px 0;">
-    <div class="impd-wrap" style="text-align: center;">
-      <p class="impd-label" style="color: var(--impd-accent);">§Testimonial</p>
-      <p class="impd-serif" style="font-size: clamp(28px, 4vw, 40px); line-height: 1.4; margin-top: 24px; max-width: 800px; margin-left: auto; margin-right: auto;">
+    <div class="impd-wrap impd-centered">
+      <p class="impd-label impd-accent-text">§Testimonial</p>
+      <p class="impd-serif impd-quote">
         "<%= @reviews.first.content %>"
       </p>
-      <p class="impd-label-muted" style="color: rgba(239,236,228,.55); margin-top: 24px;">
+      <p class="impd-label-muted impd-quote-source">
         — <%= @reviews.first.reviewer_name %> · <%= '★' * @reviews.first.rating %>
       </p>
     </div>
@@ -696,15 +696,15 @@
   <%# 대체 신뢰 카드 — 개인 후기 없어도 Townin 평점으로 신뢰 보강 %>
   <% stats = @member.stats %>
   <section style="background: var(--impd-ink); color: var(--impd-paper); padding: 64px 0; margin: 64px 0;">
-    <div class="impd-wrap" style="text-align: center;">
-      <p class="impd-label" style="color: var(--impd-accent);">§ Trust · Townin 검증</p>
-      <p class="impd-serif" style="font-size: clamp(28px, 4vw, 40px); line-height: 1.4; margin-top: 24px; max-width: 800px; margin-left: auto; margin-right: auto;">
-        Townin에서 <strong style="color: var(--impd-accent);"><%= stats["rating"].to_f.round(1) %>★</strong> 평점을 유지하는 파트너입니다.
+    <div class="impd-wrap impd-centered">
+      <p class="impd-label impd-accent-text">§ Trust · Townin 검증</p>
+      <p class="impd-serif impd-quote">
+        Townin에서 <strong class="impd-accent-text"><%= stats["rating"].to_f.round(1) %>★</strong> 평점을 유지하는 파트너입니다.
         <% if stats["review_count"].to_i > 0 %>
           <span style="color: rgba(239,236,228,.7); font-size: 0.7em;">(리뷰 <%= stats["review_count"] %>건 기반)</span>
         <% end %>
       </p>
-      <p class="impd-label-muted" style="color: rgba(239,236,228,.55); margin-top: 24px;">
+      <p class="impd-label-muted impd-quote-source">
         개인 후기는 준비 중 · Townin 공개 프로필에서 전체 리뷰를 확인하세요
       </p>
     </div>
@@ -716,10 +716,10 @@
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
       <span class="impd-label">§D</span>
-      <span class="impd-display" style="font-size: 36px; flex: 1;">활동 기록</span>
+      <span class="impd-display impd-stat-num">활동 기록</span>
       <% if @member.activity_live? %>
-        <span style="display: inline-flex; align-items: center; gap: 6px; font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; color: #fff; background: #16a34a; padding: 4px 10px; border-radius: 3px;">
-          <span style="width: 7px; height: 7px; background: #fff; border-radius: 50%; display: inline-block; animation: impd-pulse 1.8s ease-in-out infinite;"></span>
+        <span class="impd-live-badge">
+          <span class="impd-live-dot"></span>
           LIVE · 오늘도 활동 중
         </span>
       <% else %>
@@ -764,7 +764,7 @@
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
       <span class="impd-label">§X</span>
-      <span class="impd-display" style="font-size: 36px; flex: 1;">검증된 달란트</span>
+      <span class="impd-display impd-stat-num">검증된 달란트</span>
       <span class="impd-label-muted"><%= @skills.size %> TALENTS · <%= @doc_count %> DOCS</span>
     </div>
 
@@ -824,7 +824,7 @@
       <% end %>
     </div>
 
-    <p style="margin-top: 14px; font-size: 12px; color: var(--impd-muted); font-family: var(--impd-font-mono); text-align: right;">
+    <p class="impd-section-note">
       위 달란트는 업로드된 이력·수료증 <%= @doc_count %>개에서 자동 추출 · 가중치는 빈도·맥락 분석 결과
     </p>
   </section>
@@ -873,10 +873,10 @@
 <section class="impd-wrap impd-section">
   <div class="impd-section-header">
     <span class="impd-label">§Y</span>
-    <span class="impd-display" style="font-size: 36px; flex: 1;">이렇게 도와드립니다.</span>
+    <span class="impd-display impd-stat-num">이렇게 도와드립니다.</span>
     <span class="impd-label-muted"><%= kit.size %> SERVICES</span>
   </div>
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+  <div class="impd-card-grid">
     <% kit.each_with_index do |item, i| %>
       <div style="background: <%= ["var(--impd-card)", "var(--impd-paper)"][i % 2] %>; border: 1px solid var(--impd-rule); padding: 24px 20px; min-height: 140px;">
         <div class="impd-label-muted" style="margin-bottom: 10px;">0<%= i + 1 %></div>
@@ -885,7 +885,7 @@
       </div>
     <% end %>
   </div>
-  <p style="margin-top: 14px; font-size: 12px; color: var(--impd-muted); font-family: var(--impd-font-mono); text-align: right;">
+  <p class="impd-section-note">
     <% if kit_personalized %>
       <%= @member.name %>님의 기록에서 자동 구성 · 상세는 문의 후 상담
     <% else %>
@@ -908,7 +908,7 @@
   <div style="background: var(--impd-paper); border-top: 1px solid var(--impd-ink); border-bottom: 1px solid var(--impd-ink); padding: 28px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; align-items: center;">
     <div>
       <div class="impd-label-muted">상태</div>
-      <div class="impd-display" style="font-size: 22px; margin-top: 4px;">
+      <div class="impd-display impd-status-value">
         <span style="display: inline-flex; align-items: center; gap: 6px;">
           <span style="width: 7px; height: 7px; background: #16a34a; border-radius: 50%; display: inline-block;"></span>
           imPD 검증 회원
@@ -917,13 +917,13 @@
     </div>
     <div>
       <div class="impd-label-muted">활동 기간</div>
-      <div class="impd-display" style="font-size: 22px; margin-top: 4px;">
+      <div class="impd-display impd-status-value">
         <%= joined_months > 0 ? "#{joined_months}개월째" : "신규" %>
       </div>
     </div>
     <div>
       <div class="impd-label-muted">이번주 방문</div>
-      <div class="impd-display" style="font-size: 22px; margin-top: 4px;"><%= week_visits %>회</div>
+      <div class="impd-display impd-status-value"><%= week_visits %>회</div>
     </div>
     <% if @member.partner_active? %>
       <div>
@@ -957,19 +957,19 @@
         </p>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div class="impd-contact-stack">
         <% if @bookings.any? %>
           <div style="margin-bottom: 10px; padding-bottom: 18px; border-bottom: 1px solid var(--impd-rule);">
-            <p class="impd-label-muted" style="margin-bottom: 8px;">예약하기</p>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
+            <p class="impd-label-muted impd-field-spacing">예약하기</p>
+            <div class="impd-contact-stack">
               <% @bookings.each do |booking| %>
                 <%= link_to booking.external_url,
                       target: "_blank",
                       rel: "noopener",
                       class: "impd-btn impd-btn-primary",
                       style: "width: 100%; justify-content: space-between; height: 46px; padding: 0 18px; font-size: 14px;" do %>
-                  <span style="font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.3px; opacity: 0.65;">예약</span>
-                  <span style="font-weight: 600;"><%= booking.booking_type.presence || "예약하기" %> →</span>
+                  <span class="impd-contact-label">예약</span>
+                  <span class="impd-contact-value"><%= booking.booking_type.presence || "예약하기" %> →</span>
                 <% end %>
               <% end %>
             </div>
@@ -981,8 +981,8 @@
             <a href="<%= o[:href] %>"
                class="impd-btn <%= i == 0 ? 'impd-btn-primary' : 'impd-btn-secondary' %>"
                style="width: 100%; justify-content: space-between; height: 46px; padding: 0 18px; font-size: 14px;">
-              <span style="font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.3px; opacity: 0.65;"><%= o[:label] %></span>
-              <span style="font-weight: 600;"><%= o[:value] %> →</span>
+              <span class="impd-contact-label"><%= o[:label] %></span>
+              <span class="impd-contact-value"><%= o[:value] %> →</span>
             </a>
           <% end %>
         <% else %>
@@ -1027,7 +1027,7 @@
 
 <!-- Footer -->
 <footer style="border-top: 1px solid var(--impd-rule); padding: 32px 40px; display: flex; gap: 32px; flex-wrap: wrap; align-items: center; font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted);">
-  <span class="impd-display" style="font-size: 16px; text-transform: none; color: var(--impd-ink);">imPD<span style="color: var(--impd-accent);">.</span></span>
+  <span class="impd-display" style="font-size: 16px; text-transform: none; color: var(--impd-ink);">imPD<span class="impd-accent-text">.</span></span>
   <span><%= @member.name %> · /<%= @member.slug %></span>
   <span style="flex: 1;"></span>
   <span>powered by imPD</span>
