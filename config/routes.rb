@@ -95,6 +95,8 @@ Rails.application.routes.draw do
         post :suspend
         post :activate
         post :unlink_oauth
+        # ISS-135: OAuth 미설정 시 로그인 경로 복구 — 관리자가 비밀번호 직접 재설정
+        post :reset_password
         # Townin 파트너 관리
         post :link_townin
         post :promote_partner

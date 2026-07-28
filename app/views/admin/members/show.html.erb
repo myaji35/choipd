@@ -218,6 +218,34 @@
       </div>
     <% end %>
 
+    <!-- ISS-135: 비밀번호 재설정 (로그인 불가 회원 복구) -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-semibold text-navy text-sm">비밀번호 재설정</h2>
+        <% if @member.password_digest.blank? %>
+          <span class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded font-medium">비밀번호 없음</span>
+        <% else %>
+          <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-medium">설정됨</span>
+        <% end %>
+      </div>
+      <% if @member.password_digest.blank? %>
+        <p class="text-xs text-red-600">이 회원은 비밀번호가 없어 이메일 로그인이 불가능합니다. 소셜 로그인이 중단된 동안에는 아래에서 임시 비밀번호를 설정해 주세요.</p>
+      <% else %>
+        <p class="text-xs text-gray-500">회원이 비밀번호를 잊은 경우 여기서 새 비밀번호를 설정하고 안전하게 전달해 주세요.</p>
+      <% end %>
+      <%= form_with url: reset_password_admin_member_path(@member), method: :post, local: true, class: "mt-3 space-y-2" do %>
+        <%= password_field_tag :new_password, nil,
+              required: true,
+              minlength: 8,
+              autocomplete: "new-password",
+              placeholder: "새 비밀번호 (8자 이상)",
+              class: "w-full text-xs px-3 py-2 border border-gray-300 rounded" %>
+        <%= submit_tag "비밀번호 재설정",
+              data: { turbo_confirm: "이 회원의 비밀번호를 재설정합니다. 계속할까요?" },
+              class: "w-full text-xs px-3 py-2 border border-blue-300 text-blue-600 hover:bg-blue-50 rounded cursor-pointer" %>
+      <% end %>
+    </div>
+
     <!-- Townin 파트너 연결 -->
     <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
       <div class="flex items-center justify-between mb-3">

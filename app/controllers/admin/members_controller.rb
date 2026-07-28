@@ -1,6 +1,6 @@
 class Admin::MembersController < Admin::BaseController
   before_action :set_member, only: [ :show, :edit, :update, :destroy, :approve, :reject, :suspend, :activate,
-                                     :unlink_oauth, :lookup_townin, :link_townin, :promote_partner, :suspend_partner, :unlink_townin,
+                                     :unlink_oauth, :reset_password, :lookup_townin, :link_townin, :promote_partner, :suspend_partner, :unlink_townin,
                                      :update_stats, :refresh_stats ]
 
   def index
@@ -76,6 +76,17 @@ class Admin::MembersController < Admin::BaseController
     provider = @member.provider
     @member.update!(provider: nil, uid: nil, oauth_connected_at: nil, oauth_email_verified: 0, oauth_raw: nil)
     redirect_to admin_member_path(@member), notice: "#{@member.name} 의 #{provider} 소셜 연결이 해제되었습니다."
+  end
+
+  # ISS-135: 관리자가 회원 비밀번호를 직접 재설정.
+  # Google OAuth env 미설정 시 password_digest 빈 회원은 로그인 경로가 0개라 이 액션이 유일한 복구 수단.
+  def reset_password
+    new_password = params[:new_password].to_s
+    if new_password.length < 8
+      redirect_to admin_member_path(@member), alert: "비밀번호는 8자 이상이어야 합니다." and return
+    end
+    @member.update!(password: new_password)
+    redirect_to admin_member_path(@member), notice: "#{@member.name} 의 비밀번호가 재설정되었습니다. 회원에게 새 비밀번호를 안전하게 전달해 주세요."
   end
 
   # ── Townin 파트너 관리 ─────────────────────────
