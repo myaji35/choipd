@@ -1,0 +1,122 @@
+<% content_for :title, "#{member.name} | imPD" %>
+<% content_for :description, member.bio.to_s.first(160) %>
+
+<%
+  grid_photos = moments.to_a.select { |photo| photo.image.attached? }.first(6)
+  grid_services = services.to_a.first(3)
+  social_entries = case (social = member.social)
+  when Hash
+    social.filter_map do |label, value|
+      url = value.is_a?(Hash) ? (value["url"] || value[:url]) : value
+      { label: label.to_s.humanize, url: url.to_s } if url.to_s.present?
+    end
+  when Array
+    social.filter_map do |entry|
+      next unless entry.is_a?(Hash)
+      url = entry["url"] || entry[:url]
+      label = entry["label"] || entry[:label] || entry["platform"] || entry[:platform] || "외부 링크"
+      { label: label.to_s, url: url.to_s } if url.to_s.present?
+    end
+  else
+    []
+  end
+  grid_qr_url = "/qr/#{member.slug}.svg"
+%>
+
+<style>
+  .impd-grid-page { max-width: 1200px; margin: 0 auto; padding: 40px; font-family: var(--impd-font-sans); }
+  .impd-bento { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); grid-auto-flow: dense; gap: 16px; }
+  .impd-bento-tile { min-width: 0; overflow: hidden; background: var(--impd-card); border: 1px solid var(--impd-rule); border-radius: 12px; box-shadow: var(--impd-shadow-card); padding: 24px; }
+  .impd-bento-profile { grid-column: span 2; display: flex; flex-direction: column; }
+  .impd-bento-photo { min-height: 260px; padding: 0; position: relative; }
+  .impd-bento-photo img, .impd-bento-photo video { width: 100%; height: 100%; min-height: 260px; object-fit: cover; display: block; }
+  .impd-bento-photo figcaption { position: absolute; inset: auto 0 0; padding: 28px 16px 14px; color: var(--impd-on-dark); background: linear-gradient(transparent, var(--impd-green-house)); }
+  .impd-bento-heading { font-family: var(--impd-font-display); font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; }
+  .impd-bento-link { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid var(--impd-rule); color: var(--impd-ink); text-decoration: none; overflow-wrap: anywhere; }
+  @media (max-width: 620px) {
+    .impd-grid-page { padding: 20px; }
+    .impd-bento { grid-template-columns: 1fr; }
+    .impd-bento-profile { grid-column: span 1; }
+  }
+</style>
+
+<main class="impd-grid-page">
+  <div class="impd-bento">
+    <section class="impd-bento-tile impd-bento-profile">
+      <div>
+        <span class="impd-label">imPD · 공개 프로필</span>
+        <h1 class="impd-bento-heading" style="font-size: clamp(48px, 8vw, 96px); margin-top: 18px; color: var(--impd-green);"><%= member.name %></h1>
+        <% if member.profession.present? %>
+          <p class="impd-bento-heading" style="font-size: 26px; margin-top: 10px; color: var(--impd-ink2);"><%= member.profession_label %></p>
+        <% end %>
+        <% if member.bio.present? %>
+          <p style="font-size: 18px; line-height: 1.65; margin-top: 20px; color: var(--impd-ink2);"><%= member.bio %></p>
+        <% end %>
+      </div>
+      <% if member.profile_image.present? %>
+        <img src="<%= member.profile_image %>" alt="<%= member.name %> 프로필 사진" style="width: 140px; height: 140px; border-radius: 12px; object-fit: cover; margin-top: 28px;">
+      <% end %>
+    </section>
+
+    <section class="impd-bento-tile" id="contact" style="background: var(--impd-green-house); color: var(--impd-on-dark); display: flex; flex-direction: column; justify-content: space-between; min-height: 240px;">
+      <div>
+        <span class="impd-label" style="color: var(--impd-gold);">연락</span>
+        <h2 class="impd-bento-heading" style="font-size: 30px; margin-top: 12px;">함께 이야기해요.</h2>
+        <% if member.email.present? %>
+          <p style="margin-top: 12px; color: var(--impd-on-dark-soft); overflow-wrap: anywhere;"><%= member.email %></p>
+        <% end %>
+      </div>
+      <% if member.email.present? %>
+        <a href="mailto:<%= member.email %>" class="impd-btn impd-btn-primary" style="margin-top: 20px; justify-content: center;">문의하기 →</a>
+      <% end %>
+    </section>
+
+    <% grid_photos.each do |photo| %>
+      <figure class="impd-bento-tile impd-bento-photo">
+        <a href="/p/<%= member.slug %>/<%= photo.id %>" style="display: block; height: 100%; color: var(--impd-on-dark); text-decoration: none;">
+          <% if photo.video? %>
+            <video src="<%= photo.display_url %>" controls preload="metadata"></video>
+          <% else %>
+            <img src="<%= photo.thumbnail_url %>"
+                 data-fallback="<%= photo.display_url %>"
+                 onerror="if(this.dataset.fallback && this.src !== this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}"
+                 alt="<%= photo.caption.presence || member.name %> 사진"
+                 loading="lazy">
+          <% end %>
+          <% if photo.caption.present? %><figcaption><%= photo.caption %></figcaption><% end %>
+        </a>
+      </figure>
+    <% end %>
+
+    <% grid_services.each do |service| %>
+      <article class="impd-bento-tile" style="min-height: 220px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <span class="impd-label">서비스</span>
+          <h2 class="impd-bento-heading" style="font-size: 26px; margin-top: 12px;"><%= service.title %></h2>
+          <% if service.description.present? %>
+            <p style="margin-top: 12px; color: var(--impd-ink2); line-height: 1.6;"><%= truncate(service.description, length: 100) %></p>
+          <% end %>
+        </div>
+        <p style="margin-top: 18px; font-family: var(--impd-font-mono); color: var(--impd-green);"><%= service.price_label.presence || service.price.presence || "문의" %></p>
+      </article>
+    <% end %>
+
+    <% if social_entries.any? %>
+      <section class="impd-bento-tile">
+        <span class="impd-label">링크</span>
+        <h2 class="impd-bento-heading" style="font-size: 26px; margin: 12px 0 18px;">더 알아보기</h2>
+        <% social_entries.each do |entry| %>
+          <a class="impd-bento-link" href="<%= entry[:url] %>" target="_blank" rel="noopener"><span><%= entry[:label] %></span><span>↗</span></a>
+        <% end %>
+      </section>
+    <% end %>
+
+    <section class="impd-bento-tile" style="text-align: center;">
+      <span class="impd-label">QR · 디지털 명함</span>
+      <a href="<%= grid_qr_url %>" download="<%= member.slug %>-qr.svg" style="display: block; color: var(--impd-ink); text-decoration: none;">
+        <img src="<%= grid_qr_url %>" alt="<%= member.name %> QR 코드" style="display: block; width: min(180px, 100%); aspect-ratio: 1; margin: 18px auto; background: var(--impd-card);">
+        <span style="font-family: var(--impd-font-mono); font-size: 12px;">스캔하거나 QR 저장</span>
+      </a>
+    </section>
+  </div>
+</main>

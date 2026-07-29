@@ -1,3 +1,6 @@
+<% if @member.layout_preset == "grid" %>
+<%= render "public_profile/grid_layout", member: @member, services: @services, moments: @moments %>
+<% else %>
 <% content_for :title, "#{@member.name} | imPD" %>
 <% content_for :description, @member.bio.to_s.first(160) %>
 
@@ -303,16 +306,20 @@
                      preload="metadata" muted playsinline loop
                      onmouseover="this.play()" onmouseout="this.pause(); this.currentTime=0;"></video>
             <% else %>
+              <%# 이미지가 404면 숨기기만 하면 단색 블록이 남아 '준비 안 된 페이지'로 읽힌다.
+                  부모 figure 에 impd-stripe 를 붙여 의도된 빈 타일로 보이게 한다. (ISS-426) %>
               <img src="<%= t[:media_url] %>"
                    alt="<%= t[:title] %>"
-                   onerror="this.style.display='none'"
+                   onerror="this.style.display='none'; this.closest('figure')?.classList.add('impd-stripe');"
                    class="impd-media-cover"
                    loading="lazy">
             <% end %>
-            <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%);"></div>
           <% end %>
+          <%# 캡션 가독성 오버레이는 미디어 유무와 무관하게 항상 깐다.
+              단색 배경(노랑 #e4b230 등) 위 흰 글씨는 대비 1.96 으로 WCAG AA 미달이었다. (ISS-427) %>
+          <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 35%, transparent 65%); pointer-events: none;"></div>
           <figcaption style="position: absolute; bottom: 12px; left: 12px; right: 12px; color: #fff;">
-            <p class="impd-label" style="color: rgba(255,255,255,.75);"><%= t[:category] %></p>
+            <p class="impd-label" style="color: rgba(255,255,255,.92);"><%= t[:category] %></p>
             <p style="font-family: var(--impd-font-display); font-size: 18px; margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.4);"><%= t[:title] %></p>
           </figcaption>
         </figure>
@@ -398,7 +405,14 @@
     live = @member.activity_live?
     revenue = @member.revenue_label
     tenure_months = s["tenure_months"].to_i
-    tenure_months = ((Time.current - @member.partner_promoted_at) / 1.month).to_i if tenure_months.zero? && @member.partner_promoted_at
+    if tenure_months.zero? && @member.partner_promoted_at
+      # 달력 기준 개월 수 (ISS-425 와 동일 사유 — Time 차이 / Duration 금지)
+      pf = @member.partner_promoted_at.to_date
+      pt = Date.current
+      tm = (pt.year * 12 + pt.month) - (pf.year * 12 + pf.month)
+      tm -= 1 if pt.day < pf.day
+      tenure_months = [ tm, 0 ].max
+    end
     activities = Array(s["recent_activities"]).first(3)
   %>
   <%# §B-3 full-bleed: section 자체를 풀폭 배경으로, 내부 impd-wrap 가 1200px 중앙정렬 %>
@@ -897,7 +911,17 @@
 
 <!-- ── §Z imPD 검증 배지 블록 — 페이지 마무리 + 플랫폼 신뢰 전달 ─ -->
 <%
-  joined_months = @member.created_at ? ((Time.current - @member.created_at) / 1.month).to_i : 0
+  # 개월 수는 달력 기준으로 센다. (Time 차이는 Float(초)라 Duration 으로 나누면
+  # 초 단위가 섞여 678 같은 값이 나온다 — ISS-425)
+  joined_months = if @member.created_at
+    from = @member.created_at.to_date
+    to   = Date.current
+    m = (to.year * 12 + to.month) - (from.year * 12 + from.month)
+    m -= 1 if to.day < from.day
+    [ m, 0 ].max
+  else
+    0
+  end
   week_visits = AnalyticsEvent.for_tenant.where(
     event_name: "page_view",
     page_path: "/#{@member.slug}",
@@ -1032,3 +1056,4 @@
   <span style="flex: 1;"></span>
   <span>powered by imPD</span>
 </footer>
+<% end %>

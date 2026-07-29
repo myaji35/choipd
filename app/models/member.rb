@@ -87,6 +87,10 @@ class Member < ApplicationRecord
     ThemePreset.find(theme_preset)
   end
 
+  def layout
+    LayoutPreset.find(layout_preset)
+  end
+
   def impd_completed?
     impd_status == "completed"
   end

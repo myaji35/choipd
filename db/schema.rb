@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_19_000005) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_27_072634) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -800,6 +800,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_19_000005) do
     t.string "impd_verification_id"
     t.integer "is_featured", default: 0
     t.datetime "last_sign_in_at"
+    t.string "layout_preset", default: "editorial", null: false
     t.string "name", null: false
     t.datetime "oauth_connected_at"
     t.integer "oauth_email_verified", default: 0
