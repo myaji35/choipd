@@ -1,8 +1,10 @@
 class ApplicationController < ActionController::Base
   include Pagy::Backend
 
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
+  # 브라우저 게이트는 관리 화면(Admin::/Pd::/MemberAdmin::BaseController)에만 적용한다.
+  # 공개 페이지(공개 프로필·명함·QR·후기·문의)는 명함/QR로 공유받은 방문자가 진입점이므로
+  # 브라우저 버전으로 차단하지 않는다. Rails :modern 프리셋은 Safari 17.2+ 를 요구해
+  # iOS Safari 17.0~17.1 사용자가 공개 프로필에서 전면 406을 받았다. (ISS-424)
 
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
