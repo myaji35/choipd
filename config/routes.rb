@@ -87,6 +87,7 @@ Rails.application.routes.draw do
       end
       resource :identity, controller: "distributor_identities", only: [ :show, :update, :destroy ]
     end
+    resources :referrals, only: [ :index ]
 
     resources :members do
       member do
@@ -307,6 +308,7 @@ Rails.application.routes.draw do
       # Step 2/3/4 저장
       patch "/editor/info",    to: "editor#update_info",   as: :editor_update_info
       patch "/editor/style",   to: "editor#update_style",  as: :editor_update_style
+      patch "/editor/layout",  to: "editor#update_layout", as: :editor_update_layout
       patch "/editor/publish", to: "editor#publish",       as: :editor_publish
 
       resources :documents, only: [ :create, :update, :destroy ] do

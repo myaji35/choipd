@@ -24,6 +24,8 @@ class Member < ApplicationRecord
   # 단축링크는 회원 페이지로 가는 리다이렉트일 뿐이라 보존 대상이 아니다.
   # 선언이 없어 FK 제약으로 회원 삭제가 실패했다(가입 시 자동 생성되어 사실상 전 회원 해당).
   has_many :short_links,            dependent: :destroy
+  belongs_to :referrer, class_name: "Member", optional: true
+  has_many :referrals, class_name: "Member", foreign_key: :referrer_id, dependent: :nullify
 
   STATUSES = %w[pending_approval approved rejected suspended].freeze
   IMPD_STATUSES = %w[none in_progress completed rejected].freeze

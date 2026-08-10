@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_10_055918) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_10_062157) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -817,6 +817,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_055918) do
     t.string "profile_image"
     t.string "provider"
     t.datetime "published_at"
+    t.integer "referrer_id"
     t.string "region"
     t.text "rejection_reason"
     t.string "slug", null: false
@@ -843,6 +844,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_055918) do
     t.index ["impd_verification_id"], name: "index_members_on_impd_verification_id", unique: true
     t.index ["partner_status"], name: "index_members_on_partner_status"
     t.index ["provider", "uid"], name: "index_members_on_provider_and_uid", unique: true, where: "provider IS NOT NULL"
+    t.index ["referrer_id"], name: "index_members_on_referrer_id"
     t.index ["slug"], name: "index_members_on_slug", unique: true
     t.index ["tenant_id"], name: "index_members_on_tenant_id"
     t.index ["terms_agreed_at"], name: "index_members_on_terms_agreed_at"

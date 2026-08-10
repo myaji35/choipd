@@ -1,0 +1,61 @@
+<% content_for :title, "추천 가입 회원" %>
+
+<div class="mb-6">
+  <h1 class="text-xl font-bold text-navy">추천 가입 회원</h1>
+</div>
+
+<% if @referrer_stats.any? %>
+  <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-4 mb-6">
+    <h2 class="text-sm font-semibold text-gray-600 mb-3">추천인별 요약</h2>
+    <div class="flex flex-wrap gap-2">
+      <% @referrer_stats.each do |stat| %>
+        <span class="text-sm px-3 py-1.5 rounded-full bg-blue-50 text-navy">
+          <%= stat[:name] %> — <%= stat[:count] %>명
+        </span>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+  <table class="w-full">
+    <thead class="bg-gray-50 border-b">
+      <tr>
+        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase">회원</th>
+        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase">추천인</th>
+        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase">상태</th>
+        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase">가입일</th>
+        <th class="text-right px-4 py-3 text-xs font-semibold text-gray-600 uppercase">보기</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y">
+      <% @referred.each do |member| %>
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3">
+            <p class="font-medium text-navy"><%= member.name %></p>
+            <p class="text-xs text-gray-500"><%= member.email %></p>
+            <p class="text-xs text-gray-400 mt-0.5">/<%= member.slug %></p>
+          </td>
+          <td class="px-4 py-3 text-sm text-gray-600"><%= member.referrer&.name || "-" %></td>
+          <td class="px-4 py-3">
+            <% color = case member.status; when "approved" then "green"; when "pending_approval" then "yellow"; when "rejected" then "red"; when "suspended" then "gray"; else "gray"; end %>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-<%= color %>-100 text-<%= color %>-700"><%= member.status %></span>
+          </td>
+          <td class="px-4 py-3 text-xs text-gray-400"><%= member.created_at.strftime("%Y.%m.%d") %></td>
+          <td class="px-4 py-3 text-right">
+            <% if member.slug.present? %>
+              <%= link_to "공개 페이지", "/#{member.slug}",
+                  target: "_blank", rel: "noopener noreferrer",
+                  class: "inline-flex items-center px-2.5 py-1 rounded-full border border-green-700 text-green-700 hover:bg-green-700 hover:text-white text-xs font-semibold transition" %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+      <% if @referred.empty? %>
+        <tr><td colspan="5" class="text-center py-12 text-gray-400">아직 추천으로 가입한 회원이 없습니다</td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<p class="text-xs text-gray-400 mt-4 text-right">전체 <%= @referred.size %>명</p>
