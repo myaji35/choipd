@@ -141,6 +141,19 @@
             <input type="url" name="member[kakao_channel]" value="<%= @member.social["kakao_channel"] %>" placeholder="https://pf.kakao.com/..."
                    style="width: 100%; padding: 10px 12px; border: 1px solid var(--impd-ink); font-family: var(--impd-font-mono); font-size: 13px; margin-top: 6px;">
           </div>
+
+          <div style="margin-top: 14px;">
+            <label class="impd-label-muted">경력·이력 <span style="font-weight: 400; color: var(--impd-muted);">(선택)</span></label>
+            <div style="font-size: 11px; color: var(--impd-muted); margin-top: 6px;">학력·경력·수상·자격 등을 자유롭게 쓰세요. 정해진 형식은 없습니다.</div>
+            <textarea name="member[career_note]" rows="10"
+                      placeholder="예시)
+1970년생
+학력 - OO대 신문방송학과 졸업 (1995)
+경력 - KBS PD (1996~2015), 한국환경저널 발행인 (2016~)
+수상 - 방송대상 (2010)
+자격 - 사회복지사 2급"
+                      style="width: 100%; padding: 10px 12px; border: 1px solid var(--impd-ink); font-family: var(--impd-font-sans); font-size: 14px; margin-top: 6px; resize: vertical;"><%= @member.career_note %></textarea>
+          </div>
         </fieldset>
 
         <button type="submit" class="impd-btn impd-btn-primary" style="margin-top: 20px; height: 52px; padding: 0 28px; font-size: 15px; width: 100%; justify-content: center;">
@@ -231,6 +244,43 @@
 
       <button type="submit" class="impd-btn impd-btn-primary" style="margin-top: 28px; height: 52px; padding: 0 28px; font-size: 15px;">
         스타일 적용하고 발행 →
+      </button>
+    <% end %>
+
+    <div class="impd-section-header" style="margin-top: 48px;">
+      <span class="impd-label">레이아웃</span>
+      <span class="impd-display" style="font-size: 28px; flex: 1;">페이지 구성 선택</span>
+      <span class="impd-label-muted">현재: <%= @member.layout_preset.upcase %></span>
+    </div>
+
+    <%= form_with url: slug_admin_editor_update_layout_path(slug: @member.slug), method: :patch, local: true, data: { turbo: false } do |f| %>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+        <% @layout_presets.each do |p| %>
+          <label style="cursor: pointer; display: block;">
+            <input type="radio" name="layout_preset" value="<%= p[:key] %>" <%= "checked" if @member.layout_preset == p[:key] %> style="display: none;" class="layout-radio">
+            <div class="layout-card" style="background: var(--impd-card); color: var(--impd-ink); border: 2px solid transparent; padding: 20px; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; transition: all .15s;">
+              <div>
+                <div style="font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-accent);">
+                  <%= p[:key].upcase %>
+                </div>
+                <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 28px; letter-spacing: -0.5px; line-height: 1; margin-top: 8px;">
+                  <%= p[:name] %>
+                </div>
+              </div>
+              <div style="font-size: 11px; opacity: 0.75; line-height: 1.5;">
+                <%= p[:desc] %>
+              </div>
+            </div>
+          </label>
+        <% end %>
+      </div>
+
+      <style>
+        .layout-radio:checked + .layout-card { border-color: var(--impd-accent) !important; box-shadow: var(--impd-shadow-card); }
+      </style>
+
+      <button type="submit" class="impd-btn impd-btn-primary" style="margin-top: 20px; height: 46px; padding: 0 24px; font-size: 14px;">
+        레이아웃 적용
       </button>
     <% end %>
 

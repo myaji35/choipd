@@ -13,11 +13,12 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
     @skills          = @member.member_skills.includes(:skill).joins(:skill).order(weight: :desc).limit(12)
     @doc_count       = @documents.size
     @presets         = ThemePreset::THEME_PRESETS
+    @layout_presets  = LayoutPreset::LAYOUT_PRESETS
     @checklist       = build_checklist
   end
 
   def update_info
-    permitted = params.require(:member).permit(:bio, :profession, :region, :phone, :email, :kakao_channel)
+    permitted = params.require(:member).permit(:bio, :profession, :region, :phone, :email, :kakao_channel, :career_note)
     kakao_ch = permitted.delete(:kakao_channel)
 
     # social_links JSON 안에 kakao_channel 저장
@@ -42,6 +43,17 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
       redirect_to action: :show, params: { slug: @member.slug, step: 4 }, notice: "스타일 '#{preset[:name]}' 적용됨"
     else
       redirect_to action: :show, params: { slug: @member.slug, step: 3 }, alert: "유효한 스타일을 선택해 주세요"
+    end
+  end
+
+  def update_layout
+    key = params[:layout_preset].to_s
+    preset = LayoutPreset.find(key)
+    if preset
+      @member.update!(layout_preset: key)
+      redirect_to action: :show, params: { slug: @member.slug, step: 3 }, notice: "레이아웃 '#{preset[:name]}' 적용됨"
+    else
+      redirect_to action: :show, params: { slug: @member.slug, step: 3 }, alert: "유효한 레이아웃을 선택해 주세요"
     end
   end
 

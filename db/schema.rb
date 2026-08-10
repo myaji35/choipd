@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_27_072634) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_10_054225) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -787,6 +787,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_27_072634) do
   create_table "members", force: :cascade do |t|
     t.text "bio"
     t.string "business_type"
+    t.text "career_note"
     t.string "cover_image"
     t.datetime "created_at", null: false
     t.string "email", null: false
