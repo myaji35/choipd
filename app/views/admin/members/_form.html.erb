@@ -55,6 +55,11 @@
       <%= f.label :bio, "자기소개", class: "block text-sm font-semibold text-gray-700 mb-1" %>
       <%= f.text_area :bio, rows: 4, class: "w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm" %>
     </div>
+    <div class="md:col-span-2">
+      <%= f.label :career_note, "경력·이력", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+      <p class="text-xs text-gray-500 mb-1">학력·경력·수상·자격 등을 자유롭게 씁니다. 정해진 형식은 없습니다.</p>
+      <%= f.text_area :career_note, rows: 10, placeholder: "예시)\n1970년생\n학력 - OO대 신문방송학과 졸업 (1995)\n경력 - KBS PD (1996~2015)\n수상 - 방송대상 (2010)\n자격 - 사회복지사 2급", class: "w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm" %>
+    </div>
     <div>
       <%= f.label :profile_image, "프로필 이미지 URL", class: "block text-sm font-semibold text-gray-700 mb-1" %>
       <%= f.url_field :profile_image, class: "w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm" %>

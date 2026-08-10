@@ -225,7 +225,7 @@ class Admin::MembersController < Admin::BaseController
     params.require(:member).permit(
       :name, :email, :phone, :slug, :bio, :profile_image, :cover_image,
       :business_type, :profession, :region, :status, :subscription_plan,
-      :is_featured, :featured_order, :impd_status, :rejection_reason
+      :is_featured, :featured_order, :impd_status, :rejection_reason, :career_note
     )
   end
 end
