@@ -725,6 +725,18 @@
   </section>
 <% end %>
 
+<!-- ── §C-3 경력 · 이력 ─────────────────────────────── -->
+<% if @member.career_note.present? %>
+  <section class="impd-wrap impd-section">
+    <div class="impd-section-header">
+      <span class="impd-label">§C-3</span>
+      <span class="impd-display impd-stat-num">경력 · 이력</span>
+      <span class="impd-label-muted">본인 제공 정보</span>
+    </div>
+    <div style="background: #fbf8f1; border: 1px solid var(--impd-rule); padding: 24px; font-family: var(--impd-font-sans); color: var(--impd-ink2); line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere;"><%= @member.career_note %></div>
+  </section>
+<% end %>
+
 <!-- ── §D 활동 연대기 (CV) ───────────────────────── -->
 <% if @posts.any? %>
   <section class="impd-wrap impd-section">

@@ -84,6 +84,16 @@
             </svg>
             <span>사이트 보기</span>
           <% end %>
+          <% if current_admin_user&.personal_page? %>
+            <%= link_to slug_admin_dashboard_path(slug: current_admin_user.member.slug), class: "text-xs text-gray-500 hover:text-primary flex items-center space-x-1" do %>
+              <svg class="w-3.5 h-3.5" stroke="currentColor" fill="none" viewBox="0 0 24 24" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/>
+                <line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+              <span>내 페이지 관리</span>
+            <% end %>
+          <% end %>
           <span class="text-xs text-gray-500"><%= current_admin_user&.email %></span>
         </div>
       </header>

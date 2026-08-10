@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_10_054225) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_10_055918) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -81,12 +81,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_054225) do
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
+    t.integer "member_id"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.string "role", default: "admin"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admin_users_on_email", unique: true
+    t.index ["member_id"], name: "index_admin_users_on_member_id"
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
