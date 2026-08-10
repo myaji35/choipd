@@ -22,7 +22,7 @@ class Admin::DistributorsController < Admin::BaseController
   def create
     @distributor = Distributor.new(distributor_params)
     if @distributor.save
-      redirect_to admin_distributor_path(@distributor), notice: "유통사가 등록되었습니다."
+      redirect_to admin_distributor_path(@distributor), notice: "추천 회원이 등록되었습니다."
     else
       render :new, status: :unprocessable_entity
     end
@@ -32,7 +32,7 @@ class Admin::DistributorsController < Admin::BaseController
 
   def update
     if @distributor.update(distributor_params)
-      redirect_to admin_distributor_path(@distributor), notice: "유통사 정보가 수정되었습니다."
+      redirect_to admin_distributor_path(@distributor), notice: "추천 회원 정보가 수정되었습니다."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -40,7 +40,7 @@ class Admin::DistributorsController < Admin::BaseController
 
   def destroy
     @distributor.destroy
-    redirect_to admin_distributors_path, notice: "유통사가 삭제되었습니다."
+    redirect_to admin_distributors_path, notice: "추천 회원이 삭제되었습니다."
   end
 
   def approve

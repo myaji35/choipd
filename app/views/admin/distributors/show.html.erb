@@ -2,7 +2,7 @@
 
 <div class="mb-6 flex items-center justify-between">
   <div>
-    <%= link_to "← 유통사 목록", admin_distributors_path, class: "text-primary text-sm hover:text-primary-dark" %>
+    <%= link_to "← 추천 회원 목록", admin_distributors_path, class: "text-primary text-sm hover:text-primary-dark" %>
     <h1 class="text-2xl font-bold text-navy mt-2"><%= @distributor.name %></h1>
     <% if @distributor.slug.present? %>
       <p class="text-sm text-gray-500 mt-1">
@@ -130,7 +130,7 @@
       <% elsif @distributor.approved? %>
         <%= button_to "정지", suspend_admin_distributor_path(@distributor),
             class: "w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors",
-            data: { turbo_confirm: "이 유통사를 정지하시겠습니까?" } %>
+            data: { turbo_confirm: "이 추천 회원을 정지하시겠습니까?" } %>
       <% elsif @distributor.suspended? %>
         <%= button_to "재활성화", activate_admin_distributor_path(@distributor),
             class: "w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors" %>
