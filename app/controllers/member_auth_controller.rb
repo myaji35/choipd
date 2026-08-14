@@ -30,8 +30,14 @@ class MemberAuthController < ApplicationController
     end
 
     if member.password_digest.blank?
-      redirect_to member_login_path,
-                  alert: "이 계정은 Google 로그인으로 가입되어 있습니다. 아래 Google 버튼으로 계속해 주세요." and return
+      # OAuth가 꺼져 있으면 Google 버튼이 렌더되지 않는다.
+      # 그 상태에서 "아래 Google 버튼으로"라고 안내하면 로그인 경로가 사라진다.
+      msg = if google_oauth_enabled?
+              "이 계정은 Google 로그인으로 가입되어 있습니다. 아래 Google 버튼으로 계속해 주세요."
+            else
+              "이 계정은 Google 로그인으로 가입되어 있습니다. 현재 Google 로그인을 사용할 수 없습니다. 관리자에게 비밀번호 재설정을 요청해 주세요."
+            end
+      redirect_to member_login_path, alert: msg and return
     end
 
     unless member.authenticate(password)
