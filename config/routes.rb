@@ -197,6 +197,7 @@ Rails.application.routes.draw do
       member { post :resend }
     end
     resources :courses
+    resources :brands
     resources :posts
     resources :works
     resources :inquiries,    only: [ :index, :show, :update ]
