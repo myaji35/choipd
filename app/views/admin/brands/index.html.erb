@@ -61,6 +61,11 @@
           <% end %>
 
           <div class="mt-3 pt-3 border-t border-gray-100 flex gap-2">
+            <% if brand.marketing_handoff_url.present? %>
+              <%= link_to "12단계 마케팅", brand.marketing_handoff_url, target: "_blank", rel: "noopener noreferrer", class: "text-xs flex-1 text-center bg-primary text-white py-1.5 rounded hover:opacity-90" %>
+            <% else %>
+              <span class="text-xs flex-1 text-center bg-gray-100 text-gray-400 py-1.5 rounded cursor-not-allowed" title="12단계 마케팅을 시작하려면 웹사이트 URL이 필요합니다">웹사이트 URL 필요</span>
+            <% end %>
             <%= link_to "수정", edit_admin_brand_path(brand), class: "text-xs flex-1 text-center bg-gray-100 text-gray-700 py-1.5 rounded hover:bg-gray-200" %>
             <%= button_to "삭제", admin_brand_path(brand), method: :delete,
                 class: "text-xs text-red-600 hover:text-red-800",
@@ -118,6 +123,11 @@
               <% end %>
             </td>
             <td class="px-4 py-3 text-right space-x-2">
+              <% if brand.marketing_handoff_url.present? %>
+                <%= link_to "12단계 마케팅", brand.marketing_handoff_url, target: "_blank", rel: "noopener noreferrer", class: "text-xs text-primary" %>
+              <% else %>
+                <span class="text-xs text-gray-400 cursor-not-allowed" title="12단계 마케팅을 시작하려면 웹사이트 URL이 필요합니다">웹사이트 URL 필요</span>
+              <% end %>
               <%= link_to "수정", edit_admin_brand_path(brand), class: "text-xs text-primary" %>
               <%= button_to "삭제", admin_brand_path(brand), method: :delete,
                   class: "text-xs text-red-500",

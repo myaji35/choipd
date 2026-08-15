@@ -7,6 +7,23 @@ class Brand < ApplicationRecord
 
   before_validation :generate_slug, if: -> { slug.blank? && name.present? }
 
+  def marketing_handoff_url
+    return if website_url.blank?
+
+    uri = URI.parse(ENV.fetch("SOCIALDOCTORS_BASE_URL", "https://app-socialdoctors.158.247.235.31.nip.io"))
+    uri.path = "/admin/campaigns/new"
+    uri.query = URI.encode_www_form(
+      source: "impd",
+      brandId: id,
+      slug: slug,
+      name: name,
+      website: website_url,
+      businessType: business_type,
+      region: region
+    )
+    uri.to_s
+  end
+
   private
 
   def generate_slug

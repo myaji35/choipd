@@ -1,8 +1,15 @@
 <% content_for :title, "브랜드 수정" %>
 <div class="max-w-2xl">
-  <div class="mb-6">
-    <%= link_to "← 브랜드 목록", admin_brands_path, class: "text-primary text-sm hover:text-primary-dark" %>
-    <h1 class="text-xl font-bold text-navy mt-2"><%= @brand.name %> 수정</h1>
+  <div class="mb-6 flex items-start justify-between gap-4">
+    <div>
+      <%= link_to "← 브랜드 목록", admin_brands_path, class: "text-primary text-sm hover:text-primary-dark" %>
+      <h1 class="text-xl font-bold text-navy mt-2"><%= @brand.name %> 수정</h1>
+    </div>
+    <% if @brand.marketing_handoff_url.present? %>
+      <%= link_to "12단계 마케팅", @brand.marketing_handoff_url, target: "_blank", rel: "noopener noreferrer", class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 shrink-0" %>
+    <% else %>
+      <span class="bg-gray-100 text-gray-400 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed shrink-0" title="12단계 마케팅을 시작하려면 웹사이트 URL이 필요합니다">웹사이트 URL 필요</span>
+    <% end %>
   </div>
   <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-6">
     <%= render "form", brand: @brand %>
