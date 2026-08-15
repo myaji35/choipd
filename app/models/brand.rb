@@ -11,6 +11,16 @@ class Brand < ApplicationRecord
 
   def generate_slug
     base_slug = name.parameterize
+    if base_slug.blank? && website_url.present?
+      begin
+        host = URI.parse(website_url).host.to_s.downcase.sub(/\Awww\./, "")
+        base_slug = host.split(".").first.to_s.gsub(/[^a-z0-9-]/, "")
+      rescue URI::InvalidURIError
+        base_slug = ""
+      end
+    end
+    base_slug = "brand" if base_slug.blank?
+
     candidate = base_slug
     suffix = 2
 
