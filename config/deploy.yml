@@ -43,6 +43,7 @@ env:
   secret:
     - RAILS_MASTER_KEY
     - GOOGLE_OAUTH_CLIENT_SECRET
+    - IMPD_HANDOFF_SECRET
   clear:
     SOLID_QUEUE_IN_PUMA: true
     RAILS_ENV: production
