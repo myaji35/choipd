@@ -9,14 +9,15 @@ class Brand < ApplicationRecord
 
   before_validation :generate_slug, if: -> { slug.blank? && name.present? }
 
-  def marketing_handoff_url
+  def marketing_handoff_url(email)
     return if website_url.blank?
+    return if email.blank?
 
     secret = ENV["IMPD_HANDOFF_SECRET"]
     return if secret.blank?
 
     ts = Time.now.to_i
-    canonical = "impd:#{id}:#{slug}:#{ts}"
+    canonical = "impd:#{id}:#{slug}:#{email}:#{ts}"
     sig = OpenSSL::HMAC.hexdigest("SHA256", secret, canonical)
 
     uri = URI.parse(ENV.fetch("SOCIALDOCTORS_BASE_URL", "https://app-socialdoctors.158.247.235.31.nip.io"))
@@ -29,6 +30,7 @@ class Brand < ApplicationRecord
       website: website_url,
       businessType: business_type,
       region: region,
+      email: email,
       ts: ts,
       sig: sig
     )
