@@ -1,3 +1,5 @@
+require "openssl"
+
 class Brand < ApplicationRecord
   validates :name, :slug, presence: true
   validates :slug, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }
@@ -10,8 +12,15 @@ class Brand < ApplicationRecord
   def marketing_handoff_url
     return if website_url.blank?
 
+    secret = ENV["IMPD_HANDOFF_SECRET"]
+    return if secret.blank?
+
+    ts = Time.now.to_i
+    canonical = "impd:#{id}:#{slug}:#{ts}"
+    sig = OpenSSL::HMAC.hexdigest("SHA256", secret, canonical)
+
     uri = URI.parse(ENV.fetch("SOCIALDOCTORS_BASE_URL", "https://app-socialdoctors.158.247.235.31.nip.io"))
-    uri.path = "/admin/campaigns/new"
+    uri.path = "/api/admin/handoff"
     uri.query = URI.encode_www_form(
       source: "impd",
       brandId: id,
@@ -19,7 +28,9 @@ class Brand < ApplicationRecord
       name: name,
       website: website_url,
       businessType: business_type,
-      region: region
+      region: region,
+      ts: ts,
+      sig: sig
     )
     uri.to_s
   end
