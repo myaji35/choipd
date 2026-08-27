@@ -53,7 +53,15 @@ class MemberAdmin::FacebookConnectionsController < MemberAdmin::BaseController
       return
     end
 
-    account = @member.sns_accounts.find_or_initialize_by(platform: "facebook", account_name: page[:name])
+    account = @member.sns_accounts.find_by(platform: "facebook", external_id: page[:id])
+    account ||= @member.sns_accounts.find_by(
+      platform: "facebook",
+      account_name: page[:name],
+      external_id: [nil, ""]
+    )
+    account ||= @member.sns_accounts.new(platform: "facebook")
+    account.external_id = page[:id]
+    account.account_name = page[:name]
     account.access_token = page[:access_token]
     account.is_active = true
 
