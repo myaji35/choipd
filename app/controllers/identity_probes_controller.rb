@@ -103,6 +103,11 @@ class IdentityProbesController < ApplicationController
   def rewrite_bio
     current_index = params[:index].to_i
     variations = mock_bio_variations
+    if variations.empty?
+      render json: { bio: "", index: 0, total: 0 }
+      return
+    end
+
     next_index = (current_index + 1) % variations.size
     render json: {
       bio: variations[next_index],
@@ -169,20 +174,31 @@ class IdentityProbesController < ApplicationController
   def normalized_identity(probe)
     raw = probe.identity
     parsed = raw.is_a?(Hash) ? raw : (JSON.parse(raw.to_s) rescue nil)
-    return mock_identity_fallback(probe) if parsed.blank?
+    identity = if parsed.blank?
+                 mock_identity_fallback(probe)
+               elsif parsed.key?("candidates") || parsed.key?("professions")
+                 # (A) 프론트 스키마 그대로
+                 parsed
+               elsif parsed.key?("profile") || parsed.key?("structured")
+                 # (B) 백엔드 스키마 → 프론트 스키마로 어댑팅
+                 adapt_backend_identity(parsed, probe)
+               else
+                 mock_identity_fallback(probe)
+               end
 
-    # (A) 프론트 스키마 그대로
-    return parsed if parsed.key?("candidates") || parsed.key?("professions")
-
-    # (B) 백엔드 스키마 → 프론트 스키마로 어댑팅
-    if parsed.key?("profile") || parsed.key?("structured")
-      return adapt_backend_identity(parsed, probe)
-    end
-
-    mock_identity_fallback(probe)
+    flag_llm_unavailable(identity)
   rescue => e
     Rails.logger.warn("[IdentityProbe#normalize] #{e.class}: #{e.message}")
-    mock_identity_fallback(probe)
+    flag_llm_unavailable(mock_identity_fallback(probe))
+  end
+
+  # 후보·직업·지역·링크·아바타·bio가 전부 비었으면 LLM 결과 없음 → 뷰가 직접 입력 경로를 안내한다.
+  def flag_llm_unavailable(identity)
+    empty = identity.values_at("candidates", "professions", "regions", "sns_links", "avatars").all?(&:blank?) &&
+            identity["bio_draft"].blank?
+    return identity unless empty
+
+    identity.merge("_llm_unavailable" => true)
   end
 
   # 백엔드 (profile/structured/hints) → 프론트 (candidates/professions/regions/...) 어댑터.
@@ -264,6 +280,17 @@ class IdentityProbesController < ApplicationController
   # ISS-401 백엔드가 아직 완성 안됐을 가능성에 대비한 mock identity.
   # member.name / member.email 만으로 상식적 후보 생성.
   def mock_identity_fallback(probe)
+    unless mock_allowed?
+      return {
+        "candidates" => [],
+        "professions" => [],
+        "regions" => [],
+        "sns_links" => [],
+        "bio_draft" => "",
+        "avatars" => [],
+      }
+    end
+
     name = current_member.name.to_s
     email_local = current_member.email.to_s.split("@").first
 
@@ -316,12 +343,18 @@ class IdentityProbesController < ApplicationController
   end
 
   def mock_bio_variations
+    return [] unless mock_allowed?
+
     name = current_member.name.to_s.presence || "한 사람"
     [
       "저는 #{name}입니다. 스마트폰 하나로 새로운 일을 시작하려는 사람을 돕습니다. 30년 현장에서 배운 것을, 지금 필요한 언어로 전합니다.",
       "#{name} — 4050을 위한 스마트폰 창업 코치. 강의가 아니라 실행을 만듭니다. 작은 기술이 큰 전환이 되도록.",
       "흩어진 경험을 하나의 주소로 모읍니다. #{name}의 일은, 설명보다 증거입니다. 수업 후기 300건, 첫 달 매출 낸 수강생 42명.",
     ]
+  end
+
+  def mock_allowed?
+    Rails.env.local? && ENV["LLM_MOCK"] == "1"
   end
 
   # finish 시점에 probe 결과를 Member에 반영.

@@ -17,7 +17,14 @@ module IdentityProbeEngine
       end
 
       def call(structured_signals, hints: {})
-        return mock_result(structured_signals, hints) if anthropic_key.empty?
+        if anthropic_key.empty?
+          if Rails.env.local? && ENV["LLM_MOCK"] == "1"
+            Rails.logger.warn("[IdentityProbe:RankCopySonnet] mock mode (LLM_MOCK=1)")
+            return mock_result(structured_signals, hints)
+          end
+
+          return { "status" => "skipped", "reason" => "llm_unavailable" }
+        end
         return { "status" => "skipped", "reason" => "no_structured" } unless structured_signals.is_a?(Hash)
 
         body = build_body(structured_signals, hints)
