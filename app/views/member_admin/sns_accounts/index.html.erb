@@ -31,11 +31,31 @@
                   <p style="margin-top: 8px; color: var(--impd-ink2); font-size: 13px;">
                     액세스 토큰: <strong><%= account.access_token_encrypted.present? ? "연결됨" : "미연결" %></strong>
                   </p>
+                  <% latest_snapshot = account.latest_follower_snapshot %>
+                  <div style="margin-top: 12px; color: var(--impd-ink2); font-size: 13px; line-height: 1.7;">
+                    <p>
+                      최신 추종자: <strong><%= latest_snapshot ? number_with_delimiter(latest_snapshot.follower_count) : "미입력" %></strong>
+                      <% if (delta = account.follower_delta) %>
+                        <span style="color: var(--impd-accent); margin-left: 6px;"><%= delta.positive? ? "+#{number_with_delimiter(delta)}" : number_with_delimiter(delta) %></span>
+                      <% end %>
+                    </p>
+                    <% if latest_snapshot %>
+                      <p style="color: var(--impd-muted); font-size: 12px;">최근 수집: <%= latest_snapshot.captured_at.strftime("%Y.%m.%d %H:%M") %></p>
+                    <% end %>
+                  </div>
                 </div>
                 <%= button_to "삭제", slug_admin_sns_account_path(slug: @member.slug, id: account), method: :delete,
                       form: { data: { turbo_confirm: "이 SNS 계정을 삭제하시겠습니까?" } },
                       class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 12px; font-size: 12px; color: var(--impd-accent-2); border-color: var(--impd-accent-2);" %>
               </div>
+
+              <%= form_with model: SnsFollowerSnapshot.new, url: slug_admin_sns_account_follower_snapshots_path(slug: @member.slug, sns_account_id: account), style: "display: flex; gap: 8px; align-items: flex-end; margin-top: 16px; border-top: 1px solid var(--impd-rule); padding-top: 14px;" do |form| %>
+                <div class="sns-field" style="flex: 1; margin-top: 0;">
+                  <%= form.label :follower_count, "추종자 수" %>
+                  <%= form.number_field :follower_count, class: "sns-input", required: true, min: 0, step: 1, placeholder: "현재 추종자 수" %>
+                </div>
+                <%= form.submit "저장", class: "impd-btn impd-btn-primary", style: "height: 40px; padding: 0 16px;" %>
+              <% end %>
 
               <details style="margin-top: 16px; border-top: 1px solid var(--impd-rule); padding-top: 14px;">
                 <summary style="cursor: pointer; color: var(--impd-accent); font-size: 13px; font-weight: 600;">수정</summary>

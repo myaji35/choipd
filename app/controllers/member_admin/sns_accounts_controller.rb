@@ -35,7 +35,7 @@ class MemberAdmin::SnsAccountsController < MemberAdmin::BaseController
   private
 
   def load_accounts
-    @sns_accounts = @member.sns_accounts.order(:platform)
+    @sns_accounts = @member.sns_accounts.includes(:sns_follower_snapshots).order(:platform)
     @new_account = @member.sns_accounts.new
   end
 

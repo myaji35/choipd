@@ -12,6 +12,11 @@ class MemberAdmin::DashboardController < MemberAdmin::BaseController
     @unread_inquiries = @member.member_inquiries.unread.count
     @services_count = @member.member_services.count
     @link_clicks = ShortLink.where(member_id: @member.id).sum(:click_count)
+    sns_accounts = @member.sns_accounts.includes(:sns_follower_snapshots)
+    follower_counts = sns_accounts.filter_map(&:follower_count)
+    # 입력된 스냅샷이 하나도 없으면 합계를 0으로 내지 않는다 — 미집계를 수치로 위장하지 않기 위해 nil.
+    @total_followers = follower_counts.empty? ? nil : follower_counts.sum
+    @followers_missing_count = sns_accounts.size - follower_counts.size
 
     # 14일 방문 추이 (owner 제외)
     @bar_data = (0..13).map { |i|

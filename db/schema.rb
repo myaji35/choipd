@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_27_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_27_020000) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -1041,6 +1041,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_27_010000) do
     t.index ["tenant_id"], name: "index_sns_accounts_on_tenant_id"
   end
 
+  create_table "sns_follower_snapshots", force: :cascade do |t|
+    t.datetime "captured_at", null: false
+    t.datetime "created_at", null: false
+    t.integer "follower_count", null: false
+    t.integer "sns_account_id", null: false
+    t.string "source", default: "manual", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.index ["sns_account_id", "captured_at"], name: "index_sns_follower_snapshots_on_sns_account_id_and_captured_at"
+    t.index ["sns_account_id"], name: "index_sns_follower_snapshots_on_sns_account_id"
+    t.index ["tenant_id"], name: "index_sns_follower_snapshots_on_tenant_id"
+  end
+
   create_table "sns_post_histories", force: :cascade do |t|
     t.string "action"
     t.datetime "created_at", null: false
@@ -1208,6 +1221,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_27_010000) do
   add_foreign_key "payments", "distributors"
   add_foreign_key "short_links", "members"
   add_foreign_key "sns_accounts", "members"
+  add_foreign_key "sns_follower_snapshots", "sns_accounts"
   add_foreign_key "sns_post_histories", "sns_scheduled_posts"
   add_foreign_key "sns_scheduled_posts", "members"
   add_foreign_key "sns_scheduled_posts", "sns_accounts"

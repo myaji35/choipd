@@ -321,7 +321,9 @@ Rails.application.routes.draw do
       end
       resources :faqs, controller: "faqs", only: [ :index, :create, :update, :destroy ]
       resources :bookings, only: [ :index, :create, :update, :destroy ]
-      resources :sns_accounts, only: [ :index, :create, :update, :destroy ]
+      resources :sns_accounts, only: [ :index, :create, :update, :destroy ] do
+        resources :follower_snapshots, controller: "sns_follower_snapshots", only: [ :create ]
+      end
       resources :scheduled_posts, only: [ :index, :create, :destroy ], controller: "sns_scheduled_posts"
       get "/sns_accounts/facebook/connect", to: "facebook_connections#connect", as: :facebook_connect
       get "/sns_accounts/facebook/callback", to: "facebook_connections#callback", as: :facebook_callback

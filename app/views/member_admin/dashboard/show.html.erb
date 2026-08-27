@@ -18,13 +18,14 @@
   <div style="display: grid; grid-template-columns: 1fr 320px; gap: 40px;" class="dashboard-grid">
     <!-- Main 영역 -->
     <div>
-      <!-- Stats 4 카드 -->
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--impd-ink); margin-bottom: 40px;">
+      <!-- Stats 5 카드 -->
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; border-top: 1px solid var(--impd-ink); margin-bottom: 40px;">
         <% [
           ["방문", @week_visits, "최근 7일", "var(--impd-accent)"],
           ["문의", @inquiries_count, @unread_inquiries.positive? ? "안읽음 #{@unread_inquiries}" : "총합", @unread_inquiries.positive? ? "var(--impd-accent-2)" : "var(--impd-ink)"],
           ["링크 클릭", @link_clicks, "QR·공유 누적", "#e4b230"],
-          ["서비스", @services_count, "활성", "#2a9d8f"]
+          ["서비스", @services_count, "활성", "#2a9d8f"],
+          ["총 추종자", @total_followers ? number_with_delimiter(@total_followers) : "—", @followers_missing_count.positive? ? "#{@followers_missing_count}개 계정 미입력" : "최신 집계", "var(--impd-accent)"]
         ].each_with_index do |(label, val, sub, color), i| %>
           <div style="padding: 24px 20px; <%= 'border-left: 1px solid var(--impd-rule);' if i > 0 %>">
             <p class="impd-label-muted"><%= label %></p>
