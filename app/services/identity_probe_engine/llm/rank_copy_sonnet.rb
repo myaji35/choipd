@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "net/http"
-require "uri"
 require "json"
 
 module IdentityProbeEngine
@@ -27,16 +25,19 @@ module IdentityProbeEngine
         end
         return { "status" => "skipped", "reason" => "no_structured" } unless structured_signals.is_a?(Hash)
 
-        body = build_body(structured_signals, hints)
-        res  = post_json(API, body, headers: {
+        config = llm_config
+        body = build_body(structured_signals, hints, config)
+        outcome = {}
+        res  = ::Llm::Client.post(outcome: outcome, purpose: "identity_rank", model: config.model, provider: config.provider,
+          url: API, body: body, headers: {
           "x-api-key"         => anthropic_key,
           "anthropic-version" => "2023-06-01",
           "content-type"      => "application/json",
         })
 
-        return { "status" => "skipped", "reason" => "api_failed" } unless res
+        return { "status" => "skipped", "reason" => outcome["status"].presence || "api_failed" } unless res
 
-        text = extract_text(res)
+        text = ::Llm::Client.extract_text(res)
         parse_structured(text) || { "status" => "skipped", "reason" => "parse_failed", "raw" => text.to_s[0, 500] }
       rescue => e
         Rails.logger.warn("[IdentityProbe:RankCopySonnet] #{e.class}: #{e.message}")
@@ -49,7 +50,11 @@ module IdentityProbeEngine
         ENV["ANTHROPIC_API_KEY"].to_s.strip
       end
 
-      def build_body(structured, hints)
+      def llm_config
+        LlmConfig.for("identity_rank", default_model: DEFAULT_MODEL)
+      end
+
+      def build_body(structured, hints, config)
         prompt = <<~PROMPT
           당신은 imPD의 브랜드 카피 에디터입니다. 아래 구조화된 신호와 회원이 입력한 힌트를 기반으로,
           프로필 초안을 만드세요. 확실하지 않은 정보는 포함하지 마세요. 환각 금지.
@@ -72,7 +77,6 @@ module IdentityProbeEngine
           #{JSON.pretty_generate(hints)}
         PROMPT
 
-        config = LlmConfig.for("identity_rank", default_model: DEFAULT_MODEL)
         body = {
           model: config.model,
           max_tokens: config.max_tokens || 1024,
@@ -80,26 +84,6 @@ module IdentityProbeEngine
         }
         body[:temperature] = config.temperature unless config.temperature.nil?
         body
-      end
-
-      def post_json(url, body, headers: {})
-        uri = URI.parse(url)
-        req = Net::HTTP::Post.new(uri)
-        headers.each { |k, v| req[k] = v }
-        req.body = JSON.generate(body)
-
-        res = Net::HTTP.start(uri.host, uri.port, use_ssl: true, read_timeout: 10, open_timeout: 4) do |http|
-          http.request(req)
-        end
-        return nil unless res.is_a?(Net::HTTPSuccess)
-        JSON.parse(res.body)
-      rescue => e
-        Rails.logger.warn("[IdentityProbe:RankCopySonnet:http] #{e.class}: #{e.message}")
-        nil
-      end
-
-      def extract_text(res)
-        Array(res["content"]).map { |c| c["text"] }.compact.join("\n")
       end
 
       def parse_structured(text)

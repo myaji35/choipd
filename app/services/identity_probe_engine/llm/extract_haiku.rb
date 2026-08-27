@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "net/http"
-require "uri"
 require "json"
 
 module IdentityProbeEngine
@@ -28,16 +26,19 @@ module IdentityProbeEngine
         end
         return { "status" => "skipped", "reason" => "no_signals" } if signals.empty?
 
-        body = build_body(signals)
-        res  = post_json(API, body, headers: {
+        config = llm_config
+        body = build_body(signals, config)
+        outcome = {}
+        res  = ::Llm::Client.post(outcome: outcome, purpose: "identity_extract", model: config.model, provider: config.provider,
+          url: API, body: body, headers: {
           "x-api-key"         => anthropic_key,
           "anthropic-version" => "2023-06-01",
           "content-type"      => "application/json",
         })
 
-        return { "status" => "skipped", "reason" => "api_failed" } unless res
+        return { "status" => "skipped", "reason" => outcome["status"].presence || "api_failed" } unless res
 
-        text = extract_text(res)
+        text = ::Llm::Client.extract_text(res)
         parse_structured(text) || { "status" => "skipped", "reason" => "parse_failed", "raw" => text.to_s[0, 500] }
       rescue => e
         Rails.logger.warn("[IdentityProbe:ExtractHaiku] #{e.class}: #{e.message}")
@@ -50,7 +51,11 @@ module IdentityProbeEngine
         ENV["ANTHROPIC_API_KEY"].to_s.strip
       end
 
-      def build_body(signals)
+      def llm_config
+        LlmConfig.for("identity_extract", default_model: DEFAULT_MODEL)
+      end
+
+      def build_body(signals, config)
         prompt = <<~PROMPT
           다음은 공개된 웹/SNS에서 수집한 raw 신호입니다. 이 사람의 정체성 단서만 추출해 구조화 JSON으로 응답하세요.
 
@@ -68,7 +73,6 @@ module IdentityProbeEngine
           #{JSON.pretty_generate(signals.first(15))}
         PROMPT
 
-        config = LlmConfig.for("identity_extract", default_model: DEFAULT_MODEL)
         body = {
           model: config.model,
           max_tokens: config.max_tokens || 1024,
@@ -76,26 +80,6 @@ module IdentityProbeEngine
         }
         body[:temperature] = config.temperature unless config.temperature.nil?
         body
-      end
-
-      def post_json(url, body, headers: {})
-        uri = URI.parse(url)
-        req = Net::HTTP::Post.new(uri)
-        headers.each { |k, v| req[k] = v }
-        req.body = JSON.generate(body)
-
-        res = Net::HTTP.start(uri.host, uri.port, use_ssl: true, read_timeout: 10, open_timeout: 4) do |http|
-          http.request(req)
-        end
-        return nil unless res.is_a?(Net::HTTPSuccess)
-        JSON.parse(res.body)
-      rescue => e
-        Rails.logger.warn("[IdentityProbe:ExtractHaiku:http] #{e.class}: #{e.message}")
-        nil
-      end
-
-      def extract_text(res)
-        Array(res["content"]).map { |c| c["text"] }.compact.join("\n")
       end
 
       def parse_structured(text)

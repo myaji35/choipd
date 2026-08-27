@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_27_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_27_010000) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -640,6 +640,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_27_000000) do
     t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
     t.index ["tenant_id", "email"], name: "idx_leads_tenant_email", unique: true
+  end
+
+  create_table "llm_call_logs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "duration_ms"
+    t.text "error"
+    t.string "model"
+    t.string "provider"
+    t.string "purpose"
+    t.string "status", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.integer "tokens_in"
+    t.integer "tokens_out"
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_llm_call_logs_on_created_at"
+    t.index ["purpose"], name: "index_llm_call_logs_on_purpose"
+    t.index ["status"], name: "index_llm_call_logs_on_status"
+    t.index ["tenant_id"], name: "index_llm_call_logs_on_tenant_id"
   end
 
   create_table "llm_configs", force: :cascade do |t|
