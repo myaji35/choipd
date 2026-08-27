@@ -1,6 +1,15 @@
 # 시드 데이터 - imPD Rails
 puts "🌱 시드 데이터 생성 중..."
 
+# LLM 설정
+[
+  { purpose: "identity_extract", provider: "anthropic", model: "claude-haiku-4-5-20251001" },
+  { purpose: "identity_rank", provider: "anthropic", model: "claude-sonnet-4-6" },
+].each do |attrs|
+  LlmConfig.find_or_create_by!(purpose: attrs[:purpose]) { |config| config.assign_attributes(attrs) }
+end
+puts "✅ LLM 설정 2개 생성"
+
 # AdminUser 생성
 AdminUser.find_or_create_by!(email: "admin@impd.com") do |u|
   u.password = "admin123"

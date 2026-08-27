@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_10_062157) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_27_000000) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -169,6 +169,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_062157) do
     t.text "workflow_template", null: false
     t.index ["category"], name: "index_automation_templates_on_category"
     t.index ["tenant_id"], name: "index_automation_templates_on_tenant_id"
+  end
+
+  create_table "brands", force: :cascade do |t|
+    t.string "business_type"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "logo_url"
+    t.integer "member_id"
+    t.string "name", null: false
+    t.boolean "published", default: false, null: false
+    t.string "region"
+    t.string "slug", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.string "website_url"
+    t.index ["member_id"], name: "index_brands_on_member_id"
+    t.index ["published"], name: "index_brands_on_published"
+    t.index ["slug"], name: "index_brands_on_slug", unique: true
+    t.index ["tenant_id"], name: "index_brands_on_tenant_id"
   end
 
   create_table "chatbot_conversations", force: :cascade do |t|
@@ -621,6 +640,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_062157) do
     t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
     t.index ["tenant_id", "email"], name: "idx_leads_tenant_email", unique: true
+  end
+
+  create_table "llm_configs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: true, null: false
+    t.integer "max_tokens"
+    t.string "model", null: false
+    t.string "provider", default: "anthropic", null: false
+    t.string "purpose", null: false
+    t.float "temperature"
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.string "updated_by"
+    t.index ["purpose"], name: "index_llm_configs_on_purpose", unique: true
+    t.index ["tenant_id"], name: "index_llm_configs_on_tenant_id"
   end
 
   create_table "member_bookings", force: :cascade do |t|

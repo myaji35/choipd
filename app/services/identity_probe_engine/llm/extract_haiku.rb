@@ -9,8 +9,8 @@ module IdentityProbeEngine
     # Haiku 4.5 — raw signals → 구조화된 JSON 추출.
     # 키 없거나 호출 실패 시 {status: "skipped"} 반환 (orchestrator가 부분 결과로 처리).
     class ExtractHaiku
-      MODEL = "claude-haiku-4-5-20251001"
-      API   = "https://api.anthropic.com/v1/messages"
+      DEFAULT_MODEL = "claude-haiku-4-5-20251001"
+      API           = "https://api.anthropic.com/v1/messages"
 
       def self.call(raw_signals)
         new.call(raw_signals)
@@ -18,7 +18,14 @@ module IdentityProbeEngine
 
       def call(raw_signals)
         signals = Array(raw_signals)
-        return mock_result(signals) if anthropic_key.empty?
+        if anthropic_key.empty?
+          if Rails.env.local? && ENV["LLM_MOCK"] == "1"
+            Rails.logger.warn("[IdentityProbe:ExtractHaiku] mock mode (LLM_MOCK=1)")
+            return mock_result(signals)
+          end
+
+          return { "status" => "skipped", "reason" => "llm_unavailable" }
+        end
         return { "status" => "skipped", "reason" => "no_signals" } if signals.empty?
 
         body = build_body(signals)
@@ -61,11 +68,14 @@ module IdentityProbeEngine
           #{JSON.pretty_generate(signals.first(15))}
         PROMPT
 
-        {
-          model: MODEL,
-          max_tokens: 1024,
+        config = LlmConfig.for("identity_extract", default_model: DEFAULT_MODEL)
+        body = {
+          model: config.model,
+          max_tokens: config.max_tokens || 1024,
           messages: [{ role: "user", content: prompt }],
         }
+        body[:temperature] = config.temperature unless config.temperature.nil?
+        body
       end
 
       def post_json(url, body, headers: {})

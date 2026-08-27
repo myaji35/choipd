@@ -9,8 +9,8 @@ module IdentityProbeEngine
     # Sonnet 4.6 — Haiku의 구조화 신호를 병합·랭킹하고 bio를 imPD 톤으로 재작성.
     # 키 없거나 실패 시 {status: "skipped"} — orchestrator가 부분 결과로 처리.
     class RankCopySonnet
-      MODEL = "claude-sonnet-4-6"
-      API   = "https://api.anthropic.com/v1/messages"
+      DEFAULT_MODEL = "claude-sonnet-4-6"
+      API           = "https://api.anthropic.com/v1/messages"
 
       def self.call(structured_signals, hints: {})
         new.call(structured_signals, hints: hints || {})
@@ -72,11 +72,14 @@ module IdentityProbeEngine
           #{JSON.pretty_generate(hints)}
         PROMPT
 
-        {
-          model: MODEL,
-          max_tokens: 1024,
+        config = LlmConfig.for("identity_rank", default_model: DEFAULT_MODEL)
+        body = {
+          model: config.model,
+          max_tokens: config.max_tokens || 1024,
           messages: [{ role: "user", content: prompt }],
         }
+        body[:temperature] = config.temperature unless config.temperature.nil?
+        body
       end
 
       def post_json(url, body, headers: {})
