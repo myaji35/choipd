@@ -67,6 +67,15 @@
             "statusMessage": "Checking freeze boundary..."
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/orch-enforce-precode.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -100,6 +109,15 @@
             "asyncRewake": true
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/orch-enforce-label.sh"
+          }
+        ]
       }
     ],
     "SubagentStop": [
@@ -118,6 +136,17 @@
             "timeout": 30,
             "statusMessage": "Meta Agent reviewing...",
             "asyncRewake": true
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/orchestration-label.sh"
           }
         ]
       }
