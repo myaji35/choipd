@@ -130,7 +130,7 @@
       </table></div>
       <div class="privacy-note">
         <h3>국외 이전 거부 방법·절차 및 거부의 효과</h3>
-        <p><strong>거부 방법 및 절차:</strong> 정보주체는 Identity Probe 이용 전 제공되는 동의 단계에서 국외 이전 동의를 거부할 수 있으며, 동의한 뒤에도 개인정보 보호책임자([보호책임자 이메일 — 공개 전 입력 필요] / [연락처 — 공개 전 입력 필요])에게 국외 이전 거부 의사를 밝혀 철회할 수 있습니다.</p>
+        <p><strong>거부 방법 및 절차:</strong> 정보주체는 Identity Probe 이용 전 제공되는 동의 단계에서 국외 이전 동의를 거부할 수 있으며, 동의한 뒤에도 개인정보 보호책임자([보호책임자 이메일 — 공개 전 입력 필요] / <%= link_to "문의하기", new_inquiry_path %>)에게 국외 이전 거부 의사를 밝혀 철회할 수 있습니다.</p>
         <p><strong>거부의 효과:</strong> Identity Probe 동의를 거부하면 이메일과 이름을 OpenAI 또는 Anthropic에 이전하지 않으며, Identity Probe를 통한 프로필 자동 생성 기능만 제공되지 않습니다. 그 밖의 기본 프로필 작성·홍보 서비스는 이용할 수 있습니다.</p>
       </div>
     </section>
@@ -197,7 +197,7 @@
       <div class="privacy-table-wrap"><table class="privacy-table">
         <tbody>
           <tr><th>성명</th><td>[개인정보 보호책임자 — 공개 전 입력 필요]</td><th>직책</th><td>[직책 — 공개 전 입력 필요]</td></tr>
-          <tr><th>연락처</th><td>[연락처 — 공개 전 입력 필요]</td><th>전자우편</th><td>[보호책임자 이메일 — 공개 전 입력 필요]</td></tr>
+          <tr><th>연락처</th><td><%= link_to "문의하기", new_inquiry_path %></td><th>전자우편</th><td>[보호책임자 이메일 — 공개 전 입력 필요]</td></tr>
         </tbody>
       </table></div>
       <p>정보주체는 서비스 이용 중 발생한 개인정보 보호 관련 문의, 불만 및 피해구제 사항을 위 연락처로 문의할 수 있으며, 회사는 지체 없이 답변하고 처리하겠습니다.</p>
@@ -224,8 +224,8 @@
     </section>
 
     <div class="privacy-company">
-      <strong>주식회사 가가호호 AI사업부</strong> · 대표자 [대표자 — 공개 전 입력 필요] · 사업자등록번호 715-84-00843<br>
-      [사업장 주소 — 공개 전 입력 필요] · [연락처 — 공개 전 입력 필요] · [대표 이메일 — 공개 전 입력 필요]
+      <strong>주식회사 가가호호 AI사업부</strong> · 대표자 강승식 · 사업자등록번호 715-86-00843<br>
+      서울특별시 중구 남대문로9길 24, 10층(다동) · 문의: <%= link_to "문의하기", new_inquiry_path %>
     </div>
   </div>
 </div>
