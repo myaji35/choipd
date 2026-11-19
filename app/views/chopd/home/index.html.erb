@@ -83,13 +83,13 @@
         </p>
 
         <div class="impd-hero-actions">
-          <%= link_to member_signup_path, class: "impd-btn impd-btn-primary" do %>내 페이지 만들기 <%= lni_icon "arrow-right" %><% end %>
+          <%= link_to(member_signed_in? ? "/#{current_member.slug}/admin/dashboard" : member_signup_path, class: "impd-btn impd-btn-primary") do %><%= member_signed_in? ? "내 페이지 관리" : "내 페이지 만들기" %> <%= lni_icon(member_signed_in? ? "pencil-1" : "arrow-right") %><% end %>
           <%
             # 실제 회원 slug로 연결 — 첫 번째 featured 회원을 "예시"로 노출.
             # 이름은 노출하지 않고 링크만 slug 기반. anti-pattern(랜딩에 개인 노출) 회피.
             sample_slug = (@featured_members || []).first&.slug || "choi-pd"
           %>
-          <%= link_to "/#{sample_slug}", class: "impd-btn impd-btn-secondary" do %>예시 보기 <%= lni_icon "arrow-right" %><% end %>
+          <%= link_to "/#{member_signed_in? ? current_member.slug : sample_slug}", class: "impd-btn impd-btn-secondary" do %><%= member_signed_in? ? "내 페이지 보기" : "예시 보기" %> <%= lni_icon "arrow-right" %><% end %>
           <%= link_to promo_watch_path,
               class: "impd-btn impd-btn-secondary",
               style: "display: inline-flex; align-items: center; gap: 8px;",
@@ -353,9 +353,9 @@
                 </li>
               <% end %>
             </ul>
-            <%= link_to member_signup_path,
+            <%= link_to(tag == "FREE" && member_signed_in? ? "/#{current_member.slug}/admin/dashboard" : member_signup_path,
                 class: "impd-btn #{tag == 'FREE' ? 'impd-btn-primary' : 'impd-btn-outlined'}",
-                style: "width: 100%;" do %><%= tag == "FREE" ? "무료로 시작하기" : "무료로 먼저 시작" %><% end %>
+                style: "width: 100%;") do %><%= tag == "FREE" ? (member_signed_in? ? "내 페이지 관리" : "무료로 시작하기") : "무료로 먼저 시작" %><% end %>
           </div>
         <% end %>
       </div>
@@ -392,9 +392,9 @@
         시작하세요.
       </h2>
       <div style="margin-top: 48px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-        <%= link_to member_signup_path, class: "impd-btn impd-btn-primary impd-btn-lg" do %>내 페이지 만들기 <%= lni_icon "arrow-right" %><% end %>
-        <%= link_to "예시 먼저 보기", "/choi-pd",
-            class: "impd-btn", style: "background: transparent; color: var(--impd-on-dark); border: 1px solid var(--impd-on-dark);" %>
+        <%= link_to(member_signed_in? ? "/#{current_member.slug}/admin/dashboard" : member_signup_path, class: "impd-btn impd-btn-primary impd-btn-lg") do %><%= member_signed_in? ? "내 페이지 관리" : "내 페이지 만들기" %> <%= lni_icon(member_signed_in? ? "pencil-1" : "arrow-right") %><% end %>
+        <%= link_to(member_signed_in? ? "내 페이지 보기" : "예시 먼저 보기", member_signed_in? ? "/#{current_member.slug}" : "/choi-pd",
+            class: "impd-btn", style: "background: transparent; color: var(--impd-on-dark); border: 1px solid var(--impd-on-dark);") %>
         <span class="impd-label-muted" style="color: var(--impd-on-dark-soft);">카드 등록 불필요 · 언제든 비공개</span>
       </div>
     </div>
