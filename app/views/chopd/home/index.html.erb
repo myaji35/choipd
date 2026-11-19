@@ -325,10 +325,7 @@
           ["STUDIO", "공방 · 소수팀", "29,000원 / 월", ["Pro 전부 +", "최대 5인 공동 편집", "클래스 예약·결제", "월간 성과 리포트"], false],
         ].each do |tag, title, price, features, highlight| %>
           <div style="background: <%= highlight ? 'var(--impd-gold-light)' : 'var(--impd-card)' %>; color: var(--impd-ink); border-radius: 12px; padding: 28px 24px; box-shadow: var(--impd-shadow-card); position: relative; <%= 'outline: 2px solid var(--impd-gold);' if highlight %>">
-            <% if highlight %>
-              <span style="position: absolute; top: -10px; right: 20px; background: var(--impd-gold); color: var(--impd-ink); font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; padding: 4px 10px; border-radius: 50px;">추천</span>
-            <% end %>
-            <div class="impd-label" style="color: <%= highlight ? '#8a6a2f' : 'var(--impd-green)' %>;"><%= tag %></div>
+            <div class="impd-label" style="color: <%= highlight ? '#8a6a2f' : 'var(--impd-green)' %>;"><%= tag %><% if tag != "FREE" %> <span style="display: inline-block; border: 1px solid currentColor; border-radius: 50px; padding: 3px 8px; font-size: 10px; letter-spacing: 0;">준비 중</span><% end %></div>
             <div class="impd-display" style="font-size: 22px; margin: 8px 0 4px; color: var(--impd-green);"><%= title %></div>
             <% amount, unit = price.split(' / ', 2) %>
             <div class="impd-display" style="color: var(--impd-ink); margin-bottom: 20px;"><span style="font-size: 32px; font-weight: 800; color: var(--impd-ink);"><%= amount %></span> <span style="font-size: 15px; color: var(--impd-muted);">/ <%= unit %></span></div>
@@ -341,11 +338,12 @@
               <% end %>
             </ul>
             <%= link_to member_signup_path,
-                class: "impd-btn #{highlight ? 'impd-btn-accent' : 'impd-btn-outlined'}",
-                style: "width: 100%;" do %><%= highlight ? "Pro 시작하기" : "#{tag} 시작" %> <% if highlight %><%= lni_icon "arrow-right" %><% end %><% end %>
+                class: "impd-btn #{tag == 'FREE' ? 'impd-btn-primary' : 'impd-btn-outlined'}",
+                style: "width: 100%;" do %><%= tag == "FREE" ? "무료로 시작하기" : "무료로 먼저 시작" %><% end %>
           </div>
         <% end %>
       </div>
+      <p style="color: var(--impd-on-dark-soft); font-size: 14px; margin-top: 20px;">유료 요금제는 준비 중이에요. 지금은 무료로 시작하고, 열리면 알려 드려요.</p>
     </div>
   </section>
 
