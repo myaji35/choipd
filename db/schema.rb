@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_27_020000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_19_000000) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -977,6 +977,39 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_27_020000) do
     t.index ["owner_id"], name: "index_pro_subscriptions_on_owner_id", unique: true
   end
 
+  create_table "profile_accounts", force: :cascade do |t|
+    t.string "auth_status"
+    t.datetime "created_at", null: false
+    t.string "display_name"
+    t.string "external_id"
+    t.string "headline"
+    t.boolean "is_active", default: true, null: false
+    t.datetime "last_checked_at"
+    t.text "last_error"
+    t.string "login_id"
+    t.integer "member_id"
+    t.text "notes"
+    t.string "platform", null: false
+    t.string "profile_url"
+    t.string "session_status", default: "unknown", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.index ["member_id"], name: "index_profile_accounts_on_member_id"
+    t.index ["tenant_id", "platform", "external_id"], name: "idx_on_tenant_id_platform_external_id_cd4e0e5117", unique: true
+    t.index ["tenant_id"], name: "index_profile_accounts_on_tenant_id"
+  end
+
+  create_table "profile_snapshots", force: :cascade do |t|
+    t.datetime "captured_at", null: false
+    t.datetime "created_at", null: false
+    t.text "data"
+    t.integer "profile_account_id", null: false
+    t.string "source", default: "ego", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.index ["profile_account_id", "captured_at"], name: "index_profile_snapshots_on_profile_account_id_and_captured_at"
+  end
+
   create_table "rfm_segments", force: :cascade do |t|
     t.datetime "calculated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.integer "frequency_score", null: false
@@ -1219,6 +1252,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_27_020000) do
   add_foreign_key "member_skills", "members", on_delete: :cascade
   add_foreign_key "member_skills", "skills", on_delete: :cascade
   add_foreign_key "payments", "distributors"
+  add_foreign_key "profile_snapshots", "profile_accounts"
   add_foreign_key "short_links", "members"
   add_foreign_key "sns_accounts", "members"
   add_foreign_key "sns_follower_snapshots", "sns_accounts"

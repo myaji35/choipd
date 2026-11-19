@@ -1,0 +1,38 @@
+<% content_for :title, "인물정보 계정" %>
+<div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+  <h1 class="text-xl font-bold text-navy">인물정보 계정</h1>
+  <div class="flex flex-wrap gap-2">
+    <% [["전체 점검", nil], ["네이버 점검", "naver_people"], ["LinkedIn 점검", "linkedin"]].each do |label, platform| %>
+      <%= button_to label, check_pd_profile_accounts_path, params: { platform: platform }, class: "bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50", data: { turbo_submits_with: "점검 중…" } %>
+    <% end %>
+    <%= link_to "계정 직접 추가", new_pd_profile_account_path, class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600" %>
+  </div>
+</div>
+<% unless @ego_available %><p class="text-sm text-gray-500 mb-4">ego 브라우저가 설치된 Mac에서만 점검할 수 있습니다.</p><% end %>
+<% if @accounts.empty? %>
+  <div class="py-12 text-center text-gray-400 bg-white rounded-lg border border-gray-100">아직 등록된 계정이 없습니다. 점검을 실행하면 로그인된 계정이 자동으로 등록됩니다.</div>
+<% end %>
+<% ProfileAccount::PLATFORMS.each do |platform, label| %>
+  <% accounts = @accounts[platform] || [] %>
+  <% next if accounts.empty? %>
+  <section class="mb-6 bg-white rounded-lg border border-gray-100 shadow-sm">
+    <h2 class="font-semibold text-navy p-4"><%= label %></h2>
+    <div class="overflow-x-auto">
+    <table class="w-full min-w-[1200px] table-fixed text-sm text-left">
+      <thead class="text-gray-500 border-b"><tr><% ["이름", "로그인 아이디", "외부 ID", "직함/직업", "권한", "상태", "마지막 점검", "최근 사본 시각", "프로필 링크", "상세"].each do |heading| %><th class="px-4 py-2 whitespace-nowrap"><%= heading %></th><% end %></tr></thead>
+      <tbody>
+        <% accounts.each do |account| %>
+          <tr class="border-b border-gray-100 align-top">
+            <td class="px-4 py-3"><%= account.display_name %><% if account.last_error.present? %><p class="text-xs text-red-600 mt-1"><%= account.last_error %></p><% end %></td>
+            <td class="px-4 py-3 break-all"><%= account.login_id.presence || "-" %></td><td class="px-4 py-3"><div class="max-w-[10rem] truncate font-mono text-xs" title="<%= account.external_id %>"><%= account.external_id.presence || "-" %></div></td><td class="px-4 py-3"><div class="max-w-xs line-clamp-2 break-words" title="<%= account.headline %>"><%= account.headline.presence || "-" %></div></td><td class="px-4 py-3"><%= account.auth_status.presence || "-" %></td>
+            <% badge = { "logged_in" => "bg-green-100 text-green-700", "logged_out" => "bg-amber-100 text-amber-700", "error" => "bg-red-100 text-red-700", "unknown" => "bg-gray-100 text-gray-500" }[account.session_status] %>
+            <td class="px-4 py-3 whitespace-nowrap"><span class="<%= badge %> text-xs px-2 py-1 rounded-full"><%= account.session_status_label %></span></td>
+            <td class="px-4 py-3 whitespace-nowrap"><%= account.last_checked_at&.localtime&.strftime("%Y-%m-%d %H:%M") || "-" %></td><td class="px-4 py-3 whitespace-nowrap"><%= account.latest_snapshot&.captured_at&.localtime&.strftime("%Y-%m-%d %H:%M") || "-" %></td>
+            <td class="px-4 py-3"><% if account.profile_url.present? %><%= link_to "프로필", account.profile_url, target: "_blank", rel: "noopener", class: "text-primary" %><% else %>-<% end %></td><td class="px-4 py-3"><%= link_to "상세", pd_profile_account_path(account), class: "text-primary" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    </div>
+  </section>
+<% end %>

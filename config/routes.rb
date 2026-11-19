@@ -209,6 +209,9 @@ Rails.application.routes.draw do
 
     resource  :profile,          only: [ :edit, :update ]
     resources :sns_accounts
+    resources :profile_accounts, path: "people_accounts" do
+      collection { post :check }
+    end
     resources :scheduled_posts,  controller: "sns_scheduled_posts"
     resources :hero_images
     resources :leads,            only: [ :index ]

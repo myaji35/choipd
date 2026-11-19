@@ -1,0 +1,10 @@
+<%= form_with model: [:pd, account], class: "space-y-4" do |f| %>
+  <% if account.errors.any? %><div class="bg-red-50 border border-red-200 rounded-lg p-4"><% account.errors.full_messages.each do |message| %><p class="text-red-600 text-sm"><%= message %></p><% end %></div><% end %>
+  <div><%= f.label :platform, "플랫폼", class: "block text-sm font-medium text-gray-700 mb-1" %><%= f.select :platform, ProfileAccount::PLATFORMS.map { |key, value| [value, key] }, {}, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <% { display_name: "이름", login_id: "로그인 아이디", external_id: "외부 ID", headline: "직함/직업", profile_url: "프로필 링크" }.each do |field, label| %>
+    <div><%= f.label field, label, class: "block text-sm font-medium text-gray-700 mb-1" %><%= f.text_field field, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <% end %>
+  <div><%= f.label :notes, "메모", class: "block text-sm font-medium text-gray-700 mb-1" %><%= f.text_area :notes, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <div><%= f.check_box :is_active, class: "rounded border-gray-300 text-primary" %> <%= f.label :is_active, "활성화", class: "text-sm text-gray-700" %></div>
+  <div class="flex gap-3"><%= f.submit account.persisted? ? "수정" : "추가", class: "bg-primary text-white px-6 py-2 rounded-lg text-sm cursor-pointer" %><%= link_to "취소", pd_profile_accounts_path, class: "bg-gray-100 text-gray-700 px-6 py-2 rounded-lg text-sm" %></div>
+<% end %>
