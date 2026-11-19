@@ -6,6 +6,15 @@ class MemberSessionsControllerTest < ActionDispatch::IntegrationTest
       slug: "member-#{SecureRandom.hex(4)}", status: "approved", password: "password1234")
   end
 
+  test "login redirects show one flash message" do
+    get "/#{@member.slug}/admin/dashboard"
+    follow_redirect!
+    assert_equal 1, response.body.scan("로그인이 필요합니다").size
+    get probe_wizard_show_path
+    follow_redirect!
+    assert_equal 1, response.body.scan("로그인이 필요합니다").size
+  end
+
   test "both login pages link to password help" do
     [ member_login_path, login_member_path(slug: @member.slug) ].each do |path|
       get path
@@ -28,6 +37,8 @@ class MemberSessionsControllerTest < ActionDispatch::IntegrationTest
     post login_member_post_path(slug: @member.slug), params: { password: "password1234" }
     assert_redirected_to "/#{@member.slug}/admin/dashboard"
     assert_equal @member.id, session[:member_id]
+    follow_redirect!
+    assert_select 'a[href="#main-content"]', text: "본문 바로가기"
   end
 
   test "잘못된 비밀번호와 알 수 없는 회원은 거부한다" do

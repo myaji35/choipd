@@ -1,3 +1,8 @@
+<% content_for :og_title, "#{@member.name} · #{@member.profession_label}" %>
+<% content_for :og_description, truncate(@member.bio.to_s, length: 100) %>
+<% if @member.profile_image.present? %>
+  <% content_for :og_image, URI.join("#{public_base_url}/", @member.profile_image).to_s %>
+<% end %>
 <% if @member.layout_preset == "grid" %>
 <%= render "public_profile/grid_layout", member: @member, services: @services, moments: @moments %>
 <% else %>
@@ -7,21 +12,9 @@
 <%# OG/Twitter 카드 — 카톡/페북/슬랙 공유 시 디지털 명함 이미지 노출. %>
 <% content_for :head do %>
   <%
-    card_url  = "#{public_base_url}/card/#{@member.slug}.svg"
     share_url = "#{public_base_url}/#{@member.slug}"
   %>
   <meta property="og:type" content="profile">
-  <meta property="og:title" content="<%= @member.name %> — imPD">
-  <meta property="og:description" content="<%= @member.bio.to_s.first(160).presence || '흩어진 내 일, 하나의 주소로.' %>">
-  <meta property="og:url" content="<%= share_url %>">
-  <meta property="og:image" content="<%= card_url %>">
-  <meta property="og:image:type" content="image/svg+xml">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="<%= @member.name %> — imPD">
-  <meta name="twitter:description" content="<%= @member.bio.to_s.first(160).presence || '흩어진 내 일, 하나의 주소로.' %>">
-  <meta name="twitter:image" content="<%= card_url %>">
   <%
     social_urls = case (social = @member.social)
     when Hash
@@ -138,7 +131,7 @@
                    alt="<%= t[:title] %>"
                    onerror="this.style.display='none'; this.closest('figure')?.classList.add('impd-stripe');"
                    class="impd-media-cover"
-                   loading="lazy">
+                   loading="lazy" decoding="async">
             <% end %>
           <% end %>
           <%# 캡션 가독성 오버레이는 미디어 유무와 무관하게 항상 깐다.
@@ -192,11 +185,11 @@
                    onmouseover="this.play()" onmouseout="this.pause(); this.currentTime=0;"></video>
             <div style="position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); color: var(--impd-ink); font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.2px; padding: 3px 8px;">동영상</div>
           <% else %>
-            <img src="<%= photo.thumbnail_url %>"
+            <img loading="lazy" decoding="async" src="<%= photo.thumbnail_url %>"
                  data-fallback="<%= photo.display_url %>"
                  onerror="if(this.dataset.fallback && this.src !== this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}"
                  alt="<%= photo.caption || @member.name %> 일상"
-                 class="impd-media-cover" loading="lazy">
+                 class="impd-media-cover">
           <% end %>
           <% if photo.caption.present? %>
             <figcaption style="position: absolute; bottom: 0; left: 0; right: 0; padding: 10px 12px; background: linear-gradient(to top, rgba(15,13,11,0.75), transparent); color: #fff; font-size: 12px; font-family: var(--impd-font-serif);">

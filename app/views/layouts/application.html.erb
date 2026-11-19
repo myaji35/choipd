@@ -3,10 +3,12 @@
   <head>
     <%= stylesheet_link_tag "lineicons", "data-turbo-track": "reload" %>
     <title><%= content_for(:title) || "Choi Pd Rails" %></title>
+    <%= render "shared/og_image", og_title: (content_for?(:title) ? yield(:title) : "imPD") %>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Choi Pd Rails">
     <meta name="mobile-web-app-capable" content="yes">
+    <%= render "shared/feedback_styles" %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -25,6 +27,7 @@
   </head>
 
   <body>
+    <%= render "shared/flash" unless controller_path == "member_auth" && action_name == "new" %>
     <main class="container mx-auto mt-28 px-5 flex">
       <%= yield %>
     </main>

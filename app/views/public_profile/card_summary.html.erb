@@ -1,21 +1,9 @@
 <% content_for :title, "#{@member.name} | imPD" %>
 <% content_for :description, @member.bio.to_s.first(160).presence || "imPD · #{@member.name}" %>
 
-<%# OG/Twitter 카드 — SVG 명함을 썸네일로 %>
-<% content_for :head do %>
-  <%
-    card_svg_url = "#{public_base_url}/card/#{@member.slug}.svg"
-    share_url    = "#{public_base_url}/s/#{@short_link&.hash_code}"
-  %>
-  <meta property="og:type" content="profile">
-  <meta property="og:title" content="<%= @member.name %> — imPD">
-  <meta property="og:description" content="<%= @member.bio.to_s.first(160).presence || '흩어진 내 일, 하나의 주소로.' %>">
-  <meta property="og:url" content="<%= share_url %>">
-  <meta property="og:image" content="<%= card_svg_url %>">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image">
-<% end %>
+<% content_for :og_title, "#{@member.name} · #{@member.profession_label}" %>
+<% content_for :og_description, truncate(@member.bio.to_s, length: 100) %>
+<% if @member.profile_image.present? %><% content_for :og_image, URI.join("#{public_base_url}/", @member.profile_image).to_s %><% end %>
 
 <%
   short_abs  = "#{public_host}/s/#{@short_link&.hash_code}"

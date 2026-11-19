@@ -1,0 +1,9 @@
+<% flash.each do |kind, message| %>
+  <% next if message.blank? || !%w[notice success alert info].include?(kind.to_s) %>
+  <% type = kind.to_s == "alert" ? "alert" : (kind.to_s == "info" ? "info" : "success") %>
+  <div class="shared-flash shared-flash--<%= type %>" role="<%= type == 'alert' ? 'alert' : 'status' %>">
+    <%= lni_icon(type == 'alert' ? 'xmark-circle' : 'check-circle-1') %>
+    <span><%= message %></span>
+    <button type="button" aria-label="알림 닫기" onclick="this.parentElement.remove()"><%= lni_icon 'xmark' %></button>
+  </div>
+<% end %>

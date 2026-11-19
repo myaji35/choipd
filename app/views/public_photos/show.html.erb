@@ -1,21 +1,20 @@
 <% content_for :title, (@photo.caption.presence || "#{@member.name} 사진") %>
 <% content_for :description, (@photo.caption.presence || "imPD · #{@member.name} · #{@photo.category.to_s.upcase}").first(160) %>
 
+<% photo_url = url_for(@photo.image) %>
+<% photo_abs = photo_url.start_with?("http") ? photo_url : "#{request.base_url}#{photo_url}" %>
+<% content_for :og_image, photo_abs %>
 <%# OG/Twitter — 공유 시 사진 자체가 썸네일 %>
 <% content_for :head do %>
   <%
     # 사진 원본을 OG 이미지로 직접 사용 (1200x630 권장이지만 원본 그대로도 대부분 채널에서 크롭)
-    photo_url = url_for(@photo.image)
-    photo_abs = photo_url.start_with?("http") ? photo_url : "#{request.protocol}#{request.host_with_port}#{photo_url}"
     page_url  = "#{request.protocol}#{request.host_with_port}/p/#{@member.slug}/#{@photo.id}"
   %>
   <meta property="og:type" content="article">
   <meta property="og:title" content="<%= @photo.caption.presence || "#{@member.name} · #{@photo.category.to_s.upcase}" %>">
   <meta property="og:description" content="<%= "imPD · #{@member.name}" %>">
   <meta property="og:url" content="<%= page_url %>">
-  <meta property="og:image" content="<%= photo_abs %>">
   <meta property="article:author" content="<%= @member.name %>">
-  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="<%= @photo.caption.presence || @member.name %>">
   <meta name="twitter:image" content="<%= photo_abs %>">
 <% end %>

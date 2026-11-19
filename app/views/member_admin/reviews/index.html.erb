@@ -55,8 +55,6 @@
       <% end %>
     </div>
   <% else %>
-    <div style="padding: 56px 24px; background: var(--impd-card); border: 1px solid var(--impd-rule); text-align: center;">
-      <p style="font-size: 15px; line-height: 1.8; color: var(--impd-muted);">아직 받은 후기가 없어요. 위 리뷰 요청 링크를 고객에게 공유해보세요.</p>
-    </div>
+    <%= render "shared/empty_state", icon: "star-fat", title: "아직 받은 후기가 없어요", text: "위 리뷰 요청 링크를 고객에게 공유해보세요." %>
   <% end %>
 </main>

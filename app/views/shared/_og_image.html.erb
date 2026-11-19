@@ -1,0 +1,7 @@
+<% og_image = content_for?(:og_image) ? yield(:og_image).to_s.presence : nil %>
+<% og_image ||= "#{Rails.env.production? ? "https://#{public_host}" : request.base_url}#{image_path("og-default.png")}" %>
+<meta property="og:image" content="<%= og_image %>">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="<%= content_for?(:og_image_alt) ? yield(:og_image_alt) : og_title %>">
+<meta name="twitter:card" content="summary_large_image">

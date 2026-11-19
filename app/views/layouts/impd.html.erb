@@ -4,18 +4,27 @@
     <%= stylesheet_link_tag "lineicons", "data-turbo-track": "reload" %>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= content_for?(:title) ? yield(:title) + " | imPD" : "imPD — 1인 사업자·크리에이터의 홍보 페이지" %></title>
+    <% page_title = content_for?(:title) ? yield(:title).to_s : "imPD — 1인 사업자·크리에이터의 홍보 페이지" %>
+    <title><%= page_title.include?("imPD") ? page_title : "#{page_title} | imPD" %></title>
+    <% og_title = content_for?(:og_title) ? yield(:og_title) : page_title %>
+    <% og_description = content_for?(:og_description) ? yield(:og_description) : (content_for?(:description) ? yield(:description) : '사진과 수료증만 올리면 자동으로 홍보 페이지가 완성됩니다.') %>
+    <meta property="og:title" content="<%= og_title %>">
+    <meta property="og:description" content="<%= og_description %>">
+    <meta property="og:url" content="<%= public_base_url %><%= request.path %>">
+    <%= render "shared/og_image", og_title: og_title %>
     <meta name="description" content="<%= content_for?(:description) ? yield(:description) : '사진과 수료증만 올리면 자동으로 홍보 페이지가 완성됩니다.' %>">
 
     <!-- imPD 디자인 시스템 폰트 — C2 Starbucks-inspired retail tone -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter+Tight:wght@700;800&family=Lora:ital@1&family=Noto+Serif+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&family=Caveat:wght@400;500;700&family=Nanum+Pen+Script&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
 
     <style>
       :root {
         /* C2 palette (Starbucks-inspired warm retail) */
+        --impd-size-display: clamp(48px, 8vw, 96px); --impd-size-h2: clamp(26px, 4vw, 36px); --impd-size-h3: 20px; --impd-size-body: 16px; --impd-size-small: 13px;
         --impd-paper: #f2f0eb;         /* Neutral Warm canvas */
         --impd-ceramic: #edebe9;       /* section separator */
         --impd-card: #ffffff;          /* card/white surface */
@@ -59,6 +68,7 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html { scroll-behavior: smooth; }
       body {
+        font-size: var(--impd-size-body); line-height: 1.7;
         word-break: keep-all;
         overflow-wrap: anywhere;
         background: var(--impd-paper);
@@ -71,6 +81,9 @@
       }
       a { color: inherit; text-decoration: none; }
 
+      .impd-section-title { font-size: var(--impd-size-h2); font-weight: 800; }
+      .impd-subtitle { font-size: var(--impd-size-h3); font-weight: 700; }
+      .impd-small { font-size: var(--impd-size-small); }
       /* 핵심 클래스 */
       .impd-label { font-family: var(--impd-font-sans); font-size: 13px; font-weight: 600; letter-spacing: 0.02em; text-transform: none; color: var(--impd-green); }
       .impd-label-muted { font-family: var(--impd-font-sans); font-size: 12px; font-weight: 500; letter-spacing: 0.02em; text-transform: none; color: rgba(0,0,0,0.60); }
@@ -179,6 +192,7 @@
       </style>
     <% end %>
 
+    <%= render "shared/feedback_styles" %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= javascript_importmap_tags %>
@@ -186,6 +200,7 @@
     <%= yield(:head) if content_for?(:head) %>
   </head>
   <body>
+    <a class="skip-link" href="#main-content">본문 바로가기</a>
     <!-- C2 Join Strip — 최상단 검정 bar (비로그인에만) -->
     <% unless member_signed_in? || controller_path == "public_profile" %>
       <div class="impd-joinstrip" style="background: #000; color: #fff; padding: 10px 24px; display: flex; align-items: center; gap: 14px; font-size: 13px; letter-spacing: -0.01em;">
@@ -264,15 +279,10 @@
       </div>
     </div>
 
-    <% if flash[:notice] %>
-      <div style="background: rgba(58,42,240,.1); border-left: 3px solid var(--impd-accent); color: var(--impd-accent); padding: 12px 40px; font-size: 13px;"><%= flash[:notice] %></div>
-    <% end %>
-    <% if flash[:alert] %>
-      <div style="background: rgba(255,90,31,.1); border-left: 3px solid var(--impd-accent-2); color: var(--impd-accent-2); padding: 12px 40px; font-size: 13px;"><%= flash[:alert] %></div>
-    <% end %>
+    <%= render "shared/flash" unless action_name == "new" && %w[member_auth member_sessions].include?(controller_path) %>
 
     <% hide_frap = controller_path == "public_profile" || (action_name == "new" && %w[member_signups member_auth member_sessions].include?(controller_path)) || request.path.match?(%r{\A/[^/]+/admin(?:/|\z)}) %>
-    <main class="<%= "impd-main-with-frap" unless hide_frap %>">
+    <main id="main-content" tabindex="-1" class="<%= "impd-main-with-frap" unless hide_frap %>">
       <%= yield %>
     </main>
 

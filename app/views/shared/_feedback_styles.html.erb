@@ -1,0 +1,13 @@
+<style>
+  :is(a, button, input, select, textarea, summary):focus-visible { outline: 3px solid #00754A !important; outline-offset: 2px !important; }
+  .skip-link { position: fixed; top: 8px; left: 8px; z-index: 1000; padding: 12px 16px; background: white; color: #006241; transform: translateY(-150%); }
+  .skip-link:focus { transform: translateY(0); }
+  .shared-flash { display: flex; align-items: center; gap: 12px; padding: 8px 24px; border-left: 4px solid #00754A; background: #e5f3ec; color: #006241; }
+  .shared-flash--alert { border-color: #B3261E; background: #fceeed; color: #B3261E; }
+  .shared-flash--info { border-color: #555; background: #f1f1f1; color: #333; }
+  .shared-flash button { margin-left: auto; min-width: 44px; min-height: 44px; border: 0; background: transparent; color: inherit; cursor: pointer; }
+  .shared-empty { padding: 56px 24px; text-align: center; background: var(--impd-card, #fff); border: 1px solid var(--impd-rule, #ddd); grid-column: 1 / -1; }
+  .shared-empty h2 { font-size: 20px; margin: 12px 0 8px; }
+  .shared-empty p { font-size: 16px; line-height: 1.7; }
+  .shared-empty-action { margin-top: 20px; }
+</style>

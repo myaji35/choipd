@@ -37,9 +37,7 @@
       <% end %>
     </div>
   <% else %>
-    <div class="impd-card" style="padding: 56px 24px; text-align: center;">
-      <p style="font-size: 14px; color: var(--impd-ink2);">아직 받은 문의가 없어요.</p>
-    </div>
+    <%= render "shared/empty_state", icon: "envelope-1", title: "아직 받은 문의가 없어요", text: "페이지를 공유하고 고객의 문의를 받아보세요." %>
   <% end %>
 </div>
 

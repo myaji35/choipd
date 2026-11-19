@@ -4,8 +4,29 @@ class PublicPagesTest < ActionDispatch::IntegrationTest
   test "homepage returns 200" do
     get root_path
     assert_response :success
+    assert_select 'meta[property="og:title"][content=?]', "imPD — 1인 사업자·크리에이터의 홍보 페이지"
+    assert_select 'meta[property="og:image"][content^=?]', "#{request.base_url}/assets/og-default"
+    assert_select 'meta[property="og:image:width"][content="1200"]'
+    assert_select 'meta[property="og:image:height"][content="630"]'
+    assert_select 'meta[property="og:image:alt"][content]', count: 1
+    assert_select 'meta[name="twitter:card"][content="summary_large_image"]'
+    assert_select "title", text: "imPD — 1인 사업자·크리에이터의 홍보 페이지"
+    assert_select 'a[href="#main-content"]', text: "본문 바로가기"
     assert_select "footer a[href=?]", new_inquiry_path, text: "문의하기"
     assert_select "a[href=?]", privacy_path, text: "개인정보처리방침", count: 1
+  end
+
+  test "member page has a profile share title" do
+    member = Member.create!(name: "공유 회원", email: "og-#{SecureRandom.hex(4)}@example.com",
+      slug: "og-#{SecureRandom.hex(4)}", status: "approved", password: "password1234")
+    get "/#{member.slug}"
+    assert_response :success
+    assert_select 'meta[property="og:title"][content=?]', "#{member.name} · #{member.profession_label}"
+    assert_select 'meta[property="og:image"][content*="og-default"]'
+
+    member.update!(profile_image: "https://example.com/profile.jpg")
+    get "/#{member.slug}"
+    assert_select 'meta[property="og:image"][content=?]', "https://example.com/profile.jpg", count: 1
   end
 
   test "homepage CTAs reflect member session" do

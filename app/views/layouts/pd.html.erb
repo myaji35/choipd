@@ -35,6 +35,7 @@
         .pd-main main { padding: 16px; }
       }
     </style>
+    <%= render "shared/feedback_styles" %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
@@ -116,12 +117,7 @@
         </div>
       </header>
 
-      <% if flash[:notice] %>
-        <div class="bg-green-50 border-l-4 border-green-500 text-green-800 px-6 py-3 text-sm"><%= flash[:notice] %></div>
-      <% end %>
-      <% if flash[:alert] %>
-        <div class="bg-red-50 border-l-4 border-red-500 text-red-800 px-6 py-3 text-sm"><%= flash[:alert] %></div>
-      <% end %>
+      <%= render "shared/flash" %>
 
       <main class="flex-1 p-6">
         <%= yield %>

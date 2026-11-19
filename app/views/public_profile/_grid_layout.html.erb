@@ -49,7 +49,7 @@
           <% if photo.video? %>
             <video src="<%= photo.display_url %>" controls preload="metadata"></video>
           <% else %>
-            <img src="<%= photo.thumbnail_url %>"
+            <img loading="lazy" decoding="async" src="<%= photo.thumbnail_url %>"
                  data-fallback="<%= photo.display_url %>"
                  onerror="if(this.dataset.fallback && this.src !== this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}"
                  alt="<%= photo.caption.presence || member.name %> 사진"
