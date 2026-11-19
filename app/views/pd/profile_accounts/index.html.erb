@@ -1,11 +1,11 @@
 <% content_for :title, "인물정보 계정" %>
 <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
-  <h1 class="text-xl font-bold text-navy">인물정보 계정</h1>
+  <div><h1 class="text-xl font-bold text-navy">인물정보 계정</h1><p class="text-sm text-gray-500 mt-2">플랫폼별 계정과 점검 상태를 확인하세요.</p></div>
   <div class="flex flex-wrap gap-2">
     <% [["전체 점검", nil], ["네이버 점검", "naver_people"], ["LinkedIn 점검", "linkedin"]].each do |label, platform| %>
-      <%= button_to label, check_pd_profile_accounts_path, params: { platform: platform }, class: "bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50", data: { turbo_submits_with: "점검 중…" } %>
+      <%= button_to label, check_pd_profile_accounts_path, params: { platform: platform }, class: (platform.nil? ? "bg-primary text-white px-4 py-2 rounded-lg text-sm" : "bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50"), data: { turbo_submits_with: "점검 중…" } %>
     <% end %>
-    <%= link_to "계정 직접 추가", new_pd_profile_account_path, class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600" %>
+    <%= link_to "계정 직접 추가", new_pd_profile_account_path, class: "bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm" %>
   </div>
 </div>
 <% unless @ego_available %><p class="text-sm text-gray-500 mb-4">ego 브라우저가 설치된 Mac에서만 점검할 수 있습니다.</p><% end %>
@@ -23,10 +23,10 @@
       <tbody>
         <% accounts.each do |account| %>
           <tr class="border-b border-gray-100 align-top">
-            <td class="px-4 py-3"><%= account.display_name %><% if account.platform == "naver_people" && account.latest_snapshot %><p class="text-xs text-gray-500">완성도 <%= NaverPeople::Presenter.new(account.latest_snapshot.data).completeness_score %>%</p><% end %><% if account.last_error.present? %><p class="text-xs text-red-600 mt-1"><%= account.last_error %></p><% end %></td>
+            <td class="px-4 py-3"><%= account.display_name %><% if account.platform == "naver_people" && account.latest_snapshot %><p class="text-xs text-gray-500">완성도 <%= NaverPeople::Presenter.new(account.latest_snapshot.data).completeness_score %>%</p><progress class="w-full" max="100" value="<%= NaverPeople::Presenter.new(account.latest_snapshot.data).completeness_score %>" aria-label="네이버 완성도"></progress><% end %><% if account.last_error.present? %><p class="text-xs text-red-600 mt-1"><%= account.last_error %></p><% end %></td>
             <td class="px-4 py-3 break-all"><%= account.login_id.presence || "-" %></td><td class="px-4 py-3"><div class="max-w-[10rem] truncate font-mono text-xs" title="<%= account.external_id %>"><%= account.external_id.presence || "-" %></div></td><td class="px-4 py-3"><div class="max-w-xs line-clamp-2 break-words" title="<%= account.headline %>"><%= account.headline.presence || "-" %></div></td><td class="px-4 py-3"><%= account.auth_status.presence || "-" %></td>
             <% badge = { "logged_in" => "bg-green-100 text-green-700", "logged_out" => "bg-amber-100 text-amber-700", "error" => "bg-red-100 text-red-700", "unknown" => "bg-gray-100 text-gray-500" }[account.session_status] %>
-            <td class="px-4 py-3 whitespace-nowrap"><span class="<%= badge %> text-xs px-2 py-1 rounded-full"><%= account.session_status_label %></span></td>
+            <td class="px-4 py-3 whitespace-nowrap"><span class="<%= badge %> text-sm px-3 py-2 rounded-full"><%= lni_icon(account.session_status == "logged_in" ? "check-circle-1" : "xmark-circle") %> <%= account.session_status_label %></span></td>
             <td class="px-4 py-3 whitespace-nowrap"><%= account.last_checked_at&.localtime&.strftime("%Y-%m-%d %H:%M") || "-" %></td><td class="px-4 py-3 whitespace-nowrap"><%= account.latest_snapshot&.captured_at&.localtime&.strftime("%Y-%m-%d %H:%M") || "-" %></td>
             <td class="px-4 py-3"><% if (url = http_url(account.profile_url)) %><%= link_to "프로필", url, target: "_blank", rel: "noopener", class: "text-primary" %><% else %>-<% end %></td><td class="px-4 py-3"><%= link_to "상세", pd_profile_account_path(account), class: "text-primary" %></td>
           </tr>

@@ -326,6 +326,7 @@ Rails.application.routes.draw do
       end
       resources :faqs, controller: "faqs", only: [ :index, :create, :update, :destroy ]
       resources :bookings, only: [ :index, :create, :update, :destroy ]
+      resource :brand, only: [ :show ]
       resource :brand_consents, path: "consents", only: [ :show, :update ]
       resources :sns_accounts, only: [ :index, :create, :update, :destroy ] do
         resources :follower_snapshots, controller: "sns_follower_snapshots", only: [ :create ]

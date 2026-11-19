@@ -16,21 +16,21 @@
           target: "_blank", rel: "noopener noreferrer",
           title: "#{@member.name}님의 공개 페이지를 새 탭에서 열기",
           class: "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-green-700 text-white text-sm font-semibold hover:bg-green-800 transition" do %>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        <%= lni_icon "arrow-angular-top-right" %>
         공개 페이지 ↗
       <% end %>
       <%= link_to "/#{@member.slug}/card",
           target: "_blank", rel: "noopener noreferrer",
           title: "명함 상세 페이지",
           class: "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-gray-400 text-gray-800 text-sm font-semibold hover:bg-gray-900 hover:text-white transition" do %>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h6M6 14h4M16 10h2v4h-2z"/></svg>
+        <%= lni_icon "credit-card-multiple" %>
         명함
       <% end %>
       <%= link_to "/qr/#{@member.slug}.svg",
           target: "_blank", rel: "noopener noreferrer",
           title: "QR 코드 SVG (새 탭)",
           class: "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-gray-400 text-gray-800 text-sm font-semibold hover:bg-gray-900 hover:text-white transition" do %>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h2v2h-2zM18 14h3M14 18h3v3"/></svg>
+        <%= lni_icon "dashboard-square-1" %>
         QR
       <% end %>
     <% end %>

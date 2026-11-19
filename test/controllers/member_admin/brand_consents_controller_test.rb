@@ -9,7 +9,7 @@ class MemberAdmin::BrandConsentsControllerTest < ActionDispatch::IntegrationTest
   test "screen grants and revokes with evidence" do
     get slug_admin_brand_consents_path(slug: @member.slug)
     assert_response :success
-    assert_includes response.body, "먼저 SocialDoctors"
+    assert_includes response.body, "SocialDoctors 노출에 먼저"
     patch slug_admin_brand_consents_path(slug: @member.slug), params: { consent_type: "socialdoctors_exposure", decision: "grant" }
     consent = ProConsent.current_for(@member.id, "socialdoctors_exposure")
     assert_equal ProConsent::SOCIALDOCTORS_EXPOSURE_TEXT, consent.consent_text

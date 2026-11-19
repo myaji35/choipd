@@ -9,9 +9,9 @@
   <% if @account.platform == "naver_people" && @latest_snapshot %>
     <% presenter = NaverPeople::Presenter.new(@latest_snapshot.data) %>
     <section class="border border-gray-100 rounded-lg p-4">
-      <h2 class="font-semibold text-navy">완성도 <%= presenter.completeness_score %>%</h2>
+      <h2 class="font-semibold text-navy">완성도 <%= presenter.completeness_score %>%</h2><progress class="w-full mt-2" max="100" value="<%= presenter.completeness_score %>" aria-label="네이버 완성도"></progress>
       <ul class="mt-3 space-y-2 text-sm"><% presenter.completeness.each do |check| %>
-        <li><%= check[:filled] ? "✔" : "✕" %> <%= check[:label] %><% unless check[:filled] %><p class="text-gray-500 ml-5"><%= check[:hint] %></p><% end %></li>
+        <li><%= lni_icon(check[:filled] ? "check-circle-1" : "xmark-circle") %> <%= check[:label] %><% unless check[:filled] %><p class="text-gray-500 ml-5"><%= check[:hint] %></p><% end %></li>
       <% end %></ul>
     </section>
     <% presenter.sections.each do |section| %>

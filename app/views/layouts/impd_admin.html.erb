@@ -60,6 +60,7 @@
         ["대시보드", slug_admin_dashboard_path(slug: @member.slug), controller_path == "member_admin/dashboard"],
         ["에디터", slug_admin_editor_path(slug: @member.slug), controller_path == "member_admin/editor"],
         ["고객(문의함)", slug_admin_inquiries_path(slug: @member.slug), controller_path == "member_admin/inquiries"],
+        ["내 브랜드", slug_admin_brand_path(slug: @member.slug), controller_path == "member_admin/brands"],
         ["노출·광고 동의", slug_admin_brand_consents_path(slug: @member.slug), controller_path == "member_admin/brand_consents"]
       ] %>
     <% end %>

@@ -59,17 +59,13 @@
         <%= render "layouts/admin_nav_item", icon: "link", label: "외부 연동", path: admin_integrations_path %>
         <%= render "layouts/admin_nav_item", icon: "anchor", label: "웹훅", path: admin_webhooks_path %>
         <%= render "layouts/admin_nav_item", icon: "cpu", label: "AI 도구", path: admin_ai_path %>
-        <%= render "layouts/admin_nav_item", icon: "message-circle", label: "💬 카카오 인박스 (Pro)", path: admin_kakao_inbox_index_path %>
-        <%= render "layouts/admin_nav_item", icon: "star", label: "⚡ Pro 구독", path: admin_pro_subscriptions_path %>
+        <%= render "layouts/admin_nav_item", icon: "message-circle", label: "카카오 인박스 (Pro)", path: admin_kakao_inbox_index_path %>
+        <%= render "layouts/admin_nav_item", icon: "star", label: "Pro 구독", path: admin_pro_subscriptions_path %>
 
         <div class="pt-4 mt-4 border-t border-white/10">
           <%= link_to destroy_admin_user_session_path, method: :delete, data: { turbo_method: :delete },
               class: "flex items-center space-x-2 px-3 py-2 rounded text-sm text-gray-400 hover:text-white hover:bg-white/10 transition-colors" do %>
-            <svg class="w-4 h-4" stroke="currentColor" fill="none" viewBox="0 0 24 24" stroke-width="2">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-              <polyline points="16 17 21 12 16 7"/>
-              <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
+            <%= lni_icon "exit" %>
             <span>로그아웃</span>
           <% end %>
         </div>
@@ -83,20 +79,12 @@
         <h1 class="text-sm font-semibold text-gray-700"><%= content_for?(:title) ? yield(:title) : "대시보드" %></h1>
         <div class="flex items-center space-x-3">
           <%= link_to root_path, target: "_blank", class: "text-xs text-gray-500 hover:text-primary flex items-center space-x-1" do %>
-            <svg class="w-3.5 h-3.5" stroke="currentColor" fill="none" viewBox="0 0 24 24" stroke-width="2">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-              <polyline points="15 3 21 3 21 9"/>
-              <line x1="10" y1="14" x2="21" y2="3"/>
-            </svg>
+            <%= lni_icon "arrow-angular-top-right" %>
             <span>사이트 보기</span>
           <% end %>
           <% if current_admin_user&.personal_page? %>
             <%= link_to slug_admin_dashboard_path(slug: current_admin_user.member.slug), class: "text-xs text-gray-500 hover:text-primary flex items-center space-x-1" do %>
-              <svg class="w-3.5 h-3.5" stroke="currentColor" fill="none" viewBox="0 0 24 24" stroke-width="2">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                <polyline points="15 3 21 3 21 9"/>
-                <line x1="10" y1="14" x2="21" y2="3"/>
-              </svg>
+              <%= lni_icon "arrow-angular-top-right" %>
               <span>내 페이지 관리</span>
             <% end %>
           <% end %>

@@ -109,7 +109,7 @@
       <% groups = {
         "내 페이지" => [["에디터", "pencil-1", slug_admin_editor_path(slug: @member.slug), nil], ["서비스", "service-bell-1", slug_admin_services_path(slug: @member.slug), nil], ["FAQ", "question-mark-circle", slug_admin_faqs_path(slug: @member.slug), nil], ["소식", "file-pencil", slug_admin_posts_path(slug: @member.slug), nil]],
         "고객" => [["문의함", "message-2", slug_admin_inquiries_path(slug: @member.slug), @unread_inquiries], ["후기", "star-fat", slug_admin_reviews_path(slug: @member.slug), nil], ["예약 링크", "calendar-days", slug_admin_bookings_path(slug: @member.slug), nil]],
-        "홍보" => [["SNS 연결", "share-1", slug_admin_sns_accounts_path(slug: @member.slug), nil], ["예약 발행", "calendar-days", slug_admin_scheduled_posts_path(slug: @member.slug), nil], ["노출·광고 동의", "megaphone-1", slug_admin_brand_consents_path(slug: @member.slug), nil]]
+        "홍보" => [["내 브랜드", "briefcase-1", slug_admin_brand_path(slug: @member.slug), nil], ["SNS 연결", "share-1", slug_admin_sns_accounts_path(slug: @member.slug), nil], ["예약 발행", "calendar-days", slug_admin_scheduled_posts_path(slug: @member.slug), nil], ["노출·광고 동의", "megaphone-1", slug_admin_brand_consents_path(slug: @member.slug), nil]]
       } %>
       <% groups.each do |heading, items| %>
         <h2 style="font-size: 13px; color: var(--impd-muted); margin: 16px 0 4px;"><%= heading %></h2>
