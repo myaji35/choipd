@@ -21,7 +21,7 @@ class CreateIdentityProbes < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :identity_probes, [:member_id, :status]
+    add_index :identity_probes, [ :member_id, :status ]
     add_index :identity_probes, :expires_at
     add_index :identity_probes, :status
   end

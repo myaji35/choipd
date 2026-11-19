@@ -57,7 +57,7 @@ class MemberAdmin::FacebookConnectionsController < MemberAdmin::BaseController
     account ||= @member.sns_accounts.find_by(
       platform: "facebook",
       account_name: page[:name],
-      external_id: [nil, ""]
+      external_id: [ nil, "" ]
     )
     account ||= @member.sns_accounts.new(platform: "facebook")
     account.external_id = page[:id]

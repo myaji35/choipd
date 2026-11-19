@@ -65,7 +65,7 @@ class TowninClient
     req.body = {
       targetRole: target_role,
       impdVerificationId: verification_id,
-      impdCompletedAt: completed_at || Time.current.iso8601,
+      impdCompletedAt: completed_at || Time.current.iso8601
     }.to_json
 
     response = request_with_key(req, uri)

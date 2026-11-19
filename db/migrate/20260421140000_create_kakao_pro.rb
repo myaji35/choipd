@@ -36,8 +36,8 @@ class CreateKakaoPro < ActiveRecord::Migration[8.1]
       t.datetime :received_at, null: false
       t.timestamps
     end
-    add_index :kakao_messages, [:kakao_channel_id, :received_at]
-    add_index :kakao_messages, [:replied, :urgency_score]
+    add_index :kakao_messages, [ :kakao_channel_id, :received_at ]
+    add_index :kakao_messages, [ :replied, :urgency_score ]
 
     # ── 일일 요약 (저녁 8시 자동 생성) ─────────────────
     create_table :kakao_summaries do |t|
@@ -54,7 +54,7 @@ class CreateKakaoPro < ActiveRecord::Migration[8.1]
       t.boolean :pushed, default: false                  # 사장님에게 알림 보냈나
       t.datetime :pushed_at
     end
-    add_index :kakao_summaries, [:kakao_channel_id, :summary_date], unique: true
+    add_index :kakao_summaries, [ :kakao_channel_id, :summary_date ], unique: true
 
     # ── 긴급 알림 (즉시 푸시) ─────────────────────────
     create_table :kakao_alerts do |t|
@@ -69,7 +69,7 @@ class CreateKakaoPro < ActiveRecord::Migration[8.1]
       t.datetime :acknowledged_at
       t.datetime :created_at, default: -> { "CURRENT_TIMESTAMP" }, null: false
     end
-    add_index :kakao_alerts, [:kakao_channel_id, :acknowledged]
+    add_index :kakao_alerts, [ :kakao_channel_id, :acknowledged ]
 
     # ── 긴급 키워드 사전 (사장님이 커스터마이즈) ──────
     create_table :kakao_keywords do |t|
@@ -81,7 +81,7 @@ class CreateKakaoPro < ActiveRecord::Migration[8.1]
       t.boolean :is_active, default: true
       t.timestamps
     end
-    add_index :kakao_keywords, [:owner_id, :keyword], unique: true
+    add_index :kakao_keywords, [ :owner_id, :keyword ], unique: true
 
     # ── Pro 구독 ──────────────────────────────────────
     create_table :pro_subscriptions do |t|
@@ -114,6 +114,6 @@ class CreateKakaoPro < ActiveRecord::Migration[8.1]
       t.datetime :revoked_at
       t.datetime :created_at, default: -> { "CURRENT_TIMESTAMP" }, null: false
     end
-    add_index :pro_consents, [:owner_id, :consent_type]
+    add_index :pro_consents, [ :owner_id, :consent_type ]
   end
 end

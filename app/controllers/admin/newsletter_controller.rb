@@ -11,8 +11,8 @@ class Admin::NewsletterController < Admin::BaseController
       end
       format.csv do
         csv = CSV.generate(headers: true) do |c|
-          c << ["id", "email", "subscribed_at", "created_at"]
-          @leads.find_each { |l| c << [l.id, l.email, l.subscribed_at, l.created_at] }
+          c << [ "id", "email", "subscribed_at", "created_at" ]
+          @leads.find_each { |l| c << [ l.id, l.email, l.subscribed_at, l.created_at ] }
         end
         send_data csv, filename: "newsletter-#{Date.today}.csv", type: "text/csv"
       end

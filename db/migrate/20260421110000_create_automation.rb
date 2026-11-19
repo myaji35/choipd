@@ -31,7 +31,7 @@ class CreateAutomation < ActiveRecord::Migration[8.1]
       t.text :metadata
       t.datetime :created_at, default: -> { "CURRENT_TIMESTAMP" }, null: false
     end
-    add_index :workflow_executions, [:workflow_id, :created_at]
+    add_index :workflow_executions, [ :workflow_id, :created_at ]
 
     create_table :integrations do |t|
       t.integer :tenant_id, default: 1, null: false
@@ -81,7 +81,7 @@ class CreateAutomation < ActiveRecord::Migration[8.1]
       t.text :error
       t.datetime :created_at, default: -> { "CURRENT_TIMESTAMP" }, null: false
     end
-    add_index :webhook_logs, [:webhook_id, :created_at]
+    add_index :webhook_logs, [ :webhook_id, :created_at ]
 
     create_table :automation_templates do |t|
       t.integer :tenant_id, default: 1, null: false

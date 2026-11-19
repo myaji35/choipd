@@ -51,7 +51,7 @@ module Api
               sort_order: p.sort_order,
               is_archived: p.is_archived,
               created_at: p.created_at,
-              updated_at: p.updated_at,
+              updated_at: p.updated_at
             }
           end
 
@@ -61,7 +61,7 @@ module Api
               title: c.title,
               sort_order: c.sort_order,
               kanban_project_id: c.kanban_project_id,
-              tasks: c.kanban_tasks.ordered.map { |t| serialize_task(t) },
+              tasks: c.kanban_tasks.ordered.map { |t| serialize_task(t) }
             }
           end
 
@@ -75,7 +75,7 @@ module Api
               due_date: t.due_date,
               is_completed: t.is_completed,
               sort_order: t.sort_order,
-              kanban_column_id: t.kanban_column_id,
+              kanban_column_id: t.kanban_column_id
             }
           end
         end

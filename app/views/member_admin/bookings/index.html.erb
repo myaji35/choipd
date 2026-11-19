@@ -24,7 +24,11 @@
               <div style="display: flex; justify-content: space-between; gap: 20px; align-items: flex-start;">
                 <div style="min-width: 0;">
                   <h3 style="font-size: 17px; line-height: 1.45;"><%= booking.booking_type.presence || "예약 링크" %></h3>
-                  <%= link_to booking.external_url, booking.external_url, target: "_blank", rel: "noopener", style: "display: block; margin-top: 8px; color: var(--impd-accent); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere;" %>
+                  <% if http_url(booking.external_url).present? %>
+                  <%= link_to booking.external_url, http_url(booking.external_url), target: "_blank", rel: "noopener", style: "display: block; margin-top: 8px; color: var(--impd-accent); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere;" %>
+                  <% else %>
+                    <span><%= booking.external_url %></span>
+                  <% end %>
                   <% if booking.description.present? %>
                     <p style="margin-top: 8px; color: var(--impd-ink2); font-size: 14px; line-height: 1.6;"><%= booking.description %></p>
                   <% end %>

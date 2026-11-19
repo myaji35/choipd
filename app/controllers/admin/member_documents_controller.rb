@@ -77,7 +77,7 @@ class Admin::MemberDocumentsController < Admin::BaseController
       canonical = name.strip.downcase
       skill = Skill.find_or_create_by!(tenant_id: 1, canonical_name: canonical) do |s|
         s.category = "hard"
-        s.aliases = [name].to_json
+        s.aliases = [ name ].to_json
       end
       MemberSkill.find_or_create_by!(member_id: doc.member_id, skill_id: skill.id) do |ms|
         ms.tenant_id = 1

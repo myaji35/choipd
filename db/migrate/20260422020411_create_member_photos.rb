@@ -12,7 +12,7 @@ class CreateMemberPhotos < ActiveRecord::Migration[8.1]
       t.integer :height
       t.timestamps
     end
-    add_index :member_photos, [:member_id, :uploaded_at]
-    add_index :member_photos, [:member_id, :category]
+    add_index :member_photos, [ :member_id, :uploaded_at ]
+    add_index :member_photos, [ :member_id, :category ]
   end
 end

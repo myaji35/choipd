@@ -22,7 +22,7 @@ class MemberAdmin::DashboardController < MemberAdmin::BaseController
     @bar_data = (0..13).map { |i|
       d = today - i.days
       count = visit_scope.where(created_at: d.beginning_of_day..d.end_of_day).count
-      [d, count]
+      [ d, count ]
     }.reverse
 
     @recent_inquiries = @member.member_inquiries.recent.limit(4)

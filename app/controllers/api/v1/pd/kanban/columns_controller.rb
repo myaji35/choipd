@@ -44,7 +44,7 @@ module Api
               sort_order: c.sort_order,
               kanban_project_id: c.kanban_project_id,
               created_at: c.created_at,
-              updated_at: c.updated_at,
+              updated_at: c.updated_at
             }
           end
         end

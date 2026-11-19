@@ -8,7 +8,7 @@ class MemberAuthController < ApplicationController
 
   def new
     if redirect_if_signed_in
-      return
+      nil
     end
     # flash alert/notice 그대로 표시
   end

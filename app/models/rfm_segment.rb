@@ -1,6 +1,6 @@
 class RfmSegment < ApplicationRecord
   USER_TYPES = %w[distributor lead].freeze
-  SEGMENTS = ["Champions", "Loyal", "Potential", "New", "At Risk", "Cant Lose", "Hibernating", "Lost"].freeze
+  SEGMENTS = [ "Champions", "Loyal", "Potential", "New", "At Risk", "Cant Lose", "Hibernating", "Lost" ].freeze
 
   validates :user_id, :user_type, :recency_score, :frequency_score, :monetary_score, :rfm_segment, presence: true
   validates :recency_score, :frequency_score, :monetary_score, inclusion: { in: 1..5 }

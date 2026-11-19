@@ -6,6 +6,6 @@ class AddOauthFieldsToMembers < ActiveRecord::Migration[8.1]
     add_column :members, :oauth_connected_at, :datetime
     add_column :members, :oauth_raw, :text                  # JSON (raw_info, 디버깅/감사용)
 
-    add_index :members, [:provider, :uid], unique: true, where: "provider IS NOT NULL"
+    add_index :members, [ :provider, :uid ], unique: true, where: "provider IS NOT NULL"
   end
 end

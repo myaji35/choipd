@@ -9,7 +9,7 @@ class ShortLink < ApplicationRecord
   validates :target_path, presence: true,
                           format: { with: %r{\A/[^\s]*\z}, message: "는 '/'로 시작하는 내부 경로여야 합니다" }
 
-  CHARS = ([*"0".."9", *"a".."z", *"A".."Z"]).freeze
+  CHARS = ([ *"0".."9", *"a".."z", *"A".."Z" ]).freeze
   DEFAULT_LENGTH = 8
 
   scope :for_member, ->(m) { where(member_id: m.id) if m }

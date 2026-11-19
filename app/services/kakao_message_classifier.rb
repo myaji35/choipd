@@ -40,7 +40,7 @@ class KakaoMessageClassifier
     score += 10 if @body.length < 30 && @body.match?(/[!.]{2,}|급|빨리/)
     # 시간 지연 표현
     score += 15 if @body.match?(/언제|아직|왜 안|기다리|연락 없/)
-    [score, 100].min
+    [ score, 100 ].min
   end
 
   def matched_keywords

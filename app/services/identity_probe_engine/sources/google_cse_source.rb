@@ -24,7 +24,7 @@ module IdentityProbeEngine
             snippet: item["snippet"],
             link: item["link"],
             display_link: item["displayLink"],
-            raw_preview: "#{item['title']} — #{item['snippet']}".to_s[0, 500],
+            raw_preview: "#{item['title']} — #{item['snippet']}".to_s[0, 500]
           }.compact
         end
       end

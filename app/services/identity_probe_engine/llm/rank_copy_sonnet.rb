@@ -32,7 +32,7 @@ module IdentityProbeEngine
           url: API, body: body, headers: {
           "x-api-key"         => anthropic_key,
           "anthropic-version" => "2023-06-01",
-          "content-type"      => "application/json",
+          "content-type"      => "application/json"
         })
 
         return { "status" => "skipped", "reason" => outcome["status"].presence || "api_failed" } unless res
@@ -80,7 +80,7 @@ module IdentityProbeEngine
         body = {
           model: config.model,
           max_tokens: config.max_tokens || 1024,
-          messages: [{ role: "user", content: prompt }],
+          messages: [ { role: "user", content: prompt } ]
         }
         body[:temperature] = config.temperature unless config.temperature.nil?
         body
@@ -104,12 +104,12 @@ module IdentityProbeEngine
         {
           "status" => "mock",
           "display_name" => names.first || hints[:name].to_s,
-          "professional_roles" => roles.empty? ? [hints[:profession_hint]].compact : roles,
+          "professional_roles" => roles.empty? ? [ hints[:profession_hint] ].compact : roles,
           "region" => { "country" => "KR", "city" => region.to_s },
           "bio_draft" => bios.first.to_s.empty? ? "아직 자기소개를 확정하지 않았습니다. 잠시 뒤 확인하세요." : bios.join(" "),
           "bio_source_quote" => bios.first.to_s[0, 140],
           "links" => links,
-          "confidence" => structured && structured["candidate_names"].is_a?(Array) && !structured["candidate_names"].empty? ? 0.45 : 0.1,
+          "confidence" => structured && structured["candidate_names"].is_a?(Array) && !structured["candidate_names"].empty? ? 0.45 : 0.1
         }
       end
     end

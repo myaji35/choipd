@@ -20,7 +20,7 @@ module IdentityProbeEngine
             handle: handle,
             profile_url: url,
             confidence_hint: "handle_guessed_from_name",
-            raw_preview: "https://www.instagram.com/#{handle}/",
+            raw_preview: "https://www.instagram.com/#{handle}/"
           }
         end
 

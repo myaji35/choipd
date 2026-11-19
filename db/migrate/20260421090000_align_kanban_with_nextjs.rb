@@ -38,7 +38,7 @@ class AlignKanbanWithNextjs < ActiveRecord::Migration[8.1]
         t.datetime :read_at
         t.datetime :created_at, default: -> { "CURRENT_TIMESTAMP" }, null: false
       end
-      add_index :notifications, [:tenant_id, :user_id, :is_read], name: "idx_notifications_user_unread"
+      add_index :notifications, [ :tenant_id, :user_id, :is_read ], name: "idx_notifications_user_unread"
     end
 
     # task의 project_id 백필 (column에서 가져와서)

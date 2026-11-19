@@ -23,7 +23,7 @@ class MemberSessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "잘못된 비밀번호와 알 수 없는 회원은 거부한다" do
-    [@member.slug, "unknown-member"].each do |slug|
+    [ @member.slug, "unknown-member" ].each do |slug|
       post login_member_post_path(slug: slug), params: { password: "wrong" }
       assert_redirected_to login_member_path(slug: slug)
       assert_equal "비밀번호를 확인해주세요", flash[:alert]

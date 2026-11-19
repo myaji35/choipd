@@ -9,7 +9,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
       image_size: 200,
       skip_jwt: true,
       access_type: "online",
-      provider_ignores_state: false,
+      provider_ignores_state: false
     }
 end
 

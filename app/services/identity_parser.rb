@@ -136,7 +136,7 @@ class IdentityParser
     body.lines.map(&:strip).reject(&:empty?)
         .select { |l| l.start_with?("-", "*", "•", "1.", "2.", "3.") || l.include?(",") }
         .map { |l| l.gsub(/\A[-*•\d.]+\s*/, "").strip }
-        .flat_map { |l| l.include?(",") ? l.split(",").map(&:strip) : [l] }
+        .flat_map { |l| l.include?(",") ? l.split(",").map(&:strip) : [ l ] }
         .reject(&:empty?)
         .uniq
         .first(max)

@@ -26,7 +26,7 @@ module IdentityProbeEngine
             profile_url: entry["profileUrl"],
             location: entry["currentLocation"],
             urls: Array(entry["urls"]).map { |u| u["value"] }.compact,
-            raw_preview: entry.slice("displayName", "aboutMe", "currentLocation").to_s[0, 500],
+            raw_preview: entry.slice("displayName", "aboutMe", "currentLocation").to_s[0, 500]
           }.compact
         end
 

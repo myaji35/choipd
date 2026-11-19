@@ -46,7 +46,7 @@ class KakaoSummarizer
       .limit(3)
 
     if candidates.empty?
-      ["오늘은 답변이 필요한 긴급 문의가 없습니다."]
+      [ "오늘은 답변이 필요한 긴급 문의가 없습니다." ]
     else
       candidates.map { |m|
         prefix = m.urgency_score >= 80 ? "🚨" : m.question_kind == "question" ? "❓" : "💬"

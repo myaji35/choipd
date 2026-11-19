@@ -55,11 +55,11 @@ class Admin::KakaoInboxController < Admin::BaseController
   def simulate
     @channel = KakaoChannel.find(params[:id])
     samples = [
-      ["고객A", "환불 어떻게 받을 수 있나요? 너무 별로였어요"],
-      ["고객B", "예약 변경하고 싶은데 가능할까요?"],
-      ["고객C", "고소할 거예요. 답변 빨리 주세요!"],
-      ["고객D", "친절하게 안내해주셔서 감사합니다"],
-      ["고객E", "배송이 아직 안 왔어요 언제 오나요?"]
+      [ "고객A", "환불 어떻게 받을 수 있나요? 너무 별로였어요" ],
+      [ "고객B", "예약 변경하고 싶은데 가능할까요?" ],
+      [ "고객C", "고소할 거예요. 답변 빨리 주세요!" ],
+      [ "고객D", "친절하게 안내해주셔서 감사합니다" ],
+      [ "고객E", "배송이 아직 안 왔어요 언제 오나요?" ]
     ]
     samples.each do |name, body|
       msg = @channel.kakao_messages.create!(

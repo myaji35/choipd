@@ -56,7 +56,7 @@ class IdentityProbesControllerTest < ActionDispatch::IntegrationTest
       member: @member,
       status: "in_progress",
       last_step: 0,
-      sources_queried: ["gravatar"],
+      sources_queried: [ "gravatar" ],
       sources_hit: [],
       raw_signals: [],
       step_payloads: {},
@@ -88,6 +88,16 @@ class IdentityProbesControllerTest < ActionDispatch::IntegrationTest
     assert_equal({ "profession" => "강사" }, probe.step_payloads["s2"])
   end
 
+  test "step payload permits known keys and filters unknown nested keys" do
+    sign_in_as(@member)
+    probe = IdentityProbe.create!(member: @member, status: "completed", step_payloads: {})
+    patch "/welcome/probe/step/3", params: { payload: { links: [ { platform: "instagram", url: "https://example.com", evil: "bad" } ], evil: "bad" } }
+    assert_response :redirect
+    assert_equal({ "links" => [ { "platform" => "instagram", "url" => "https://example.com" } ] }, probe.reload.step_payloads["s3"])
+    patch "/welcome/probe/step/4"
+    assert_equal({}, probe.reload.step_payloads["s4"])
+  end
+
   test "POST /welcome/probe/finish with both required consents applies to member and redirects to slug" do
     sign_in_as(@member)
     probe = IdentityProbe.create!(
@@ -98,7 +108,7 @@ class IdentityProbesControllerTest < ActionDispatch::IntegrationTest
       step_payloads: { "s4" => { "bio" => "새 소개 문장" } },
     )
 
-    post "/welcome/probe/finish", params: { consents: { publish: "1", share: "1" } }
+    post "/welcome/probe/finish", params: { consents: { publish: "1", share: "1", auto_sync: "1", sample_use: "1", unexpected: "1" } }
     assert_response :redirect
     assert_redirected_to "/#{@member.slug}"
 

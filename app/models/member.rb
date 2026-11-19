@@ -39,7 +39,7 @@ class Member < ApplicationRecord
     "shopowner"       => "자영업자",
     "freelancer"      => "프리랜서",
     "creator"         => "크리에이터",
-    "custom"          => "크리에이터",
+    "custom"          => "크리에이터"
   }.freeze
 
   validates :name, :email, :slug, presence: true
@@ -126,7 +126,7 @@ class Member < ApplicationRecord
     "fp"                => "금융 설계사",
     "citizen_reporter"  => "시민 기자",
     "citizen_journalist"=> "시민 기자",
-    "user"              => "회원",
+    "user"              => "회원"
   }.freeze
 
   def partner_display_role
@@ -230,7 +230,7 @@ class Member < ApplicationRecord
   def self.generate_unique_slug(name: nil, email: nil)
     seeds = [
       email.to_s.split("@").first,
-      name.to_s,
+      name.to_s
     ].compact_blank
 
     base = seeds.filter_map do |s|

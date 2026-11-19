@@ -21,7 +21,7 @@ module IdentityProbeEngine
         name: @member.name,
         email: @member.email,
         profession_hint: @member.respond_to?(:profession) ? @member.profession : nil,
-        region_hint: @member.respond_to?(:region) ? @member.region : nil,
+        region_hint: @member.respond_to?(:region) ? @member.region : nil
       }
 
       raw_signals, sources_queried, sources_hit = run_sources(hints)
@@ -38,7 +38,7 @@ module IdentityProbeEngine
           "profile"     => profile,
           "structured"  => structured,
           "hints"       => stringify_hints(hints),
-          "mock_mode"   => mock_mode?,
+          "mock_mode"   => mock_mode?
         },
         sources_queried: sources_queried,
         sources_hit: sources_hit,
@@ -66,7 +66,7 @@ module IdentityProbeEngine
         Sources::GravatarSource.new,
         Sources::GoogleCseSource.new,
         Sources::NaverSearchSource.new,
-        Sources::InstagramOembedSource.new,
+        Sources::InstagramOembedSource.new
       ]
 
       raw_signals = []
@@ -94,7 +94,7 @@ module IdentityProbeEngine
         sigs.each { |s| raw_signals << s.merge(source: key) }
       end
 
-      [raw_signals, queried.uniq, hit.uniq]
+      [ raw_signals, queried.uniq, hit.uniq ]
     end
 
     def safe_call_llm(stage)

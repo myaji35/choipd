@@ -61,7 +61,7 @@ class IdentityProbeTest < ActiveSupport::TestCase
     probe = IdentityProbe.create!(
       member: @member,
       status: "completed",
-      raw_signals: [{ "source" => "gravatar", "data" => "secret" }],
+      raw_signals: [ { "source" => "gravatar", "data" => "secret" } ],
     )
     assert_equal 1, probe.raw_signals.size
     probe.purge_raw_signals!

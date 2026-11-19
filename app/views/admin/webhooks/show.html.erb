@@ -45,7 +45,7 @@
         <div class="flex justify-between"><dt class="text-gray-500">활성</dt><dd><%= @webhook.is_active? ? '✓' : '✗' %></dd></div>
         <div class="flex justify-between"><dt class="text-gray-500">성공</dt><dd class="text-green-600 font-bold"><%= @webhook.success_count %></dd></div>
         <div class="flex justify-between"><dt class="text-gray-500">실패</dt><dd class="text-red-600 font-bold"><%= @webhook.failure_count %></dd></div>
-        <div class="border-t border-gray-100 pt-2"><dt class="text-gray-500 text-xs">이벤트</dt><dd class="mt-1"><%= @webhook.events_list.map { |e| "<span class='text-xs px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-mono'>#{e}</span>" }.join(" ").html_safe %></dd></div>
+        <div class="border-t border-gray-100 pt-2"><dt class="text-gray-500 text-xs">이벤트</dt><dd class="mt-1"><%= safe_join(@webhook.events_list.map { |event| content_tag(:span, event, class: "text-xs px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-mono") }, " ") %></dd></div>
       </dl>
     </div>
   </div>
