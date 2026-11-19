@@ -224,6 +224,9 @@ Rails.application.routes.draw do
 
   # ── API (JSON) — Phase 1 P0 ──────────────────────────
   namespace :api, defaults: { format: :json } do
+    namespace :socialdoctors do
+      get "consented-brands", to: "consented_brands#index"
+    end
     namespace :v1 do
       # 인증
       get  "auth/me",       to: "auth#me"
@@ -324,6 +327,7 @@ Rails.application.routes.draw do
       end
       resources :faqs, controller: "faqs", only: [ :index, :create, :update, :destroy ]
       resources :bookings, only: [ :index, :create, :update, :destroy ]
+      resource :brand_consents, path: "consents", only: [ :show, :update ]
       resources :sns_accounts, only: [ :index, :create, :update, :destroy ] do
         resources :follower_snapshots, controller: "sns_follower_snapshots", only: [ :create ]
       end
