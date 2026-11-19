@@ -31,7 +31,7 @@
     </div>
   </div>
 
-  <!-- ── HERO 01 (v2: 좌우 2컬럼 + Polaroid Stack) ───────────────────────── -->
+  <!-- ── HERO 01 (좌우 2컬럼 + 회원 페이지 미리보기) ───────────────────────── -->
   <section class="impd-wrap" style="padding: 80px 40px 40px;">
     <div class="impd-label" style="margin-bottom: 28px;">업로드만 하세요. 나머지는 저희가.</div>
 
@@ -75,30 +75,12 @@
         </div>
       </div>
 
-      <!-- 우: Polaroid Stack (340x400) -->
-      <div class="impd-polaroid-slot" style="display: flex; justify-content: center; padding-top: 20px;">
-        <%= render "shared/polaroid_stack", width: 340, height: 400, items: [
-          { color: "#ff5a1f", kind: "활동 사진", date: "26.04",   caption: "수강생 환한 표정." },
-          { color: "#3a2af0", kind: "수료증",    date: "23.07",   caption: "요가 지도자 자격." },
-          { color: "#2a9d8f", kind: "SNS",       date: "이번 달", caption: "팔로워 급증한 릴." },
-          { color: "#e4b230", kind: "포스터",    date: "지난달",  caption: "워크숍 모객 전단." },
-          { color: "#aa2a6a", kind: "후기",      date: "최근",    caption: "5점 만점 리뷰들." },
-          { color: "#1a1a1a", kind: "릴스",      date: "이번주",  caption: "조회수 1.2만." }
-        ] %>
-      </div>
+      <%= render "hero_phone_preview" %>
     </div>
 
     <style>
       @media (max-width: 768px) {
         .impd-hero-grid { grid-template-columns: 1fr !important; }
-        /* 폴라로이드 스택은 340px 고정폭이라 좁은 화면에서 부모를 넘친다.
-           슬롯 기준으로 축소해 오버플로를 막는다(비율 340:400 유지). */
-        .impd-polaroid-slot > [data-controller="polaroid-stack"] {
-          width: 100% !important;
-          max-width: 340px;
-          height: auto !important;
-          aspect-ratio: 340 / 400;
-        }
       }
     </style>
   </section>
