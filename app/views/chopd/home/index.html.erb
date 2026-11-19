@@ -331,7 +331,7 @@
         오래 쓸수록 더 예뻐지는 페이지.
       </h2>
       <p style="color: var(--impd-on-dark-soft); font-size: 16px; line-height: 1.6; max-width: 720px;">
-        첫 페이지를 연 순간부터 방문 수·후기·수료증이 쌓입니다. imPD는 그 기록을 <span class="impd-serif" style="color: var(--impd-gold);">골드 레이어</span>로 페이지 위에 얹어드려요.
+        첫 페이지를 연 순간부터 방문 수·후기·수료증이 쌓입니다. imPD는 그 기록을 <span class="impd-serif" style="color: var(--impd-gold);">성장 기록</span>으로 페이지에 차곡차곡 쌓아 드려요.
       </p>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 40px;">
@@ -344,9 +344,10 @@
             <% if highlight %>
               <span style="position: absolute; top: -10px; right: 20px; background: var(--impd-gold); color: var(--impd-ink); font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; padding: 4px 10px; border-radius: 50px;">추천</span>
             <% end %>
-            <div class="impd-label" style="color: <%= highlight ? 'var(--impd-gold)' : 'var(--impd-green)' %>;"><%= tag %></div>
+            <div class="impd-label" style="color: <%= highlight ? '#8a6a2f' : 'var(--impd-green)' %>;"><%= tag %></div>
             <div class="impd-display" style="font-size: 22px; margin: 8px 0 4px; color: var(--impd-green);"><%= title %></div>
-            <div class="impd-display" style="font-size: 28px; margin-bottom: 20px;"><%= price %></div>
+            <% amount, unit = price.split(' / ', 2) %>
+            <div class="impd-display" style="color: var(--impd-ink); margin-bottom: 20px;"><span style="font-size: 32px; font-weight: 800; color: var(--impd-ink);"><%= amount %></span> <span style="font-size: 15px; color: var(--impd-muted);">/ <%= unit %></span></div>
             <ul style="list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-direction: column; gap: 10px;">
               <% features.each do |f| %>
                 <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--impd-ink);">
