@@ -7,7 +7,8 @@ on:
 
 jobs:
   scan_ruby:
-    runs-on: ubuntu-latest
+    # ubuntu-26.04 러너에는 Ruby 3.3.10 사전 빌드가 없어 고정 (.ruby-version·Dockerfile 과 일치)
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -24,7 +25,7 @@ jobs:
         run: bin/bundler-audit
 
   scan_js:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -38,7 +39,7 @@ jobs:
         run: bin/importmap audit
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       RUBOCOP_CACHE_ROOT: tmp/rubocop
     steps:
@@ -64,7 +65,7 @@ jobs:
         run: bin/rubocop -f github
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       RAILS_ENV: test
       DATABASE_URL: sqlite3:storage/test.sqlite3
@@ -101,7 +102,7 @@ jobs:
 
   # main 브랜치에 푸시되고 모든 검증 통과 시 자동 Kamal 배포
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [scan_ruby, scan_js, lint, test]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: production
