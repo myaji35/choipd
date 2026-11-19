@@ -2,7 +2,7 @@
     트리거: 버튼에 data-promo-popup 속성 → 클릭 시 열림.
            또는 첫 방문자는 자동으로 3초 후 열림(localStorage 'impd_promo_seen' 없으면).
     닫기:  ESC / 배경 클릭 / X 버튼 / 영상 종료 후 4초.
-    자동재생: muted autoplay (브라우저 정책 준수). 🔊 버튼으로 unmute.
+    자동재생: muted autoplay (브라우저 정책 준수). 소리 버튼으로 unmute.
 
     이 파셜은 layout 하단(footer 뒤)에 한 번만 render 하면 된다.
 %>
@@ -11,7 +11,7 @@
 
   <div class="promo-popup-frame">
     <button type="button" class="promo-popup-close" aria-label="닫기">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <%= lni_icon "xmark", size: 20 %>
     </button>
 
     <div class="promo-popup-brand">
@@ -34,10 +34,7 @@
           "못 찾는 문제" 방지: 중앙 대형 버튼 + 펄스 애니메이션 + 화살표 힌트. %>
       <div class="promo-popup-unmute-center" id="promo-popup-unmute-wrap">
         <button type="button" id="promo-popup-unmute" class="promo-popup-unmute-big" aria-label="소리 켜기">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"/>
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
-          </svg>
+          <%= lni_icon "volume-high", size: 28 %>
           <span class="label">소리 켜기</span>
           <span class="hint">음악도 함께 들어보세요</span>
         </button>
@@ -45,7 +42,7 @@
     </div>
 
     <div class="promo-popup-cta">
-      <a href="/auth/signup" class="promo-popup-btn primary">내 페이지 만들기 →</a>
+      <a href="/auth/signup" class="promo-popup-btn primary">내 페이지 만들기 <%= lni_icon "arrow-right" %></a>
       <a href="/promo/watch" class="promo-popup-btn ghost">공유 / 다운로드</a>
     </div>
   </div>
@@ -156,7 +153,7 @@
     transform: translateY(-2px) scale(1.03);
     animation: none;
   }
-  .promo-popup-unmute-big svg { display: block; }
+  .promo-popup-unmute-big .lni { display: block; }
   .promo-popup-unmute-big .label {
     font-size: 16px; font-weight: 700; letter-spacing: -0.02em;
     margin-top: 2px;

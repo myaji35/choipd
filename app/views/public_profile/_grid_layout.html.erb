@@ -67,7 +67,7 @@
         <% end %>
       </div>
       <% if member.email.present? %>
-        <a href="mailto:<%= member.email %>" class="impd-btn impd-btn-primary" style="margin-top: 20px; justify-content: center;">문의하기 →</a>
+        <a href="mailto:<%= member.email %>" class="impd-btn impd-btn-primary" style="margin-top: 20px; justify-content: center;">문의하기 <%= lni_icon "arrow-right" %></a>
       <% end %>
     </section>
 
@@ -106,7 +106,7 @@
         <span class="impd-label">링크</span>
         <h2 class="impd-bento-heading" style="font-size: 26px; margin: 12px 0 18px;">더 알아보기</h2>
         <% social_entries.each do |entry| %>
-          <a class="impd-bento-link" href="<%= entry[:url] %>" target="_blank" rel="noopener"><span><%= entry[:label] %></span><span>↗</span></a>
+          <a class="impd-bento-link" href="<%= entry[:url] %>" target="_blank" rel="noopener"><span><%= entry[:label] %></span><%= lni_icon "arrow-angular-top-right" %></a>
         <% end %>
       </section>
     <% end %>

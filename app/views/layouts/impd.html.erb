@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
   <head>
+    <%= stylesheet_link_tag "lineicons", "data-turbo-track": "reload" %>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= content_for?(:title) ? yield(:title) + " | imPD" : "imPD — 1인 사업자·크리에이터의 홍보 페이지" %></title>
@@ -184,7 +185,7 @@
       <div class="impd-joinstrip" style="background: #000; color: #fff; padding: 10px 24px; display: flex; align-items: center; gap: 14px; font-size: 13px; letter-spacing: -0.01em;">
         <span style="opacity: 0.9;">지금 가입하면 첫 페이지 제작 무료 · 수수료 없이 3개월</span>
         <span style="flex: 1;"></span>
-        <%= link_to "자세히 보기 →", member_signup_path, style: "color: #fff; text-decoration: underline; font-weight: 600; white-space: nowrap;" %>
+        <%= link_to member_signup_path, style: "color: #fff; text-decoration: underline; font-weight: 600; white-space: nowrap;" do %>자세히 보기 <%= lni_icon "arrow-right" %><% end %>
       </div>
     <% end %>
 
@@ -267,14 +268,7 @@
     <% frap_href = member_signed_in? ? "/welcome/probe" : member_signup_path %>
     <% frap_label = member_signed_in? ? "이메일로 자동 채우기" : "내 페이지 만들기" %>
     <%= link_to frap_href, class: "impd-frap", "aria-label": frap_label, title: frap_label do %>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <% if member_signed_in? %>
-          <%# sparkle 아이콘 — AI 자동 채우기 %>
-          <path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z M18 14l1 2 2 1-2 1-1 2-1-2-2-1 2-1z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <% else %>
-          <path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-        <% end %>
-      </svg>
+      <%= lni_icon(member_signed_in? ? "star-fat" : "plus", size: 22) %>
     <% end %>
   </body>
 </html>

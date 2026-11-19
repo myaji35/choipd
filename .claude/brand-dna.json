@@ -51,7 +51,7 @@
     },
     "personality": {
       "mood": "잡지처럼 단정하지만 다정한 개인 홍보 페이지",
-      "icon_style": "feather-outline",
+      "icon_style": "lineicons (Lineicons Free 5.0, 자체 호스팅, 헬퍼 lni_icon)",
       "illustration_style": "none"
     }
   },
@@ -64,7 +64,8 @@
     "공개 화면과 회원 관리 화면의 서로 다른 브랜드 색",
     "색만으로 상태 구분",
     "빈 구역(후기 0건, 방문 0)을 그대로 노출",
-    "한 화면에 같은 무게의 버튼 5개 이상 나열"
+    "한 화면에 같은 무게의 버튼 5개 이상 나열",
+    "이모지·직접 그린 SVG 아이콘 사용(아이콘은 LineIcons만, 2026-11-19 대표님 지시)"
   ],
   "primary_action_per_screen": "MUST_EXIST",
   "user_decision_clarity": "0.5초 룰 — 첫 시선 0.5초 안에 다음 행동 식별 가능해야 함",
