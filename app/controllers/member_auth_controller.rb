@@ -4,6 +4,7 @@
 # OAuth:  POST /auth/google_oauth2 → OmniauthCallbacksController
 class MemberAuthController < ApplicationController
   layout "application"
+  rate_limit to: 10, within: 3.minutes, only: :create
 
   def new
     if redirect_if_signed_in
@@ -24,34 +25,20 @@ class MemberAuthController < ApplicationController
 
     member = Member.where("LOWER(email) = ?", email).first
 
-    unless member
+    unless member && member.withdrawn_at.blank?
       # 보안상 "이메일이 없다"고 직접 말하지 않는다. 동일한 메시지로 통일.
       redirect_to member_login_path, alert: "이메일 또는 비밀번호가 일치하지 않습니다." and return
     end
 
     if member.password_digest.blank?
-      # OAuth가 꺼져 있으면 Google 버튼이 렌더되지 않는다.
-      # 그 상태에서 "아래 Google 버튼으로"라고 안내하면 로그인 경로가 사라진다.
-      msg = if google_oauth_enabled?
-              "이 계정은 Google 로그인으로 가입되어 있습니다. 아래 Google 버튼으로 계속해 주세요."
-            else
-              "이 계정은 Google 로그인으로 가입되어 있습니다. 현재 Google 로그인을 사용할 수 없습니다. 관리자에게 비밀번호 재설정을 요청해 주세요."
-            end
-      redirect_to member_login_path, alert: msg and return
+      redirect_to member_login_path, alert: oauth_only_login_alert and return
     end
 
     unless member.authenticate(password)
       redirect_to member_login_path, alert: "이메일 또는 비밀번호가 일치하지 않습니다." and return
     end
 
-    case member.status
-    when "pending_approval"
-      redirect_to root_path, notice: "#{member.name}님, 관리자 승인 대기 중입니다." and return
-    when "rejected"
-      redirect_to root_path, alert: "가입이 거절된 계정입니다. 관리자에게 문의해 주세요." and return
-    when "suspended"
-      redirect_to root_path, alert: "정지된 계정입니다. 관리자에게 문의해 주세요." and return
-    end
+    return if reject_unapproved_member(member)
 
     session[:member_id] = member.id
     member.update(last_sign_in_at: Time.current) if member.respond_to?(:last_sign_in_at)

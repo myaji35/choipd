@@ -6,9 +6,10 @@ class SnsFollowerSnapshotFlowTest < ActionDispatch::IntegrationTest
     @member = Member.create!(
       name: "팔로워테스트",
       email: "follower-test-#{SecureRandom.hex(4)}@example.com",
-      slug: "follower-test-#{SecureRandom.hex(4)}"
+      slug: "follower-test-#{SecureRandom.hex(4)}",
+      status: "approved", password: "password1234"
     )
-    @member.update_columns(password_digest: nil)
+    post login_member_post_path(slug: @member.slug), params: { password: "password1234" }
     @account = @member.sns_accounts.create!(platform: "instagram", account_name: "@flow_test", is_active: true)
     @member.sns_accounts.create!(platform: "youtube", account_name: "@flow_tube", is_active: true)
     @base = "/#{@member.slug}/admin/sns_accounts"
