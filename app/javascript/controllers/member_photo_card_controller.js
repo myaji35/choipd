@@ -1,7 +1,30 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static values = { deleteUrl: String, csrf: String, id: Number }
+  static values = { deleteUrl: String, updateUrl: String, csrf: String, id: Number }
+
+  connect() {
+    const select = this.element.querySelector("select")
+    if (select) select.dataset.previous = select.value
+  }
+
+  async updateCategory(e) {
+    const select = e.currentTarget
+    const previous = select.dataset.previous || select.defaultValue
+    try {
+      const res = await fetch(this.updateUrlValue, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "X-CSRF-Token": this.csrfValue, "Accept": "application/json" },
+        body: JSON.stringify({ category: select.value })
+      })
+      if (!res.ok) throw new Error()
+      select.dataset.previous = select.value
+      this.element.querySelector("[data-category-chip]").textContent = select.selectedOptions[0].textContent
+    } catch (_) {
+      select.value = previous
+      alert("분류를 저장하지 못했습니다.")
+    }
+  }
 
   async destroy(e) {
     e.preventDefault()

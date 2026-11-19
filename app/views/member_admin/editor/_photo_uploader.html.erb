@@ -1,7 +1,7 @@
 <% photo_categories = MemberPhoto::CATEGORIES %>
 <% photos = member.member_photos.ordered.limit(30) %>
 
-<div class="impd-label" style="margin-bottom: 12px;">§01-B · 일상 사진·영상도 올려주세요</div>
+<div class="impd-label" style="margin-bottom: 12px;">일상 사진·영상도 올려주세요</div>
 
 <div style="border: 2px dashed var(--impd-accent); padding: 36px 24px; text-align: center; background: var(--impd-card);"
      data-controller="member-photo-uploader"
@@ -38,7 +38,7 @@
   </div>
 
   <p style="font-size: 10px; color: var(--impd-muted); margin-top: 14px; line-height: 1.5;">
-    <strong>이미지</strong>: JPG · PNG · WebP · HEIC · HEIF · GIF · AVIF · BMP · 최대 25MB<br>
+    <strong>이미지</strong>: 휴대폰 사진 그대로 OK · 25MB까지<br>
     <strong>영상</strong>: MP4 · MOV · M4V · 3GP · WebM · 최대 100MB
   </p>
 

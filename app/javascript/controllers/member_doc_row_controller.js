@@ -11,6 +11,7 @@ export default class extends Controller {
       body: JSON.stringify({ category: newCat })
     })
     if (!res.ok) alert("저장 실패")
+    else this.element.querySelector("[data-category-chip]").textContent = e.currentTarget.selectedOptions[0].textContent
   }
 
   async destroy(e) {

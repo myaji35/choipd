@@ -1,6 +1,6 @@
 <% content_for :title, "에디터 — #{@member.name}" %>
 
-<div style="max-width: 1200px; margin: 0 auto; padding: 40px;">
+<div class="editor-page" style="max-width: 1200px; margin: 0 auto; padding: 40px;">
   <!-- 4단계 progress rail — 모두 클릭 가능. 각 단계별 완료 상태 표시. -->
   <%
     # 각 Step 완료 기준 (build_checklist 의 key 매핑)
@@ -10,16 +10,16 @@
     step4_done = @member.published_at.present?
 
     steps = [
-      [1, "업로드",     "자료 올리기",   step1_done],
-      [2, "정보 확인",  "AI 추출 검토",  step2_done],
-      [3, "스타일 선택", "테마/레이아웃", step3_done],
-      [4, "발행",      "공개",         step4_done],
+      [1, "자료 올리기", "", step1_done],
+      [2, "정보 확인", "", step2_done],
+      [3, "스타일", "", step3_done],
+      [4, "공개", "", step4_done],
     ]
   %>
   <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--impd-ink); margin-bottom: 48px;">
     <% steps.each_with_index do |(n, label, desc, done), i| %>
       <% current = @step == n %>
-      <a href="?step=<%= n %>"
+      <a href="?step=<%= n %>" <%= 'aria-current="step"'.html_safe if current %>
          style="display: block; padding: 16px 20px; text-decoration: none; <%= 'border-left: 1px solid var(--impd-rule);' if i > 0 %> position: relative; background: <%= current ? 'var(--impd-card)' : 'transparent' %>; transition: background .15s;"
          onmouseover="if(!<%= current %>)this.style.background='var(--impd-card)';"
          onmouseout="if(!<%= current %>)this.style.background='transparent';">
@@ -27,8 +27,8 @@
           <div style="position: absolute; top: -2px; left: 0; right: 0; height: 3px; background: var(--impd-accent);"></div>
         <% end %>
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-          <div class="impd-label" style="color: <%= current ? 'var(--impd-accent)' : (done ? 'var(--impd-ink)' : 'var(--impd-muted)') %>;">§0<%= n %></div>
-          <% if done %>
+          <div class="impd-label" style="color: <%= current ? 'var(--impd-accent)' : (done ? 'var(--impd-ink)' : 'var(--impd-muted)') %>;"><%= n %></div>
+          <% if done && n < @step %>
             <span style="width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; background: #16a34a; color: #fff; font-size: 11px; font-weight: 700; border-radius: 50%;"><%= lni_icon "check" %></span>
           <% elsif current %>
             <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--impd-accent);"></span>
@@ -44,7 +44,7 @@
     <!-- ── Step 1: 업로드 허브 ───────────────────────── -->
     <div style="display: grid; grid-template-columns: 0.9fr 1.5fr; gap: 56px;" class="editor-grid">
       <div>
-        <div class="impd-label">§01 · 올리기만 하세요</div>
+        <div class="impd-label">자료 올리기</div>
         <h2 class="impd-display" style="font-size: 54px; margin-top: 18px; line-height: 0.95;">
           뭘 올려야<br>할지<br>
           <span class="impd-serif" style="color: var(--impd-accent); font-weight: 400;">고민 마세요.</span>
@@ -54,13 +54,10 @@
           imPD가 자동 분류해서 <span class="impd-serif" style="color: var(--impd-accent-2);">당신의 페이지</span>로 만들어 드립니다.
         </p>
 
-        <div style="margin-top: 28px; display: grid; grid-template-columns: auto 1fr; gap: 10px 14px; font-size: 12px; color: var(--impd-muted); font-family: var(--impd-font-mono);">
-          <span style="color: var(--impd-ink); font-weight: 700;">자료</span>
-          <span>MD · TXT &nbsp;≤ 1MB</span>
-          <span style="color: var(--impd-ink); font-weight: 700;">사진</span>
-          <span>JPG · PNG · WebP · HEIC · GIF · AVIF · BMP &nbsp;≤ 25MB</span>
-          <span style="color: var(--impd-ink); font-weight: 700;">영상</span>
-          <span>MP4 · MOV · M4V · 3GP · WebM &nbsp;≤ 100MB</span>
+        <div style="margin-top: 28px; display: grid; gap: 10px; font-size: 14px; color: var(--impd-muted);">
+          <span>이력서·경력 문서 (글 파일 .txt로 올려 주세요 — 한글·워드 문서는 내용을 복사해 메모장에 붙여 저장하면 돼요)</span>
+          <span>사진 (휴대폰 사진 그대로 OK · 25MB까지)</span>
+          <span>영상 (100MB까지)</span>
         </div>
       </div>
 
@@ -72,9 +69,9 @@
   <% elsif @step == 2 %>
     <!-- ── Step 2: 정보 확인 — AI 추출 결과 검토 + 누락 필드 입력 ─ -->
     <div class="impd-section-header">
-      <span class="impd-label">§02</span>
+      <span class="impd-label">정보 확인</span>
       <span class="impd-display" style="font-size: 36px; flex: 1;">정보 확인 — AI 추출 결과 + 누락 필드</span>
-      <span class="impd-label-muted"><%= @skills.size %> TALENTS · <%= @doc_count %> DOCS · <%= @photos_count %> PHOTOS</span>
+      <span class="impd-label-muted"><%= @skills.size %> 개 역량 · <%= @doc_count %> 개 문서 · <%= @photos_count %> 개 사진</span>
     </div>
 
     <%# 현재 로그인 세션 표시 — 대표님 지적: "로그인한 이메일 정보 표시할 수 없나?" %>
@@ -100,7 +97,7 @@
           <legend class="impd-label" style="padding: 0 10px; color: var(--impd-accent);">기본 정보</legend>
 
           <div style="margin-top: 16px;">
-            <label class="impd-label-muted">자기소개 (bio)</label>
+            <label class="impd-label-muted">자기소개</label>
             <textarea name="member[bio]" rows="3" maxlength="200"
                       placeholder="한 줄로 표현할 수 있나요? (예: 스마트폰 하나로 유튜브 채널 만드는 법을 가르치는 강사)"
                       style="width: 100%; padding: 10px 12px; border: 1px solid var(--impd-ink); font-family: var(--impd-font-sans); font-size: 14px; margin-top: 6px; resize: vertical;"><%= @member.bio %></textarea>
@@ -175,11 +172,11 @@
               <% end %>
             </div>
             <p style="margin-top: 14px; font-size: 11px; color: var(--impd-muted); font-family: var(--impd-font-mono);">
-              <%= @doc_count %>개 문서에서 자동 추출됨 · weight ≥ 60 은 대표 역량
+              <%= @doc_count %>개 문서에서 자동 추출됨 · 점수가 높은 항목은 대표 역량입니다
             </p>
           <% else %>
             <p style="font-size: 13px; color: var(--impd-muted); margin: 12px 0;">
-              Step 1에서 이력·수료증 MD/TXT를 업로드하면 달란트가 자동 추출됩니다.
+              자료 올리기에서 이력·수료증을 올리면 역량을 찾아 드립니다.
             </p>
             <a href="?step=1" class="impd-btn impd-btn-secondary" style="margin-top: 6px; height: 36px; font-size: 12px;">← 문서 올리러 가기</a>
           <% end %>
@@ -200,7 +197,7 @@
   <% elsif @step == 3 %>
     <!-- ── Step 3: 스타일 선택 (5개 프리셋) ───────────── -->
     <div class="impd-section-header">
-      <span class="impd-label">§03</span>
+      <span class="impd-label">스타일</span>
       <span class="impd-display" style="font-size: 36px; flex: 1;">스타일 선택</span>
       <span class="impd-label-muted">현재: <%= @member.theme_preset.presence&.upcase || "미설정" %></span>
     </div>
@@ -213,19 +210,20 @@
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
         <% @presets.each do |p| %>
           <label style="cursor: pointer; display: block;">
-            <input type="radio" name="theme_preset" value="<%= p[:key] %>" <%= "checked" if @member.theme_preset == p[:key] %> style="display: none;" class="theme-radio">
+            <input type="radio" name="theme_preset" value="<%= p[:key] %>" <%= "checked" if @member.theme_preset == p[:key] %> style="position: absolute; opacity: 0;" class="theme-radio">
             <div class="theme-card" style="background: <%= p[:paper] %>; color: <%= p[:ink] %>; border: 2px solid transparent; padding: 20px; min-height: 180px; display: flex; flex-direction: column; justify-content: space-between; transition: all .15s;">
               <div>
                 <div style="font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: <%= p[:accent] %>;">
-                  <%= p[:key].upcase %>
+                  <%= "사용 중" if @member.theme_preset == p[:key] %>
                 </div>
                 <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 28px; letter-spacing: -0.5px; line-height: 1; margin-top: 8px;">
                   <%= p[:name] %>
                 </div>
                 <div style="font-family: var(--impd-font-serif); font-style: italic; font-size: 16px; color: <%= p[:accent] %>; margin-top: 2px;">
-                  작가.
+                  <%= LayoutPreset.find(@member.layout_preset)&.dig(:name) || "페이지 구성" %>
                 </div>
               </div>
+              <div style="height: 36px; margin: 12px 0; border-top: 3px solid <%= p[:accent] %>; border-bottom: 1px solid <%= p[:ink] %>; opacity: .6;"></div>
               <div style="font-size: 11px; opacity: 0.75; line-height: 1.5; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
                 <span><%= p[:desc] %></span>
                 <span style="display: inline-flex; flex-shrink: 0; gap: 4px;" aria-label="강조색과 배경색">
@@ -257,16 +255,18 @@
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
         <% @layout_presets.each do |p| %>
           <label style="cursor: pointer; display: block;">
-            <input type="radio" name="layout_preset" value="<%= p[:key] %>" <%= "checked" if @member.layout_preset == p[:key] %> style="display: none;" class="layout-radio">
+            <input type="radio" name="layout_preset" value="<%= p[:key] %>" <%= "checked" if @member.layout_preset == p[:key] %> style="position: absolute; opacity: 0;" class="layout-radio">
             <div class="layout-card" style="background: var(--impd-card); color: var(--impd-ink); border: 2px solid transparent; padding: 20px; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; transition: all .15s;">
               <div>
                 <div style="font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-accent);">
-                  <%= p[:key].upcase %>
+                  <%= "사용 중" if @member.layout_preset == p[:key] %>
                 </div>
                 <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 28px; letter-spacing: -0.5px; line-height: 1; margin-top: 8px;">
                   <%= p[:name] %>
                 </div>
               </div>
+              <% preview_theme = ThemePreset.find(@member.theme_preset) || @presets.first %>
+              <div style="background: <%= preview_theme[:paper] %>; color: <%= preview_theme[:ink] %>; border-top: 6px solid <%= preview_theme[:accent] %>; padding: 12px; margin: 12px 0; min-height: 60px;"><strong><%= p[:name] %></strong><div style="border-top: 1px solid; margin-top: 8px; opacity: .5;"></div></div>
               <div style="font-size: 11px; opacity: 0.75; line-height: 1.5;">
                 <%= p[:desc] %>
               </div>
@@ -287,7 +287,7 @@
   <% else %>
     <!-- ── Step 4: 발행 체크리스트 + 공개 ─────────────── -->
     <div class="impd-section-header">
-      <span class="impd-label">§04</span>
+      <span class="impd-label">공개</span>
       <span class="impd-display" style="font-size: 36px; flex: 1;">발행 — 공개 페이지 활성화</span>
       <% if @member.published_at %>
         <span class="impd-label-muted" style="color: #16a34a;">● 발행됨 · <%= @member.published_at.strftime("%Y.%m.%d") %></span>
@@ -375,5 +375,7 @@
 </div>
 
 <style>
-  @media (max-width: 768px) { .editor-grid { grid-template-columns: 1fr !important; } }
+  @media (max-width: 768px) { .editor-page { padding: 20px 16px !important; } .editor-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 24px !important; } .editor-page > div:first-of-type a { padding: 12px 4px !important; min-width: 0; } .editor-page > div:first-of-type a p { font-size: 13px !important; overflow-wrap: anywhere; } .editor-page .impd-section-header { flex-wrap: wrap; } }
+  .editor-page button, .editor-page select, .editor-page .impd-btn { min-height: 44px; }
+  .theme-radio:focus-visible + .theme-card, .layout-radio:focus-visible + .layout-card { outline: 3px solid var(--impd-accent); }
 </style>
