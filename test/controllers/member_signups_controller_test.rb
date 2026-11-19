@@ -20,6 +20,22 @@ class MemberSignupsControllerTest < ActionDispatch::IntegrationTest
     { member: base.merge(overrides), terms_agree: "1" }
   end
 
+  test "signup renders profession radio cards with custom selected" do
+    get "/auth/signup"
+    assert_response :success
+    Member::PROFESSIONS.each do |profession|
+      assert_select "input[type=radio][name='member[profession]'][value=?]", profession
+    end
+    assert_select "input[type=radio][value=custom][checked]"
+    assert_select "label", text: /직접 입력\/기타/
+  end
+
+  test "signup accepts the selected profession" do
+    params = valid_params(profession: "educator")
+    post "/auth/signup", params: params
+    assert_equal "educator", Member.find_by!(email: params[:member][:email]).profession
+  end
+
   test "POST /auth/signup without consent checkbox goes to /<slug> and does not enqueue probe" do
     params = valid_params
     assert_no_enqueued_jobs only: IdentityProbeJob do
