@@ -66,7 +66,6 @@ Rails.application.routes.draw do
   match "/_next(/*path)", to: "choi_proxy#proxy", via: :all  # Next.js static assets
 
   scope module: :chopd do
-
     resources :inquiries,    only: [ :new, :create ]
     resources :leads,        only: [ :create ]
   end

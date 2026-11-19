@@ -67,7 +67,7 @@ module Api
               kanban_column_id: t.kanban_column_id,
               project_id: t.project_id,
               created_at: t.created_at,
-              updated_at: t.updated_at,
+              updated_at: t.updated_at
             }
           end
         end

@@ -33,7 +33,7 @@ module IdentityProbeEngine
           url: API, body: body, headers: {
           "x-api-key"         => anthropic_key,
           "anthropic-version" => "2023-06-01",
-          "content-type"      => "application/json",
+          "content-type"      => "application/json"
         })
 
         return { "status" => "skipped", "reason" => outcome["status"].presence || "api_failed" } unless res
@@ -76,7 +76,7 @@ module IdentityProbeEngine
         body = {
           model: config.model,
           max_tokens: config.max_tokens || 1024,
-          messages: [{ role: "user", content: prompt }],
+          messages: [ { role: "user", content: prompt } ]
         }
         body[:temperature] = config.temperature unless config.temperature.nil?
         body
@@ -102,7 +102,7 @@ module IdentityProbeEngine
             next nil unless s[:profile_url] || s[:link]
             { "url" => s[:profile_url] || s[:link], "source" => s[:source].to_s }
           }.first(5),
-          "notes" => "mock mode — ANTHROPIC_API_KEY not set",
+          "notes" => "mock mode — ANTHROPIC_API_KEY not set"
         }
       end
     end

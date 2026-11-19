@@ -127,7 +127,7 @@ class CreateMembersAndTalent < ActiveRecord::Migration[8.1]
       t.text :description
       t.datetime :created_at, default: -> { "CURRENT_TIMESTAMP" }, null: false
     end
-    add_index :skills, [:tenant_id, :canonical_name], unique: true
+    add_index :skills, [ :tenant_id, :canonical_name ], unique: true
     add_index :skills, :axis
 
     create_table :member_skills do |t|
@@ -141,7 +141,7 @@ class CreateMembersAndTalent < ActiveRecord::Migration[8.1]
       t.datetime :verified_at
       t.timestamps
     end
-    add_index :member_skills, [:member_id, :skill_id], unique: true, name: "idx_member_skills_unique"
+    add_index :member_skills, [ :member_id, :skill_id ], unique: true, name: "idx_member_skills_unique"
 
     create_table :member_documents do |t|
       t.integer :tenant_id, default: 1, null: false
@@ -158,7 +158,7 @@ class CreateMembersAndTalent < ActiveRecord::Migration[8.1]
       t.text :extracted_entities, default: "{}"
       t.datetime :uploaded_at, default: -> { "CURRENT_TIMESTAMP" }, null: false
     end
-    add_index :member_documents, [:member_id, :content_hash], unique: true, name: "idx_member_documents_hash"
+    add_index :member_documents, [ :member_id, :content_hash ], unique: true, name: "idx_member_documents_hash"
 
     create_table :member_gap_reports do |t|
       t.integer :tenant_id, default: 1, null: false

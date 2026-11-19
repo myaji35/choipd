@@ -22,10 +22,10 @@ class ProbeWizardFlowTest < ActionDispatch::IntegrationTest
         password_confirmation: "password1234",
         business_type: "individual",
         profession: "custom",
-        region: "서울",
+        region: "서울"
       },
       identity_probe_consent: consent ? "1" : "0",
-      terms_agree: "1", # 가입 필수 동의(ISS-116)
+      terms_agree: "1" # 가입 필수 동의(ISS-116)
     }
     Member.find_by(email: email)
   end
@@ -57,7 +57,7 @@ class ProbeWizardFlowTest < ActionDispatch::IntegrationTest
     follow_redirect!
     patch "/welcome/probe/step/2", params: { payload: { profession: "스마트폰 강사", region: "서울 강남구" } }
     follow_redirect!
-    patch "/welcome/probe/step/3", params: { payload: { links: [{ platform: "instagram", url: "https://instagram.com/x" }] } }
+    patch "/welcome/probe/step/3", params: { payload: { links: [ { platform: "instagram", url: "https://instagram.com/x" } ] } }
     follow_redirect!
     patch "/welcome/probe/step/4", params: { payload: { bio: "저는 ~입니다." } }
     follow_redirect!
@@ -130,7 +130,7 @@ class ProbeWizardFlowTest < ActionDispatch::IntegrationTest
     assert_equal 1, probe.last_step
     # params를 통해 들어오므로 문자열 "true"로 저장됨.
     rejected = probe.step_payloads.dig("s1", "rejected")
-    assert_includes [true, "true"], rejected
+    assert_includes [ true, "true" ], rejected
 
     # S2가 렌더되는지 확인 (URL 파라미터 step=2 전달).
     get "/welcome/probe", params: { step: 2 }
@@ -154,7 +154,7 @@ class ProbeWizardFlowTest < ActionDispatch::IntegrationTest
         "profile" => { "confidence" => 0.1, "display_name" => member.name },
         "structured" => {},
         "hints" => { "email" => member.email, "name" => member.name },
-        "mock_mode" => true,
+        "mock_mode" => true
       },
       sources_queried: %w[gravatar google naver instagram],
       sources_hit: [],

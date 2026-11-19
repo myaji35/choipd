@@ -13,7 +13,7 @@ class CreateAi < ActiveRecord::Migration[8.1]
       t.datetime :clicked_at
       t.datetime :created_at, default: -> { "CURRENT_TIMESTAMP" }, null: false
     end
-    add_index :ai_recommendations, [:user_id, :recommendation_type]
+    add_index :ai_recommendations, [ :user_id, :recommendation_type ]
 
     create_table :content_embeddings do |t|
       t.integer :tenant_id, default: 1, null: false
@@ -25,7 +25,7 @@ class CreateAi < ActiveRecord::Migration[8.1]
       t.text :metadata
       t.timestamps
     end
-    add_index :content_embeddings, [:content_type, :content_id]
+    add_index :content_embeddings, [ :content_type, :content_id ]
 
     create_table :chatbot_conversations do |t|
       t.integer :tenant_id, default: 1, null: false
@@ -38,7 +38,7 @@ class CreateAi < ActiveRecord::Migration[8.1]
       t.text :metadata
       t.datetime :created_at, default: -> { "CURRENT_TIMESTAMP" }, null: false
     end
-    add_index :chatbot_conversations, [:session_id, :created_at]
+    add_index :chatbot_conversations, [ :session_id, :created_at ]
 
     create_table :ai_generated_contents do |t|
       t.integer :tenant_id, default: 1, null: false
@@ -71,7 +71,7 @@ class CreateAi < ActiveRecord::Migration[8.1]
       t.string :analyzed_by, null: false
       t.datetime :analyzed_at, default: -> { "CURRENT_TIMESTAMP" }, null: false
     end
-    add_index :content_quality_scores, [:content_type, :content_id]
+    add_index :content_quality_scores, [ :content_type, :content_id ]
 
     create_table :image_auto_tags do |t|
       t.integer :tenant_id, default: 1, null: false
@@ -88,7 +88,7 @@ class CreateAi < ActiveRecord::Migration[8.1]
       t.string :model, null: false
       t.datetime :created_at, default: -> { "CURRENT_TIMESTAMP" }, null: false
     end
-    add_index :image_auto_tags, [:content_type, :content_id]
+    add_index :image_auto_tags, [ :content_type, :content_id ]
 
     create_table :faq_knowledge_bases do |t|
       t.integer :tenant_id, default: 1, null: false
@@ -104,7 +104,7 @@ class CreateAi < ActiveRecord::Migration[8.1]
       t.string :created_by, null: false
       t.timestamps
     end
-    add_index :faq_knowledge_bases, [:tenant_id, :category]
+    add_index :faq_knowledge_bases, [ :tenant_id, :category ]
 
     create_table :user_activity_patterns do |t|
       t.integer :tenant_id, default: 1, null: false

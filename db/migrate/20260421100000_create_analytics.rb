@@ -23,7 +23,7 @@ class CreateAnalytics < ActiveRecord::Migration[8.1]
       t.text :metadata         # JSON
       t.datetime :created_at, default: -> { "CURRENT_TIMESTAMP" }, null: false
     end
-    add_index :analytics_events, [:tenant_id, :created_at]
+    add_index :analytics_events, [ :tenant_id, :created_at ]
     add_index :analytics_events, :event_name
     add_index :analytics_events, :user_id
 
@@ -85,7 +85,7 @@ class CreateAnalytics < ActiveRecord::Migration[8.1]
       t.text :metadata
     end
     add_index :ab_test_participants, :session_id
-    add_index :ab_test_participants, [:ab_test_id, :variant]
+    add_index :ab_test_participants, [ :ab_test_id, :variant ]
 
     create_table :custom_reports do |t|
       t.integer :tenant_id, default: 1, null: false

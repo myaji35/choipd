@@ -29,11 +29,11 @@ class Phase1AlignWithNextjsSchema < ActiveRecord::Migration[8.1]
 
     # leads: tenant_id + 복합 unique
     add_column :leads, :tenant_id, :integer, default: 1, null: false unless column_exists?(:leads, :tenant_id)
-    add_index :leads, [:tenant_id, :email], unique: true, name: 'idx_leads_tenant_email' unless index_exists?(:leads, [:tenant_id, :email])
+    add_index :leads, [ :tenant_id, :email ], unique: true, name: 'idx_leads_tenant_email' unless index_exists?(:leads, [ :tenant_id, :email ])
 
     # settings: tenant_id + 복합 unique
     add_column :settings, :tenant_id, :integer, default: 1, null: false unless column_exists?(:settings, :tenant_id)
-    add_index :settings, [:tenant_id, :key], unique: true, name: 'idx_settings_tenant_key' unless index_exists?(:settings, [:tenant_id, :key])
+    add_index :settings, [ :tenant_id, :key ], unique: true, name: 'idx_settings_tenant_key' unless index_exists?(:settings, [ :tenant_id, :key ])
 
     # hero_images: 누락 컬럼 6개 추가 + tenant_id
     add_column :hero_images, :tenant_id, :integer, default: 1, null: false unless column_exists?(:hero_images, :tenant_id)
@@ -62,7 +62,7 @@ class Phase1AlignWithNextjsSchema < ActiveRecord::Migration[8.1]
       end
       add_index :enrollments, :tenant_id
       add_index :enrollments, :user_id
-      add_index :enrollments, [:provider, :external_order_id], unique: true, name: 'uq_enrollments_provider_order'
+      add_index :enrollments, [ :provider, :external_order_id ], unique: true, name: 'uq_enrollments_provider_order'
     end
 
     # ── distribution (6) ────────────────────────────────────────

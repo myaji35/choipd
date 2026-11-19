@@ -74,7 +74,7 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
       { key: "photo",      label: "사진 1장 이상",  done: @photos_count.to_i > 0 },
       { key: "doc",        label: "이력 문서 1건",  done: @doc_count.to_i > 0 },
       { key: "skill",      label: "달란트 3개+",    done: @skills.size >= 3 },
-      { key: "theme",      label: "스타일 선택",    done: @member.theme_preset.present? },
+      { key: "theme",      label: "스타일 선택",    done: @member.theme_preset.present? }
     ]
   end
 end

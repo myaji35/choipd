@@ -47,7 +47,7 @@ class IdentityProbesController < ApplicationController
       sources_hit: safe_json_array(@probe.sources_hit),
       sources_queried: safe_json_array(@probe.sources_queried),
       progress_percent: s0_progress_percent(@probe),
-      candidates_count: normalized_identity(@probe).dig("candidates")&.size.to_i,
+      candidates_count: normalized_identity(@probe).dig("candidates")&.size.to_i
     }
   end
 
@@ -60,12 +60,15 @@ class IdentityProbesController < ApplicationController
     # payload가 비거나 누락이어도 "다음"은 허용 — 빈 해시로 정규화 후 저장.
     raw_payload = params[:payload]
     payload = if raw_payload.is_a?(ActionController::Parameters)
-                raw_payload.permit!.to_h
-              elsif raw_payload.is_a?(Hash)
-                raw_payload
-              else
+                raw_payload.permit(
+                  :candidate_id, :selected, :rejected, :reset, :manual, :_skipped,
+                  :profession, :region, :links, :bio, :source, :url,
+                  selected: [ :id, :name, :title, :region, :avatar_url, :confidence, :source_quote, { sources: [] } ],
+                  links: [ :platform, :url, :handle, :confidence, :manual ]
+                ).to_h
+    else
                 {}
-              end
+    end
     @probe.advance_step!(step, payload)
 
     next_step = [ step + 1, MAX_STEP_IDX ].min
@@ -77,7 +80,7 @@ class IdentityProbesController < ApplicationController
   # POST /welcome/probe/finish
   # 4개 동의 체크 + 최종 확정 → Member에 bio/avatar/social 반영 → /:slug 리다이렉트.
   def finish
-    consents = params[:consents].is_a?(ActionController::Parameters) ? params[:consents].permit!.to_h : {}
+    consents = params[:consents].is_a?(ActionController::Parameters) ? params[:consents].permit(:publish, :share, :auto_sync, :sample_use).to_h : {}
     required_publish = consents["publish"].to_s == "1" || consents["publish"] == true
     required_share   = consents["share"].to_s   == "1" || consents["share"] == true
 
@@ -112,7 +115,7 @@ class IdentityProbesController < ApplicationController
     render json: {
       bio: variations[next_index],
       index: next_index,
-      total: variations.size,
+      total: variations.size
     }
   end
 
@@ -176,15 +179,15 @@ class IdentityProbesController < ApplicationController
     parsed = raw.is_a?(Hash) ? raw : (JSON.parse(raw.to_s) rescue nil)
     identity = if parsed.blank?
                  mock_identity_fallback(probe)
-               elsif parsed.key?("candidates") || parsed.key?("professions")
+    elsif parsed.key?("candidates") || parsed.key?("professions")
                  # (A) 프론트 스키마 그대로
                  parsed
-               elsif parsed.key?("profile") || parsed.key?("structured")
+    elsif parsed.key?("profile") || parsed.key?("structured")
                  # (B) 백엔드 스키마 → 프론트 스키마로 어댑팅
                  adapt_backend_identity(parsed, probe)
-               else
+    else
                  mock_identity_fallback(probe)
-               end
+    end
 
     flag_llm_unavailable(identity)
   rescue => e
@@ -229,7 +232,7 @@ class IdentityProbesController < ApplicationController
         "avatar_url" => nil,
         "confidence" => confidence,
         "sources" => (profile["sources"] || structured["sources"] || []).map { |s| s.to_s },
-        "source_quote" => profile["bio_source_quote"].to_s,
+        "source_quote" => profile["bio_source_quote"].to_s
       }
     end
 
@@ -251,7 +254,7 @@ class IdentityProbesController < ApplicationController
         "platform" => (l["source"] || "manual").to_s.downcase.gsub("oembed", ""),
         "url" => l["url"].to_s,
         "handle" => l["url"].to_s,
-        "confidence" => 70,
+        "confidence" => 70
       }
     end
     sns_links = mock["sns_links"] if sns_links.empty?
@@ -267,7 +270,7 @@ class IdentityProbesController < ApplicationController
       "bio_draft" => bio_draft,
       "avatars" => avatars,
       "_backend_confidence" => confidence,
-      "_backend_mock_mode" => be["mock_mode"] == true,
+      "_backend_mock_mode" => be["mock_mode"] == true
     }
   end
 
@@ -287,7 +290,7 @@ class IdentityProbesController < ApplicationController
         "regions" => [],
         "sns_links" => [],
         "bio_draft" => "",
-        "avatars" => [],
+        "avatars" => []
       }
     end
 
@@ -304,7 +307,7 @@ class IdentityProbesController < ApplicationController
           "avatar_url" => nil,
           "confidence" => 82,
           "sources" => [ "google", "naver" ],
-          "source_quote" => "@#{email_local} · 네이버 블로그 · 최근 30일",
+          "source_quote" => "@#{email_local} · 네이버 블로그 · 최근 30일"
         },
         {
           "id" => "c2",
@@ -314,31 +317,31 @@ class IdentityProbesController < ApplicationController
           "avatar_url" => nil,
           "confidence" => 61,
           "sources" => [ "instagram" ],
-          "source_quote" => "인스타그램 @yoga_#{email_local} · 공개 프로필",
-        },
+          "source_quote" => "인스타그램 @yoga_#{email_local} · 공개 프로필"
+        }
       ],
       "professions" => [
         { "label" => "스마트폰 강사", "confidence" => 88, "source" => "네이버 블로그", "quote" => "스마트폰 창업 3기 강의 진행" },
         { "label" => "콘텐츠 크리에이터", "confidence" => 72, "source" => "유튜브 채널", "quote" => "구독자 1.2만명" },
-        { "label" => "1인 사업가", "confidence" => 65, "source" => "브런치", "quote" => "4050 시니어 창업 에세이" },
+        { "label" => "1인 사업가", "confidence" => 65, "source" => "브런치", "quote" => "4050 시니어 창업 에세이" }
       ],
       "regions" => [
         { "label" => "서울 강남구", "confidence" => 80, "source" => "네이버 플레이스", "quote" => "강남구 역삼동 사무실" },
-        { "label" => "서울 마포구", "confidence" => 45, "source" => "인스타그램", "quote" => "마포구 합정동 스튜디오" },
+        { "label" => "서울 마포구", "confidence" => 45, "source" => "인스타그램", "quote" => "마포구 합정동 스튜디오" }
       ],
       "sns_links" => [
         { "platform" => "instagram", "url" => "https://instagram.com/#{email_local}", "handle" => "@#{email_local}", "confidence" => 88 },
         { "platform" => "youtube", "url" => "https://youtube.com/@#{email_local}", "handle" => "@#{email_local}", "confidence" => 75 },
         { "platform" => "blog", "url" => "https://blog.naver.com/#{email_local}", "handle" => "blog.naver.com/#{email_local}", "confidence" => 68 },
-        { "platform" => "threads", "url" => "https://threads.net/@#{email_local}", "handle" => "@#{email_local}", "confidence" => 52 },
+        { "platform" => "threads", "url" => "https://threads.net/@#{email_local}", "handle" => "@#{email_local}", "confidence" => 52 }
       ],
       "bio_draft" => "저는 #{name.presence || '한 사람'}입니다. 스마트폰 하나로 새로운 일을 시작하려는 사람을 돕습니다. 30년 현장에서 배운 것을, 지금 필요한 언어로 전합니다.",
       "avatars" => [
         { "source" => "gravatar", "url" => nil, "label" => "Gravatar" },
         { "source" => "instagram", "url" => nil, "label" => "인스타그램 대표 사진" },
         { "source" => "blog", "url" => nil, "label" => "블로그 프로필" },
-        { "source" => "initials", "url" => nil, "label" => "이니셜로 만들기" },
-      ],
+        { "source" => "initials", "url" => nil, "label" => "이니셜로 만들기" }
+      ]
     }
   end
 
@@ -349,7 +352,7 @@ class IdentityProbesController < ApplicationController
     [
       "저는 #{name}입니다. 스마트폰 하나로 새로운 일을 시작하려는 사람을 돕습니다. 30년 현장에서 배운 것을, 지금 필요한 언어로 전합니다.",
       "#{name} — 4050을 위한 스마트폰 창업 코치. 강의가 아니라 실행을 만듭니다. 작은 기술이 큰 전환이 되도록.",
-      "흩어진 경험을 하나의 주소로 모읍니다. #{name}의 일은, 설명보다 증거입니다. 수업 후기 300건, 첫 달 매출 낸 수강생 42명.",
+      "흩어진 경험을 하나의 주소로 모읍니다. #{name}의 일은, 설명보다 증거입니다. 수업 후기 300건, 첫 달 매출 낸 수강생 42명."
     ]
   end
 

@@ -9,7 +9,7 @@ module IdentityProbeConfig
   VALUES = {
     timeout_sec: 15,      # 파이프라인 전체 예산
     expiry_hours: 24,     # probe 결과 만료
-    purge_raw_days: 30,   # raw_signals 자동 퍼지 (PIPA)
+    purge_raw_days: 30   # raw_signals 자동 퍼지 (PIPA)
   }.freeze
 end
 
@@ -19,7 +19,7 @@ Rails.application.config.after_initialize do
     google_cse_key: ENV["GOOGLE_CSE_KEY"].to_s.strip,
     google_cse_id:  ENV["GOOGLE_CSE_ID"].to_s.strip,
     naver_id:       ENV["NAVER_CLIENT_ID"].to_s.strip,
-    naver_secret:   ENV["NAVER_CLIENT_SECRET"].to_s.strip,
+    naver_secret:   ENV["NAVER_CLIENT_SECRET"].to_s.strip
   }
 
   presence = keys.transform_values { |v| v.empty? ? "missing" : "present" }

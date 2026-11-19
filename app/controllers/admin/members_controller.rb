@@ -133,7 +133,7 @@ class Admin::MembersController < Admin::BaseController
         @member.promote_to_partner!(notes: params[:notes])
         partner_id = result["partnerId"]
         if partner_id.present?
-          @member.update(partner_notes: [@member.partner_notes, "[townin.partnerId=#{partner_id}] promoted #{Time.current.iso8601}"].compact.join("\n"))
+          @member.update(partner_notes: [ @member.partner_notes, "[townin.partnerId=#{partner_id}] promoted #{Time.current.iso8601}" ].compact.join("\n"))
         end
         redirect_to admin_member_path(@member), notice: "#{@member.name} 을(를) Townin 파트너로 승급했습니다. (partnerId: #{partner_id || '—'})"
       rescue TowninClient::BadRequest => e
@@ -171,7 +171,7 @@ class Admin::MembersController < Admin::BaseController
       "review_count" => params[:review_count].presence&.to_i,
       "tenure_months" => params[:tenure_months].presence&.to_i,
       "last_activity_at" => params[:last_activity_at].presence || Time.current.iso8601,
-      "recent_activities" => parse_activities_input(params[:recent_activities]),
+      "recent_activities" => parse_activities_input(params[:recent_activities])
     }.compact
 
     mode = params[:stats_display_mode].presence || "revenue_range"

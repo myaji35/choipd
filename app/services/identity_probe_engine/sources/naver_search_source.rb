@@ -16,7 +16,7 @@ module IdentityProbeEngine
         url = "https://openapi.naver.com/v1/search/blog.json?query=#{URI.encode_www_form_component(query)}&display=5"
         data = http_get_json(url, headers: {
           "X-Naver-Client-Id"     => cid,
-          "X-Naver-Client-Secret" => sec,
+          "X-Naver-Client-Secret" => sec
         })
         return [] unless data.is_a?(Hash)
 
@@ -28,7 +28,7 @@ module IdentityProbeEngine
             snippet: strip_tags(item["description"]),
             link: item["link"],
             blogger: item["bloggername"],
-            raw_preview: "#{strip_tags(item['title'])} — #{strip_tags(item['description'])}".to_s[0, 500],
+            raw_preview: "#{strip_tags(item['title'])} — #{strip_tags(item['description'])}".to_s[0, 500]
           }.compact
         end
       end

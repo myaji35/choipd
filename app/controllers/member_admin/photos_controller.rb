@@ -26,7 +26,7 @@ class MemberAdmin::PhotosController < MemberAdmin::BaseController
         mb   = (limit / 1024.0 / 1024.0).round
         errors << {
           filename: uploaded.original_filename,
-          message: "#{kind} #{(uploaded.size / 1024.0 / 1024.0).round(1)}MB — #{mb}MB를 초과합니다",
+          message: "#{kind} #{(uploaded.size / 1024.0 / 1024.0).round(1)}MB — #{mb}MB를 초과합니다"
         }
         next
       end
@@ -88,7 +88,7 @@ class MemberAdmin::PhotosController < MemberAdmin::BaseController
       thumbnail_url: photo.thumbnail_url,
       display_url: photo.display_url,
       file_size: photo.file_size,
-      uploaded_at: photo.uploaded_at&.iso8601,
+      uploaded_at: photo.uploaded_at&.iso8601
     }
   end
 end

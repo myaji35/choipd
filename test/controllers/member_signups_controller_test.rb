@@ -14,7 +14,7 @@ class MemberSignupsControllerTest < ActionDispatch::IntegrationTest
       password_confirmation: "password1234",
       business_type: "individual",
       profession: "custom",
-      region: "서울",
+      region: "서울"
     }
     # terms_agree: 가입 필수 동의(ISS-116). member 밖 최상위 파라미터.
     { member: base.merge(overrides), terms_agree: "1" }
