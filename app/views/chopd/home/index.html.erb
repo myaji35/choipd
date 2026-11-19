@@ -31,9 +31,9 @@
     </div>
   </div>
 
-  <!-- ── HERO §01 (v2: 좌우 2컬럼 + Polaroid Stack) ───────────────────────── -->
+  <!-- ── HERO 01 (v2: 좌우 2컬럼 + Polaroid Stack) ───────────────────────── -->
   <section class="impd-wrap" style="padding: 80px 40px 40px;">
-    <div class="impd-label" style="margin-bottom: 28px;">§01 · 업로드만 하세요. 나머지는 저희가.</div>
+    <div class="impd-label" style="margin-bottom: 28px;">업로드만 하세요. 나머지는 저희가.</div>
 
     <div class="impd-hero-grid" style="display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 60px; align-items: start;">
       <!-- 좌: 헤드라인 + 본문 + CTA -->
@@ -128,12 +128,11 @@
     </p>
   </section>
 
-  <!-- ── §02 3-step pitch ───────────────────────── -->
+  <!-- ── 02 3-step pitch ───────────────────────── -->
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
-      <span class="impd-label">§02</span>
       <span class="impd-display" style="font-size: 36px; flex: 1;">자료를 올리면, 페이지가 됩니다.</span>
-      <span class="impd-label-muted">3 STEPS</span>
+      <span class="impd-label-muted">3단계</span>
     </div>
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;">
       <% [
@@ -142,7 +141,7 @@
         ["03", "페이지 완성", "잡지처럼 다듬어진 당신만의 홍보 페이지가 열립니다."]
       ].each_with_index do |(num, title, desc), i| %>
         <div style="padding: 32px 24px; <%= 'border-left: 1px solid var(--impd-rule);' if i > 0 %>">
-          <div class="impd-label" style="color: var(--impd-accent);">§<%= num %></div>
+          <div class="impd-label" style="color: var(--impd-accent);"><%= num %></div>
           <h3 class="impd-display" style="font-size: 28px; margin: 12px 0 16px;"><%= title %></h3>
           <p style="font-size: 15px; line-height: 1.55; color: var(--impd-ink2);"><%= desc %></p>
         </div>
@@ -150,12 +149,11 @@
     </div>
   </section>
 
-  <!-- ── §03 자료 종류 그리드 ───────────────────────── -->
+  <!-- ── 03 자료 종류 그리드 ───────────────────────── -->
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
-      <span class="impd-label">§03</span>
       <span class="impd-display" style="font-size: 36px; flex: 1;">이런 자료들이 페이지가 됩니다.</span>
-      <span class="impd-label-muted">6 TYPES</span>
+      <span class="impd-label-muted">6가지</span>
     </div>
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--impd-rule); border-left: 1px solid var(--impd-rule);">
       <% [
@@ -175,7 +173,7 @@
     </div>
   </section>
 
-  <!-- ── §05 Creators (실제 회원 카드 + 클릭 시 공개 페이지로 이동) ───── -->
+  <!-- ── 05 Creators (실제 회원 카드 + 클릭 시 공개 페이지로 이동) ───── -->
   <%
     # profession 한글 매핑 (Member::PROFESSIONS 값 → UI 노출)
     profession_labels = {
@@ -209,9 +207,8 @@
   %>
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
-      <span class="impd-label">§05</span>
       <span class="impd-display" style="font-size: 36px; flex: 1;">imPD를 쓰는 사람들.</span>
-      <span class="impd-label-muted"><%= cards.size %> CREATORS</span>
+      <span class="impd-label-muted"><%= cards.size %>명</span>
     </div>
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
       <% cards.each_with_index do |c, i| %>
@@ -226,7 +223,7 @@
           <div style="position: relative; padding: 16px; z-index: 1; display: flex; justify-content: space-between; align-items: start; gap: 8px;">
             <div class="impd-label" style="color: rgba(255,255,255,.7);"><%= c[:region] %></div>
             <% if clickable %>
-              <div style="font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1px; color: rgba(255,255,255,.65); background: rgba(0,0,0,.18); padding: 3px 8px; border-radius: 3px; white-space: nowrap;">LIVE</div>
+              <div style="font-family: var(--impd-font-sans); font-size: 12px; letter-spacing: 0.02em; color: rgba(255,255,255,.65); background: rgba(0,0,0,.18); padding: 3px 8px; border-radius: 3px; white-space: nowrap;">운영 중</div>
             <% end %>
           </div>
           <div style="position: relative; padding: 16px; z-index: 1;">
@@ -242,17 +239,16 @@
       <% end %>
     </div>
     <p style="margin-top: 16px; font-size: 12px; color: var(--impd-muted); text-align: right;">
-      LIVE 태그가 붙은 카드는 실제 회원 페이지로 이동합니다
+      운영 중 태그가 붙은 카드는 실제 회원 페이지로 이동합니다
     </p>
   </section>
 
-  <!-- ── §05.5 Real Moments (회원들이 올린 실제 장면) ──────────── -->
+  <!-- ── 05.5 Real Moments (회원들이 올린 실제 장면) ──────────── -->
   <% if @featured_moments.present? && @featured_moments.any? %>
     <%# full-bleed 배경: 부모 overflow-x: hidden과 호환되도록 wrapper 내부에서 처리 %>
     <div style="background: var(--impd-card); border-top: 1px solid var(--impd-rule); border-bottom: 1px solid var(--impd-rule); margin: 40px 0;">
       <section class="impd-wrap" style="padding-top: 64px; padding-bottom: 64px;">
         <div class="impd-section-header">
-          <span class="impd-label">§05.5</span>
           <span class="impd-display" style="font-size: 36px; flex: 1;">실제 페이지에서 살아있는 장면들.</span>
           <span class="impd-label-muted"><%= @featured_moments.size %> MOMENTS</span>
         </div>
@@ -324,10 +320,10 @@
     </div>
   </section>
 
-  <!-- ── §07 Reward Feature Band (C2 Starbucks-style dark green) ───────────────────────── -->
+  <!-- ── 07 Reward Feature Band (C2 Starbucks-style dark green) ───────────────────────── -->
   <section id="pricing" class="impd-c2-band impd-stripe" style="padding: 80px 40px;">
     <div style="max-width: 1200px; margin: 0 auto;">
-      <div class="impd-label" style="color: var(--impd-gold); margin-bottom: 18px;" id="faq">§07 · imPD 리워드</div>
+      <div class="impd-label" style="margin-bottom: 18px;" id="faq">imPD 리워드</div>
       <h2 class="impd-display" style="font-size: clamp(36px, 5vw, 56px); color: var(--impd-on-dark); max-width: 860px; margin-bottom: 12px;">
         오래 쓸수록 더 예뻐지는 페이지.
       </h2>
@@ -366,10 +362,10 @@
     </div>
   </section>
 
-  <!-- ── §09 Final CTA — C2 house green band ───────────────────────── -->
+  <!-- ── 09 Final CTA — C2 house green band ───────────────────────── -->
   <section class="impd-wrap impd-section">
     <div class="impd-stripe" style="background: var(--impd-green-house); color: var(--impd-on-dark); padding: 80px 60px; position: relative; overflow: hidden; border-radius: 12px;">
-      <div class="impd-label" style="color: var(--impd-gold); margin-bottom: 24px;">§09 · 시작</div>
+      <div class="impd-label" style="color: #dfc49d; margin-bottom: 24px;">시작하기</div>
       <h2 class="impd-display" style="font-size: clamp(44px, 7vw, 88px); color: var(--impd-on-dark); max-width: 900px;">
         지금 가지고 있는<br>
         <span class="impd-serif" style="color: var(--impd-gold);">자료 한 장</span>으로<br>
