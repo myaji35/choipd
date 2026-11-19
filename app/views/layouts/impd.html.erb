@@ -262,9 +262,11 @@
       <%= yield %>
     </main>
 
-    <div style="padding: 16px 24px 22px; text-align: center; font-family: var(--impd-font-sans); font-size: 12px; color: var(--impd-soft-muted);">
-      <%= link_to "개인정보처리방침", privacy_path, style: "color: inherit; text-decoration: underline; text-underline-offset: 3px;" %>
-    </div>
+    <% unless controller_path == "chopd/home" && action_name == "index" %>
+      <div style="padding: 16px 24px 22px; text-align: center; font-family: var(--impd-font-sans); font-size: 12px; color: var(--impd-soft-muted);">
+        <%= link_to "개인정보처리방침", privacy_path, style: "color: inherit; text-decoration: underline; text-underline-offset: 3px;" %>
+      </div>
+    <% end %>
 
     <%# 홍보 영상 팝업 (data-promo-popup 트리거 + 첫 방문자 자동 재생) %>
     <%= render "shared/promo_popup" %>

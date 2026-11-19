@@ -25,6 +25,11 @@
   .impd-faq summary .lni { flex-shrink: 0; transition: transform 150ms ease; }
   .impd-faq details[open] summary .lni { transform: rotate(180deg); }
   .impd-faq p { margin: 0; padding: 0 0 20px; color: var(--impd-ink2); font-size: 15px; line-height: 1.7; }
+  .impd-home-footer { background: transparent; border-top: 1px solid var(--impd-rule); padding: 40px 40px 48px; display: flex; justify-content: space-between; gap: 24px 40px; flex-wrap: wrap; font-family: var(--impd-font-sans); font-size: 14px; color: var(--impd-muted); }
+  .impd-home-footer p { margin: 8px 0 0; }
+  .impd-home-footer nav { display: flex; flex-wrap: wrap; align-content: start; gap: 0 20px; }
+  .impd-home-footer nav a { display: inline-flex; align-items: center; min-height: 44px; color: inherit; text-decoration: none; }
+  .impd-home-footer nav a:hover { text-decoration: underline; }
   @media (prefers-reduced-motion: reduce) { .impd-faq summary .lni { transition: none; } }
   @media (max-width: 599px) { .impd-professions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .impd-profession-pill { padding: 0 10px; } }
   @media (max-width: 899px) { .impd-types-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -37,6 +42,7 @@
     .impd-section { padding: 48px 0; }
   }
   @media (max-width: 599px) {
+    .impd-home-footer { padding: 40px 20px 48px; }
     .impd-stats-grid, .impd-steps-grid, .impd-types-grid { grid-template-columns: 1fr; }
     .impd-stats-grid > div + div, .impd-steps-grid > div + div, .impd-examples-grid > div + div { border-left: 0; border-top: 1px solid var(--impd-rule); }
   }
@@ -385,15 +391,22 @@
   </section>
 
   <!-- ── Footer ───────────────────────── -->
-  <footer style="border-top: 1px solid var(--impd-rule); margin-top: 0; padding: 32px 40px 60px; display: flex; gap: 32px; flex-wrap: wrap; align-items: center; font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted);">
-    <span class="impd-display" style="font-size: 16px; text-transform: none; color: var(--impd-ink);">
-      imPD<span style="color: var(--impd-accent);">.</span>
-    </span>
-    <span>vol. 04 · 2026</span>
-    <span style="flex: 1;">혼자 일하는 사람을 위한 홍보 페이지</span>
-    <%= link_to "이용약관", terms_path, class: "text-muted" %>
-    <%= link_to "개인정보", privacy_path, class: "text-muted" %>
-    <span>hello@impd.page</span>
+  <footer class="impd-home-footer">
+    <div>
+      <span class="impd-display" style="font-size: 16px; text-transform: none; color: var(--impd-ink);">
+        imPD<span style="color: var(--impd-accent);">.</span>
+      </span>
+      <p>혼자 일하는 사람을 위한 홍보 페이지</p>
+      <p>운영: 주식회사 가가호호</p>
+    </div>
+    <nav aria-label="푸터 메뉴">
+      <%= link_to "둘러보기", explore_path %>
+      <%= link_to "가격", "/#pricing" %>
+      <%= link_to "자주 묻는 질문", "/#faq" %>
+      <%= link_to "문의하기", new_inquiry_path %>
+      <%= link_to "이용약관", terms_path %>
+      <%= link_to "개인정보처리방침", privacy_path, style: "font-weight: 700;" %>
+    </nav>
   </footer>
 </div>
 
