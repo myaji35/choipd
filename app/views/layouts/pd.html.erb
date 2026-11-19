@@ -106,7 +106,7 @@
     <div class="pd-main ml-60 flex-1 flex flex-col min-h-screen min-w-0">
       <header class="bg-white border-b px-6 py-3 flex items-center justify-between sticky top-0 z-30">
         <button type="button" class="pd-menu-button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="pd-navigation" data-impd-nav-target="button" data-action="impd-nav#toggle"><span data-impd-nav-target="menuIcon"><%= lni_icon "menu-hamburger-1" %></span><span data-impd-nav-target="closeIcon" hidden><%= lni_icon "xmark" %></span></button>
-        <h1 class="pd-header-title text-sm font-semibold text-gray-700"><%= content_for?(:title) ? yield(:title) : "대시보드" %></h1>
+        <span class="pd-header-title text-sm font-semibold text-gray-700"><%= content_for?(:title) ? yield(:title) : "대시보드" %></span>
         <div class="pd-header-links flex items-center space-x-3">
           <%= link_to root_path, target: "_blank", class: "text-xs text-gray-500 hover:text-primary" do %>
             공개 사이트 보기

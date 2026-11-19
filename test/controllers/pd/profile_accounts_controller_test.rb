@@ -11,6 +11,7 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
   test "index lists account and detail and forms render" do
     get pd_profile_accounts_path
     assert_response :success
+    assert_select "h1", count: 1
     assert_includes response.body, "가상 인물"
     get pd_profile_account_path(@account)
     assert_response :success
