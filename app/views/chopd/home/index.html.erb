@@ -300,24 +300,25 @@
     </div>
   <% end %>
 
-  <!-- ── §06 Testimonials ───────────────────────── -->
+  <!-- ── 활용 예시 ───────────────────────── -->
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
-      <span class="impd-label">§06</span>
-      <span class="impd-display" style="font-size: 36px; flex: 1;">실제 사용자의 이야기.</span>
-      <span class="impd-label-muted">2 STORIES</span>
+      <span class="impd-label">활용 예시</span>
+      <span class="impd-display" style="font-size: 36px; flex: 1;">이런 분들이 imPD로 시작합니다.</span>
     </div>
-    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; border-top: 1px solid var(--impd-rule);">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 0; border-top: 1px solid var(--impd-rule);">
       <% [
-        ["사진 몇 장 올렸을 뿐인데, 수강생이 늘었어요. 처음으로 디자이너 없이 페이지가 생겼습니다.", "김다인", "요가 강사 · 성수동"],
-        ["수료증을 어떻게 보여줘야 할지 몰랐는데, imPD가 알아서 깔끔하게 정리해줬어요.", "박민준", "도예 공방장 · 양평"]
-      ].each_with_index do |(quote, name, meta), i| %>
+        ["보험설계사", "상담 분야와 자격을 한 페이지에 정리하고, 명함 QR로 고객이 바로 상담을 신청해요.", "na-seolgye"],
+        ["1인 크리에이터", "작업물·채널·협업 문의를 한곳에 모아, 브랜드 담당자에게 링크 하나로 보내요.", "yujin-studio"],
+        ["동네 가게 사장님", "가게 소개·메뉴·후기를 정리하고, 지역 주민에게 Townin 전단지로 알려요.", nil]
+      ].each_with_index do |(title, description, slug), i| %>
         <div style="padding: 40px 32px; <%= 'border-left: 1px solid var(--impd-rule);' if i > 0 %>">
-          <p class="impd-serif" style="font-size: 24px; line-height: 1.4; color: var(--impd-ink);">"<%= quote %>"</p>
-          <div style="margin-top: 24px; display: flex; gap: 12px; align-items: center;">
-            <span class="impd-display" style="font-size: 18px;"><%= name %></span>
-            <span class="impd-label-muted"><%= meta %></span>
-          </div>
+          <span class="impd-label" style="display: inline-block; border: 1px solid var(--impd-rule); padding: 4px 10px;">예시</span>
+          <h3 class="impd-display" style="font-size: 18px; margin: 24px 0 12px;"><%= title %></h3>
+          <p class="impd-serif" style="font-size: 24px; line-height: 1.4; color: var(--impd-ink);"><%= description %></p>
+          <% if slug && Member.find_by(slug: slug, status: "approved") %>
+            <a href="/<%= slug %>" style="display: inline-block; margin-top: 24px;">예시 페이지 보기 →</a>
+          <% end %>
         </div>
       <% end %>
     </div>
