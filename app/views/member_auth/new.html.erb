@@ -36,11 +36,11 @@
     margin: 0;
     position: relative;
   }
-  .auth-brand .dot { color: var(--impd-accent, #3a2af0); }
+  .auth-brand .dot { color: var(--impd-accent, #00754A); }
   .auth-strap {
     font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
     font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase;
-    color: var(--impd-accent, #3a2af0);
+    color: var(--impd-accent, #00754A);
     margin-top: 4px;
     position: relative;
   }
@@ -64,7 +64,7 @@
   .auth-section {
     font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
     font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
-    color: var(--impd-accent, #3a2af0);
+    color: var(--impd-accent, #00754A);
     margin-bottom: 8px;
   }
   .auth-headline {
@@ -79,7 +79,7 @@
     font-family: var(--impd-font-serif, 'Noto Serif KR', serif);
     font-style: italic;
     font-weight: 400;
-    color: var(--impd-accent, #3a2af0);
+    color: var(--impd-accent, #00754A);
   }
   .auth-sub {
     margin-top: 16px;
@@ -89,17 +89,17 @@
   }
 
   .auth-alert {
-    background: rgba(255,90,31,0.08);
-    border-left: 2px solid var(--impd-accent-2, #ff5a1f);
-    color: var(--impd-accent-2, #ff5a1f);
+    background: rgba(179,38,30,0.08);
+    border-left: 2px solid #B3261E;
+    color: #B3261E;
     padding: 10px 14px;
     font-size: 13px;
     margin-bottom: 16px;
   }
   .auth-notice {
-    background: rgba(58,42,240,0.06);
-    border-left: 2px solid var(--impd-accent, #3a2af0);
-    color: var(--impd-accent, #3a2af0);
+    background: rgba(0,117,74,0.06);
+    border-left: 2px solid var(--impd-accent, #00754A);
+    color: var(--impd-accent, #00754A);
     padding: 10px 14px;
     font-size: 13px;
     margin-bottom: 16px;
@@ -137,7 +137,7 @@
     transition: border-color 150ms ease, box-shadow 150ms ease;
   }
   .email-field::placeholder { color: rgba(15,13,11,0.35); }
-  .email-field:focus { border-color: var(--impd-accent, #3a2af0); box-shadow: inset 0 0 0 1px var(--impd-accent, #3a2af0); }
+  .email-field:focus { border-color: var(--impd-accent, #00754A); box-shadow: inset 0 0 0 1px var(--impd-accent, #00754A); }
 
   .email-submit {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -153,7 +153,7 @@
     cursor: pointer;
     transition: background 150ms ease;
   }
-  .email-submit:hover { background: var(--impd-accent, #3a2af0); border-color: var(--impd-accent, #3a2af0); }
+  .email-submit:hover { background: var(--impd-accent, #00754A); border-color: var(--impd-accent, #00754A); }
 
   .auth-divider {
     display: flex; align-items: center; gap: 12px;
@@ -184,7 +184,7 @@
     line-height: 1.6;
   }
   .auth-alt strong { color: var(--impd-ink, #0f0d0b); }
-  .auth-alt a { color: var(--impd-accent, #3a2af0); text-decoration: underline; }
+  .auth-alt a { color: var(--impd-accent, #00754A); text-decoration: underline; }
 
   .auth-foot {
     margin-top: auto;
@@ -198,7 +198,7 @@
     position: relative;
   }
   .auth-foot a { color: inherit; text-decoration: none; }
-  .auth-foot a:hover { color: var(--impd-accent, #3a2af0); }
+  .auth-foot a:hover { color: var(--impd-accent, #00754A); }
 
   .auth-poster {
     background: var(--impd-ink, #0f0d0b);
@@ -235,7 +235,7 @@
     font-family: var(--impd-font-serif, 'Noto Serif KR', serif);
     font-style: italic;
     font-weight: 400;
-    color: var(--impd-accent-2, #ff5a1f);
+    color: #B3261E;
   }
   .auth-poster-sub {
     margin-top: 20px;
@@ -284,10 +284,10 @@
       </div>
 
       <% if alert.present? %>
-        <div class="auth-alert"><%= alert %></div>
+        <div class="auth-alert"><%= lni_icon "xmark-circle" %> <%= alert %></div>
       <% end %>
       <% if notice.present? %>
-        <div class="auth-notice"><%= notice %></div>
+        <div class="auth-notice"><%= lni_icon "check-circle-1" %> <%= notice %></div>
       <% end %>
 
       <%= form_with url: member_login_path, method: :post, local: true, class: "email-form" do |f| %>

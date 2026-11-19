@@ -14,7 +14,7 @@
         --impd-paper: #efece4; --impd-card: #fbf8f1; --impd-ink: #0f0d0b;
         --impd-ink2: rgba(15,13,11,0.85); --impd-muted: rgba(15,13,11,0.55);
         --impd-soft-muted: rgba(15,13,11,0.35); --impd-rule: rgba(15,13,11,0.15);
-        --impd-accent: #3a2af0; --impd-accent-2: #ff5a1f;
+        --impd-accent: #00754A; --impd-accent-2: #CBA258;
         --impd-font-display: "Inter Tight","Pretendard Variable","Pretendard",system-ui,sans-serif;
         --impd-font-sans: "Pretendard Variable","Pretendard",system-ui,sans-serif;
         --impd-font-serif: "Noto Serif KR",serif; --impd-font-mono: "JetBrains Mono",ui-monospace,monospace;
@@ -22,7 +22,7 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { background: var(--impd-paper); color: var(--impd-ink); font-family: var(--impd-font-sans); -webkit-font-smoothing: antialiased; }
       a { color: inherit; text-decoration: none; }
-      .impd-label { font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-accent); }
+      .impd-label { font-family: var(--impd-font-sans); font-size: 13px; font-weight: 600; letter-spacing: .02em; color: var(--impd-accent); }
       .impd-label-muted { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted); }
       .impd-display { font-family: var(--impd-font-display); font-weight: 800; letter-spacing: -1.6px; line-height: 1.05; }
       .impd-section-header { display: flex; align-items: baseline; gap: 16px; border-top: 1px solid var(--impd-ink); padding-top: 14px; margin-bottom: 24px; }
@@ -65,8 +65,8 @@
       <% end %>
     </div>
 
-    <% if flash[:notice] %><div style="background: rgba(58,42,240,.1); border-left: 3px solid var(--impd-accent); color: var(--impd-accent); padding: 12px 40px; font-size: 13px;"><%= flash[:notice] %></div><% end %>
-    <% if flash[:alert] %><div style="background: rgba(255,90,31,.1); border-left: 3px solid var(--impd-accent-2); color: var(--impd-accent-2); padding: 12px 40px; font-size: 13px;"><%= flash[:alert] %></div><% end %>
+    <% if flash[:notice] %><div style="background: rgba(0,117,74,.1); border-left: 3px solid var(--impd-accent); color: var(--impd-accent); padding: 12px 40px; font-size: 13px;"><%= lni_icon "check-circle-1" %> <%= flash[:notice] %></div><% end %>
+    <% if flash[:alert] %><div style="background: rgba(179,38,30,.08); border-left: 3px solid #B3261E; color: #B3261E; padding: 12px 40px; font-size: 13px;"><%= lni_icon "xmark-circle" %> <%= flash[:alert] %></div><% end %>
 
     <main><%= yield %></main>
   </body>

@@ -38,11 +38,11 @@
     margin: 0;
     position: relative;
   }
-  .auth-brand .dot { color: var(--impd-accent, #3a2af0); }
+  .auth-brand .dot { color: var(--impd-accent, #00754A); }
   .auth-strap {
     font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
     font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase;
-    color: var(--impd-accent, #3a2af0);
+    color: var(--impd-accent, #00754A);
     margin-top: 4px;
     position: relative;
   }
@@ -66,7 +66,7 @@
   .auth-section {
     font-family: var(--impd-font-mono, 'JetBrains Mono', monospace);
     font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
-    color: var(--impd-accent, #3a2af0);
+    color: var(--impd-accent, #00754A);
     margin-bottom: 8px;
   }
   .auth-headline {
@@ -81,7 +81,7 @@
     font-family: var(--impd-font-serif, 'Noto Serif KR', serif);
     font-style: italic;
     font-weight: 400;
-    color: var(--impd-accent, #3a2af0);
+    color: var(--impd-accent, #00754A);
   }
   .auth-sub {
     margin-top: 16px;
@@ -113,9 +113,9 @@
   }
   .auth-field input:focus {
     outline: none;
-    border-color: var(--impd-accent, #3a2af0);
+    border-color: var(--impd-accent, #00754A);
     background: #fcfaf4;
-    box-shadow: 0 0 0 3px rgba(58,42,240,0.1);
+    box-shadow: 0 0 0 3px rgba(0,117,74,0.1);
   }
 
   .auth-remember {
@@ -128,7 +128,7 @@
   }
   .auth-remember input[type="checkbox"] {
     width: 16px; height: 16px;
-    accent-color: var(--impd-accent, #3a2af0);
+    accent-color: var(--impd-accent, #00754A);
     cursor: pointer;
   }
 
@@ -149,12 +149,12 @@
     cursor: pointer;
     transition: background 150ms ease;
   }
-  .auth-submit:hover { background: var(--impd-accent, #3a2af0); }
+  .auth-submit:hover { background: var(--impd-accent, #00754A); }
 
   .auth-alert {
-    background: rgba(255,90,31,0.08);
-    border-left: 2px solid var(--impd-accent-2, #ff5a1f);
-    color: var(--impd-accent-2, #ff5a1f);
+    background: rgba(179,38,30,0.08);
+    border-left: 2px solid #B3261E;
+    color: #B3261E;
     padding: 10px 14px;
     font-size: 13px;
     margin-bottom: 16px;
@@ -184,7 +184,7 @@
     position: relative;
   }
   .auth-foot a { color: inherit; text-decoration: none; }
-  .auth-foot a:hover { color: var(--impd-accent, #3a2af0); }
+  .auth-foot a:hover { color: var(--impd-accent, #00754A); }
 
   /* ── 우측 포스터 ──────────────────────── */
   .auth-poster {
@@ -222,7 +222,7 @@
     font-family: var(--impd-font-serif, 'Noto Serif KR', serif);
     font-style: italic;
     font-weight: 400;
-    color: var(--impd-accent-2, #ff5a1f);
+    color: #B3261E;
   }
   .auth-poster-sub {
     margin-top: 20px;
@@ -268,7 +268,7 @@
       </div>
 
       <% if alert.present? %>
-        <div class="auth-alert"><%= alert %></div>
+        <div class="auth-alert"><%= lni_icon "xmark-circle" %> <%= alert %></div>
       <% end %>
 
       <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
