@@ -1,29 +1,37 @@
 {
   "_comment": "이 파일은 빈 템플릿입니다. 'brand 정의해줘' 라고 말하면 brand-guardian이 코드베이스/git/README 분석으로 자동 초안을 작성합니다. v3에서는 design_tokens가 핵심 — 이것이 프로젝트 UI 개성을 결정합니다.",
   "project": "",
-  "agenda": "",
+  "agenda": "혼자 일하는 사람의 이력과 실력을 5분 만에 믿음직한 한 페이지로 — 개인사업자·1인 크리에이터·보험설계사가 \"나도 이렇게 보이고 싶다\"고 느끼게 한다.",
   "brand_voice": "",
-  "emotional_tone": [],
+  "emotional_tone": [
+    "따뜻함",
+    "믿음직함",
+    "쉬움",
+    "부담 없음",
+    "단정함"
+  ],
   "design_metaphors": [],
-
   "design_tokens": {
     "colors": {
-      "hero": "",
-      "surface": "",
-      "surface_alt": "",
-      "text_primary": "",
-      "text_secondary": "",
-      "accent": "",
-      "border": ""
+      "hero": "#00754A",
+      "surface": "#FFFFFF",
+      "surface_alt": "#F2F0EB",
+      "text_primary": "rgba(0,0,0,0.87)",
+      "text_secondary": "rgba(0,0,0,0.60)",
+      "accent": "#CBA258",
+      "border": "rgba(0,0,0,0.10)",
+      "dark": "#1E3932"
     },
     "typography": {
-      "font_heading": "",
-      "font_body": "",
-      "font_mono": "",
-      "scale": "default"
+      "font_heading": "Pretendard Variable",
+      "font_body": "Pretendard Variable",
+      "font_mono": "JetBrains Mono (숫자·코드에만)",
+      "scale": "default",
+      "min_body_px": 15,
+      "min_label_px": 12
     },
     "shape": {
-      "radius": "moderate",
+      "radius": "soft",
       "card_shadow": "sm",
       "border_width": "1px"
     },
@@ -42,15 +50,31 @@
       "grid": "centered"
     },
     "personality": {
-      "mood": "",
+      "mood": "잡지처럼 단정하지만 다정한 개인 홍보 페이지",
       "icon_style": "feather-outline",
       "illustration_style": "none"
     }
   },
-
   "hero_color": "",
-  "anti_patterns": [],
+  "anti_patterns": [
+    "근거 없는 후기·숫자를 실제처럼 노출(예시는 \"예시\" 표시)",
+    "개발자 용어 노출(MD, TXT, HEIC, §, slug 등)",
+    "9~10px 고정폭 장식 글씨로 정보 전달",
+    "사선 무늬 자리표시가 실제 콘텐츠처럼 보이는 첫 화면",
+    "공개 화면과 회원 관리 화면의 서로 다른 브랜드 색",
+    "색만으로 상태 구분",
+    "빈 구역(후기 0건, 방문 0)을 그대로 노출",
+    "한 화면에 같은 무게의 버튼 5개 이상 나열"
+  ],
   "primary_action_per_screen": "MUST_EXIST",
   "user_decision_clarity": "0.5초 룰 — 첫 시선 0.5초 안에 다음 행동 식별 가능해야 함",
-  "_status": "uninitialized"
+  "_status": "defined",
+  "_defined_at": "2026-11-19",
+  "_source": "대표님 지시 2026-11-19 (개인사업자·1인 크리에이터 호감, docs/ux-50-rounds.md)",
+  "target_audience": [
+    "개인사업자(가게·공방·서비스업)",
+    "1인 크리에이터",
+    "보험설계사 등 영업 전문직",
+    "강사"
+  ]
 }
