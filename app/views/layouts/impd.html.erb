@@ -132,7 +132,8 @@
       /* C2 Frap — floating CTA */
       .impd-frap {
         position: fixed; bottom: 24px; right: 24px; z-index: 50;
-        width: 56px; height: 56px; border-radius: 50%;
+        height: 52px; padding: 0 20px 0 16px; border-radius: 999px;
+        gap: 8px; font-size: 15px; font-weight: 700; text-decoration: none;
         background: var(--impd-green-accent); color: var(--impd-on-dark);
         border: none; cursor: pointer;
         box-shadow: var(--impd-shadow-frap);
@@ -141,6 +142,11 @@
       }
       .impd-frap:hover { background: var(--impd-green); }
       .impd-frap:active { transform: scale(0.95); box-shadow: 0 0 6px rgba(0,0,0,0.24); }
+
+      .impd-main-with-frap { padding-bottom: 88px; }
+      @media (max-width: 599px) {
+        .impd-frap { left: 16px; right: 16px; width: calc(100% - 32px); max-width: 360px; margin: 0 auto; }
+      }
 
       /* C2 Reward/credential top bar — colored accent */
       .impd-credential-card { background: var(--impd-card); border-radius: 12px; box-shadow: var(--impd-shadow-card); padding: 24px 20px; position: relative; overflow: hidden; }
@@ -153,14 +159,12 @@
       .impd-stripe { background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.08) 0 3px, transparent 3px 10px); }
 
       @keyframes c1FadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-      @keyframes c1Marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
       @keyframes c1Pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
       .impd-fade-in { animation: c1FadeIn 700ms ease-out both; }
-      .impd-marquee { animation: c1Marquee 28s linear infinite; }
       .impd-pulse { animation: c1Pulse 2s infinite; }
 
       @media (prefers-reduced-motion: reduce) {
-        .impd-fade-in, .impd-marquee, .impd-pulse { animation: none !important; }
+        .impd-fade-in, .impd-pulse { animation: none !important; }
         .impd-btn, .impd-frap { transition: none !important; }
       }
     </style>
@@ -253,7 +257,8 @@
       <div style="background: rgba(255,90,31,.1); border-left: 3px solid var(--impd-accent-2); color: var(--impd-accent-2); padding: 12px 40px; font-size: 13px;"><%= flash[:alert] %></div>
     <% end %>
 
-    <main>
+    <% hide_frap = (action_name == "new" && %w[member_signups member_auth member_sessions].include?(controller_path)) || request.path.match?(%r{\A/[^/]+/admin(?:/|\z)}) %>
+    <main class="<%= "impd-main-with-frap" unless hide_frap %>">
       <%= yield %>
     </main>
 
@@ -264,13 +269,13 @@
     <%# 홍보 영상 팝업 (data-promo-popup 트리거 + 첫 방문자 자동 재생) %>
     <%= render "shared/promo_popup" %>
 
-    <%# C2 Frap — 플로팅 CTA. 로그인 상태에 따라 목적지 분기.
-        로그인 회원 → 이메일로 자동 채우기 위자드(/welcome/probe)로 직행.
-        비로그인 → 가입 페이지. %>
-    <% frap_href = member_signed_in? ? "/welcome/probe" : member_signup_path %>
-    <% frap_label = member_signed_in? ? "이메일로 자동 채우기" : "내 페이지 만들기" %>
-    <%= link_to frap_href, class: "impd-frap", "aria-label": frap_label, title: frap_label do %>
-      <%= lni_icon(member_signed_in? ? "star-fat" : "plus", size: 22) %>
+    <% unless hide_frap %>
+      <% frap_href = member_signed_in? ? "/#{current_member.slug}/admin/dashboard" : member_signup_path %>
+      <% frap_label = member_signed_in? ? "내 페이지 관리" : "내 페이지 만들기" %>
+      <%= link_to frap_href, class: "impd-frap" do %>
+        <%= lni_icon(member_signed_in? ? "pencil-1" : "plus", size: 20) %>
+        <%= frap_label %>
+      <% end %>
     <% end %>
   </body>
 </html>
