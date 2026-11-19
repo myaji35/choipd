@@ -1,0 +1,39 @@
+<%
+  entries = case member.social
+  when Hash
+    member.social.map { |key, value| [key.to_s, value.is_a?(Hash) ? (value["url"] || value[:url]) : value] }
+  when Array
+    member.social.filter_map { |entry| [entry["label"] || entry["platform"], entry["url"]] if entry.is_a?(Hash) }
+  else []
+  end
+  kakao = entries.find { |label, url| url.present? && (label.to_s.match?(/kakao|카카오|카톡/i) || url.to_s.match?(%r{(?:pf\.kakao\.com|open\.kakao\.com)}i)) }&.last
+%>
+<style>
+  .public-member { color: var(--impd-ink); font: 16px/1.6 var(--impd-font-sans); word-break: keep-all; overflow-wrap: anywhere; }
+  .public-member * { box-sizing: border-box; }
+  .public-member-inner { max-width: 1200px; margin: auto; padding: 48px 40px; }
+  .public-avatar { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; background: color-mix(in srgb, var(--impd-accent) 14%, white); color: var(--impd-accent); display: grid; place-items: center; font-size: 44px; font-weight: 700; }
+  .public-hero h1 { font-size: clamp(32px, 5vw, 56px); line-height: 1.15; margin: 16px 0 8px; }
+  .public-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .public-actions a, .public-actions button, .public-sticky a, .public-sticky button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border: 1px solid var(--impd-accent); border-radius: 6px; color: var(--impd-accent); background: var(--impd-paper); text-decoration: none; font: inherit; cursor: pointer; }
+  .public-actions .primary, .public-sticky .primary { background: var(--impd-accent); color: var(--impd-paper); }
+  .public-sticky { display: none; }
+  .public-form input:not([type=checkbox]), .public-form textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--impd-rule); background: var(--impd-paper); color: var(--impd-ink); font: inherit; }
+  .public-form label { display: block; margin: 16px 0 6px; }
+  .public-form input[type=checkbox] { width: 20px; height: 20px; vertical-align: middle; }
+  @media (max-width: 767px) { .public-member-inner { padding: 40px 20px; } .public-avatar { width: 80px; height: 80px; font-size: 36px; } .public-sticky { display: flex; gap: 8px; position: fixed; z-index: 100; bottom: 0; left: 0; right: 0; padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); background: var(--impd-paper); border-top: 1px solid var(--impd-rule); } .public-sticky a, .public-sticky button { flex: 1; min-width: 0; } body { padding-bottom: calc(68px + env(safe-area-inset-bottom)); } .impd-section { padding-block: 40px !important; } }
+</style>
+<section class="public-member public-hero"><div class="public-member-inner">
+  <% if member.profile_image.present? %><img class="public-avatar" src="<%= member.profile_image %>" alt="<%= member.name %> 프로필 사진"><% else %><div class="public-avatar" aria-hidden="true"><%= member.name.to_s.first %></div><% end %>
+  <h1><%= member.name %></h1>
+  <p><%= member.profession_label if member.profession.present? %><% if member.region.present? %> <%= lni_icon "map-marker-5" %> <%= member.region %><% end %></p>
+  <% if member.bio.present? %><p><%= truncate(member.bio, length: 100) %></p><% end %>
+  <div class="public-actions"><a class="primary" href="#contact">상담·문의하기</a><% if member.phone.present? %><a href="tel:<%= member.phone %>">전화</a><% end %><% if kakao %><a href="<%= kakao %>" target="_blank" rel="noopener">카카오톡</a><% end %><% if member.email.present? %><a href="mailto:<%= member.email %>">이메일</a><% end %></div>
+  <% photos = moments.to_a.select { |photo| photo.image.attached? && !photo.video? }.first(3) %>
+  <% if photos.any? %><div style="display: flex; gap: 8px; margin-top: 24px; overflow: hidden;"><% photos.each do |photo| %><img src="<%= photo.thumbnail_url || photo.display_url %>" alt="<%= photo.caption.presence || member.name + ' 사진' %>" style="width: 100px; height: 100px; object-fit: cover; border: 4px solid var(--impd-paper);"><% end %></div><% end %>
+</div></section>
+<nav class="public-sticky public-member" aria-label="빠른 연락"><% if member.phone.present? %><a href="tel:<%= member.phone %>">전화</a><% end %><a class="primary" href="#contact">문의</a><% if kakao %><a href="<%= kakao %>" target="_blank" rel="noopener">카카오</a><% else %><button type="button" onclick="shareMemberPage(this)">공유</button><% end %></nav>
+<script>
+  async function copyMemberLink(button) { try { await navigator.clipboard.writeText(location.href); button.textContent = '복사했어요'; } catch (_) { const input = document.createElement('textarea'); input.value = location.href; document.body.appendChild(input); input.select(); document.execCommand('copy'); input.remove(); button.textContent = '복사했어요'; } }
+  async function shareMemberPage(button) { if (navigator.share) { try { await navigator.share({ title: document.title, url: location.href }); } catch (_) {} } else { await copyMemberLink(button); } }
+</script>

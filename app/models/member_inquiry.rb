@@ -1,4 +1,6 @@
 class MemberInquiry < ApplicationRecord
+  attr_accessor :consent
+
   belongs_to :member
   validates :sender_name, :sender_email, :message, presence: true
   validates :message, length: { in: 5..2000 }

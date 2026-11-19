@@ -4,8 +4,13 @@ class MemberInquiriesController < ApplicationController
 
     if params[:website].present?
       redirect_back fallback_location: public_profile_path(slug: member.slug),
-                    notice: "문의가 전송되었습니다. 보통 24시간 안에 답장드려요.",
+                    notice: "보냈어요. 보통 24시간 안에 답장이 와요.",
                     status: :see_other
+      return
+    end
+
+    unless params.dig(:member_inquiry, :consent) == "1"
+      redirect_to public_profile_path(slug: member.slug, anchor: "contact"), alert: "개인정보 전달에 동의해 주세요.", status: :see_other
       return
     end
 
@@ -14,7 +19,7 @@ class MemberInquiriesController < ApplicationController
     if inquiry.persisted?
       MemberInquiryMailer.notify(inquiry).deliver_later
       redirect_back fallback_location: public_profile_path(slug: member.slug),
-                    notice: "문의가 전송되었습니다. 보통 24시간 안에 답장드려요.",
+                    notice: "보냈어요. 보통 24시간 안에 답장이 와요.",
                     status: :see_other
     else
       redirect_back fallback_location: public_profile_path(slug: member.slug),

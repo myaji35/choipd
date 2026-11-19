@@ -271,7 +271,7 @@
       <div style="background: rgba(255,90,31,.1); border-left: 3px solid var(--impd-accent-2); color: var(--impd-accent-2); padding: 12px 40px; font-size: 13px;"><%= flash[:alert] %></div>
     <% end %>
 
-    <% hide_frap = (action_name == "new" && %w[member_signups member_auth member_sessions].include?(controller_path)) || request.path.match?(%r{\A/[^/]+/admin(?:/|\z)}) %>
+    <% hide_frap = controller_path == "public_profile" || (action_name == "new" && %w[member_signups member_auth member_sessions].include?(controller_path)) || request.path.match?(%r{\A/[^/]+/admin(?:/|\z)}) %>
     <main class="<%= "impd-main-with-frap" unless hide_frap %>">
       <%= yield %>
     </main>

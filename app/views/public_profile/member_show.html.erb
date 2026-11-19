@@ -79,181 +79,8 @@
   @media (max-width: 768px) { .impd-wrap { padding-inline: 20px; } .impd-section { padding-block: 28px; } }
 </style>
 
-<!-- ── Masthead (3컬럼) ───────────────────────── -->
-<section class="impd-wrap impd-section">
-  <div style="display: grid; grid-template-columns: 1.3fr 1fr 0.9fr; gap: 40px; align-items: start;" class="masthead-grid">
-    <!-- 좌: 이름 -->
-    <div>
-      <div class="impd-label">imPD 검증 회원</div>
-      <h1 style="font-family: var(--impd-font-display); font-weight: 800; font-size: clamp(64px, 10vw, 128px); line-height: 0.88; letter-spacing: -4px; margin-top: 16px;">
-        <%= @member.name %>
-        <% if @member.profession.present? %>
-          <br><span style="color: var(--impd-accent); font-style: italic; word-break: keep-all;"><%= @member.profession_label %>.</span>
-        <% end %>
-      </h1>
-      <% if @member.bio.present? %>
-        <p class="impd-serif" style="font-size: 22px; line-height: 1.45; margin-top: 24px; color: var(--impd-ink2); max-width: 480px;">
-          "<%= @member.bio %>"
-        </p>
-      <% end %>
-    </div>
+<%= render "public_profile/profile_intro", member: @member, services: @services, moments: @moments %>
 
-    <!-- 중: Polaroid Stack (업로드된 사진 우선, 없으면 더미) -->
-    <div style="display: flex; justify-content: center;">
-      <%
-        fallback_colors = [ "#ff5a1f", "#3a2af0", "#2a9d8f", "#e4b230", "#1a1a1a" ]
-        fallback_items = [
-          { kind: "최근 활동", date: "이번 달", caption: "현장 사진." },
-          { kind: "수료증",    date: "검증 완료", caption: "공인 자격." },
-          { kind: "포트폴리오", date: "오늘",     caption: "최신 작업물." },
-          { kind: "후기",      date: "별점 5",   caption: "고객의 칭찬." },
-          { kind: "인터뷰",    date: "최근",     caption: "미디어 출연기." }
-        ]
-        # 일상 사진 상위 5장을 폴라로이드로 (업로드된 것 있으면 우선)
-        recent_photos = @moments&.first(5) || []
-        polaroid_items = fallback_items.each_with_index.map do |item, i|
-          photo = recent_photos[i]
-          if photo && photo.image.attached?
-            {
-              color: fallback_colors[i],
-              kind: photo.category.to_s.upcase,
-              date: photo.uploaded_at&.strftime("%y.%m.%d") || item[:date],
-              caption: photo.caption.presence || item[:caption],
-              image_url: photo.video? ? nil : (photo.thumbnail_url || photo.display_url),
-              video_url: photo.video? ? photo.display_url : nil,
-            }
-          else
-            { color: fallback_colors[i] }.merge(item)
-          end
-        end
-      %>
-      <%= render "shared/polaroid_stack", width: 300, height: 360, items: polaroid_items %>
-    </div>
-
-    <!-- 우: 직함·지역·CTA -->
-    <div>
-      <% is_owner_view = viewing_as_owner?(@member) %>
-
-      <% if is_owner_view %>
-        <%# 본인만 보이는 진입 CTA — 이메일 기반 AI 자동 채우기 위자드 %>
-        <%= link_to "/welcome/probe", title: "imPD가 이메일을 바탕으로 공개 정보를 찾아 페이지를 자동으로 채워드려요",
-            style: "display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--impd-green-house); color: var(--impd-on-dark); border-radius: 12px; margin-bottom: 14px; text-decoration: none; box-shadow: var(--impd-shadow-card); transition: transform .2s ease, background .2s ease;",
-            onmouseover: "this.style.background='var(--impd-green)'",
-            onmouseout: "this.style.background='var(--impd-green-house)'" do %>
-          <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--impd-gold); color: var(--impd-green-house); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <%= lni_icon "star-fat", size: 18 %>
-          </div>
-          <div style="flex: 1; min-width: 0;">
-            <div style="font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-gold); margin-bottom: 2px;">imPD AI · 본인 전용</div>
-            <div style="font-size: 14px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.3;">이메일로 자동 채우기 <%= lni_icon "arrow-right" %></div>
-          </div>
-        <% end %>
-      <% end %>
-
-      <% if @member.partner_active? %>
-        <%# Townin 파트너 배지 — 히어로 상단 %>
-        <a href="#partner" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--impd-accent-2); color: #fff; font-family: var(--impd-font-sans); font-weight: 600; font-size: 12px; letter-spacing: -0.2px; margin-bottom: 14px; text-decoration: none;">
-          <%= lni_icon "star-fat" %> Townin <%= @member.partner_display_role || "파트너" %>
-        </a>
-      <% end %>
-      <dl style="border-top: 1px solid var(--impd-ink); padding-top: 16px;">
-        <% if @member.profession.present? %>
-          <div class="impd-field-spacing"><dt class="impd-label-muted">직함</dt><dd class="impd-profile-value"><%= @member.profession_label %></dd></div>
-        <% end %>
-        <% if @member.region.present? %>
-          <div class="impd-field-spacing"><dt class="impd-label-muted">지역</dt><dd class="impd-profile-value"><%= @member.region %></dd></div>
-        <% end %>
-        <% if @services.any? %>
-          <div class="impd-field-spacing"><dt class="impd-label-muted">서비스</dt><dd class="impd-profile-value"><%= @services.first.title %></dd></div>
-        <% end %>
-      </dl>
-      <a href="#contact" class="impd-btn impd-btn-primary" style="width: 100%; justify-content: center; margin-top: 14px;">문의하기 <%= lni_icon "arrow-right" %></a>
-      <a href="#classes" class="impd-btn impd-btn-secondary" style="width: 100%; justify-content: center; margin-top: 6px;">서비스 보기</a>
-
-      <%# 빠른 연결 — 한국 프리랜서가 바로 연락받을 수 있는 채널. 값 있는 것만 노출. %>
-      <%
-        social = @member.social
-        kakao_ch = social["kakao_channel"].presence
-        quick_links = []
-        quick_links << { label: "전화",   href: "tel:#{@member.phone}",        icon: "phone" } if @member.phone.present?
-        quick_links << { label: "이메일", href: "mailto:#{@member.email}",     icon: "envelope-1" } if @member.email.present?
-        quick_links << { label: "카톡",   href: kakao_ch,                      icon: "chat-bubble-2" } if kakao_ch
-      %>
-      <% if quick_links.any? %>
-        <div class="impd-quick-panel">
-          <div class="impd-label-muted impd-quick-label">바로 연결</div>
-          <div style="display: grid; grid-template-columns: repeat(<%= quick_links.size %>, 1fr); gap: 6px;">
-            <% quick_links.each do |q| %>
-              <a href="<%= q[:href] %>"
-                 style="display: inline-flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 6px; border: 1px solid var(--impd-rule); background: var(--impd-card); font-size: 12px; color: var(--impd-ink); text-decoration: none; transition: all .15s;"
-                 onmouseover="this.style.background='var(--impd-ink)';this.style.color='var(--impd-paper)';"
-                 onmouseout="this.style.background='var(--impd-card)';this.style.color='var(--impd-ink)';">
-                <span style="font-size: 16px;"><%= lni_icon q[:icon], size: 16 %></span>
-                <span style="font-family: var(--impd-font-mono); letter-spacing: 1px;"><%= q[:label] %></span>
-              </a>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
-
-      <%# 명함 빠른 액션 — QR · 링크 복사 · 상세 보기 (A-CARD 섹션 대체) %>
-      <%
-        hero_card_svg_url = "/card/#{@member.slug}.svg"
-        hero_qr_svg_url   = "/qr/#{@member.slug}.svg"
-        hero_short_link   = ShortLink.resolve_or_create(target_path: "/#{@member.slug}/card", member: @member)
-        hero_short_url    = "#{public_base_url}/s/#{hero_short_link&.hash_code}"
-      %>
-      <div class="impd-quick-panel"
-           data-controller="card-share"
-           data-card-share-short-url-value="<%= hero_short_url %>"
-           data-card-share-profile-url-value="<%= public_base_url %>/<%= @member.slug %>">
-        <div class="impd-label-muted impd-quick-label">디지털 명함</div>
-
-        <%# QR 실 이미지 — 스캔 가능한 큰 블록 %>
-        <a href="<%= hero_qr_svg_url %>" download="<%= @member.slug %>-qr.svg"
-           title="QR 저장"
-           style="display: block; background: var(--impd-card); border: 1px solid var(--impd-rule); border-radius: 12px; padding: 12px; text-align: center; box-shadow: var(--impd-shadow-card); text-decoration: none;">
-          <img src="<%= hero_qr_svg_url %>" alt="<%= @member.name %> QR 코드"
-               style="display: block; width: 100%; max-width: 170px; height: auto; aspect-ratio: 1 / 1; margin: 0 auto; background: #fff;">
-          <div style="margin-top: 6px; font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted);">
-            QR · 스캔하여 열기
-          </div>
-        </a>
-
-        <%# 링크 복사 · 상세 보기 — 2열 pill 버튼 %>
-        <div style="margin-top: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-          <button type="button" data-action="click->card-share#copyShort"
-                  class="impd-btn impd-btn-secondary impd-btn-sm"
-                  style="width: 100%; font-family: var(--impd-font-sans);">
-            <%= lni_icon "link-2-angular-right", size: 14 %>
-            링크 복사
-          </button>
-          <%= link_to "/#{@member.slug}/card",
-              class: "impd-btn impd-btn-secondary impd-btn-sm",
-              style: "width: 100%;" do %>
-            <%= lni_icon "credit-card-multiple", size: 14 %>
-            상세 보기
-          <% end %>
-        </div>
-
-        <div data-card-share-target="flash"
-             style="margin-top: 8px; font-size: 12px; color: var(--impd-green-accent); opacity: 0; transition: opacity .2s; text-align: center; font-family: var(--impd-font-mono); letter-spacing: 1px;">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <style>
-    @media (max-width: 768px) { .masthead-grid { grid-template-columns: 1fr !important; gap: 32px !important; } }
-  </style>
-</section>
-
-<!-- ── A-Card 디지털 명함 ────────────────────────────
-     카톡/SNS 공유 시 이 섹션의 SVG 명함이 OG 이미지로 노출되고,
-     본인이 "명함 저장" / QR 복사 / 짧은 링크 복사 가능.
-     e-name.kr의 '모바일 명함' 개념을 impd 에디토리얼 톤으로 재해석. -->
-<%# A-CARD 섹션은 히어로 우측 3버튼(QR·링크 복사·상세 보기)으로 통합됨.
-    디지털 명함 상세 뷰는 /:slug/card 라우트(public_profile#card)에서 계속 제공. %>
 <%
   # 갤러리 우선순위:
   #   1) 업로드된 사진·영상 (실제 데이터)
@@ -292,7 +119,7 @@
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
       <span class="impd-display impd-stat-num">갤러리</span>
-      <span class="impd-label-muted"><%= gallery_tiles.size %> ITEMS</span>
+      <span class="impd-label-muted">사진 <%= gallery_tiles.size %>개</span>
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
       <% gallery_tiles.each_with_index do |t, i| %>
@@ -332,7 +159,7 @@
   <section class="impd-wrap impd-section" id="moments">
     <div class="impd-section-header">
       <span class="impd-display impd-stat-num">일상 장면</span>
-      <span class="impd-label-muted"><%= @member.member_photos.count %> MOMENTS</span>
+      <span class="impd-label-muted">사진 <%= @member.member_photos.count %>개</span>
     </div>
     <p style="font-family: var(--impd-font-serif); font-size: 17px; color: var(--impd-ink2); line-height: 1.55; max-width: 58ch; margin-bottom: 28px;">
       작업 현장, 수강생의 환한 표정, 손끝의 순간들. 한 장의 사진이 한 줄의 카피보다 많은 것을 전합니다.
@@ -363,7 +190,7 @@
                    class="impd-video-cover"
                    preload="metadata" muted playsinline loop
                    onmouseover="this.play()" onmouseout="this.pause(); this.currentTime=0;"></video>
-            <div style="position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); color: var(--impd-ink); font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.2px; padding: 3px 8px;">▶ VIDEO</div>
+            <div style="position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); color: var(--impd-ink); font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.2px; padding: 3px 8px;">동영상</div>
           <% else %>
             <img src="<%= photo.thumbnail_url %>"
                  data-fallback="<%= photo.display_url %>"
@@ -423,7 +250,7 @@
           <% if live %>
             <span class="impd-live-badge">
               <span class="impd-live-dot"></span>
-              LIVE · 오늘도 활동 중
+              오늘도 활동 중
             </span>
           <% else %>
             <span style="font-family: var(--impd-font-sans); font-weight: 600; font-size: 12px; letter-spacing: -0.1px; color: var(--impd-accent-2); background: rgba(255,90,31,0.1); padding: 4px 10px; border-radius: 3px;"><%= lni_icon "star-fat" %> 검증된 파트너</span>
@@ -432,7 +259,7 @@
         <% if tenure_months > 0 %>
           <span class="impd-label-muted"><%= tenure_months %>개월째 활동</span>
         <% elsif @member.partner_promoted_at %>
-          <span class="impd-label-muted">SINCE <%= @member.partner_promoted_at.strftime("%Y.%m") %></span>
+          <span class="impd-label-muted">활동 시작 <%= @member.partner_promoted_at.strftime("%Y.%m") %></span>
         <% end %>
       </div>
 
@@ -648,7 +475,7 @@
   <section class="impd-wrap impd-section" id="classes">
     <div class="impd-section-header">
       <span class="impd-display impd-stat-num">서비스 / 수업</span>
-      <span class="impd-label-muted"><%= @services.size %> ITEMS</span>
+      <span class="impd-label-muted">서비스 <%= @services.size %>개</span>
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
       <% @services.first(6).each_with_index do |s, i| %>
@@ -672,7 +499,7 @@
   <section class="impd-wrap impd-section" id="faq">
     <div class="impd-section-header">
       <h2 class="impd-display impd-stat-num">자주 묻는 질문</h2>
-      <span class="impd-label-muted"><%= @faqs.size %> QUESTIONS</span>
+      <span class="impd-label-muted">질문 <%= @faqs.size %>개</span>
     </div>
     <div style="border-top: 1px solid var(--impd-ink);">
       <% @faqs.each_with_index do |faq, index| %>
@@ -688,11 +515,11 @@
   </section>
 <% end %>
 
-<!-- ── Testimonial (인용) ───────────────────────── -->
+<!-- ── 후기 (인용) ───────────────────────── -->
 <% if @reviews.any? && @reviews.first.content.present? %>
   <section style="background: var(--impd-ink); color: var(--impd-paper); padding: 80px 0; margin: 64px 0;">
     <div class="impd-wrap impd-centered">
-      <p class="impd-label impd-accent-text">Testimonial</p>
+      <p class="impd-label impd-accent-text">후기</p>
       <p class="impd-serif impd-quote">
         "<%= @reviews.first.content %>"
       </p>
@@ -706,7 +533,7 @@
   <% stats = @member.stats %>
   <section style="background: var(--impd-ink); color: var(--impd-paper); padding: 64px 0; margin: 64px 0;">
     <div class="impd-wrap impd-centered">
-      <p class="impd-label impd-accent-text">Trust · Townin 검증</p>
+      <p class="impd-label impd-accent-text">Townin 검증</p>
       <p class="impd-serif impd-quote">
         Townin에서 <strong class="impd-accent-text"><%= stats["rating"].to_f.round(1) %><%= lni_icon "star-fat" %></strong> 평점을 유지하는 파트너입니다.
         <% if stats["review_count"].to_i > 0 %>
@@ -739,10 +566,10 @@
       <% if @member.activity_live? %>
         <span class="impd-live-badge">
           <span class="impd-live-dot"></span>
-          LIVE · 오늘도 활동 중
+          오늘도 활동 중
         </span>
       <% else %>
-        <span class="impd-label-muted">CV</span>
+        <span class="impd-label-muted">활동 기록</span>
       <% end %>
     </div>
     <div>
@@ -783,7 +610,7 @@
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
       <span class="impd-display impd-stat-num">검증된 달란트</span>
-      <span class="impd-label-muted"><%= @skills.size %> TALENTS · <%= @doc_count %> DOCS</span>
+      <span class="impd-label-muted">달란트 <%= @skills.size %>개 · 문서 <%= @doc_count %>개</span>
     </div>
 
     <% if @member.bio.present? %>
@@ -827,8 +654,8 @@
             <% items.first(8).each do |ms| %>
               <%
                 w = ms.weight.to_i
-                chip_bg = w >= 60 ? "var(--impd-green-accent)" : "var(--impd-green-mint)"
-                chip_fg = w >= 60 ? "var(--impd-on-dark)" : "var(--impd-green)"
+                chip_bg = w >= 60 ? "var(--impd-accent)" : "var(--impd-paper)"
+                chip_fg = w >= 60 ? "var(--impd-paper)" : "var(--impd-ink)"
               %>
               <span style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; background: <%= chip_bg %>; color: <%= chip_fg %>; border-radius: 50px; font-size: 12px; font-family: var(--impd-font-sans); font-weight: 500; letter-spacing: -0.01em;">
                 <%= ms.skill.canonical_name %>
@@ -863,7 +690,7 @@
   end
   # 2) 포트폴리오 제목들 (최대 2개)
   @portfolio.first(2).each do |p|
-    personal << { head: p.title.to_s[0, 30], desc: (p.category.presence || "PORTFOLIO").to_s.upcase }
+    personal << { head: p.title.to_s[0, 30], desc: (p.category.presence || "포트폴리오").to_s.upcase }
   end
   # 3) 서비스 제목들 (최대 2개)
   @services.first(2).each do |s|
@@ -891,7 +718,7 @@
 <section class="impd-wrap impd-section">
   <div class="impd-section-header">
     <span class="impd-display impd-stat-num">이렇게 도와드립니다.</span>
-    <span class="impd-label-muted"><%= kit.size %> SERVICES</span>
+    <span class="impd-label-muted">항목 <%= kit.size %>개</span>
   </div>
   <div class="impd-card-grid">
     <% kit.each_with_index do |item, i| %>
@@ -931,13 +758,15 @@
     user_type: "anonymous"
   ).where(created_at: 1.week.ago..Time.current).count rescue 0
 %>
-<section class="impd-wrap" style="padding: 40px 0 24px;">
+<% if @member.created_at && @member.created_at <= 30.days.ago && week_visits >= 50 %>
+<section class="impd-wrap public-stats" style="padding-block: 40px 24px;">
+  <style>.public-stats .impd-label-muted { font: 13px var(--impd-font-sans); letter-spacing: normal; text-transform: none; }</style>
   <div style="background: var(--impd-paper); border-top: 1px solid var(--impd-ink); border-bottom: 1px solid var(--impd-ink); padding: 28px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; align-items: center;">
     <div>
       <div class="impd-label-muted">상태</div>
       <div class="impd-display impd-status-value">
         <span style="display: inline-flex; align-items: center; gap: 6px;">
-          <span style="width: 7px; height: 7px; background: #16a34a; border-radius: 50%; display: inline-block;"></span>
+          <span style="width: 7px; height: 7px; background: var(--impd-accent); border-radius: 50%; display: inline-block;"></span>
           imPD 검증 회원
         </span>
       </div>
@@ -961,102 +790,13 @@
   </div>
 </section>
 
-<!-- ── Contact CTA — 3열 그리드, 빈 공간 최소화 ──────── -->
-<section class="impd-wrap impd-section" id="contact">
-  <%
-    social_e = @member.social
-    kakao_ch_e = social_e["kakao_channel"].presence
-    contact_options = []
-    contact_options << { label: "이메일", value: @member.email,              href: "mailto:#{@member.email}" }       if @member.email.present?
-    contact_options << { label: "전화",   value: @member.phone,              href: "tel:#{@member.phone}" }          if @member.phone.present?
-    contact_options << { label: "카톡 채널", value: "카톡 1:1 문의",          href: kakao_ch_e }                       if kakao_ch_e
-  %>
-  <div style="background: var(--impd-card); border: 1px solid var(--impd-ink); padding: 36px 32px;">
-    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 28px; align-items: center;">
-      <div>
-        <p class="impd-label">함께 일하실 분</p>
-        <h2 class="impd-display" style="font-size: clamp(28px, 3.8vw, 48px); margin-top: 12px; line-height: 1.1;">
-          <%= @member.name %>님께<br>
-          <span style="color: var(--impd-accent); font-style: italic;">직접 문의</span>하세요.
-        </h2>
-        <p style="margin-top: 14px; font-size: 13px; color: var(--impd-ink2); line-height: 1.55; max-width: 32ch;">
-          어떤 채널로 연락하셔도 됩니다. 보통 24시간 안에 답장드립니다.
-        </p>
-      </div>
+<% end %>
 
-      <div class="impd-contact-stack">
-        <% if @bookings.any? %>
-          <div style="margin-bottom: 10px; padding-bottom: 18px; border-bottom: 1px solid var(--impd-rule);">
-            <p class="impd-label-muted impd-field-spacing">예약하기</p>
-            <div class="impd-contact-stack">
-              <% @bookings.each do |booking| %>
-                <%= link_to booking.external_url,
-                      target: "_blank",
-                      rel: "noopener",
-                      class: "impd-btn impd-btn-primary",
-                      style: "width: 100%; justify-content: space-between; height: 46px; padding: 0 18px; font-size: 14px;" do %>
-                  <span class="impd-contact-label">예약</span>
-                  <span class="impd-contact-value"><%= booking.booking_type.presence || "예약하기" %> <%= lni_icon "arrow-right" %></span>
-                <% end %>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
-
-        <% if contact_options.any? %>
-          <% contact_options.each_with_index do |o, i| %>
-            <a href="<%= o[:href] %>"
-               class="impd-btn <%= i == 0 ? 'impd-btn-primary' : 'impd-btn-secondary' %>"
-               style="width: 100%; justify-content: space-between; height: 46px; padding: 0 18px; font-size: 14px;">
-              <span class="impd-contact-label"><%= o[:label] %></span>
-              <span class="impd-contact-value"><%= o[:value] %> <%= lni_icon "arrow-right" %></span>
-            </a>
-          <% end %>
-        <% else %>
-          <p style="font-size: 12px; color: var(--impd-muted);">연락처 준비 중</p>
-        <% end %>
-      </div>
-    </div>
-
-    <div style="border-top: 1px solid var(--impd-rule); margin-top: 28px; padding-top: 28px;">
-      <div class="impd-section-header" style="margin-bottom: 20px;">
-        <span class="impd-label">문의 보내기</span>
-        <span class="impd-label-muted">CONTACT FORM</span>
-      </div>
-      <%= form_with model: MemberInquiry.new, url: member_inquiries_path(slug: @member.slug), method: :post, class: "contact-inquiry-form" do |form| %>
-        <div class="contact-inquiry-fields" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-          <div>
-            <%= form.label :sender_name, "이름", style: "display: block; margin-bottom: 6px; color: var(--impd-muted); font-size: 13px; font-weight: 600;" %>
-            <%= form.text_field :sender_name, required: true, autocomplete: "name", style: "width: 100%; border: 1px solid #d1d5db; background: #fff; padding: 10px 12px; color: var(--impd-ink); font-family: var(--impd-font-sans); font-size: 14px;" %>
-          </div>
-          <div>
-            <%= form.label :sender_email, "이메일", style: "display: block; margin-bottom: 6px; color: var(--impd-muted); font-size: 13px; font-weight: 600;" %>
-            <%= form.email_field :sender_email, required: true, autocomplete: "email", style: "width: 100%; border: 1px solid #d1d5db; background: #fff; padding: 10px 12px; color: var(--impd-ink); font-family: var(--impd-font-sans); font-size: 14px;" %>
-          </div>
-        </div>
-        <div style="margin-top: 16px;">
-          <%= form.label :message, "문의내용", style: "display: block; margin-bottom: 6px; color: var(--impd-muted); font-size: 13px; font-weight: 600;" %>
-          <%= form.text_area :message, required: true, minlength: 5, maxlength: 2000, rows: 6, style: "width: 100%; border: 1px solid #d1d5db; background: #fff; padding: 10px 12px; color: var(--impd-ink); font-family: var(--impd-font-sans); font-size: 14px; line-height: 1.65; resize: vertical;" %>
-        </div>
-        <%= hidden_field_tag :website, "", autocomplete: "off", tabindex: -1 %>
-        <%= form.submit "문의 전송", class: "impd-btn impd-btn-primary", style: "margin-top: 16px; min-width: 140px; justify-content: center;" %>
-      <% end %>
-    </div>
-  </div>
-
-  <style>
-    @media (max-width: 768px) {
-      section#contact > div > div { grid-template-columns: 1fr !important; }
-      .contact-inquiry-fields { grid-template-columns: 1fr !important; }
-    }
-  </style>
-</section>
+<%= render "public_profile/profile_contact", member: @member, services: @services %>
 
 <!-- Footer -->
-<footer style="border-top: 1px solid var(--impd-rule); padding: 32px 40px; display: flex; gap: 32px; flex-wrap: wrap; align-items: center; font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted);">
-  <span class="impd-display" style="font-size: 16px; text-transform: none; color: var(--impd-ink);">imPD<span class="impd-accent-text">.</span></span>
-  <span><%= @member.name %> · /<%= @member.slug %></span>
-  <span style="flex: 1;"></span>
-  <span>powered by imPD</span>
+<footer style="border-top: 1px solid var(--impd-rule); padding: 32px 40px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; font-family: var(--impd-font-sans); font-size: 13px; color: var(--impd-muted);">
+  <span>imPD로 만든 페이지 · <%= public_host %>/<%= @member.slug %></span>
+  <%= link_to "나도 만들기", member_signup_path, style: "color: var(--impd-accent);" %>
 </footer>
 <% end %>
