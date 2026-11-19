@@ -5,11 +5,18 @@
   body { background: var(--impd-paper); color: var(--impd-ink); }
   .impd-wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
   .impd-section { padding: 80px 0; }
+  .impd-section-header { flex-wrap: wrap; gap: 12px; }
+  .impd-section-header > .impd-display { font-size: clamp(26px, 7vw, 36px); flex: 1 1 280px; min-width: 0; }
+  .impd-stats-grid, .impd-steps-grid, .impd-types-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
+  .impd-stats-grid { border-top: 1px solid var(--impd-ink); }
+  .impd-stats-grid > div + div, .impd-steps-grid > div + div, .impd-examples-grid > div + div { border-left: 1px solid var(--impd-rule); }
+  .impd-types-grid { border-top: 1px solid var(--impd-rule); border-left: 1px solid var(--impd-rule); }
   .impd-member-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
   .impd-professions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
   .impd-profession-pill { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border: 1px solid var(--impd-rule); border-radius: 999px; background: #fff; color: var(--impd-ink); font-size: 15px; font-weight: 600; text-decoration: none; transition: border-color 150ms ease, transform 150ms ease; }
   .impd-profession-pill:hover { border-color: var(--impd-green); transform: translateY(-2px); }
   @media (max-width: 599px) { .impd-professions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .impd-profession-pill { padding: 0 10px; } }
+  @media (max-width: 899px) { .impd-types-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 899px) { .impd-member-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 599px) { .impd-member-grid { grid-template-columns: 1fr; } }
   @media (max-width: 768px) {
@@ -18,9 +25,9 @@
     .impd-wrap { padding-left: 20px !important; padding-right: 20px !important; }
     .impd-section { padding: 48px 0; }
   }
-  @media (max-width: 639px) {
-    .impd-stats-grid { grid-template-columns: 1fr !important; }
-    .impd-stats-grid > div + div { border-left: 0 !important; border-top: 1px solid var(--impd-rule); }
+  @media (max-width: 599px) {
+    .impd-stats-grid, .impd-steps-grid, .impd-types-grid { grid-template-columns: 1fr; }
+    .impd-stats-grid > div + div, .impd-steps-grid > div + div, .impd-examples-grid > div + div { border-left: 0; border-top: 1px solid var(--impd-rule); }
   }
 </style>
 
@@ -92,13 +99,13 @@
 
   <!-- ── 3가지 약속 ───────────────────────── -->
   <section class="impd-wrap" style="padding: 40px 40px 32px;">
-    <div class="impd-stats-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--impd-ink);">
+    <div class="impd-stats-grid">
       <% [
         ["0원", "무료로 시작", "카드 등록 없이 바로 만들어요"],
         ["5분", "첫 페이지 완성", "가진 자료를 올리면 정리는 저희가"],
         ["0%", "수수료 없음", "문의·예약은 고객과 직접 연결돼요"]
       ].each_with_index do |(num, label, sub), i| %>
-        <div style="padding: 24px 20px; <%= 'border-left: 1px solid var(--impd-rule);' if i > 0 %>">
+        <div style="padding: 24px 20px;">
           <div class="impd-display" style="font-size: 44px; letter-spacing: -0.03em; color: var(--impd-green);"><%= num %></div>
           <div style="margin-top: 6px; font-size: 15px; font-weight: 700; color: var(--impd-ink);"><%= label %></div>
           <div style="font-size: 13px; color: var(--impd-muted); margin-top: 2px; font-family: var(--impd-font-sans);"><%= sub %></div>
@@ -130,16 +137,16 @@
   <!-- ── 02 3-step pitch ───────────────────────── -->
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
-      <span class="impd-display" style="font-size: 36px; flex: 1;">자료를 올리면, 페이지가 됩니다.</span>
+      <span class="impd-display">자료를 올리면, 페이지가 됩니다.</span>
       <span class="impd-label-muted">3단계</span>
     </div>
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;">
+    <div class="impd-steps-grid">
       <% [
         ["01", "업로드", "사진·자격증·이력서·SNS 링크 — 무엇이든 올려 주세요."],
         ["02", "자동 정리", "AI가 카테고리별로 분류하고 핵심 정보를 추출합니다."],
         ["03", "페이지 완성", "잡지처럼 다듬어진 당신만의 홍보 페이지가 열립니다."]
       ].each_with_index do |(num, title, desc), i| %>
-        <div style="padding: 32px 24px; <%= 'border-left: 1px solid var(--impd-rule);' if i > 0 %>">
+        <div style="padding: 32px 24px;">
           <div class="impd-label" style="color: var(--impd-accent);"><%= num %></div>
           <h3 class="impd-display" style="font-size: 28px; margin: 12px 0 16px;"><%= title %></h3>
           <p style="font-size: 15px; line-height: 1.55; color: var(--impd-ink2);"><%= desc %></p>
@@ -151,10 +158,10 @@
   <!-- ── 03 자료 종류 그리드 ───────────────────────── -->
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
-      <span class="impd-display" style="font-size: 36px; flex: 1;">이런 자료들이 페이지가 됩니다.</span>
+      <span class="impd-display">이런 자료들이 페이지가 됩니다.</span>
       <span class="impd-label-muted">6가지</span>
     </div>
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--impd-rule); border-left: 1px solid var(--impd-rule);">
+    <div class="impd-types-grid">
       <% [
         ["camera-1", "현장 사진", "갤러리 그리드"],
         ["book-1", "수료증·자격증", "달란트 배지"],
@@ -196,7 +203,7 @@
   %>
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
-      <span class="impd-display" style="font-size: 36px; flex: 1;">imPD를 쓰는 사람들.</span>
+      <span class="impd-display">imPD를 쓰는 사람들.</span>
       <% if real_cards.any? %><span class="impd-label-muted">지금 <%= real_cards.size %>명이 운영 중</span><% end %>
     </div>
     <div class="impd-member-grid">
@@ -232,7 +239,7 @@
     <div style="background: var(--impd-card); border-top: 1px solid var(--impd-rule); border-bottom: 1px solid var(--impd-rule); margin: 40px 0;">
       <section class="impd-wrap" style="padding-top: 64px; padding-bottom: 64px;">
         <div class="impd-section-header">
-          <span class="impd-display" style="font-size: 36px; flex: 1;">실제 페이지에서 살아있는 장면들.</span>
+          <span class="impd-display">실제 페이지에서 살아있는 장면들.</span>
           <span class="impd-label-muted"><%= @featured_moments.size %> MOMENTS</span>
         </div>
         <p style="font-family: var(--impd-font-serif); font-style: italic; font-size: 17px; color: var(--impd-ink2); line-height: 1.55; max-width: 58ch; margin-bottom: 28px;">
@@ -283,15 +290,15 @@
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
       <span class="impd-label">활용 예시</span>
-      <span class="impd-display" style="font-size: 36px; flex: 1;">이런 분들이 imPD로 시작합니다.</span>
+      <span class="impd-display">이런 분들이 imPD로 시작합니다.</span>
     </div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 0; border-top: 1px solid var(--impd-rule);">
+    <div class="impd-examples-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 0; border-top: 1px solid var(--impd-rule);">
       <% [
         ["보험설계사", "상담 분야와 자격을 한 페이지에 정리하고, 명함 QR로 고객이 바로 상담을 신청해요.", "na-seolgye"],
         ["1인 크리에이터", "작업물·채널·협업 문의를 한곳에 모아, 브랜드 담당자에게 링크 하나로 보내요.", "yujin-studio"],
         ["동네 가게 사장님", "가게 소개·메뉴·후기를 정리하고, 지역 주민에게 Townin 전단지로 알려요.", nil]
       ].each_with_index do |(title, description, slug), i| %>
-        <div style="padding: 40px 32px; <%= 'border-left: 1px solid var(--impd-rule);' if i > 0 %>">
+        <div style="padding: 40px 32px;">
           <span class="impd-label" style="display: inline-block; border: 1px solid var(--impd-rule); padding: 4px 10px;">예시</span>
           <h3 class="impd-display" style="font-size: 18px; margin: 24px 0 12px;"><%= title %></h3>
           <p class="impd-serif" style="font-size: 24px; line-height: 1.4; color: var(--impd-ink);"><%= description %></p>
