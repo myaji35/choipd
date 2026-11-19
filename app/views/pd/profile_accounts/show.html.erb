@@ -3,7 +3,7 @@
 <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-6 space-y-4">
   <dl class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
     <% { "플랫폼" => @account.platform_label, "로그인 아이디" => @account.login_id, "외부 ID" => @account.external_id, "직함/직업" => @account.headline, "권한" => @account.auth_status, "상태" => @account.session_status_label, "마지막 점검" => @account.last_checked_at&.localtime&.strftime("%Y-%m-%d %H:%M"), "활성화" => (@account.is_active? ? "활성" : "비활성"), "메모" => @account.notes, "최근 오류" => @account.last_error }.each do |label, value| %><div class="min-w-0"><dt class="text-gray-500"><%= label %></dt><dd class="text-navy break-all"><%= value.presence || "-" %></dd></div><% end %>
-    <div class="min-w-0"><dt class="text-gray-500">프로필 링크</dt><dd class="break-all"><% if @account.profile_url.present? %><%= link_to @account.profile_url, @account.profile_url, target: "_blank", rel: "noopener", class: "text-primary" %><% else %>-<% end %></dd></div>
+    <div class="min-w-0"><dt class="text-gray-500">프로필 링크</dt><dd class="break-all"><% if (url = http_url(@account.profile_url)) %><%= link_to url, url, target: "_blank", rel: "noopener", class: "text-primary" %><% else %>-<% end %></dd></div>
   </dl>
   <div class="flex gap-3"><%= link_to "수정", edit_pd_profile_account_path(@account), class: "text-primary text-sm" %><%= button_to "삭제", pd_profile_account_path(@account), method: :delete, class: "text-red-600 text-sm", data: { turbo_confirm: "삭제하시겠습니까?" } %></div>
   <% if @account.platform == "naver_people" && @latest_snapshot %>

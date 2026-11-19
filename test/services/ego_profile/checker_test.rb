@@ -11,7 +11,7 @@ class EgoProfile::CheckerTest < ActiveSupport::TestCase
   end
 
   setup do
-    @runner = FakeRunner.new({ "logged_in" => true, "accounts" => [{ "external_id" => "fake-id", "display_name" => "가상 인물", "data" => { "value" => 1 } }] })
+    @runner = FakeRunner.new({ "logged_in" => true, "accounts" => [ { "external_id" => "fake-id", "display_name" => "가상 인물", "data" => { "value" => 1 } } ] })
     @checker = EgoProfile::Checker.new(runner: @runner, tenant_id: 7)
   end
 
@@ -57,5 +57,4 @@ class EgoProfile::CheckerTest < ActiveSupport::TestCase
       assert_equal result.error, ProfileAccount.find_by!(tenant_id: 7).last_error
     end
   end
-
 end

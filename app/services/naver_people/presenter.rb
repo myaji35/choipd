@@ -32,7 +32,7 @@ module NaverPeople
       when "peopleJob" then [ item["nameTx"], ("#{item['annual']}년 차" if item["annual"].present?), ("현직" if item["current"] == "Y") ]
       when "peopleOffice" then [ item["name"], item["position"], item["department"], ("현직" if item["current"] == "Y") ]
       when "peopleCareer" then [ [ date(item["startDate"]), (item["current"] == "Y" ? "현재" : date(item["endDate"])) ].reject(&:blank?).join(" ~ "), item["comment"] ]
-      when "peopleSchool" then [ [ item["name"], item["major"], item["degree"] ].map { |v| text(v) }.reject(&:blank?).join(" "), ("(#{[text(item['enterDate']), text(item['graduateDate'])].join('~')})" if item["enterDate"].present? || item["graduateDate"].present?) ]
+      when "peopleSchool" then [ [ item["name"], item["major"], item["degree"] ].map { |v| text(v) }.reject(&:blank?).join(" "), ("(#{[ text(item['enterDate']), text(item['graduateDate']) ].join('~')})" if item["enterDate"].present? || item["graduateDate"].present?) ]
       when "peopleWorkList" then [ item["kind"], item["comment"], item["date"] ]
       else %w[name comment title url date kind gubun].map { |k| item[k] }
       end

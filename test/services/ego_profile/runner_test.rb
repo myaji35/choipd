@@ -40,5 +40,4 @@ class EgoProfile::RunnerTest < ActiveSupport::TestCase
     open3_class.alias_method :capture3, :original_capture3_for_test
     open3_class.remove_method :original_capture3_for_test
   end
-
 end

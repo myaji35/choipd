@@ -28,7 +28,7 @@
             <% badge = { "logged_in" => "bg-green-100 text-green-700", "logged_out" => "bg-amber-100 text-amber-700", "error" => "bg-red-100 text-red-700", "unknown" => "bg-gray-100 text-gray-500" }[account.session_status] %>
             <td class="px-4 py-3 whitespace-nowrap"><span class="<%= badge %> text-xs px-2 py-1 rounded-full"><%= account.session_status_label %></span></td>
             <td class="px-4 py-3 whitespace-nowrap"><%= account.last_checked_at&.localtime&.strftime("%Y-%m-%d %H:%M") || "-" %></td><td class="px-4 py-3 whitespace-nowrap"><%= account.latest_snapshot&.captured_at&.localtime&.strftime("%Y-%m-%d %H:%M") || "-" %></td>
-            <td class="px-4 py-3"><% if account.profile_url.present? %><%= link_to "프로필", account.profile_url, target: "_blank", rel: "noopener", class: "text-primary" %><% else %>-<% end %></td><td class="px-4 py-3"><%= link_to "상세", pd_profile_account_path(account), class: "text-primary" %></td>
+            <td class="px-4 py-3"><% if (url = http_url(account.profile_url)) %><%= link_to "프로필", url, target: "_blank", rel: "noopener", class: "text-primary" %><% else %>-<% end %></td><td class="px-4 py-3"><%= link_to "상세", pd_profile_account_path(account), class: "text-primary" %></td>
           </tr>
         <% end %>
       </tbody>

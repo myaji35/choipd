@@ -4,8 +4,8 @@ module IconHelper
       raise ArgumentError, "Unknown Lineicons icon: #{name}"
     end
 
-    styles = [style, ("font-size: #{Integer(size)}px" if size)].compact.join("; ")
-    attributes = { class: ["lni", "lni-#{name}", binding.local_variable_get(:class)].compact.join(" "), style: styles.presence }
+    styles = [ style, ("font-size: #{Integer(size)}px" if size) ].compact.join("; ")
+    attributes = { class: [ "lni", "lni-#{name}", binding.local_variable_get(:class) ].compact.join(" "), style: styles.presence }
     attributes.merge!(label.present? ? { "aria-hidden": "false", role: "img", "aria-label": label } : { "aria-hidden": "true" })
     tag.i(**attributes)
   end
