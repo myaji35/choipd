@@ -196,58 +196,72 @@
     <% end %>
 
     <!-- imPD TopNav — C2 whisper-soft shadow -->
-    <div class="impd-topnav" style="position: sticky; top: 0; z-index: 20; background: var(--impd-card); box-shadow: var(--impd-shadow-nav); padding: 18px 24px; display: flex; align-items: center; gap: 20px;">
-      <%= link_to root_path, style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; color: var(--impd-green); white-space: nowrap;" do %>
-        imPD
-      <% end %>
-      <nav class="impd-topnav-links" style="display: flex; gap: 22px; flex: 1;">
-        <% [["홈", root_path], ["둘러보기", explore_path], ["예시", "/choi-pd"], ["가격", root_path(anchor: "pricing")], ["도움말", root_path(anchor: "faq")]].each do |label, path| %>
-          <%= link_to label, path, style: "color: var(--impd-muted); font-size: 13px; font-weight: 500; white-space: nowrap;" %>
+    <% nav_links = [["홈", root_path, request.path == "/"], ["둘러보기", explore_path, request.path.start_with?("/explore")], ["예시", "/choi-pd", false], ["가격", root_path(anchor: "pricing"), false], ["도움말", root_path(anchor: "faq"), false]] %>
+    <style>
+      .impd-topnav { position: sticky; top: 0; z-index: 20; background: var(--impd-card); box-shadow: var(--impd-shadow-nav); }
+      .impd-topnav-bar { padding: 18px 24px; display: flex; align-items: center; gap: 20px; }
+      .impd-topnav-links { display: flex; gap: 22px; flex: 1; }
+      .impd-nav-link { color: var(--impd-ink2); font-size: 14px; font-weight: 500; white-space: nowrap; }
+      .impd-nav-link[aria-current="page"] { color: var(--impd-green); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
+      .impd-topnav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+      .impd-topnav-identity { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 2px; white-space: nowrap; line-height: 1.2; }
+      .impd-nav-toggle, .impd-mobile-panel { display: none; }
+      @media (max-width: 768px) {
+        .impd-topnav-bar { padding: 12px 16px; gap: 12px; }
+        .impd-topnav-links, .impd-topnav-actions { display: none; }
+        .impd-nav-toggle { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-left: auto; border: 0; background: transparent; color: var(--impd-ink); cursor: pointer; }
+        .impd-mobile-panel:not([hidden]) { display: block; padding: 0 16px 16px; }
+        .impd-mobile-panel .impd-nav-link { display: flex; align-items: center; min-height: 48px; font-size: 16px; }
+        .impd-mobile-actions { display: grid; gap: 8px; padding-top: 12px; }
+        .impd-mobile-actions .impd-btn { width: 100%; min-height: 48px; font-size: 16px; }
+      }
+    </style>
+    <div class="impd-topnav" data-controller="impd-nav" data-action="keydown.esc@window->impd-nav#close">
+      <div class="impd-topnav-bar">
+        <%= link_to root_path, style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; color: var(--impd-green); white-space: nowrap;" do %>
+          imPD
         <% end %>
-      </nav>
-      <style>
-        @media (max-width: 768px) {
-          .impd-topnav { padding: 12px 16px !important; gap: 12px !important; }
-          .impd-topnav-links { display: none !important; }
-          /* 로그인 시 우측 영역(이름·이메일 + 버튼 2개)이 flex-shrink:0 라 375px 에서 109px 넘쳤다.
-             이메일 줄은 숨기고 버튼을 좁혀 한 줄에 들어오게 한다. */
-          .impd-topnav-identity { display: none !important; }
-          .impd-topnav .impd-btn { padding: 0 10px !important; min-width: 0 !important; font-size: 12px !important; }
-        }
-      </style>
-      <%# 로그인 상태에 따른 우측 액션 영역 %>
-      <% if member_signed_in? %>
-        <%# 로그인됨: 이름 / 내 페이지 / 로그아웃. button_to form 이 줄바꿈 되지 않도록 display: inline-flex. %>
-        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
-          <div class="impd-topnav-identity" title="<%= current_member.email %>" style="display: inline-flex; flex-direction: column; align-items: flex-end; gap: 1px; white-space: nowrap; line-height: 1;">
-            <span style="font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted);">
-              <%= truncate(current_member.name.to_s, length: 12) %>
-            </span>
-            <span style="font-family: var(--impd-font-mono); font-size: 10px; color: var(--impd-ink); letter-spacing: -0.1px;">
-              <%= truncate(current_member.email.to_s, length: 24) %>
-            </span>
+        <nav class="impd-topnav-links" aria-label="주요 메뉴">
+          <% nav_links.each do |label, path, active| %>
+            <%= link_to label, path, class: "impd-nav-link", aria: { current: ("page" if active) } %>
+          <% end %>
+        </nav>
+        <% if member_signed_in? %>
+          <div class="impd-topnav-actions">
+            <div class="impd-topnav-identity" title="<%= current_member.email %>">
+              <span style="font-family: var(--impd-font-sans); font-size: 13px; color: var(--impd-muted);"><%= truncate(current_member.name.to_s, length: 12) %></span>
+              <span style="font-family: var(--impd-font-sans); font-size: 10px; color: var(--impd-ink);"><%= truncate(current_member.email.to_s, length: 24) %></span>
+            </div>
+            <%= link_to "내 페이지", "/#{current_member.slug}", class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 14px; font-size: 13px; white-space: nowrap;" %>
+            <%= button_to "로그아웃", member_logout_path, method: :delete, form: { data: { turbo_confirm: "로그아웃하시겠습니까?" }, style: "display: inline-flex; margin: 0;" }, class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 14px; font-size: 13px; white-space: nowrap;" %>
           </div>
-          <%= link_to "내 페이지", "/#{current_member.slug}",
-                class: "impd-btn impd-btn-secondary",
-                style: "height: 36px; padding: 0 14px; font-size: 13px; white-space: nowrap;" %>
-          <%= button_to "로그아웃", member_logout_path,
-                method: :delete,
-                form: { data: { turbo_confirm: "로그아웃하시겠습니까?" }, style: "display: inline-flex; margin: 0;" },
-                class: "impd-btn impd-btn-secondary",
-                style: "height: 36px; padding: 0 14px; font-size: 13px; white-space: nowrap;" %>
+        <% else %>
+          <div class="impd-topnav-actions">
+            <%= link_to "회원가입", member_signup_path, style: "font-size: 13px; color: var(--impd-muted); white-space: nowrap;" %>
+            <%= link_to "로그인", member_login_path, class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 14px; font-size: 13px; white-space: nowrap;" %>
+          </div>
+        <% end %>
+        <button type="button" class="impd-nav-toggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="impd-mobile-menu" data-impd-nav-target="button" data-action="impd-nav#toggle">
+          <span data-impd-nav-target="menuIcon"><%= lni_icon "menu-hamburger-1", size: 24 %></span>
+          <span data-impd-nav-target="closeIcon" hidden><%= lni_icon "xmark", size: 24 %></span>
+        </button>
+      </div>
+      <div id="impd-mobile-menu" class="impd-mobile-panel" data-impd-nav-target="panel" data-action="click->impd-nav#closeOnLink" hidden>
+        <nav aria-label="모바일 주요 메뉴">
+          <% nav_links.each do |label, path, active| %>
+            <%= link_to label, path, class: "impd-nav-link", aria: { current: ("page" if active) } %>
+          <% end %>
+        </nav>
+        <div class="impd-mobile-actions">
+          <% if member_signed_in? %>
+            <%= link_to "내 페이지 관리", "/#{current_member.slug}/admin/dashboard", class: "impd-btn impd-btn-primary" %>
+            <%= button_to "로그아웃", member_logout_path, method: :delete, form: { data: { turbo_confirm: "로그아웃하시겠습니까?" } }, class: "impd-btn impd-btn-secondary" %>
+          <% else %>
+            <%= link_to "로그인", member_login_path, class: "impd-btn impd-btn-secondary" %>
+            <%= link_to "무료로 시작하기", member_signup_path, class: "impd-btn impd-btn-primary" %>
+          <% end %>
         </div>
-      <% else %>
-        <%# 미로그인: 회원가입 + 로그인 2버튼 %>
-        <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-          <%= link_to "회원가입", member_signup_path,
-                style: "font-size: 13px; color: var(--impd-muted); text-decoration: none; white-space: nowrap;",
-                onmouseover: "this.style.color='var(--impd-accent)'",
-                onmouseout: "this.style.color='var(--impd-muted)'" %>
-          <%= link_to "로그인", member_login_path,
-                class: "impd-btn impd-btn-secondary",
-                style: "height: 36px; padding: 0 14px; font-size: 13px; white-space: nowrap;" %>
-        </div>
-      <% end %>
+      </div>
     </div>
 
     <% if flash[:notice] %>
