@@ -15,6 +15,17 @@
   .impd-professions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
   .impd-profession-pill { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border: 1px solid var(--impd-rule); border-radius: 999px; background: #fff; color: var(--impd-ink); font-size: 15px; font-weight: 600; text-decoration: none; transition: border-color 150ms ease, transform 150ms ease; }
   .impd-profession-pill:hover { border-color: var(--impd-green); transform: translateY(-2px); }
+  .impd-faq { max-width: 860px; margin: 0 auto; }
+  .impd-faq h2 { margin: 0 0 24px; font-size: clamp(26px, 7vw, 36px); }
+  .impd-faq details { border-top: 1px solid var(--impd-rule); }
+  .impd-faq details:last-child { border-bottom: 1px solid var(--impd-rule); }
+  .impd-faq summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 56px; padding: 16px 0; cursor: pointer; font-size: 17px; font-weight: 700; list-style: none; }
+  .impd-faq summary::-webkit-details-marker { display: none; }
+  .impd-faq summary:focus-visible { outline: 2px solid var(--impd-green); outline-offset: 3px; }
+  .impd-faq summary .lni { flex-shrink: 0; transition: transform 150ms ease; }
+  .impd-faq details[open] summary .lni { transform: rotate(180deg); }
+  .impd-faq p { margin: 0; padding: 0 0 20px; color: var(--impd-ink2); font-size: 15px; line-height: 1.7; }
+  @media (prefers-reduced-motion: reduce) { .impd-faq summary .lni { transition: none; } }
   @media (max-width: 599px) { .impd-professions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .impd-profession-pill { padding: 0 10px; } }
   @media (max-width: 899px) { .impd-types-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 899px) { .impd-member-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -299,7 +310,7 @@
   <!-- ── 07 Reward Feature Band (C2 Starbucks-style dark green) ───────────────────────── -->
   <section id="pricing" class="impd-c2-band impd-stripe" style="padding: 80px 40px;">
     <div style="max-width: 1200px; margin: 0 auto;">
-      <div class="impd-label" style="margin-bottom: 18px;" id="faq">imPD 리워드</div>
+      <div class="impd-label" style="margin-bottom: 18px;">imPD 리워드</div>
       <h2 class="impd-display" style="font-size: clamp(36px, 5vw, 56px); color: var(--impd-on-dark); max-width: 860px; margin-bottom: 12px;">
         오래 쓸수록 더 예뻐지는 페이지.
       </h2>
@@ -335,6 +346,25 @@
           </div>
         <% end %>
       </div>
+    </div>
+  </section>
+
+  <section id="faq" class="impd-wrap impd-section" aria-labelledby="faq-title">
+    <div class="impd-faq">
+      <h2 id="faq-title" class="impd-display">자주 묻는 질문</h2>
+      <% [
+        ["정말 무료로 시작할 수 있나요?", "네. 무료 요금제는 월 0원이며 가입할 때 카드 정보를 입력하지 않습니다."],
+        ["내 페이지 주소는 어떻게 되나요?", "공개 페이지 주소는 #{public_host}/내 주소 형식입니다. 가입할 때 주소를 직접 입력하거나 비워 두어 자동으로 만들 수 있어요."],
+        ["언제든 탈퇴할 수 있나요?", "회원 관리 화면에서 탈퇴할 수 있어요. 탈퇴하면 공개 페이지가 닫히고 개인정보는 익명화되며 업로드한 문서와 사진은 삭제됩니다. 거래·후기·문의 기록은 남습니다."],
+        ["외부 노출과 광고는 어떻게 동의하나요?", "회원 관리의 노출·광고 동의 화면에서 선택하고 철회할 수 있어요. SocialDoctors 브랜드 노출 정보에는 이메일과 전화번호가 포함되지 않습니다."],
+        ["보험설계사도 쓸 수 있나요?", "네. 가입할 때 직업으로 보험설계사를 선택할 수 있어요."],
+        ["사진이나 자료가 없어도 가입할 수 있나요?", "네. 이메일 가입에는 이름, 이메일, 비밀번호와 비밀번호 확인, 이용약관 및 개인정보처리방침 동의가 필요해요. 사진이나 자료는 가입 필수 항목이 아닙니다."]
+      ].each do |question, answer| %>
+        <details>
+          <summary><%= question %><%= lni_icon "chevron-down", size: 20 %></summary>
+          <p><%= answer %></p>
+        </details>
+      <% end %>
     </div>
   </section>
 
