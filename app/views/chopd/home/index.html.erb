@@ -1,4 +1,4 @@
-<% content_for :title, "imPD — 강사·공방·아티스트의 홍보 페이지" %>
+<% content_for :title, "imPD — 1인 사업자·크리에이터의 홍보 페이지" %>
 <% content_for :description, "사진과 수료증만 올리면 자동으로 홍보 페이지가 완성됩니다. imPD." %>
 
 <style>
@@ -23,7 +23,7 @@
       <% 2.times do %>
         <span>지금 신청 받는 중</span>
         <span>vol. 04 · 2026 봄</span>
-        <span>강사·공방·아티스트를 위해</span>
+        <span>사장님·크리에이터·설계사를 위해</span>
         <span>템플릿 없음</span>
         <span>매번 새로 디자인</span>
         <span>베타 초대 진행 중 · 실제 페이지만 노출</span>
@@ -42,16 +42,15 @@
              style="font-family: var(--impd-font-display); font-weight: 800; font-size: clamp(48px, 8vw, 96px); letter-spacing: -4.5px; line-height: 0.9;">
           <div>당신은</div>
           <div style="height: 1em; overflow: hidden; position: relative;">
-            <div data-impd-rotator-target="word" style="color: var(--impd-accent); font-style: italic;">강사</div>
+            <div data-impd-rotator-target="word" style="color: var(--impd-accent); font-style: italic;">사장님입니다.</div>
           </div>
           <div>사진 몇 장,</div>
-          <div><span style="color: var(--impd-accent); font-style: italic;">수료증 하나</span>면</div>
+          <div><span style="color: var(--impd-accent); font-style: italic;">자격증 하나</span>면</div>
           <div>완성됩니다.</div>
         </div>
 
         <p style="margin-top: 36px; font-size: 16px; line-height: 1.6; color: var(--impd-ink2); max-width: 480px;">
-          SNS에 흩어진 사진, 서랍 속 수료증, 그동안 진행해 온 강의 이력 —
-          그냥 올리기만 하세요. imPD가 자동으로 정리해 당신만의 홍보 페이지로 만들어 드립니다.
+          SNS 사진, 자격증, 그동안 쌓은 경력과 고객 후기 — 갖고 있는 그대로 올리기만 하세요. imPD가 정리해 믿음직한 홍보 페이지로 만들어 드립니다.
         </p>
 
         <div style="display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap;">
@@ -390,7 +389,7 @@
       imPD<span style="color: var(--impd-accent);">.</span>
     </span>
     <span>vol. 04 · 2026</span>
-    <span style="flex: 1;">강사·공방·아티스트를 위한 홍보 페이지</span>
+    <span style="flex: 1;">혼자 일하는 사람을 위한 홍보 페이지</span>
     <%= link_to "이용약관", terms_path, class: "text-muted" %>
     <%= link_to "개인정보", privacy_path, class: "text-muted" %>
     <span>hello@impd.page</span>
@@ -402,7 +401,7 @@
   (function() {
     const target = document.querySelector('[data-impd-rotator-target="word"]');
     if (!target) return;
-    const words = ['강사', '공방장', '작가', '셀러', '코치', '유튜버', '디렉터', '장인'];
+    const words = ['사장님', '크리에이터', '보험설계사', '강사', '공방장', '코치', '프리랜서', '작가'];
     let i = 0;
     setInterval(() => {
       i = (i + 1) % words.length;
