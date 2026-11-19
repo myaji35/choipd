@@ -37,33 +37,59 @@
     <%= javascript_importmap_tags %>
   </head>
   <body>
-    <!-- imPD admin TopNav -->
-    <div style="position: sticky; top: 0; z-index: 20; background: var(--impd-paper); border-bottom: 1px solid var(--impd-rule); padding: 14px 40px; display: flex; align-items: center; gap: 32px;">
-      <%= link_to "/", style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 20px; color: var(--impd-ink);" do %>
-        imPD<span style="color: var(--impd-accent);">.</span>
-      <% end %>
-      <div style="display: flex; gap: 22px; flex: 1;">
-        <%= link_to "홈", "/", style: "color: var(--impd-muted); font-size: 13px; font-weight: 500;" %>
+    <style>
+      .admin-nav { position: sticky; top: 0; z-index: 20; background: var(--impd-paper); border-bottom: 1px solid var(--impd-rule); }
+      .admin-nav-bar { padding: 14px 40px; display: flex; align-items: center; gap: 24px; }
+      .admin-nav-links { display: flex; align-items: center; gap: 22px; flex: 1; }
+      .admin-nav-link { font-size: 13px; color: var(--impd-muted); padding: 8px 0; border-bottom: 2px solid transparent; }
+      .admin-nav-link[aria-current="page"] { color: var(--impd-accent); border-bottom-color: var(--impd-accent); font-weight: 700; }
+      .admin-identity { display: flex; flex-direction: column; align-items: flex-end; font-size: 13px; }
+      .admin-email { font-size: 12px; color: var(--impd-muted); }
+      .admin-menu-button, .admin-mobile-panel { display: none; }
+      @media (max-width: 767px) {
+        .admin-nav-bar { padding: 12px 18px; gap: 12px; }
+        .admin-nav-links, .admin-email, .admin-logout { display: none; }
+        .admin-identity { margin-left: auto; }
+        .admin-menu-button { display: inline-flex; border: 0; background: transparent; padding: 8px; font-size: 22px; }
+        .admin-mobile-panel:not([hidden]) { display: flex; flex-direction: column; padding: 0 18px 16px; }
+        .admin-mobile-panel .admin-nav-link { min-height: 44px; display: flex; align-items: center; gap: 6px; }
+      }
+    </style>
+    <% if @member %>
+      <% nav_items = [
+        ["대시보드", slug_admin_dashboard_path(slug: @member.slug), controller_path == "member_admin/dashboard"],
+        ["에디터", slug_admin_editor_path(slug: @member.slug), controller_path == "member_admin/editor"],
+        ["고객(문의함)", slug_admin_inquiries_path(slug: @member.slug), controller_path == "member_admin/inquiries"],
+        ["노출·광고 동의", slug_admin_brand_consents_path(slug: @member.slug), controller_path == "member_admin/brand_consents"]
+      ] %>
+    <% end %>
+    <nav class="admin-nav" data-controller="impd-nav" aria-label="회원 관리 메뉴">
+      <div class="admin-nav-bar">
+        <%= link_to "imPD.", (@member ? slug_admin_dashboard_path(slug: @member.slug) : root_path), style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 20px;" %>
         <% if @member %>
-          <%= link_to "예시 페이지", "/#{@member.slug}", target: "_blank", style: "color: var(--impd-muted); font-size: 13px; font-weight: 500;" %>
-          <%= link_to "에디터", slug_admin_editor_path(slug: @member.slug),
-              style: "color: #{request.path.include?('editor') ? 'var(--impd-ink)' : 'var(--impd-muted)'}; font-size: 13px; font-weight: #{request.path.include?('editor') ? '600' : '500'}; border-bottom: #{request.path.include?('editor') ? '2px solid var(--impd-accent)' : '2px solid transparent'}; padding: 4px 0;" %>
-          <%= link_to "노출·광고 동의", slug_admin_brand_consents_path(slug: @member.slug), style: "color: var(--impd-muted); font-size: 13px; font-weight: 500; padding: 4px 0;" %>
-          <%= link_to "대시보드", slug_admin_dashboard_path(slug: @member.slug),
-              style: "color: #{request.path.include?('dashboard') ? 'var(--impd-ink)' : 'var(--impd-muted)'}; font-size: 13px; font-weight: #{request.path.include?('dashboard') ? '600' : '500'}; border-bottom: #{request.path.include?('dashboard') ? '2px solid var(--impd-accent)' : '2px solid transparent'}; padding: 4px 0;" %>
+          <div class="admin-nav-links">
+            <% nav_items.each do |label, path, active| %>
+              <%= link_to label, path, class: "admin-nav-link", aria: { current: ("page" if active) } %>
+            <% end %>
+            <%= link_to "/#{@member.slug}", target: "_blank", rel: "noopener", class: "admin-nav-link" do %>내 페이지 보기 <%= lni_icon "arrow-angular-top-right" %><% end %>
+          </div>
+          <div class="admin-identity"><span><%= @member.name %>님</span><span class="admin-email"><%= @member.email %></span></div>
+          <div class="admin-logout"><%= button_to "로그아웃", logout_member_path(slug: @member.slug), method: :delete, class: "impd-btn impd-btn-secondary", style: "height: 32px; padding: 0 12px; font-size: 12px;" %></div>
+          <button type="button" class="admin-menu-button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="admin-mobile-menu" data-impd-nav-target="button" data-action="impd-nav#toggle">
+            <span data-impd-nav-target="menuIcon"><%= lni_icon "menu-hamburger-1" %></span><span data-impd-nav-target="closeIcon" hidden><%= lni_icon "xmark" %></span>
+          </button>
         <% end %>
       </div>
       <% if @member %>
-        <%# 로그인 이메일 명시 — 대표님 지적 "로그인한 이메일 정보 표시할 수 없나?" %>
-        <div style="display: inline-flex; flex-direction: column; align-items: flex-end; gap: 1px; line-height: 1;">
-          <span class="impd-label-muted"><%= @member.name %>님</span>
-          <span style="font-family: var(--impd-font-mono); font-size: 10px; color: var(--impd-ink); letter-spacing: -0.1px;">
-            <%= truncate(@member.email.to_s, length: 24) %>
-          </span>
+        <div id="admin-mobile-menu" class="admin-mobile-panel" data-impd-nav-target="panel" data-action="click->impd-nav#closeOnLink" hidden>
+          <% nav_items.each do |label, path, active| %>
+            <%= link_to label, path, class: "admin-nav-link", aria: { current: ("page" if active) } %>
+          <% end %>
+          <%= link_to "/#{@member.slug}", target: "_blank", rel: "noopener", class: "admin-nav-link" do %>내 페이지 보기 <%= lni_icon "arrow-angular-top-right" %><% end %>
+          <%= button_to "로그아웃", logout_member_path(slug: @member.slug), method: :delete, class: "impd-btn impd-btn-secondary" %>
         </div>
-        <%= button_to "로그아웃", logout_member_path(slug: @member.slug), method: :delete, class: "impd-btn impd-btn-secondary", style: "height: 32px; padding: 0 12px; font-size: 12px;" %>
       <% end %>
-    </div>
+    </nav>
 
     <% if flash[:notice] %><div style="background: rgba(0,117,74,.1); border-left: 3px solid var(--impd-accent); color: var(--impd-accent); padding: 12px 40px; font-size: 13px;"><%= lni_icon "check-circle-1" %> <%= flash[:notice] %></div><% end %>
     <% if flash[:alert] %><div style="background: rgba(179,38,30,.08); border-left: 3px solid #B3261E; color: #B3261E; padding: 12px 40px; font-size: 13px;"><%= lni_icon "xmark-circle" %> <%= flash[:alert] %></div><% end %>

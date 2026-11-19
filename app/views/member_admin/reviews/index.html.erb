@@ -34,7 +34,7 @@
         <article style="background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 24px;">
           <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
             <strong style="font-size: 15px;"><%= review.reviewer_name %></strong>
-            <span aria-label="별점 <%= review.rating %>점" style="color: #9a6b00; letter-spacing: 1px; font-size: 14px;"><%= "★" * review.rating %></span>
+            <span aria-label="별점 <%= review.rating %>점" style="color: #9a6b00; letter-spacing: 1px; font-size: 14px;"><% review.rating.times do %><%= lni_icon "star-fat" %><% end %></span>
             <span style="padding: 4px 8px; border: 1px solid <%= status_color %>; color: <%= status_color %>; font-size: 12px; font-weight: 700;"><%= status_label %></span>
             <time datetime="<%= review.created_at.iso8601 %>" style="margin-left: auto; font-size: 12px; color: var(--impd-muted);"><%= review.created_at.strftime("%Y.%m.%d %H:%M") %></time>
           </div>

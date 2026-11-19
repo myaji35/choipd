@@ -11,6 +11,7 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
       @member.update!(layout_preset: layout)
       get public_profile_path(slug: @member.slug)
       assert_response :success
+      assert_not_includes response.body, "지금 가입하면 첫 페이지 제작 무료"
       assert_no_match(/현장 사진/, response.body)
       assert_no_match(/서비스 \/ 수업/, response.body)
       assert_includes response.body, "모집인 등록번호는 상담 시 안내해 드려요."

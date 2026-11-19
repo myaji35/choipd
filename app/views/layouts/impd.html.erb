@@ -187,7 +187,7 @@
   </head>
   <body>
     <!-- C2 Join Strip — 최상단 검정 bar (비로그인에만) -->
-    <% unless member_signed_in? %>
+    <% unless member_signed_in? || controller_path == "public_profile" %>
       <div class="impd-joinstrip" style="background: #000; color: #fff; padding: 10px 24px; display: flex; align-items: center; gap: 14px; font-size: 13px; letter-spacing: -0.01em;">
         <span style="opacity: 0.9;">지금 가입하면 첫 페이지 제작 무료 · 수수료 없이 3개월</span>
         <span style="flex: 1;"></span>

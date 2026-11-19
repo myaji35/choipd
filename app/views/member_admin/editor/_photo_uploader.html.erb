@@ -8,22 +8,19 @@
      data-member-photo-uploader-create-url-value="<%= slug_admin_photos_path(slug: member.slug, format: :json) %>"
      data-member-photo-uploader-csrf-value="<%= form_authenticity_token %>"
      data-action="dragover->member-photo-uploader#dragover dragleave->member-photo-uploader#dragleave drop->member-photo-uploader#drop">
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--impd-accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px;" aria-hidden="true">
-    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-    <circle cx="12" cy="13" r="4"/>
-  </svg>
+  <%= lni_icon "camera-1", size: 20 %>
   <p style="font-family: var(--impd-font-display); font-size: 20px; font-weight: 800;">사진·영상을 여기로</p>
   <p style="font-size: 13px; color: var(--impd-muted); margin-top: 6px;">폰에서는 아래 버튼으로 카메라/갤러리 바로 열기</p>
 
   <div style="margin-top: 18px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
     <label style="cursor: pointer;">
-      <span class="impd-btn impd-btn-primary" style="display: inline-flex; align-items: center; gap: 6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>카메라로 촬영</span>
+      <span class="impd-btn impd-btn-primary" style="display: inline-flex; align-items: center; gap: 6px;"><%= lni_icon "camera-1", size: 20 %>카메라로 촬영</span>
       <input type="file" accept="image/*,video/*" capture="environment" multiple style="display:none;"
              data-member-photo-uploader-target="cameraInput"
              data-action="change->member-photo-uploader#fileSelected">
     </label>
     <label style="cursor: pointer;">
-      <span class="impd-btn" style="display: inline-block; background: var(--impd-paper); color: var(--impd-ink); border: 1px solid var(--impd-ink);">🖼 갤러리에서 선택</span>
+      <span class="impd-btn" style="display: inline-block; background: var(--impd-paper); color: var(--impd-ink); border: 1px solid var(--impd-ink);"><%= lni_icon "camera-1" %> 갤러리에서 선택</span>
       <input type="file" accept="image/*,video/*" multiple style="display:none;"
              data-member-photo-uploader-target="galleryInput"
              data-action="change->member-photo-uploader#fileSelected">

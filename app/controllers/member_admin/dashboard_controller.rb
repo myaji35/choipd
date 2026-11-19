@@ -35,12 +35,12 @@ class MemberAdmin::DashboardController < MemberAdmin::BaseController
 
   def build_checklist
     [
-      { label: "프로필 사진 업로드", done: @member.profile_image.present? },
-      { label: "자기소개 작성 (50자 이상)", done: @member.bio.to_s.length >= 50 },
-      { label: "직업/지역 설정", done: @member.profession.present? && @member.region.present? },
-      { label: "포트폴리오 1개 이상", done: @member.member_portfolio_items.exists? },
-      { label: "서비스 1개 이상 등록", done: @member.member_services.exists? },
-      { label: ".md 문서 업로드 (달란트 추출)", done: @member.member_documents.exists? }
+      { label: "프로필 사진 업로드", why: "얼굴을 보여주면 고객이 더 친근하게 느껴요.", path: slug_admin_editor_path(slug: @member.slug, step: 1), done: @member.profile_image.present? },
+      { label: "자기소개 작성 (50자 이상)", why: "어떤 일을 하는지 고객에게 알려주세요.", path: slug_admin_editor_path(slug: @member.slug, step: 2), done: @member.bio.to_s.length >= 50 },
+      { label: "직업/지역 설정", why: "고객이 나에게 맞는 전문가인지 알 수 있어요.", path: slug_admin_editor_path(slug: @member.slug, step: 2), done: @member.profession.present? && @member.region.present? },
+      { label: "포트폴리오 1개 이상", why: "작업 사례로 경험을 보여주세요.", path: slug_admin_editor_path(slug: @member.slug, step: 1), done: @member.member_portfolio_items.exists? },
+      { label: "서비스 1개 이상 등록", why: "고객이 제공하는 서비스를 쉽게 확인할 수 있어요.", path: slug_admin_services_path(slug: @member.slug), done: @member.member_services.exists? },
+      { label: "이력서·경력 문서 올리기", why: "경험과 강점을 페이지에 담을 수 있어요.", path: slug_admin_editor_path(slug: @member.slug, step: 1), done: @member.member_documents.exists? }
     ]
   end
 end
