@@ -6,6 +6,10 @@
   .impd-wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
   .impd-section { padding: 80px 0; }
   .impd-member-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .impd-professions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  .impd-profession-pill { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border: 1px solid var(--impd-rule); border-radius: 999px; background: #fff; color: var(--impd-ink); font-size: 15px; font-weight: 600; text-decoration: none; transition: border-color 150ms ease, transform 150ms ease; }
+  .impd-profession-pill:hover { border-color: var(--impd-green); transform: translateY(-2px); }
+  @media (max-width: 599px) { .impd-professions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .impd-profession-pill { padding: 0 10px; } }
   @media (max-width: 899px) { .impd-member-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 599px) { .impd-member-grid { grid-template-columns: 1fr; } }
   @media (max-width: 768px) {
@@ -87,7 +91,7 @@
   </section>
 
   <!-- ── 3가지 약속 ───────────────────────── -->
-  <section class="impd-wrap" style="padding: 40px 40px 80px;">
+  <section class="impd-wrap" style="padding: 40px 40px 32px;">
     <div class="impd-stats-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--impd-ink);">
       <% [
         ["0원", "무료로 시작", "카드 등록 없이 바로 만들어요"],
@@ -99,6 +103,26 @@
           <div style="margin-top: 6px; font-size: 15px; font-weight: 700; color: var(--impd-ink);"><%= label %></div>
           <div style="font-size: 13px; color: var(--impd-muted); margin-top: 2px; font-family: var(--impd-font-sans);"><%= sub %></div>
         </div>
+      <% end %>
+    </div>
+  </section>
+
+  <!-- ── 직업별 페이지 ───────────────────────── -->
+  <section class="impd-wrap" style="padding: 16px 40px 32px;">
+    <h2 style="font-size: 24px; font-weight: 700; margin: 0;">내 직업으로 먼저 보기</h2>
+    <p style="font-size: 15px; color: var(--impd-ink2); margin: 8px 0 0;">같은 일을 하는 분들의 페이지를 먼저 둘러보세요.</p>
+    <div class="impd-professions">
+      <% [
+        ["보험설계사", "insurance_agent", "shield-2-check"],
+        ["동네 가게 사장님", "shopowner", "cart-1"],
+        ["1인 크리에이터", "freelancer", "camera-1"],
+        ["강사·코치", "educator", "book-1"],
+        ["공인중개사", "realtor", "home-2"],
+        ["작가", "author", "pencil-1"]
+      ].each do |label, code, icon| %>
+        <%= link_to explore_path(profession: code), class: "impd-profession-pill" do %>
+          <%= lni_icon icon, size: 18 %> <%= label %>
+        <% end %>
       <% end %>
     </div>
   </section>
