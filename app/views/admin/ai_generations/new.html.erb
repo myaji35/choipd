@@ -11,7 +11,7 @@
         class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
   </div>
   <div class="bg-amber-50 border border-amber-200 rounded p-3 text-xs text-amber-700">
-    💡 OpenAI/Anthropic API 키가 설정되지 않은 경우 stub 응답이 반환됩니다.
+    <%= lni_icon "bulb-2" %> OpenAI/Anthropic API 키가 설정되지 않은 경우 stub 응답이 반환됩니다.
   </div>
-  <div class="flex gap-3 pt-2"><%= f.submit "🤖 생성", class: "bg-primary text-white px-6 py-2 rounded-lg text-sm cursor-pointer" %></div>
+  <div class="flex gap-3 pt-2"><%= f.submit "생성", class: "bg-primary text-white px-6 py-2 rounded-lg text-sm cursor-pointer" %></div>
 <% end %>

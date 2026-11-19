@@ -1,7 +1,7 @@
 <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
   <div class="flex items-start justify-between mb-3">
     <div>
-      <h2 class="font-semibold text-navy text-base">📊 갭 리포트</h2>
+      <h2 class="font-semibold text-navy text-base"><%= lni_icon "bar-chart-4" %> 갭 리포트</h2>
       <p class="text-xs text-gray-500 mt-1">동일 직종 중앙값/상위 10% 대비 현재 위치</p>
     </div>
     <%= button_to "리포트 생성", generate_admin_member_gap_report_path(member, format: :json),

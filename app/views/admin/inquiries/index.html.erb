@@ -2,7 +2,7 @@
 
 <div class="flex items-center justify-between mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-navy">💬 문의 관리</h1>
+    <h1 class="text-2xl font-bold text-navy"><%= lni_icon "message-3-text" %> 문의 관리</h1>
     <p class="text-sm text-gray-500 mt-1">전체 <%= @inquiries.size %>건</p>
   </div>
   <%= form_with url: admin_inquiries_path, method: :get, class: "flex gap-2" do |f| %>
@@ -23,11 +23,11 @@
     <p class="text-2xl font-bold text-yellow-700"><%= @inquiries.where(status: 'pending').size %></p>
   </div>
   <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-    <p class="text-xs text-gray-600">✓ 연락완료</p>
+    <p class="text-xs text-gray-600"><%= lni_icon "check" %> 연락완료</p>
     <p class="text-2xl font-bold text-green-700"><%= @inquiries.where(status: 'contacted').size %></p>
   </div>
   <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
-    <p class="text-xs text-gray-600">📁 종료</p>
+    <p class="text-xs text-gray-600"><%= lni_icon "folder-1" %> 종료</p>
     <p class="text-2xl font-bold text-gray-700"><%= @inquiries.where(status: 'closed').size %></p>
   </div>
 </div>
@@ -52,7 +52,7 @@
           <td class="px-4 py-3 text-gray-500 text-xs"><%= inq.email %></td>
           <td class="px-4 py-3">
             <% if inq.inquiry_type == 'b2b' %>
-              <span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded">🏢 B2B</span>
+              <span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded"><%= lni_icon "buildings-1" %> B2B</span>
             <% else %>
               <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded">일반</span>
             <% end %>

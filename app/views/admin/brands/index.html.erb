@@ -2,7 +2,7 @@
 
 <div class="flex items-center justify-between mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-navy">🏷️ 브랜드 관리</h1>
+    <h1 class="text-2xl font-bold text-navy"><%= lni_icon "bookmark-1" %> 브랜드 관리</h1>
     <p class="text-sm text-gray-500 mt-1">전체 <%= @brands.size %>개 브랜드</p>
   </div>
   <div class="flex items-center gap-2">
@@ -32,7 +32,7 @@
         <% if brand.logo_url.present? %>
           <img src="<%= brand.logo_url %>" alt="" class="w-full h-40 object-contain bg-gray-50 p-4">
         <% else %>
-          <div class="w-full h-40 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-4xl">🏷️</div>
+          <div class="w-full h-40 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-4xl"><%= lni_icon "bookmark-1" %></div>
         <% end %>
         <div class="p-4">
           <div class="flex items-start justify-between mb-2">
@@ -56,7 +56,7 @@
 
           <% if brand.website_url.present? %>
             <a href="<%= brand.website_url %>" target="_blank" rel="noopener noreferrer" class="text-xs text-blue-600 hover:underline mt-2 block">
-              🌐 웹사이트 ↗
+              <%= lni_icon "globe-1" %> 웹사이트 ↗
             </a>
           <% end %>
 
@@ -99,7 +99,7 @@
                 <% if brand.logo_url.present? %>
                   <img src="<%= brand.logo_url %>" alt="" class="w-10 h-10 object-contain bg-gray-50 rounded">
                 <% else %>
-                  <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs">🏷️</div>
+                  <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs"><%= lni_icon "bookmark-1" %></div>
                 <% end %>
                 <div>
                   <span class="font-medium text-navy block"><%= brand.name %></span>

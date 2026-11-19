@@ -68,7 +68,7 @@
       <div class="bg-gradient-to-br from-blue-50 to-white rounded-lg border border-blue-200 shadow-sm p-5">
         <div class="flex items-start justify-between">
           <div>
-            <h2 class="font-semibold text-navy text-base mb-1">🌐 회원 공개 페이지</h2>
+            <h2 class="font-semibold text-navy text-base mb-1"><%= lni_icon "globe-1" %> 회원 공개 페이지</h2>
             <p class="text-sm text-gray-600 mb-3">팔로워가 보는 분양사 홈입니다.</p>
             <a href="/<%= @distributor.slug %>" target="_blank" rel="noopener noreferrer"
                class="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90">
@@ -122,9 +122,9 @@
       </div>
       <% if @distributor.pending? %>
         <div class="space-y-2">
-          <%= button_to "✓ 승인", approve_admin_distributor_path(@distributor),
+          <%= button_to safe_join([lni_icon("check"), "승인"], " "), approve_admin_distributor_path(@distributor),
               class: "w-full bg-green-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors" %>
-          <%= button_to "✗ 거부", reject_admin_distributor_path(@distributor),
+          <%= button_to safe_join([lni_icon("xmark"), "거부"], " "), reject_admin_distributor_path(@distributor),
               class: "w-full bg-red-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors" %>
         </div>
       <% elsif @distributor.approved? %>
@@ -156,7 +156,7 @@
         <% if @distributor.identity_md.present? %>
           <div class="flex justify-between pt-2 border-t border-gray-100">
             <dt class="text-gray-500">Identity 문서</dt>
-            <dd class="text-green-600 font-semibold">✓ 등록됨</dd>
+            <dd class="text-green-600 font-semibold"><%= lni_icon "check" %> 등록됨</dd>
           </div>
         <% end %>
       </dl>

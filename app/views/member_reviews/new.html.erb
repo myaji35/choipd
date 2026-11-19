@@ -28,7 +28,7 @@
           <% (1..5).each do |rating| %>
             <label style="display: inline-flex; align-items: center; gap: 6px; min-height: 42px; padding: 8px 12px; border: 1px solid var(--impd-rule); cursor: pointer; font-size: 14px;">
               <%= form.radio_button :rating, rating, required: true %>
-              <span style="color: var(--impd-gold); letter-spacing: 1px;"><%= "★" * rating %></span>
+              <span style="color: var(--impd-gold); letter-spacing: 1px;"><% rating.times do %><%= lni_icon "star-fat" %><% end %></span>
             </label>
           <% end %>
         </div>

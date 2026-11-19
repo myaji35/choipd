@@ -23,7 +23,7 @@
   <div class="lg:col-span-2 space-y-4">
     <!-- 액션 단계 -->
     <div class="bg-white border border-gray-200 rounded-lg p-5">
-      <h2 class="font-semibold text-navy mb-3">⚙️ 액션 단계 (<%= @workflow.actions_list.size %>)</h2>
+      <h2 class="font-semibold text-navy mb-3"><%= lni_icon "gear-1" %> 액션 단계 (<%= @workflow.actions_list.size %>)</h2>
       <% if @workflow.actions_list.any? %>
         <div class="space-y-2">
           <% @workflow.actions_list.each_with_index do |a, i| %>
@@ -43,7 +43,7 @@
 
     <!-- 최근 실행 -->
     <div class="bg-white border border-gray-200 rounded-lg p-5">
-      <h2 class="font-semibold text-navy mb-3">🕒 최근 실행 (<%= @recent_executions.size %>)</h2>
+      <h2 class="font-semibold text-navy mb-3"><%= lni_icon "stopwatch" %> 최근 실행 (<%= @recent_executions.size %>)</h2>
       <% if @recent_executions.any? %>
         <table class="w-full text-sm">
           <thead class="border-b">

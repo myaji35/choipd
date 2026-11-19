@@ -14,8 +14,8 @@
     </div>
     <div class="flex gap-4 text-xs text-gray-500">
       <span>매칭 <%= @faq.match_count %>회</span>
-      <span>👍 <%= @faq.helpful_count %></span>
-      <span>👎 <%= @faq.not_helpful_count %></span>
+      <span><%= lni_icon "thumbs-up-3" %> <%= @faq.helpful_count %></span>
+      <span><%= lni_icon "thumbs-down-3" %> <%= @faq.not_helpful_count %></span>
       <span class="ml-auto">우선순위 <%= @faq.priority %></span>
     </div>
   </div>

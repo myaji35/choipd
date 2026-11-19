@@ -2,7 +2,7 @@
 
 <div class="flex items-center justify-between mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-navy">🖼️ 히어로 이미지</h1>
+    <h1 class="text-2xl font-bold text-navy"><%= lni_icon "gallery" %> 히어로 이미지</h1>
     <p class="text-sm text-gray-500 mt-1">전체 <%= @hero_images.size %>개 (활성 <%= @hero_images.select(&:is_active?).size %>개)</p>
   </div>
   <%= link_to "+ 이미지 추가", new_admin_hero_image_path,
@@ -12,7 +12,7 @@
 <% active_imgs = @hero_images.select(&:is_active?).sort_by { |h| h.display_order || 0 } %>
 <% if active_imgs.any? %>
   <div class="bg-blue-50 rounded-lg p-3 mb-4 text-sm text-blue-700">
-    💡 활성 이미지 <%= active_imgs.size %>개가 메인 페이지 히어로 슬라이드에 표시됩니다.
+    <%= lni_icon "bulb-2" %> 활성 이미지 <%= active_imgs.size %>개가 메인 페이지 히어로 슬라이드에 표시됩니다.
     표시 순서: <%= active_imgs.map { |h| h.alt_text.presence || "##{h.id}" }.join(" → ") %>
   </div>
 <% end %>
@@ -26,7 +26,7 @@
         <% elsif hero.image.attached? %>
           <%= image_tag hero.image, class: "w-full h-full object-cover" %>
         <% else %>
-          <div class="w-full h-full flex items-center justify-center text-gray-300 text-5xl">🖼️</div>
+          <div class="w-full h-full flex items-center justify-center text-gray-300 text-5xl"><%= lni_icon "gallery" %></div>
         <% end %>
         <% if hero.is_active? %>
           <span class="absolute top-2 left-2 text-xs px-2 py-0.5 bg-green-500 text-white rounded-full font-semibold">활성</span>
@@ -43,7 +43,7 @@
           <p class="text-xs text-gray-500 mt-1 font-mono truncate"><%= hero.filename %></p>
         <% end %>
         <% if hero.width && hero.height %>
-          <p class="text-xs text-gray-400 mt-1">📐 <%= hero.width %>×<%= hero.height %><% if hero.file_size %> · <%= number_to_human_size(hero.file_size) %><% end %></p>
+          <p class="text-xs text-gray-400 mt-1"><%= lni_icon "ruler-1" %> <%= hero.width %>×<%= hero.height %><% if hero.file_size %> · <%= number_to_human_size(hero.file_size) %><% end %></p>
         <% end %>
         <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center text-xs">
           <%= link_to "수정", edit_admin_hero_image_path(hero), class: "text-primary" %>

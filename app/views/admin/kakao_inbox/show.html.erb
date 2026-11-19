@@ -3,10 +3,10 @@
 <div class="mb-6 flex items-center justify-between">
   <div>
     <%= link_to "← 채널 목록", admin_kakao_inbox_index_path, class: "text-primary text-sm" %>
-    <h1 class="text-2xl font-bold text-navy mt-2">💬 <%= @channel.channel_name %></h1>
+    <h1 class="text-2xl font-bold text-navy mt-2"><%= lni_icon "message-3-text" %> <%= @channel.channel_name %></h1>
     <p class="text-xs text-gray-500 font-mono mt-1"><%= @channel.channel_id %></p>
   </div>
-  <%= button_to "📥 샘플 메시지 5건 (데모)", admin_kakao_inbox_simulate_path(@channel),
+  <%= button_to safe_join([lni_icon("download-1"), "샘플 메시지 5건 (데모)"], " "), admin_kakao_inbox_simulate_path(@channel),
       class: "bg-gray-100 text-gray-700 px-3 py-2 rounded text-xs" %>
 </div>
 
@@ -15,7 +15,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
     <!-- 답해야 할 것 -->
     <div class="bg-gradient-to-br from-orange-50 to-red-50 border-l-4 border-red-500 rounded-lg p-5">
-      <h2 class="font-bold text-red-900 mb-3">🎯 사장님이 답해야 할 것</h2>
+      <h2 class="font-bold text-red-900 mb-3"><%= lni_icon "target-user" %> 사장님이 답해야 할 것</h2>
       <ul class="space-y-2">
         <% @today_summary.must_reply.each do |line| %>
           <li class="text-sm text-red-900 leading-relaxed"><%= line %></li>
@@ -24,7 +24,7 @@
     </div>
     <!-- 오늘 요약 -->
     <div class="bg-gradient-to-br from-blue-50 to-cyan-50 border-l-4 border-blue-500 rounded-lg p-5">
-      <h2 class="font-bold text-blue-900 mb-3">📊 오늘 요약</h2>
+      <h2 class="font-bold text-blue-900 mb-3"><%= lni_icon "bar-chart-4" %> 오늘 요약</h2>
       <ul class="space-y-2">
         <% @today_summary.daily.each do |line| %>
           <li class="text-sm text-blue-900 leading-relaxed"><%= line %></li>
@@ -43,7 +43,7 @@
   <div class="lg:col-span-2 space-y-4">
     <!-- 미답변 -->
     <div class="bg-white border border-gray-200 rounded-lg p-5">
-      <h2 class="font-semibold text-navy mb-3">📨 미답변 메시지 (<%= @unanswered.size %>)</h2>
+      <h2 class="font-semibold text-navy mb-3"><%= lni_icon "envelope-1" %> 미답변 메시지 (<%= @unanswered.size %>)</h2>
       <% if @unanswered.any? %>
         <div class="space-y-2">
           <% @unanswered.each do |m| %>
@@ -54,27 +54,27 @@
                   <% kind_color = case m.question_kind; when 'question' then 'blue'; when 'complaint' then 'red'; else 'gray'; end %>
                   <span class="text-xs px-1.5 py-0.5 bg-<%= kind_color %>-100 text-<%= kind_color %>-700 rounded ml-2"><%= m.question_kind || '—' %></span>
                   <% if m.urgency_score >= 70 %>
-                    <span class="text-xs px-1.5 py-0.5 bg-red-500 text-white rounded ml-1">🚨 긴급 <%= m.urgency_score %></span>
+                    <span class="text-xs px-1.5 py-0.5 bg-red-500 text-white rounded ml-1"><%= lni_icon "bell-1" %> 긴급 <%= m.urgency_score %></span>
                   <% elsif m.urgency_score >= 40 %>
-                    <span class="text-xs px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded ml-1">⚠️ <%= m.urgency_score %></span>
+                    <span class="text-xs px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded ml-1"><%= lni_icon "bell-1" %> <%= m.urgency_score %></span>
                   <% end %>
                 </div>
                 <span class="text-xs text-gray-400"><%= m.received_at.strftime("%H:%M") %></span>
               </div>
               <p class="text-sm text-gray-700 mt-1"><%= m.body %></p>
-              <%= button_to "✓ 답변 완료 표시", admin_kakao_inbox_reply_path(@channel, message_id: m.id),
+              <%= button_to safe_join([lni_icon("check"), "답변 완료 표시"], " "), admin_kakao_inbox_reply_path(@channel, message_id: m.id),
                   class: "mt-2 text-xs text-green-600 hover:text-green-800" %>
             </div>
           <% end %>
         </div>
       <% else %>
-        <p class="text-sm text-gray-400 text-center py-6">미답변 메시지가 없습니다. 👏</p>
+        <p class="text-sm text-gray-400 text-center py-6">미답변 메시지가 없습니다. <%= lni_icon "party-spray" %></p>
       <% end %>
     </div>
 
     <!-- 최근 7일 요약 -->
     <div class="bg-white border border-gray-200 rounded-lg p-5">
-      <h2 class="font-semibold text-navy mb-3">📅 최근 7일 요약</h2>
+      <h2 class="font-semibold text-navy mb-3"><%= lni_icon "calendar-days" %> 최근 7일 요약</h2>
       <% if @recent_summaries.any? %>
         <div class="space-y-2">
           <% @recent_summaries.each do |s| %>
@@ -93,13 +93,13 @@
   <div class="space-y-4">
     <!-- 긴급 알림 -->
     <div class="bg-white border border-gray-200 rounded-lg p-5">
-      <h2 class="font-semibold text-navy mb-3 text-sm">🚨 긴급 알림 (<%= @urgent_alerts.size %>)</h2>
+      <h2 class="font-semibold text-navy mb-3 text-sm"><%= lni_icon "bell-1" %> 긴급 알림 (<%= @urgent_alerts.size %>)</h2>
       <% if @urgent_alerts.any? %>
         <div class="space-y-2">
           <% @urgent_alerts.each do |a| %>
             <div class="bg-red-50 border border-red-200 rounded p-2">
               <div class="text-xs font-semibold text-red-900">
-                <% (1..a.severity).each do %>★<% end %><% (a.severity..4).each do %>☆<% end %>
+                <% (1..a.severity).each do %><%= lni_icon "star-fat" %><% end %><% (a.severity..4).each do %><%= lni_icon "star-sharp-disabled" %><% end %>
                 <% if a.keyword %><span class="ml-1 px-1.5 bg-red-200 rounded font-mono">#<%= a.keyword %></span><% end %>
               </div>
               <p class="text-xs text-red-800 mt-1"><%= a.reason %></p>
@@ -127,7 +127,7 @@
 
     <!-- 안내 -->
     <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-xs text-gray-600">
-      <p class="font-semibold mb-1">⚠️ 운영 원칙</p>
+      <p class="font-semibold mb-1"><%= lni_icon "bell-1" %> 운영 원칙</p>
       <ul class="space-y-1 list-disc list-inside">
         <li>imPD는 메시지를 <strong>읽고 분석</strong>만 합니다</li>
         <li>답변은 사장님이 카카오에서 직접 (자동답변 X)</li>

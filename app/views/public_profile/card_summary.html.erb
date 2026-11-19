@@ -167,7 +167,7 @@
           <dt>지역</dt><dd><%= @member.region %></dd>
         <% end %>
         <% if @member.partner_active? %>
-          <dt>Townin</dt><dd>⭐ <%= @member.partner_display_role || "파트너" %></dd>
+          <dt>Townin</dt><dd><%= lni_icon "star-fat" %> <%= @member.partner_display_role || "파트너" %></dd>
         <% end %>
         <% if @skills_top.any? %>
           <dt>달란트</dt><dd><%= @skills_top.size %>개</dd>

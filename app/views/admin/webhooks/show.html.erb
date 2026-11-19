@@ -6,7 +6,7 @@
     <p class="text-xs text-gray-500 mt-1 font-mono"><%= @webhook.url %></p>
   </div>
   <div class="flex gap-2">
-    <%= button_to "🧪 테스트 송출", test_admin_webhook_path(@webhook),
+    <%= button_to safe_join([lni_icon("microscope"), "테스트 송출"], " "), test_admin_webhook_path(@webhook),
         class: "bg-primary text-white px-4 py-2 rounded-lg text-sm" %>
     <%= button_to "삭제", admin_webhook_path(@webhook), method: :delete,
         class: "bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm",
@@ -17,7 +17,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
   <div class="lg:col-span-2 space-y-4">
     <div class="bg-white border border-gray-200 rounded-lg p-5">
-      <h2 class="font-semibold text-navy mb-3">📋 송출 로그 (<%= @logs.size %>)</h2>
+      <h2 class="font-semibold text-navy mb-3"><%= lni_icon "clipboard" %> 송출 로그 (<%= @logs.size %>)</h2>
       <% if @logs.any? %>
         <table class="w-full text-sm">
           <thead class="border-b text-xs text-gray-500"><tr><th class="text-left py-2">시간</th><th class="text-left py-2">이벤트</th><th class="text-left py-2">상태</th><th class="text-left py-2">코드</th><th class="text-left py-2">시도</th></tr></thead>
@@ -42,7 +42,7 @@
     <div class="bg-white border border-gray-200 rounded-lg p-5">
       <h2 class="font-semibold text-navy mb-3 text-sm">정보</h2>
       <dl class="space-y-2 text-xs">
-        <div class="flex justify-between"><dt class="text-gray-500">활성</dt><dd><%= @webhook.is_active? ? '✓' : '✗' %></dd></div>
+        <div class="flex justify-between"><dt class="text-gray-500">활성</dt><dd><%= lni_icon(@webhook.is_active? ? "check" : "xmark", label: @webhook.is_active? ? "활성" : "비활성") %></dd></div>
         <div class="flex justify-between"><dt class="text-gray-500">성공</dt><dd class="text-green-600 font-bold"><%= @webhook.success_count %></dd></div>
         <div class="flex justify-between"><dt class="text-gray-500">실패</dt><dd class="text-red-600 font-bold"><%= @webhook.failure_count %></dd></div>
         <div class="border-t border-gray-100 pt-2"><dt class="text-gray-500 text-xs">이벤트</dt><dd class="mt-1"><%= safe_join(@webhook.events_list.map { |event| content_tag(:span, event, class: "text-xs px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-mono") }, " ") %></dd></div>

@@ -2,7 +2,7 @@
 
 <div class="flex items-center justify-between mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-navy">📊 분석 대시보드</h1>
+    <h1 class="text-2xl font-bold text-navy"><%= lni_icon "bar-chart-4" %> 분석 대시보드</h1>
     <p class="text-sm text-gray-500 mt-1">최근 <%= @period_days %>일</p>
   </div>
   <div class="flex gap-2">
@@ -36,22 +36,22 @@
 <!-- 도구 카드 -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
   <%= link_to admin_ab_tests_path, class: "block bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow" do %>
-    <p class="text-2xl">🧪</p>
+    <p class="text-2xl"><%= lni_icon "microscope" %></p>
     <p class="font-bold text-navy mt-2">AB 테스트</p>
     <p class="text-xs text-gray-500 mt-1">전체 <%= @ab_tests_count %>개</p>
   <% end %>
   <div class="block bg-white border border-gray-200 rounded-lg p-4 opacity-50">
-    <p class="text-2xl">👥</p>
+    <p class="text-2xl"><%= lni_icon "user-multiple-4" %></p>
     <p class="font-bold text-navy mt-2">코호트</p>
     <p class="text-xs text-gray-500 mt-1">전체 <%= @cohorts_count %>개 (준비 중)</p>
   </div>
   <div class="block bg-white border border-gray-200 rounded-lg p-4 opacity-50">
-    <p class="text-2xl">📉</p>
+    <p class="text-2xl"><%= lni_icon "trend-down-1" %></p>
     <p class="font-bold text-navy mt-2">퍼널 분석</p>
     <p class="text-xs text-gray-500 mt-1">전체 <%= @funnels_count %>개 (준비 중)</p>
   </div>
   <div class="block bg-white border border-gray-200 rounded-lg p-4 opacity-50">
-    <p class="text-2xl">⭐</p>
+    <p class="text-2xl"><%= lni_icon "star-fat" %></p>
     <p class="font-bold text-navy mt-2">RFM 세그먼트</p>
     <p class="text-xs text-gray-500 mt-1">전체 <%= @rfm_segments_count %>개 (준비 중)</p>
   </div>
@@ -59,7 +59,7 @@
 
 <!-- 일별 차트 (간단 SVG) -->
 <div class="bg-white border border-gray-200 rounded-lg p-5 mb-6">
-  <h2 class="font-semibold text-navy mb-3">📈 일별 이벤트 추이</h2>
+  <h2 class="font-semibold text-navy mb-3"><%= lni_icon "trend-up-1" %> 일별 이벤트 추이</h2>
   <% if @daily_counts.any? %>
     <% max_val = @daily_counts.values.max.to_f %>
     <div class="flex items-end gap-1 h-40">
@@ -79,7 +79,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
   <!-- Top 이벤트 -->
   <div class="bg-white border border-gray-200 rounded-lg p-5">
-    <h2 class="font-semibold text-navy mb-3">🔥 Top 10 이벤트</h2>
+    <h2 class="font-semibold text-navy mb-3"><%= lni_icon "trend-up-1" %> Top 10 이벤트</h2>
     <% if @top_events.any? %>
       <% max = @top_events.first[1].to_f %>
       <div class="space-y-2">
@@ -101,7 +101,7 @@
   <!-- 카테고리/디바이스 -->
   <div class="space-y-4">
     <div class="bg-white border border-gray-200 rounded-lg p-5">
-      <h2 class="font-semibold text-navy mb-3">📂 카테고리</h2>
+      <h2 class="font-semibold text-navy mb-3"><%= lni_icon "folder-1" %> 카테고리</h2>
       <% if @category_counts.any? %>
         <div class="space-y-1">
           <% @category_counts.each do |cat, c| %>
@@ -117,13 +117,13 @@
     </div>
 
     <div class="bg-white border border-gray-200 rounded-lg p-5">
-      <h2 class="font-semibold text-navy mb-3">📱 디바이스</h2>
+      <h2 class="font-semibold text-navy mb-3"><%= lni_icon "phone" %> 디바이스</h2>
       <% if @device_counts.any? %>
-        <% icons = { 'desktop' => '🖥️', 'mobile' => '📱', 'tablet' => '📲' } %>
+        <% icons = { 'desktop' => 'monitor', 'mobile' => 'phone', 'tablet' => 'laptop-phone' } %>
         <div class="flex gap-3">
           <% @device_counts.each do |dev, c| %>
             <div class="flex-1 text-center bg-gray-50 rounded p-3">
-              <p class="text-2xl"><%= icons[dev] || '📊' %></p>
+              <p class="text-2xl"><%= lni_icon(icons[dev] || 'bar-chart-4') %></p>
               <p class="text-xs text-gray-500 mt-1"><%= dev %></p>
               <p class="font-bold text-navy"><%= c %></p>
             </div>
@@ -139,7 +139,7 @@
 <!-- 최근 이벤트 -->
 <div class="bg-white border border-gray-200 rounded-lg p-5">
   <div class="flex justify-between items-center mb-3">
-    <h2 class="font-semibold text-navy">🕒 최근 이벤트 (<%= @recent_events.size %>)</h2>
+    <h2 class="font-semibold text-navy"><%= lni_icon "stopwatch" %> 최근 이벤트 (<%= @recent_events.size %>)</h2>
     <%= link_to "전체 보기 →", admin_analytics_events_path, class: "text-xs text-primary" %>
   </div>
   <% if @recent_events.any? %>

@@ -52,17 +52,17 @@
             <% end %>
             <div class="flex items-center justify-between mt-2 text-xs text-gray-400">
               <% if t.due_date %>
-                <span class="<%= 'text-red-500' if t.due_date < Date.today && !t.is_completed %>">📅 <%= t.due_date.strftime("%m/%d") %></span>
+                <span class="<%= 'text-red-500' if t.due_date < Date.today && !t.is_completed %>"><%= lni_icon "calendar-days" %> <%= t.due_date.strftime("%m/%d") %></span>
               <% else %>
                 <span></span>
               <% end %>
               <% if t.assignee.present? %>
-                <span>👤 <%= t.assignee %></span>
+                <span><%= lni_icon "user-4" %> <%= t.assignee %></span>
               <% end %>
             </div>
             <div class="mt-2 flex gap-1.5">
               <% unless t.is_completed %>
-                <button data-action="kanban#completeTask" data-task-id="<%= t.id %>" class="text-xs text-emerald-600 hover:text-emerald-800">✓ 완료</button>
+                <button data-action="kanban#completeTask" data-task-id="<%= t.id %>" class="text-xs text-emerald-600 hover:text-emerald-800"><%= lni_icon "check" %> 완료</button>
               <% else %>
                 <button data-action="kanban#reopenTask" data-task-id="<%= t.id %>" class="text-xs text-blue-600 hover:text-blue-800">↻ 재개</button>
               <% end %>

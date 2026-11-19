@@ -2,7 +2,7 @@
 
 <div class="flex items-center justify-between mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-navy">🔌 외부 연동</h1>
+    <h1 class="text-2xl font-bold text-navy"><%= lni_icon "plug-1" %> 외부 연동</h1>
     <p class="text-sm text-gray-500 mt-1">전체 <%= @integrations.size %>개 (활성 <%= @integrations.select(&:is_enabled?).size %>개)</p>
   </div>
   <%= link_to "+ 연동 추가", new_admin_integration_path,

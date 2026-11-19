@@ -2,7 +2,7 @@
 
 <div class="mb-6">
   <%= link_to "← 분석 대시보드", admin_analytics_path, class: "text-primary text-sm" %>
-  <h1 class="text-2xl font-bold text-navy mt-2">📜 이벤트 로그</h1>
+  <h1 class="text-2xl font-bold text-navy mt-2"><%= lni_icon "notebook-1" %> 이벤트 로그</h1>
 </div>
 
 <%= form_with url: admin_analytics_events_path, method: :get, class: "flex gap-2 mb-4" do |f| %>

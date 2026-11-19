@@ -111,7 +111,7 @@
             <div class="border-l-4 border-yellow-400 pl-3 py-1">
               <p class="text-sm">
                 <span class="font-medium text-navy"><%= r.reviewer_name %></span>
-                <span class="text-yellow-500 ml-2"><%= '★' * r.rating %></span>
+                <span class="text-yellow-500 ml-2"><% r.rating.times do %><%= lni_icon "star-fat" %><% end %></span>
               </p>
               <% if r.content.present? %>
                 <p class="text-xs text-gray-600 mt-1"><%= r.content %></p>
@@ -156,9 +156,9 @@
       </div>
       <% if @member.pending? %>
         <div class="space-y-2">
-          <%= button_to "✓ 승인 (소소한 활동 허용)", approve_admin_member_path(@member), class: "w-full bg-green-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-600" %>
+          <%= button_to safe_join([lni_icon("check"), "승인 (소소한 활동 허용)"], " "), approve_admin_member_path(@member), class: "w-full bg-green-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-600" %>
           <p class="text-[11px] text-gray-500 leading-relaxed">본인 페이지 편집·사진 업로드 등 기본 활동을 허용합니다. Townin 파트너 연결은 우측 "Townin 파트너" 카드에서 별도 관리.</p>
-          <%= button_to "✗ 거부", reject_admin_member_path(@member), class: "w-full bg-red-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-600" %>
+          <%= button_to safe_join([lni_icon("xmark"), "거부"], " "), reject_admin_member_path(@member), class: "w-full bg-red-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-600" %>
         </div>
       <% elsif @member.approved? %>
         <%= button_to "정지", suspend_admin_member_path(@member), class: "w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-orange-600", data: { turbo_confirm: "정지하시겠습니까?" } %>
@@ -200,7 +200,7 @@
         <p class="text-xs text-gray-600">Provider: <span class="font-mono"><%= @member.provider %></span></p>
         <p class="text-xs text-gray-600 mt-1">UID: <span class="font-mono text-[11px]"><%= @member.uid %></span></p>
         <% if @member.oauth_email_verified.to_i == 1 %>
-          <p class="text-xs text-green-600 mt-1">✓ 이메일 인증 완료</p>
+          <p class="text-xs text-green-600 mt-1"><%= lni_icon "check" %> 이메일 인증 완료</p>
         <% end %>
         <% if @member.oauth_connected_at %>
           <p class="text-xs text-gray-400 mt-1">연결일: <%= @member.oauth_connected_at.strftime("%y.%m.%d %H:%M") %></p>
@@ -250,11 +250,11 @@
     <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
       <div class="flex items-center justify-between mb-3">
         <h2 class="font-semibold text-navy text-sm flex items-center gap-2">
-          🔗 Townin 파트너
+          <%= lni_icon "link-2-angular-right" %> Townin 파트너
         </h2>
         <% case @member.partner_status
            when "active" %>
-          <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded font-medium">⭐ 파트너</span>
+          <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded font-medium"><%= lni_icon "star-fat" %> 파트너</span>
         <% when "pending" %>
           <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded font-medium">검증 대기</span>
         <% when "suspended" %>
@@ -285,7 +285,7 @@
         <%# 액션 버튼 %>
         <div class="mt-3 flex flex-col gap-2">
           <% unless @member.partner_active? %>
-            <%= button_to "⭐ 파트너로 승급",
+            <%= button_to safe_join([lni_icon("star-fat"), "파트너로 승급"], " "),
                   promote_partner_admin_member_path(@member),
                   method: :post,
                   class: "w-full text-xs px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded font-medium" %>
@@ -312,7 +312,7 @@
         <% s = @member.stats %>
         <details class="mt-4 border-t border-gray-200 pt-3" <%= "open" if s.empty? %>>
           <summary class="text-xs font-semibold text-navy cursor-pointer hover:text-accent">
-            📊 활동 스냅샷 <span class="text-[10px] font-normal text-gray-500">· 공개 페이지 §B-3에 노출</span>
+            <%= lni_icon "bar-chart-4" %> 활동 스냅샷 <span class="text-[10px] font-normal text-gray-500">· 공개 페이지 §B-3에 노출</span>
           </summary>
 
           <p class="mt-2 text-[10px] text-gray-600 leading-relaxed">
@@ -332,7 +332,7 @@
             </p>
           <% end %>
 
-          <%= button_to "🔄 Townin에서 즉시 새로고침",
+          <%= button_to safe_join([lni_icon("refresh-circle-1-clockwise"), "Townin에서 즉시 새로고침"], " "),
                 refresh_stats_admin_member_path(@member),
                 method: :post,
                 class: "w-full mt-2 text-[11px] px-3 py-2 border border-navy text-navy hover:bg-gray-50 rounded" %>
@@ -427,7 +427,7 @@
 
             <button type="submit"
                     class="w-full text-xs px-3 py-2 bg-navy text-white rounded font-medium hover:bg-[#0f1f3d]">
-              💾 스냅샷 저장 (공개 페이지 즉시 반영)
+              <%= lni_icon "floppy-disk-1" %> 스냅샷 저장 (공개 페이지 즉시 반영)
             </button>
           <% end %>
         </details>
@@ -436,7 +436,7 @@
       <%# 등록/수정 폼 — 토글 %>
       <details class="mt-3" <%= "open" unless @member.partner_connected? %> data-member-id="<%= @member.id %>">
         <summary class="text-xs text-gray-600 cursor-pointer hover:text-navy">
-          <%= @member.partner_connected? ? "✏️ Townin 정보 수정" : "➕ Townin 정보 등록" %>
+          <%= lni_icon(@member.partner_connected? ? "pencil-1" : "plus") %> <%= @member.partner_connected? ? "Townin 정보 수정" : "Townin 정보 등록" %>
         </summary>
 
         <%# Townin JSON 붙여넣기 — 가장 빠른 경로 (Townin의 "전체 4필드 JSON 복사" 버튼 호환) %>
@@ -444,12 +444,12 @@
              data-controller="townin-json">
           <div class="flex items-center justify-between mb-2">
             <label class="block text-[10px] font-semibold text-amber-700 uppercase tracking-wide">
-              📋 Townin JSON 붙여넣기 <span class="opacity-70 normal-case">· 가장 빠른 방법</span>
+              <%= lni_icon "clipboard" %> Townin JSON 붙여넣기 <span class="opacity-70 normal-case">· 가장 빠른 방법</span>
             </label>
             <button type="button"
                     data-action="click->townin-json#pasteFromClipboard"
                     class="text-[10px] px-2 py-1 bg-amber-600 text-white rounded font-semibold hover:bg-amber-700 cursor-pointer">
-              📋 클립보드에서 붙여넣기
+              <%= lni_icon "clipboard" %> 클립보드에서 붙여넣기
             </button>
           </div>
           <p class="text-[10px] text-amber-700 leading-relaxed mb-2">
@@ -464,7 +464,7 @@
             <button type="button"
                     data-action="click->townin-json#applyFromTextarea"
                     class="flex-1 text-[10px] px-2 py-1.5 bg-amber-600 text-white rounded font-semibold hover:bg-amber-700 cursor-pointer">
-              ✓ 이 JSON 적용
+              <%= lni_icon "check" %> 이 JSON 적용
             </button>
             <button type="button"
                     data-action="click->townin-json#clearFields"
@@ -553,7 +553,7 @@
                 document.getElementById("townin-name").value = u.displayName || "";
                 document.getElementById("townin-role").value = u.role || "";
                 const partnerMsg = u.partnerId ? ` (이미 파트너: ${u.partnerId})` : "";
-                status.textContent = `✓ ${u.displayName || u.email} 자동 채움 완료${partnerMsg}. "저장" 눌러 연결.`;
+                status.textContent = `${u.displayName || u.email} 자동 채움 완료${partnerMsg}. "저장" 눌러 연결.`;
                 status.className = "mt-1.5 text-[10px] text-green-700";
               } catch (e) {
                 status.textContent = "조회 실패: " + e.message;

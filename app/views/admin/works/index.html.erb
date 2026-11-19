@@ -2,12 +2,12 @@
 
 <div class="flex items-center justify-between mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-navy">🎨 작품 관리</h1>
+    <h1 class="text-2xl font-bold text-navy"><%= lni_icon "colour-palette-3" %> 작품 관리</h1>
     <p class="text-sm text-gray-500 mt-1">전체 <%= @works.size %>개 작품</p>
   </div>
   <div class="flex items-center gap-2">
     <%= form_with url: admin_works_path, method: :get, class: "flex gap-2" do |f| %>
-      <%= f.select :category, [["전체 카테고리", ""], ["📚 도서", "book"], ["✏️ 스케치", "sketch"], ["🖼️ 갤러리", "gallery"], ["📰 언론보도", "press"]],
+      <%= f.select :category, [["전체 카테고리", ""], ["도서", "book"], ["스케치", "sketch"], ["갤러리", "gallery"], ["언론보도", "press"]],
           { selected: params[:category] }, class: "border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
       <%= f.submit "필터", class: "bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm cursor-pointer" %>
     <% end %>
@@ -18,9 +18,9 @@
 
 <!-- 카테고리 통계 -->
 <div class="grid grid-cols-4 gap-3 mb-4">
-  <% [['book', '📚 도서', 'amber'], ['sketch', '✏️ 스케치', 'green'], ['gallery', '🖼️ 갤러리', 'blue'], ['press', '📰 언론보도', 'purple']].each do |cat, label, color| %>
+  <% [['book', '도서', 'amber'], ['sketch', '스케치', 'green'], ['gallery', '갤러리', 'blue'], ['press', '언론보도', 'purple']].each do |cat, label, color| %>
     <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
-      <p class="text-xs text-gray-500"><%= label %></p>
+      <p class="text-xs text-gray-500"><%= lni_icon({ 'book' => 'books-2', 'sketch' => 'pencil-1', 'gallery' => 'gallery', 'press' => 'notebook-1' }[cat]) %> <%= label %></p>
       <p class="text-2xl font-bold text-<%= color %>-600"><%= @works.where(category: cat).size %></p>
     </div>
   <% end %>
@@ -36,8 +36,8 @@
             <img src="<%= w.image_url %>" alt="<%= w.title %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
           <% else %>
             <div class="w-full h-full flex items-center justify-center text-4xl">
-              <% icons = { 'book' => '📚', 'sketch' => '✏️', 'gallery' => '🖼️', 'press' => '📰' } %>
-              <%= icons[w.category] || '🎨' %>
+              <% icons = { 'book' => 'books-2', 'sketch' => 'pencil-1', 'gallery' => 'gallery', 'press' => 'notebook-1' } %>
+              <%= lni_icon(icons[w.category] || 'colour-palette-3') %>
             </div>
           <% end %>
           <% labels = { 'book' => ['도서', 'amber'], 'sketch' => ['스케치', 'green'], 'gallery' => ['갤러리', 'blue'], 'press' => ['보도', 'purple'] } %>
@@ -53,7 +53,7 @@
             <span class="text-gray-400"><%= w.created_at.strftime("%y.%m.%d") %></span>
             <div class="flex gap-2">
               <%= link_to "수정", edit_admin_work_path(w), class: "text-primary" %>
-              <%= button_to "✕", admin_work_path(w), method: :delete,
+              <%= button_to lni_icon("xmark", label: "삭제"), admin_work_path(w), method: :delete,
                   class: "text-red-500 hover:text-red-700",
                   data: { turbo_confirm: "삭제하시겠습니까?" } %>
             </div>

@@ -5,11 +5,11 @@
   <div class="lg:col-span-2 space-y-4">
     <div class="bg-white border border-gray-200 rounded-lg p-5">
       <span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded"><%= @gen.content_type %></span>
-      <h2 class="font-semibold text-navy mt-2 mb-3">📥 프롬프트</h2>
+      <h2 class="font-semibold text-navy mt-2 mb-3"><%= lni_icon "download-1" %> 프롬프트</h2>
       <pre class="bg-gray-50 rounded p-3 text-sm whitespace-pre-wrap"><%= @gen.prompt %></pre>
     </div>
     <div class="bg-white border border-gray-200 rounded-lg p-5">
-      <h2 class="font-semibold text-navy mb-3">📤 생성 결과</h2>
+      <h2 class="font-semibold text-navy mb-3"><%= lni_icon "upload-1" %> 생성 결과</h2>
       <div class="bg-gradient-to-br from-blue-50 to-white rounded p-4 text-sm whitespace-pre-wrap"><%= @gen.generated_text %></div>
     </div>
   </div>
@@ -24,7 +24,7 @@
       </dl>
     </div>
     <% unless @gen.status == "approved" %>
-      <%= button_to "✓ 승인", approve_admin_ai_generation_path(@gen), class: "w-full bg-green-500 text-white py-2 rounded-lg text-sm font-medium" %>
+      <%= button_to safe_join([lni_icon("check"), "승인"], " "), approve_admin_ai_generation_path(@gen), class: "w-full bg-green-500 text-white py-2 rounded-lg text-sm font-medium" %>
     <% end %>
     <%= button_to "삭제", admin_ai_generation_path(@gen), method: :delete, class: "w-full bg-red-50 text-red-600 py-2 rounded-lg text-sm", data: { turbo_confirm: "삭제?" } %>
   </div>

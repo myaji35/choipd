@@ -150,7 +150,7 @@
   <% if @reviews.any? %>
     <% @reviews.each do |review| %>
       <div class="impd-notice-row">
-        <span class="badge" style="background: var(--impd-gold); color: var(--impd-on-dark);">★</span>
+        <span class="badge" style="background: var(--impd-gold); color: var(--impd-on-dark);"><%= lni_icon "star-fat" %></span>
         <span class="title"><%= review.title %> — <span style="color: var(--impd-muted); font-weight: 400;"><%= review.content.to_s.truncate(60) %></span></span>
         <span class="date"><%= review.created_at.strftime("%Y.%m.%d") %></span>
       </div>

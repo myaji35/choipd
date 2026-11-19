@@ -6,7 +6,7 @@
 
   <div class="flex items-start justify-between mb-3">
     <div>
-      <h2 class="font-semibold text-navy text-base">📄 문서 자료실 (MD 업로드)</h2>
+      <h2 class="font-semibold text-navy text-base"><%= lni_icon "notebook-1" %> 문서 자료실 (MD 업로드)</h2>
       <p class="text-xs text-gray-500 mt-1">.md 파일을 업로드하면 달란트·경력·고객사가 자동 추출됩니다</p>
     </div>
     <span data-member-doc-uploader-target="status" class="text-xs text-gray-400"></span>
@@ -14,7 +14,7 @@
 
   <label class="block border-2 border-dashed border-gray-300 rounded-lg p-5 text-center hover:border-primary cursor-pointer transition-colors"
          data-action="dragover->member-doc-uploader#dragover dragleave->member-doc-uploader#dragleave drop->member-doc-uploader#drop">
-    <p class="text-sm text-gray-600">📂 .md 파일을 끌어다 놓거나 클릭해서 업로드</p>
+    <p class="text-sm text-gray-600"><%= lni_icon "folder-1" %> .md 파일을 끌어다 놓거나 클릭해서 업로드</p>
     <p class="text-xs text-gray-400 mt-1">최대 1MB · .md / .markdown / .txt</p>
     <input type="file" class="hidden" accept=".md,.markdown,.txt"
            data-member-doc-uploader-target="fileInput"
@@ -48,7 +48,7 @@
               <span class="text-xs text-gray-400 ml-2 font-mono"><%= d.filename %></span>
               <span class="text-xs px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded ml-2"><%= d.category %></span>
               <% if d.extracted_skills_count.to_i > 0 %>
-                <span class="text-xs text-emerald-600 ml-2">✓ 달란트 <%= d.extracted_skills_count %>개 추출</span>
+                <span class="text-xs text-emerald-600 ml-2"><%= lni_icon "check" %> 달란트 <%= d.extracted_skills_count %>개 추출</span>
               <% end %>
             </div>
             <div class="text-right">

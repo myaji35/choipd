@@ -3,7 +3,7 @@
 <div class="flex items-center justify-between mb-6">
   <div>
     <%= link_to "← 분석 대시보드", admin_analytics_path, class: "text-primary text-sm" %>
-    <h1 class="text-2xl font-bold text-navy mt-2">🧪 AB 테스트</h1>
+    <h1 class="text-2xl font-bold text-navy mt-2"><%= lni_icon "microscope" %> AB 테스트</h1>
     <p class="text-sm text-gray-500 mt-1">전체 <%= @tests.size %>개</p>
   </div>
   <%= link_to "+ 새 테스트", new_admin_ab_test_path,

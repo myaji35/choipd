@@ -196,10 +196,10 @@
 <section class="works-section tab-panel active" id="tab-books">
   <div class="works-heading reveal">대표 저서</div>
   <% books = [
-    { emoji: "📱", title: "스마트폰으로 창업하라", desc: "스마트폰 하나로 시작하는 1인 창업 전략서" },
-    { emoji: "📣", title: "SNS 마케팅 바이블",    desc: "중소기업·소상공인을 위한 실전 SNS 마케팅" },
-    { emoji: "✍️", title: "디지털 글쓰기 혁명",   desc: "콘텐츠로 수익 만드는 글쓰기 기법" },
-    { emoji: "🌱", title: "환경 저널리즘 입문",    desc: "한국환경저널 발행인의 환경 미디어 실무" },
+    { icon: "phone", title: "스마트폰으로 창업하라", desc: "스마트폰 하나로 시작하는 1인 창업 전략서" },
+    { icon: "megaphone-1", title: "SNS 마케팅 바이블",    desc: "중소기업·소상공인을 위한 실전 SNS 마케팅" },
+    { icon: "pencil-1", title: "디지털 글쓰기 혁명",   desc: "콘텐츠로 수익 만드는 글쓰기 기법" },
+    { icon: "leaf-1", title: "환경 저널리즘 입문",    desc: "한국환경저널 발행인의 환경 미디어 실무" },
   ] %>
   <div class="books-grid">
     <% if @books.present? && @books.any? %>
@@ -211,7 +211,7 @@
             <% elsif book.image_url.present? %>
               <%= image_tag book.image_url, alt: book.title %>
             <% else %>
-              <%= %w[📱 📣 ✍️ 🌱 📗 📘][i % 6] %>
+              <%= lni_icon %w[phone megaphone-1 pencil-1 leaf-1 book-1 book-1][i % 6] %>
             <% end %>
           </div>
           <div class="book-title"><%= book.title %></div>
@@ -221,7 +221,7 @@
     <% else %>
       <% books.each_with_index do |b, i| %>
         <div class="book-card reveal reveal-delay-<%= (i % 3) + 1 %>">
-          <div class="book-cover"><%= b[:emoji] %></div>
+          <div class="book-cover"><%= lni_icon b[:icon] %></div>
           <div class="book-title"><%= b[:title] %></div>
           <div class="book-desc"><%= b[:desc] %></div>
         </div>
@@ -242,10 +242,10 @@
           <% elsif work.image_url.present? %>
             <%= image_tag work.image_url, alt: work.title %>
           <% else %>
-            <% gallery_emojis = ["🎨","🖼️","✏️","📐","🖌️","🎭","🌿","🏙️"] %>
+            <% gallery_icons = ["colour-palette-3","gallery","pencil-1","ruler-1","brush-2","user-4","leaf-1","buildings-1"] %>
             <% gallery_bgs    = ["rgba(168,255,62,.08)","rgba(240,192,64,.08)","rgba(255,77,28,.08)","rgba(96,165,250,.08)"] %>
             <div class="masonry-placeholder" style="background:<%= gallery_bgs[i % 4] %>;">
-              <%= gallery_emojis[i % 8] %>
+              <%= lni_icon gallery_icons[i % 8] %>
             </div>
           <% end %>
           <div class="masonry-overlay">
@@ -257,20 +257,20 @@
   <% else %>
     <!-- 플레이스홀더 갤러리 -->
     <% placeholders = [
-      { emoji: "🎨", h: "1/1",  title: "도시 스케치 #1", bg: "rgba(168,255,62,.06)" },
-      { emoji: "🖌️", h: "4/3",  title: "자연 드로잉",    bg: "rgba(240,192,64,.06)" },
-      { emoji: "✏️", h: "3/4",  title: "카페 풍경",      bg: "rgba(255,77,28,.06)" },
-      { emoji: "🌿", h: "1/1",  title: "식물 스케치",    bg: "rgba(96,165,250,.06)" },
-      { emoji: "🏙️", h: "4/3",  title: "거리 풍경 #2",  bg: "rgba(168,255,62,.06)" },
-      { emoji: "🖼️", h: "3/4",  title: "추상 드로잉",    bg: "rgba(240,192,64,.06)" },
-      { emoji: "📐", h: "1/1",  title: "건축 스케치",    bg: "rgba(255,77,28,.06)" },
-      { emoji: "🎭", h: "4/3",  title: "인물 드로잉",    bg: "rgba(96,165,250,.06)" },
+      { icon: "colour-palette-3", h: "1/1",  title: "도시 스케치 #1", bg: "rgba(168,255,62,.06)" },
+      { icon: "brush-2", h: "4/3",  title: "자연 드로잉",    bg: "rgba(240,192,64,.06)" },
+      { icon: "pencil-1", h: "3/4",  title: "카페 풍경",      bg: "rgba(255,77,28,.06)" },
+      { icon: "leaf-1", h: "1/1",  title: "식물 스케치",    bg: "rgba(96,165,250,.06)" },
+      { icon: "buildings-1", h: "4/3",  title: "거리 풍경 #2",  bg: "rgba(168,255,62,.06)" },
+      { icon: "gallery", h: "3/4",  title: "추상 드로잉",    bg: "rgba(240,192,64,.06)" },
+      { icon: "ruler-1", h: "1/1",  title: "건축 스케치",    bg: "rgba(255,77,28,.06)" },
+      { icon: "user-4", h: "4/3",  title: "인물 드로잉",    bg: "rgba(96,165,250,.06)" },
     ] %>
     <div class="masonry-grid">
       <% placeholders.each_with_index do |p, i| %>
         <div class="masonry-item reveal reveal-delay-<%= (i % 3) + 1 %>">
           <div class="masonry-placeholder" style="background:<%= p[:bg] %>;aspect-ratio:<%= p[:h] %>;">
-            <span style="font-size:48px;"><%= p[:emoji] %></span>
+            <span style="font-size:48px;"><%= lni_icon p[:icon] %></span>
           </div>
           <div class="masonry-overlay" style="opacity:.6;">
             <div class="masonry-overlay-title"><%= p[:title] %></div>

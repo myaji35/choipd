@@ -2,7 +2,7 @@
 
 <div class="flex items-center justify-between mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-navy">📧 뉴스레터 구독자</h1>
+    <h1 class="text-2xl font-bold text-navy"><%= lni_icon "envelope-1" %> 뉴스레터 구독자</h1>
     <p class="text-sm text-gray-500 mt-1">총 <%= @leads.count %>명</p>
   </div>
   <div class="flex gap-2">
@@ -11,7 +11,7 @@
           class: "border border-gray-300 rounded-lg px-3 py-2 text-sm w-56" %>
       <%= f.submit "검색", class: "bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm cursor-pointer" %>
     <% end %>
-    <%= link_to "📥 CSV 내보내기", admin_newsletter_index_path(format: :csv),
+    <%= link_to safe_join([lni_icon("download-1"), "CSV 내보내기"], " "), admin_newsletter_index_path(format: :csv),
         class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90" %>
   </div>
 </div>
@@ -47,7 +47,7 @@
           <td class="px-4 py-3 text-navy"><%= lead.email %></td>
           <td class="px-4 py-3 text-gray-500 text-xs"><%= (lead.subscribed_at || lead.created_at).strftime("%Y.%m.%d %H:%M") %></td>
           <td class="px-4 py-3 text-right">
-            <%= mail_to lead.email, "✉️", class: "text-xs text-primary" %>
+            <%= mail_to lead.email, lni_icon("envelope-1", label: "이메일"), class: "text-xs text-primary" %>
           </td>
         </tr>
       <% end %>

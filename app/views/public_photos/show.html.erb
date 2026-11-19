@@ -142,7 +142,7 @@
       <div class="label">이 사진 공유 링크</div>
       <code><%= "#{request.host_with_port}/s/#{@short_link&.hash_code}" %></code>
       <div class="actions">
-        <button type="button" data-action="click->card-share#copyShort">🔗 복사</button>
+        <button type="button" data-action="click->card-share#copyShort"><%= lni_icon "link-2-angular-right" %> 복사</button>
         <button type="button" data-action="click->card-share#shareNative">공유 →</button>
       </div>
       <p data-card-share-target="flash" style="margin-top: 8px; font-size: 10px; color: var(--impd-accent); opacity: 0; transition: opacity .2s; font-family: var(--impd-font-mono);"></p>

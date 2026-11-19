@@ -2,7 +2,7 @@
 
 <div class="flex items-center justify-between mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-navy">⚡ 워크플로우 자동화</h1>
+    <h1 class="text-2xl font-bold text-navy"><%= lni_icon "bolt-2" %> 워크플로우 자동화</h1>
     <p class="text-sm text-gray-500 mt-1">전체 <%= @workflows.size %>개 (활성 <%= @workflows.select(&:is_active?).size %>개)</p>
   </div>
   <%= link_to "+ 새 워크플로우", new_admin_workflow_path,

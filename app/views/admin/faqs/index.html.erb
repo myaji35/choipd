@@ -3,7 +3,7 @@
 <div class="flex items-center justify-between mb-6">
   <div>
     <%= link_to "← AI 도구", admin_ai_path, class: "text-primary text-sm" %>
-    <h1 class="text-2xl font-bold text-navy mt-2">📚 FAQ 지식베이스</h1>
+    <h1 class="text-2xl font-bold text-navy mt-2"><%= lni_icon "books-2" %> FAQ 지식베이스</h1>
     <p class="text-sm text-gray-500 mt-1">챗봇이 답하는 자주 묻는 질문 (<%= @faqs.size %>개)</p>
   </div>
   <%= link_to "+ 새 FAQ", new_admin_faq_path, class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90" %>

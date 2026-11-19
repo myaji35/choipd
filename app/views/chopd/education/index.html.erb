@@ -167,7 +167,7 @@
   <% if @courses.any? %>
     <div class="courses-grid">
       <% @courses.each_with_index do |course, i| %>
-        <% thumbs  = %w[📱 📣 🏫 💰 ✍️ 🎬 📊 🌐]
+        <% thumbs  = %w[phone megaphone-1 school-bench-1 dollar-circle pencil-1 camera-movie-1 bar-chart-4 globe-1]
            bgs     = %w[#1a1435 #0d2410 #1a0808 #0d1a3a #1a1200 #0a1a1a #1a0f2e #101a0d] %>
         <div class="course-card reveal reveal-delay-<%= (i % 3) + 1 %>">
           <!-- 섬네일 -->
@@ -175,7 +175,7 @@
             <% if course.thumbnail_url.present? %>
               <%= image_tag course.thumbnail_url, class: "w-full h-full object-cover absolute inset-0", alt: course.title %>
             <% else %>
-              <%= thumbs[i % thumbs.size] %>
+              <%= lni_icon thumbs[i % thumbs.size] %>
             <% end %>
             <div class="course-thumb-overlay"></div>
             <span class="course-type-badge badge-<%= course.course_type %>">
@@ -208,7 +208,7 @@
     </div>
   <% else %>
     <div class="empty-state">
-      <div style="font-size:48px;margin-bottom:16px;">📚</div>
+      <div style="font-size:48px;margin-bottom:16px;"><%= lni_icon "books-2" %></div>
       <p style="font-size:15px;">등록된 강좌가 없습니다.</p>
       <p style="font-size:13px;margin-top:8px;color:rgba(255,255,255,.2);">곧 새로운 강좌가 추가될 예정입니다.</p>
     </div>

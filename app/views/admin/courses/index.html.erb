@@ -2,7 +2,7 @@
 
 <div class="flex items-center justify-between mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-navy">📚 강좌 관리</h1>
+    <h1 class="text-2xl font-bold text-navy"><%= lni_icon "books-2" %> 강좌 관리</h1>
     <p class="text-sm text-gray-500 mt-1">전체 <%= @courses.size %>개 강좌</p>
   </div>
   <div class="flex items-center gap-2">
@@ -32,7 +32,7 @@
         <% if course.thumbnail_url.present? %>
           <img src="<%= course.thumbnail_url %>" alt="" class="w-full h-40 object-cover">
         <% else %>
-          <div class="w-full h-40 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-4xl">📚</div>
+          <div class="w-full h-40 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-4xl"><%= lni_icon "books-2" %></div>
         <% end %>
         <div class="p-4">
           <div class="flex items-start justify-between mb-2">
@@ -46,8 +46,8 @@
           <p class="text-xs text-gray-500 line-clamp-2 mb-3"><%= course.description %></p>
 
           <div class="flex items-center justify-between text-xs">
-            <% types = { 'online' => '🌐 온라인', 'offline' => '📍 오프라인', 'b2b' => '🏢 B2B' } %>
-            <span class="text-gray-500"><%= types[course.course_type] || course.course_type %></span>
+            <% types = { 'online' => '온라인', 'offline' => '오프라인', 'b2b' => 'B2B' }; type_icons = { 'online' => 'globe-1', 'offline' => 'map-marker-5', 'b2b' => 'buildings-1' } %>
+            <span class="text-gray-500"><%= lni_icon(type_icons[course.course_type]) if type_icons[course.course_type] %> <%= types[course.course_type] || course.course_type %></span>
             <% if course.price.present? && course.price > 0 %>
               <span class="font-bold text-navy"><%= number_with_delimiter(course.price) %>원</span>
             <% else %>
@@ -57,7 +57,7 @@
 
           <% if course.external_link.present? %>
             <a href="<%= course.external_link %>" target="_blank" class="text-xs text-blue-600 hover:underline mt-2 block">
-              💳 외부 결제 링크 ↗
+              <%= lni_icon "credit-card-multiple" %> 외부 결제 링크 ↗
             </a>
           <% end %>
 
@@ -94,7 +94,7 @@
                 <% if course.thumbnail_url.present? %>
                   <img src="<%= course.thumbnail_url %>" alt="" class="w-10 h-10 object-cover rounded">
                 <% else %>
-                  <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs">📚</div>
+                  <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs"><%= lni_icon "books-2" %></div>
                 <% end %>
                 <span class="font-medium text-navy"><%= course.title %></span>
               </div>

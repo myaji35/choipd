@@ -2,7 +2,7 @@
 
 <div class="flex items-center justify-between mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-navy">🪝 웹훅</h1>
+    <h1 class="text-2xl font-bold text-navy"><%= lni_icon "webhooks" %> 웹훅</h1>
     <p class="text-sm text-gray-500 mt-1">전체 <%= @webhooks.size %>개</p>
   </div>
   <%= link_to "+ 웹훅 추가", new_admin_webhook_path,

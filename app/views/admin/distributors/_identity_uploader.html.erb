@@ -9,7 +9,7 @@
 
   <div class="flex items-start justify-between mb-2">
     <div>
-      <h2 class="font-semibold text-navy text-base">📝 회원 아이덴티티 (identity.md)</h2>
+      <h2 class="font-semibold text-navy text-base"><%= lni_icon "file-pencil" %> 회원 아이덴티티 (identity.md)</h2>
       <p class="text-xs text-gray-500 mt-1">브랜드/톤/아젠다를 정의하는 .md 파일을 업로드하면 회원의 콘텐츠/홈페이지에 반영됩니다.</p>
     </div>
     <span data-identity-uploader-target="status" class="text-xs text-gray-400"></span>
@@ -20,7 +20,7 @@
          data-identity-uploader-target="dropzone"
          data-action="dragover->identity-uploader#dragover dragleave->identity-uploader#dragleave drop->identity-uploader#drop">
     <p class="text-sm text-gray-600">
-      📂 .md 파일을 끌어다 놓거나 클릭해서 업로드
+      <%= lni_icon "folder-1" %> .md 파일을 끌어다 놓거나 클릭해서 업로드
     </p>
     <p class="text-xs text-gray-400 mt-1">
       허용 확장자: .md · .markdown · .txt &nbsp;|&nbsp; 최대 512KB
