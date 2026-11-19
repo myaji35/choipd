@@ -20,6 +20,20 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "naver show displays completeness and snapshot changes" do
+    account = ProfileAccount.create!(platform: "naver_people", display_name: "가상 인물", external_id: "fake-naver")
+    account.profile_snapshots.create!(captured_at: 2.days.ago, data: { "people" => { "name" => "이전 이름" } })
+    account.profile_snapshots.create!(captured_at: 1.day.ago, data: { "people" => { "name" => "새 이름" } })
+    get pd_profile_account_path(account)
+    assert_response :success
+    assert_includes response.body, "완성도"
+    assert_includes response.body, "변경 내역"
+    assert_includes response.body, "이전 이름"
+    assert_includes response.body, "새 이름"
+    get pd_profile_accounts_path
+    assert_includes response.body, "완성도 0%"
+  end
+
   test "check reports missing browser" do
     original = EgoProfile::Runner.method(:available?)
     EgoProfile::Runner.define_singleton_method(:available?) { false }

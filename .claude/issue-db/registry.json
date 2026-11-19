@@ -352,14 +352,18 @@
     {
       "type": "FEATURE",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "parent": "ISS-460",
       "created_at": "2026-11-19T15:00:00",
-      "completed_at": null,
+      "completed_at": "2026-11-19T15:20:00",
       "assign_to": "codex",
       "id": "ISS-470",
       "title": "[네이버 인물정보] 항목별 정리 화면·사본 간 변경 내역·완성도 점검 + 검색 링크 dss 수정",
-      "description": "docs/naver-people-management-plan.md 4~6. profile_url 은 os=<auth-list people.dss> 로."
+      "description": "docs/naver-people-management-plan.md 4~6. profile_url 은 os=<auth-list people.dss> 로.",
+      "result": {
+        "tests": "74 runs 0 failures",
+        "real": "완성도 70%(수상·자격증·사이트 비어 있음), 검색 링크 os=42140857"
+      }
     },
     {
       "type": "FEATURE",
