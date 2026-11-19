@@ -45,6 +45,30 @@ class ApplicationController < ActionController::Base
   end
   helper_method :google_oauth_enabled?
 
+  def oauth_only_login_alert
+    if google_oauth_enabled?
+      "이 계정은 Google 로그인으로 가입되어 있습니다. 아래 Google 버튼으로 계속해 주세요."
+    else
+      "이 계정은 Google 로그인으로 가입되어 있습니다. 현재 Google 로그인을 사용할 수 없습니다. 관리자에게 비밀번호 재설정을 요청해 주세요."
+    end
+  end
+
+  def reject_unapproved_member(member)
+    return false if member.status == "approved"
+
+    case member.status
+    when "pending_approval"
+      redirect_to root_path, notice: "#{member.name}님, 관리자 승인 대기 중입니다."
+    when "rejected"
+      redirect_to root_path, alert: "가입이 거절된 계정입니다. 관리자에게 문의해 주세요."
+    when "suspended"
+      redirect_to root_path, alert: "정지된 계정입니다. 관리자에게 문의해 주세요."
+    else
+      redirect_to root_path, alert: "로그인할 수 없는 계정입니다."
+    end
+    true
+  end
+
   def public_host
     ENV["IMPD_PUBLIC_HOST"].presence || "impd.townin.net"
   end

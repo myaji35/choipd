@@ -445,6 +445,23 @@
       "completed_at": null,
       "assign_to": "codex",
       "description": " 대표님 지시 2026-11-19(imPD 프로필·브랜드 / SD 매체·콘텐츠 / Townin 지역 광고, 1차 보험설계사). 역할 정의서: /Volumes/GH_APFS/0008_choi-pd/docs/ecosystem-roles.md"
+    },
+    {
+      "id": "ISS-478",
+      "type": "FIX_BUG",
+      "priority": "P0",
+      "status": "AWAITING_USER",
+      "parent": null,
+      "title": "[보안] 회원 관리 로그인(/:slug/login)이 비밀번호 없는 회원(구글 가입 등)을 빈 비밀번호로 통과시킴 — 운영(impd.townin.net)에도 노출",
+      "description": "MemberSessionsController#create: member.password_digest.blank? 이면 무조건 로그인. 로그인 화면에 '데모 모드' 문구. 2026-11-19 운영 로그인 화면 GET으로 문구 확인(로그인 시도 안 함). 수정 후 운영 배포는 대표님 확인.",
+      "created_at": "2026-11-19T16:10:00",
+      "completed_at": null,
+      "assign_to": "codex",
+      "result": {
+        "tests": "85 runs 0 failures",
+        "verified": "수정 후 비밀번호 없는 회원: 관리화면 직접접근·빈 비밀번호 로그인 모두 302 로그인 화면. 정상 회원 비밀번호 로그인 200"
+      },
+      "blocked_reason": "운영 배포는 대표님 확인(hotfix/ISS-478 브랜치 준비)"
     }
   ],
   "hooks": {
