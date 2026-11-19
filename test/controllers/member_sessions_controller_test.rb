@@ -6,6 +6,14 @@ class MemberSessionsControllerTest < ActionDispatch::IntegrationTest
       slug: "member-#{SecureRandom.hex(4)}", status: "approved", password: "password1234")
   end
 
+  test "both login pages link to password help" do
+    [ member_login_path, login_member_path(slug: @member.slug) ].each do |path|
+      get path
+      assert_response :success
+      assert_select "a[href=?]", new_inquiry_path, text: "비밀번호를 잊으셨나요? 문의하기로 알려 주세요"
+    end
+  end
+
   test "OAuth 계정은 빈 비밀번호로 로그인하거나 관리자 화면에 접근할 수 없다" do
     @member.update_columns(password_digest: nil)
     post login_member_post_path(slug: @member.slug), params: { password: "" }

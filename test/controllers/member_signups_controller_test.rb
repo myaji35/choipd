@@ -20,6 +20,17 @@ class MemberSignupsControllerTest < ActionDispatch::IntegrationTest
     { member: base.merge(overrides), terms_agree: "1" }
   end
 
+  test "taken email shows a friendly inline error" do
+    existing = Member.create!(name: "기존 회원", email: "existing@example.com", slug: "existing-member", status: "approved", password: "password1234")
+    post member_signup_path, params: valid_params(email: existing.email)
+
+    assert_response :unprocessable_entity
+    assert_select "#member_email[aria-invalid=true][aria-describedby=member_email_error]"
+    assert_select "#member_email_error", text: /이미 가입된 이메일이에요. 로그인해 주세요./
+    assert_select "#member_email_error a[href=?]", member_login_path
+    assert_select ".auth-alert a[href='#member_email']", text: /입력 내용을 확인해 주세요 \(1곳\)/
+  end
+
   test "signup renders profession radio cards with custom selected" do
     get "/auth/signup"
     assert_response :success

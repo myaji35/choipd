@@ -1,0 +1,19 @@
+<% if member.errors[field].any? %>
+  <p class="field-err" id="member_<%= field %>_error"><%= lni_icon "xmark-circle" %>
+    <% if field == :email && member.errors.details[:email].any? { |error| error[:error] == :taken } %>
+      이미 가입된 이메일이에요. <%= link_to "로그인해 주세요.", member_login_path %>
+    <% elsif field == :slug && member.errors.details[:slug].any? { |error| error[:error] == :taken } %>
+      이미 쓰는 주소예요. 다른 주소를 적어 주세요.
+    <% elsif field == :password %>
+      비밀번호는 8자 이상으로 입력해 주세요.
+    <% elsif field == :password_confirmation %>
+      비밀번호가 일치하지 않아요. 다시 확인해 주세요.
+    <% elsif member.errors.details[field].any? { |error| error[:error] == :blank } %>
+      필수 항목을 입력해 주세요.
+    <% elsif field == :email %>
+      이메일 주소를 확인해 주세요.
+    <% else %>
+      <%= member.errors[field].first %>
+    <% end %>
+  </p>
+<% end %>
