@@ -1,3 +1,4 @@
+<%= render "brand_ops/public_gate_banner" %>
 <% content_for :title, "imPD는 지금" %>
 <% content_for :head do %><%= stylesheet_link_tag "brand_ops" %><% end %>
 <div style="max-width:1100px;margin:auto;padding:56px 20px;">
@@ -22,7 +23,7 @@
       <article class="ops-surface-card ops-featured">
         <p class="ops-featured-label">실제 회원 사례</p>
         <h2><%= featured.name %></h2>
-        <p><%= featured.profession_label %> · imPD에서 <%= months %>개월째</p>
+        <p><%= featured.profession_label %><% unless @imported %> · imPD에서 <%= months %>개월째<% end %></p>
         <p>최근 4주 방문 <%= BrandOps::Display.count_with_unit(recent.sum { |row| row[:visits].to_i }, "회") %> · 게시 <%= BrandOps::Display.count_with_unit(recent.sum { |row| row[:posts].to_i }, "건") %></p>
         <p class="ops-spark-label">최근 12주 방문</p>
         <svg class="ops-spark" viewBox="0 0 100 40" preserveAspectRatio="none" role="img" aria-label="최근 12주 방문 추이"><polyline points="<%= points %>" fill="none" stroke="#00754A" stroke-width="2" vector-effect="non-scaling-stroke" /></svg>
@@ -35,11 +36,11 @@
       <% delta = key == :signups ? value - (@series[-2][:members_total] - @series[-3][:members_total]) : @summary[key][:delta] %>
       <section class="ops-surface-card"><p><%= label %></p><strong><%= number_with_delimiter(value) %>명</strong><p><%= ops_delta(delta) %></p></section>
     <% end %>
-    <section class="ops-surface-card"><p>이번 달 새로 시작</p><strong><%= number_with_delimiter(@new_member_count) %>명</strong><p><%= @new_member_delta.zero? ? "지난달과 같아요" : "지난달보다 #{number_with_delimiter(@new_member_delta.abs)}명 #{@new_member_delta.positive? ? '늘었어요' : '줄었어요'}" %></p></section>
+    <% unless @imported %><section class="ops-surface-card"><p>이번 달 새로 시작</p><strong><%= number_with_delimiter(@new_member_count) %>명</strong><p><%= @new_member_delta.zero? ? "지난달과 같아요" : "지난달보다 #{number_with_delimiter(@new_member_delta.abs)}명 #{@new_member_delta.positive? ? '늘었어요' : '줄었어요'}" %></p></section><% end %>
   </div>
   </header>
   <% communication = %i[visits inquiries reviews posts sns_posts] %>
-  <% if @recent_professions.any? %><p class="ops-recent-professions">최근 시작 분야: <%= @recent_professions.join(" · ") %></p><% end %>
+  <% if !@imported && @recent_professions.any? %><p class="ops-recent-professions">최근 시작 분야: <%= @recent_professions.join(" · ") %></p><% end %>
   <p style="margin-top:16px;">이번 주 회원 페이지에서 방문 <%= number_with_delimiter(@summary[:visits][:value]) %>회, 문의 <%= number_with_delimiter(@summary[:inquiries][:value]) %>건, 게시 <%= number_with_delimiter(@summary[:posts][:value]) %>건이 오갔어요</p>
   <p style="margin:10px 0 48px;color:#52635b;font-size:13px;">로봇·운영자 방문 제외 · 집계 시점 <%= @now.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %> (KST)</p>
   <%= render "brand_ops/counting_details", platform: true %>

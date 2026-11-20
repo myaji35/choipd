@@ -31,6 +31,20 @@ class ApplicationController < ActionController::Base
   end
   helper_method :current_member
 
+  def brand_ops_gate
+    @brand_ops_gate ||= BrandOps::PublicGate.status
+  end
+  helper_method :brand_ops_gate
+
+  def brand_ops_public?
+    brand_ops_gate[:open]
+  end
+  helper_method :brand_ops_public?
+
+  def brand_ops_admin_preview?
+    current_admin_user&.admin?
+  end
+
   def member_signed_in?
     current_member.present?
   end

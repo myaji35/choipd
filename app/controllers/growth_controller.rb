@@ -1,7 +1,9 @@
 class GrowthController < ApplicationController
   layout "impd"
   def show
+    raise ActiveRecord::RecordNotFound unless brand_ops_public? || brand_ops_admin_preview?
     @now = Time.current
+    @imported = BrandOps::WeeklyStats.imported("platform", 4).present?
     new_members = Member.where(created_at: @now.beginning_of_month..@now)
     @new_member_count = new_members.count
     previous_month = @now.prev_month
@@ -13,6 +15,7 @@ class GrowthController < ApplicationController
     ids = ProConsent.granted.where(consent_type: "socialdoctors_exposure").select(:owner_id)
     @members = Member.where(status: "approved").where(id: ids).order(Arel.sql("CASE WHEN slug = 'kang-seung-sig' THEN 0 ELSE 1 END"), :name).to_a
     @member_series = @members.index_with { |m| BrandOps::WeeklyStats.member(m, now: @now) }
+    @members.select! { |m| BrandOps::WeeklyStats.imported("member", 4, m.slug).present? } if @imported
     @members = @members.sort_by { |m| [ m.slug == "kang-seung-sig" ? 0 : 1, -@member_series[m].last(4).sum { |row| %i[visits inquiries reviews posts sns_posts].sum { |key| row[key].to_i } }, m.name ] }.first(6)
   end
 end

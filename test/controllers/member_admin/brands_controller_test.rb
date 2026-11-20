@@ -2,8 +2,17 @@ require "test_helper"
 
 class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
   setup do
+    @old_active_min = ENV["BRAND_OPS_ACTIVE_MIN"]
+    @old_communication_min = ENV["BRAND_OPS_COMMUNICATION_MIN"]
+    ENV["BRAND_OPS_ACTIVE_MIN"] = "0"
+    ENV["BRAND_OPS_COMMUNICATION_MIN"] = "0"
     @member = Member.create!(name: "브랜드 회원", email: "brand-#{SecureRandom.hex(4)}@example.com", slug: "kang-seung-sig", status: "approved", business_type: "individual", profession: "custom", password: "password1234", password_confirmation: "password1234")
     post "/auth/login", params: { email: @member.email, password: "password1234" }
+  end
+
+  teardown do
+    ENV["BRAND_OPS_ACTIVE_MIN"] = @old_active_min
+    ENV["BRAND_OPS_COMMUNICATION_MIN"] = @old_communication_min
   end
 
   test "shows an empty state without brands" do

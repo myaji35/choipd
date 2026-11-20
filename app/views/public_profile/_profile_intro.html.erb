@@ -38,4 +38,4 @@
   async function shareMemberPage(button) { if (navigator.share) { try { await navigator.share({ title: document.title, url: location.href }); } catch (_) {} } else { await copyMemberLink(button); } }
 </script>
 
-<% if ProConsent.has_consent?(owner_id: member.id, type: "socialdoctors_exposure") %><p class="public-member-inner"><%= link_to "브랜드 운영 현황 보기 →", member_brand_ops_path(slug: member.slug), style: "color:#00754A;display:inline-block;padding:12px 0;" %></p><% end %>
+<% if brand_ops_public? && ProConsent.has_consent?(owner_id: member.id, type: "socialdoctors_exposure") %><p class="public-member-inner"><%= link_to "브랜드 운영 현황 보기 →", member_brand_ops_path(slug: member.slug), style: "color:#00754A;display:inline-block;padding:12px 0;" %></p><% end %>

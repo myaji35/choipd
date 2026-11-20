@@ -1,9 +1,21 @@
 require "test_helper"
 
 class BrandOpsTest < ActionDispatch::IntegrationTest
+  include Devise::Test::IntegrationHelpers
   setup do
+    @old_members_threshold = ENV["BRAND_OPS_MEMBERS_THRESHOLD"]
+    @old_active_min = ENV["BRAND_OPS_ACTIVE_MIN"]
+    @old_communication_min = ENV["BRAND_OPS_COMMUNICATION_MIN"]
+    ENV["BRAND_OPS_ACTIVE_MIN"] = "0"
+    ENV["BRAND_OPS_COMMUNICATION_MIN"] = "0"
     @member = Member.create!(name: "운영 회원", email: "ops-page@example.com", slug: "ops-page", status: "approved", password: "password1234", password_confirmation: "password1234")
   end
+  teardown do
+    ENV["BRAND_OPS_MEMBERS_THRESHOLD"] = @old_members_threshold
+    ENV["BRAND_OPS_ACTIVE_MIN"] = @old_active_min
+    ENV["BRAND_OPS_COMMUNICATION_MIN"] = @old_communication_min
+  end
+
   test "growth shows accessible charts and signup" do
     get "/growth"
     assert_response :success
@@ -105,5 +117,55 @@ class BrandOpsTest < ActionDispatch::IntegrationTest
     get "/ops-page/admin/brand"
     assert_response :success
     assert_includes response.body, "내 브랜드 운영 현황"
+    assert_includes response.body, "공개 중 (회원 50명 전까지는 항상 공개 — 지금 #{BrandOps::PublicGate.status[:members_total]}명)"
+  end
+  test "closed gate protects pages and shows owner status" do
+    ENV["BRAND_OPS_MEMBERS_THRESHOLD"] = "0"
+    ENV["BRAND_OPS_ACTIVE_MIN"] = "9999"
+    ENV["BRAND_OPS_COMMUNICATION_MIN"] = "9999"
+    ProConsent.create!(owner_id: @member.id, consent_type: "socialdoctors_exposure", consented: true)
+    get "/growth"
+    assert_response :not_found
+    get "/ops-page/brand"
+    assert_response :not_found
+    get "/"
+    assert_select 'a[href="/growth"]', count: 0
+    get "/explore"
+    assert_select 'a[href="/growth"]', count: 0
+    get "/ops-page"
+    assert_select 'a[href="/ops-page/brand"]', count: 0
+    post "/auth/login", params: { email: @member.email, password: "password1234" }
+    get "/ops-page/brand"
+    assert_redirected_to "/ops-page/admin/brand"
+    get "/ops-page/admin/brand"
+    assert_includes response.body, "공개 상태: 아직 비공개"
+    assert_includes response.body, "회원 0명 이상이라 기준을 적용 중"
+    assert_select "a", text: /공개 페이지 보기/, count: 0
+  end
+
+  test "admin previews closed pages" do
+    ENV["BRAND_OPS_MEMBERS_THRESHOLD"] = "0"
+    ENV["BRAND_OPS_ACTIVE_MIN"] = "9999"
+    ENV["BRAND_OPS_COMMUNICATION_MIN"] = "9999"
+    ProConsent.create!(owner_id: @member.id, consent_type: "socialdoctors_exposure", consented: true)
+    admin = AdminUser.create!(email: "gate-admin@example.com", password: "password1234", role: "admin")
+    sign_in admin
+    get "/growth"
+    assert_response :success
+    assert_includes response.body, "공개 전 미리보기"
+    assert_includes response.body, "회원 0명 이상이라 기준을 적용 중"
+    get "/ops-page/brand"
+    assert_response :success
+    assert_includes response.body, "공개 전 미리보기"
+    assert_select 'a[href="/growth"]', count: 0
+  end
+
+  test "open gate omits preview banner" do
+    ProConsent.create!(owner_id: @member.id, consent_type: "socialdoctors_exposure", consented: true)
+    [ "/growth", "/ops-page/brand" ].each do |path|
+      get path
+      assert_response :success
+      assert_not_includes response.body, "공개 전 미리보기"
+    end
   end
 end
