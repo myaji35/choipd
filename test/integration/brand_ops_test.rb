@@ -18,10 +18,15 @@ class BrandOpsTest < ActionDispatch::IntegrationTest
     assert_select ".ops-hero > .ops-key-grid", count: 1
     assert_match(/@media\(max-width:640px\).*\.ops-hero \.ops-key-grid\{[^}]*order:1\}\.ops-hero \.ops-featured\{order:2\}/, Rails.root.join("app/assets/stylesheets/brand_ops.css").read)
     assert_select "svg .ops-area"
-    assert_select ".ops-activity-grid section", count: 5
+    assert_select ".ops-communication-grid section.ops-surface-card", count: 5
+    assert_select ".ops-activity-chart-mobile:not([open]) > summary", text: "문의와 활동 그래프 보기"
+    assert_select ".ops-closing h2", text: "다음 운영 사례의 주인공이 되어 보세요"
+    assert_select ".ops-closing a[href=?]", member_signup_path, text: "내 페이지 만들기"
+    assert_select ".ops-closing a[href=?]", "/explore", text: "먼저 둘러보기"
+    assert_select ".ops-hero p", text: /회원 [\d,]+명이 페이지를 운영하고 있고, 이번 주에만 방문 [\d,]+회가 오갔어요\./
     assert_select ".ops-brand-card", 0..6
     assert_select "a", text: "내 페이지 만들기"
-    assert_select ".ops-key-grid section", count: 4
+    assert_select ".ops-hero .ops-key-grid section", count: 4
     assert_not_includes response.body, "미만건"
   end
   test "period selection marks the active link" do
@@ -68,8 +73,8 @@ class BrandOpsTest < ActionDispatch::IntegrationTest
   test "count with unit protects small counts" do
     %w[건 회].each do |unit|
       assert_equal "0#{unit}", BrandOps::Display.count_with_unit(0, unit)
-      assert_equal "3건 미만", BrandOps::Display.count_with_unit(1, unit)
-      assert_equal "3건 미만", BrandOps::Display.count_with_unit(2, unit)
+      assert_equal "3#{unit} 미만", BrandOps::Display.count_with_unit(1, unit)
+      assert_equal "3#{unit} 미만", BrandOps::Display.count_with_unit(2, unit)
       assert_equal "12#{unit}", BrandOps::Display.count_with_unit(12, unit)
     end
   end

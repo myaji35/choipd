@@ -2,7 +2,7 @@ module BrandOps
   module Display
     def self.count_with_unit(number, unit)
       value = count(number)
-      value == "3건 미만" ? value : "#{value}#{unit}"
+      value == "3건 미만" ? "3#{unit} 미만" : "#{value}#{unit}"
     end
 
     def self.count(number)
