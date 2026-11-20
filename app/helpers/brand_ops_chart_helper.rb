@@ -35,9 +35,9 @@ module BrandOpsChartHelper
     end)
     weeks = content_tag(:div, safe_join(series.each_with_index.map { |row, i| content_tag(:span, row[:week_start].strftime("%-m/%-d"), class: (i.even? || i == series.size - 1 ? "" : "ops-week-odd")) }), class: "ops-weeks")
     rows = series.each_with_index.map { |row, i| content_tag(:tr, content_tag(:th, row[:week_start].to_s) + safe_join(values[i].map { |v| content_tag(:td, protected_counts ? BrandOps::Display.count(v) : v) })) }
-    table = content_tag(:table, content_tag(:caption, "주간 추이 표") + content_tag(:thead, content_tag(:tr, content_tag(:th, "주 시작일") + safe_join(labels.map { |l| content_tag(:th, l) }))) + content_tag(:tbody, safe_join(rows)), class: "ops-sr-only")
+    table = content_tag(:table, content_tag(:caption, "주간 추이 표") + content_tag(:thead, content_tag(:tr, content_tag(:th, "주 시작일") + safe_join(labels.map { |l| content_tag(:th, l) }))) + content_tag(:tbody, safe_join(rows)), class: "ops-fallback-table")
     chart = content_tag(:div, ticks + content_tag(:div, grid + svg + ends, class: "ops-plot") + weeks, class: "ops-chart", style: ("min-width:#{(series.size * 8 / 0.9).ceil + 105}px" if bars))
-    safe_join([ legend, content_tag(:div, chart, class: "ops-chart-scroll"), table ])
+    content_tag(:div, legend + content_tag(:div, chart, class: "ops-chart-scroll") + content_tag(:div, table, class: "ops-sr-only"), class: "ops-chart-wrapper")
   end
 
   def ops_delta(delta, unit = "명")

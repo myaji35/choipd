@@ -1,6 +1,6 @@
 <% content_for :title, "imPD는 지금" %>
-<%= stylesheet_link_tag "brand_ops" %>
-<main style="max-width:1100px;margin:auto;padding:56px 20px;">
+<% content_for :head do %><%= stylesheet_link_tag "brand_ops" %><% end %>
+<div style="max-width:1100px;margin:auto;padding:56px 20px;">
   <header style="margin-bottom:48px;">
     <p style="color:#00754A;font-weight:700;">imPD는 지금</p>
     <h1 class="impd-display" style="font-size:clamp(32px,5vw,56px);margin:14px 0;">imPD는 지금 이렇게 자라고 있어요</h1>
@@ -9,6 +9,7 @@
     <p style="margin-top:12px;">지금 가입하면 첫 페이지 제작 무료</p>
     <% if Rails.env.development? && BrandOps::DemoSeed.present? %><p style="margin-top:16px;color:#00754A;font-weight:700;">예시 데이터</p><% end %>
   </header>
+  <section class="impd-card" style="margin-bottom:24px;"><h2>이번 달 새로 시작한 회원</h2><p><%= number_with_delimiter(@new_member_count) %>명</p><% if @recent_professions.any? %><p>가장 최근에 시작한 분야: <%= @recent_professions.join(" · ") %></p><% end %></section>
   <% communication = %i[visits inquiries reviews posts sns_posts] %>
   <div class="ops-key-grid">
     <% [["누적 회원", :members_total], ["활성 회원", :members_active], ["이번 주 가입", :signups]].each do |label, key| %>
@@ -28,4 +29,4 @@
   <section><h2 style="font-size:28px;margin-bottom:20px;">운영 중인 브랜드</h2><div class="ops-card-grid">
     <% @members.each do |member| %><% brand = Brand.where(member_id: member.id, published: true).first %><% recent = @member_series[member].last(4) %><article class="impd-card ops-brand-card"><p><%= member.profession_label %></p><h3 style="font-size:22px;margin:8px 0;"><%= member.name %></h3><% if brand && brand.name != member.name %><p><%= brand.name %></p><% end %><% counts = recent.map { |row| row[:visits].to_i }; max = [counts.max.to_i, 1].max %><p class="ops-spark-label">최근 4주</p><svg class="ops-spark" viewBox="0 0 100 40" preserveAspectRatio="none" role="img" aria-label="최근 방문 추이"><line x1="0" y1="39" x2="100" y2="39" stroke="#d6ded9" stroke-width="1" vector-effect="non-scaling-stroke" /><polyline points="<%= counts.each_with_index.map { |v, i| "#{i * 100.0 / [counts.size - 1, 1].max},#{40 - v * 38.0 / max}" }.join(' ') %>" fill="none" stroke="#00754A" stroke-width="1.5" vector-effect="non-scaling-stroke" /></svg><p>이번 달 게시 <%= BrandOps::Display.count(recent.sum { |r| r[:posts] }) %> · 방문 <%= BrandOps::Display.count(recent.sum { |r| r[:visits] }) %></p><%= link_to "브랜드 운영 보기 →", member_brand_ops_path(slug: member.slug), style: "display:inline-block;padding:12px 0;color:#00754A;" %></article><% end %>
   </div><p style="margin-top:20px;"><%= link_to "모든 회원 둘러보기", "/explore", style: "color:#00754A;" %></p></section>
-</main>
+</div>

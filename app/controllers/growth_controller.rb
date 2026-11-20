@@ -2,6 +2,9 @@ class GrowthController < ApplicationController
   layout "impd"
   def show
     @now = Time.current
+    new_members = Member.where(created_at: @now.beginning_of_month..@now)
+    @new_member_count = new_members.count
+    @recent_professions = new_members.order(created_at: :desc, id: :desc).limit(3).map(&:profession_label)
     @weeks = params[:weeks] == "26" ? 26 : 12
     @series = BrandOps::WeeklyStats.platform(weeks: @weeks, now: @now)
     @summary = BrandOps::WeeklyStats.summary(@series)
