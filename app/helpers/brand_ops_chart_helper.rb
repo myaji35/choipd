@@ -1,6 +1,6 @@
 module BrandOpsChartHelper
   def ops_line_chart(series, keys:, labels:, height: 220, protected_counts: false, area: nil, bars: false)
-    colors = area ? %w[#46534e #006241 #9ba9a3 #687a73 #bdc9c3] : %w[#00754A #687a73 #9ba9a3 #46534e #bdc9c3]
+    colors = area ? %w[#46534e #006241 #788780 #687a73 #788780] : %w[#00754A #687a73 #788780 #46534e #788780]
     values = series.map { |row| keys.map { |key| row[key].to_i } }
     plotted = values.map { |row| row.map { |n| protected_counts && n.between?(1, 2) ? 3 : n } }
     maximum = ops_nice_max(plotted.flatten.max.to_i)
@@ -24,14 +24,14 @@ module BrandOpsChartHelper
         pieces << tag.polyline(points: coords, fill: "none", stroke: colors[k % colors.size], "stroke-width": 3, "vector-effect": "non-scaling-stroke")
       end
     end
-    legend = content_tag(:div, safe_join(labels.each_with_index.map { |label, i| content_tag(:span, "● #{label}", style: "color:#{colors[i % colors.size]}") }), class: "ops-legend")
+    legend = content_tag(:div, safe_join(labels.each_with_index.map { |label, i| content_tag(:span, content_tag(:span, "●", style: "color:#{colors[i % colors.size]}", aria: { hidden: true }) + " #{label}") }), class: "ops-legend")
     ticks = content_tag(:div, safe_join([ maximum, maximum / 2, 0 ].map { |n| content_tag(:span, number_with_delimiter(n)) }), class: "ops-y-ticks#{bars ? ' ops-ticks-grouped' : ''}")
     ticks += content_tag(:div, safe_join([ stacked_maximum, stacked_maximum / 2, 0 ].map { |n| content_tag(:span, number_with_delimiter(n)) }), class: "ops-y-ticks ops-ticks-stacked") if bars
     grid = safe_join([ 0, 50, 100 ].map { |y| content_tag(:span, "", class: "ops-gridline", style: "top:#{y}%") })
     svg = content_tag(:svg, safe_join(pieces), viewBox: "0 0 100 100", preserveAspectRatio: "none", role: "img", "aria-label": "주간 추이: #{labels.join(', ')}")
     ends = bars ? "" : safe_join(keys.each_index.map do |k|
       value = values.last&.[](k).to_i
-      content_tag(:span, protected_counts ? BrandOps::Display.count(value) : number_with_delimiter(value), class: "ops-end-value", style: "top:#{100 - 100.0 * plotted.last&.[](k).to_i / maximum}%;color:#{colors[k % colors.size]}")
+      content_tag(:span, protected_counts ? BrandOps::Display.count(value) : number_with_delimiter(value), class: "ops-end-value", style: "top:#{100 - 100.0 * plotted.last&.[](k).to_i / maximum}%")
     end)
     weeks = content_tag(:div, safe_join(series.each_with_index.map { |row, i| content_tag(:span, row[:week_start].strftime("%-m/%-d"), class: (i.even? || i == series.size - 1 ? "" : "ops-week-odd")) }), class: "ops-weeks")
     rows = series.each_with_index.map { |row, i| content_tag(:tr, content_tag(:th, row[:week_start].to_s) + safe_join(values[i].map { |v| content_tag(:td, protected_counts ? BrandOps::Display.count(v) : v) })) }

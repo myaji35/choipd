@@ -14,12 +14,12 @@
     <div class="ops-key-grid ops-owner-stats">
       <% [[:visits, "방문", "회"], [:inquiries, "문의", "건"], [:posts, "게시", "건"], [:sns_posts, "SNS 발행", "건"]].each do |key, label, unit| %>
         <% stat = @four_week_stats[key]; delta = stat[:delta] %>
-        <section class="ops-surface-card"><p><%= label %></p><strong><%= number_with_delimiter(stat[:value]) %><%= unit %></strong><p>그전 4주보다 <%= delta.negative? ? "−" : "+" %><%= number_with_delimiter(delta.abs) %></p></section>
+        <section class="ops-surface-card"><p><%= label %></p><strong><%= number_with_delimiter(stat[:value]) %><%= unit %></strong><p><%= delta.zero? ? "그전 4주와 같아요" : "그전 4주보다 #{number_with_delimiter(delta.abs)}#{unit} #{delta.positive? ? '늘었어요' : '줄었어요'}" %></p></section>
       <% end %>
     </div>
     <p style="margin:12px 0;">최근 12주 활동이에요.</p>
     <%= ops_line_chart @series, keys: %i[visits inquiries posts sns_posts], labels: ["방문", "문의 건수", "게시", "SNS 발행"] %>
-    <p style="margin-top:12px;line-height:1.7;">공개 페이지(/slug/brand)에는 주간 방문·게시 그래프, 최근 4주 문의 수(1~2건은 '3건 미만'), 연결 매체, 최근 게시물 제목만 보여요. 문의 내용·연락처·방문자 정보는 공개하지 않아요.</p>
+    <p style="margin-top:12px;line-height:1.7;">공개 페이지(<%= member_brand_ops_path(slug: @member.slug) %>)에는 주간 방문·게시 그래프, 최근 4주 문의 수(1~2건은 '3건 미만'), 연결 매체, 최근 게시물 제목만 보여요. 문의 내용·연락처·방문자 정보는 공개하지 않아요.</p>
     <p style="margin-top:12px;">로봇·운영자·본인 방문 제외. 집계 시점: <%= Time.current.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %> (한국 시간)</p>
     <p style="margin-top:12px;"><% if @consented && @member.approved? %><%= link_to member_brand_ops_path(slug: @member.slug), class: "impd-btn impd-btn-secondary" do %>공개 페이지 보기 <%= lni_icon "arrow-right" %><% end %><% else %><%= link_to "공개하려면 노출 동의하기", slug_admin_brand_consents_path(slug: @member.slug), class: "impd-btn impd-btn-secondary" %><% end %></p>
   </section>

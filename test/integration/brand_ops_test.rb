@@ -8,6 +8,7 @@ class BrandOpsTest < ActionDispatch::IntegrationTest
     get "/growth"
     assert_response :success
     assert_select "main", count: 1
+    assert_select "details summary", text: "숫자는 이렇게 셌어요"
     assert_select "svg[role=img]"
     assert_select "table"
     assert_select ".ops-y-ticks span", minimum: 3
@@ -48,6 +49,7 @@ class BrandOpsTest < ActionDispatch::IntegrationTest
     get "/ops-page/brand"
     assert_response :success
     assert_select "main", count: 1
+    assert_select "details summary", text: "숫자는 이렇게 셌어요"
     assert_select "h1", text: "운영 회원"
     assert_match(/imPD에서 1개월째 운영 중 · 최근 4주 방문 0회 · 게시 0건/, response.body)
     assert_select "a.impd-btn-primary", text: "나도 이렇게 운영하기"

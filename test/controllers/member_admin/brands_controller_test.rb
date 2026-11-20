@@ -2,13 +2,15 @@ require "test_helper"
 
 class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @member = Member.create!(name: "브랜드 회원", email: "brand-#{SecureRandom.hex(4)}@example.com", slug: "brand-#{SecureRandom.hex(4)}", status: "approved", business_type: "individual", profession: "custom", password: "password1234", password_confirmation: "password1234")
+    @member = Member.create!(name: "브랜드 회원", email: "brand-#{SecureRandom.hex(4)}@example.com", slug: "kang-seung-sig", status: "approved", business_type: "individual", profession: "custom", password: "password1234", password_confirmation: "password1234")
     post "/auth/login", params: { email: @member.email, password: "password1234" }
   end
 
   test "shows an empty state without brands" do
     get slug_admin_brand_path(slug: @member.slug)
     assert_response :success
+    assert_includes response.body, "/kang-seung-sig/brand"
+    assert_not_includes response.body, "/slug/brand"
     assert_includes response.body, "아직 등록된 브랜드가 없어요"
     assert_includes response.body, "브랜드는 운영팀이 등록을 도와드려요"
     assert_select "a.impd-btn-secondary", text: "공개하려면 노출 동의하기"
@@ -32,10 +34,10 @@ class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
     2.times { SnsPostHistory.create!(sns_scheduled_post: scheduled, status: "success") }
     get slug_admin_brand_path(slug: @member.slug)
     assert_select ".ops-owner-stats section", count: 4
-    assert_select ".ops-owner-stats section", text: /방문.*4회.*\+4/m
-    assert_select ".ops-owner-stats section", text: /문의.*1건.*\+1/m
-    assert_select ".ops-owner-stats section", text: /게시.*0건.*−2/m
-    assert_select ".ops-owner-stats section", text: /SNS 발행.*2건.*\+2/m
+    assert_select ".ops-owner-stats section", text: /방문.*4회.*4회 늘었어요/m
+    assert_select ".ops-owner-stats section", text: /문의.*1건.*1건 늘었어요/m
+    assert_select ".ops-owner-stats section", text: /게시.*0건.*2건 줄었어요/m
+    assert_select ".ops-owner-stats section", text: /SNS 발행.*2건.*2건 늘었어요/m
     assert_includes response.body, "이번 달 imPD 게시 0건 · SNS 발행 2건"
   end
 end
