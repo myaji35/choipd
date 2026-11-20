@@ -7,11 +7,25 @@
   <div style="display: grid; gap: 12px;">
     <% @brands.each do |brand| %><article class="impd-card"><h3><%= brand.name %></h3><p style="margin-top: 8px;"><%= [['업종', brand.business_type], ['지역', brand.region]].filter_map { |label, value| "#{label}: #{value}" if value.present? }.join(' · ') %></p><p style="margin-top: 8px; white-space: pre-line;"><%= brand.description %></p><% if (url = http_url(brand.website_url)) %><p style="margin-top: 8px;"><%= link_to url, url, target: '_blank', rel: 'noopener', style: 'color: var(--impd-accent); text-decoration: underline;' %></p><% end %></article><% end %>
   </div>
-  <p style="margin: 16px 0 32px;">브랜드는 운영팀이 등록을 도와드려요 — <%= link_to '문의하기', new_inquiry_path, style: 'color: var(--impd-accent); text-decoration: underline;' %></p>
-  <section class="impd-card" style="margin:32px 0;"><h2>내 브랜드 운영 현황</h2><p style="margin:12px 0;">최근 12주 활동이에요.</p><%= ops_line_chart @series, keys: %i[visits inquiries posts sns_posts], labels: ["방문", "문의 건수", "게시", "SNS 발행"] %><p style="margin-top:12px;line-height:1.7;">공개 페이지에는 이름과 브랜드, 주간 활동 건수, 연결 매체와 최근 게시물 제목이 보여요. 문의 내용과 연락처는 공개하지 않아요. 로봇·운영자·본인 방문 제외. 집계 시점: <%= Time.current.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %> (한국 시간)</p><p style="margin-top:12px;"><% if @consented && @member.approved? %><%= link_to "공개 페이지 보기", member_brand_ops_path(slug: @member.slug) %><% else %><%= link_to "공개 동의 확인", slug_admin_brand_consents_path(slug: @member.slug) %><% end %></p></section>
+  <% if @brands.empty? %><p style="margin: 16px 0 32px;">브랜드는 운영팀이 등록을 도와드려요 — <%= link_to '문의하기', new_inquiry_path, style: 'color: var(--impd-accent); text-decoration: underline;' %></p><% end %>
+  <section class="impd-card" style="margin:32px 0;">
+    <h2>내 브랜드 운영 현황</h2>
+    <p style="margin:12px 0;">최근 4주 활동과 그전 4주와의 차이예요.</p>
+    <div class="ops-key-grid ops-owner-stats">
+      <% [[:visits, "방문", "회"], [:inquiries, "문의", "건"], [:posts, "게시", "건"], [:sns_posts, "SNS 발행", "건"]].each do |key, label, unit| %>
+        <% stat = @four_week_stats[key]; delta = stat[:delta] %>
+        <section class="ops-surface-card"><p><%= label %></p><strong><%= number_with_delimiter(stat[:value]) %><%= unit %></strong><p>그전 4주보다 <%= delta.negative? ? "−" : "+" %><%= number_with_delimiter(delta.abs) %></p></section>
+      <% end %>
+    </div>
+    <p style="margin:12px 0;">최근 12주 활동이에요.</p>
+    <%= ops_line_chart @series, keys: %i[visits inquiries posts sns_posts], labels: ["방문", "문의 건수", "게시", "SNS 발행"] %>
+    <p style="margin-top:12px;line-height:1.7;">공개 페이지(/slug/brand)에는 주간 방문·게시 그래프, 최근 4주 문의 수(1~2건은 '3건 미만'), 연결 매체, 최근 게시물 제목만 보여요. 문의 내용·연락처·방문자 정보는 공개하지 않아요.</p>
+    <p style="margin-top:12px;">로봇·운영자·본인 방문 제외. 집계 시점: <%= Time.current.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %> (한국 시간)</p>
+    <p style="margin-top:12px;"><% if @consented && @member.approved? %><%= link_to member_brand_ops_path(slug: @member.slug), class: "impd-btn impd-btn-secondary" do %>공개 페이지 보기 <%= lni_icon "arrow-right" %><% end %><% else %><%= link_to "공개하려면 노출 동의하기", slug_admin_brand_consents_path(slug: @member.slug), class: "impd-btn impd-btn-secondary" %><% end %></p>
+  </section>
   <h2 style="margin-bottom: 12px;">연결 상태</h2>
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px;">
     <% [['SocialDoctors', 'socialdoctors_exposure'], ['Townin 지역 광고', 'townin_local_ads']].each do |label, type| %><section class="impd-card"><h3><%= label %></h3><p style="margin: 12px 0;"><%= lni_icon(ProConsent.current_for(@member.id, type) ? 'check-circle-1' : 'xmark-circle') %> <%= ProConsent.current_for(@member.id, type) ? '동의함' : '동의 안 함' %></p><%= link_to '동의 상태 확인', slug_admin_brand_consents_path(slug: @member.slug), style: 'color: var(--impd-accent); text-decoration: underline;' %></section><% end %>
-    <section class="impd-card"><h3>콘텐츠·성과</h3><p style="margin-top: 12px;">준비 중</p><p style="margin-top: 8px; line-height: 1.6;">SocialDoctors 연동 후 여기에 매체별 발행·Townin 읽음 수가 보여요.</p></section>
+    <section class="impd-card"><h3>콘텐츠·성과</h3><p style="margin-top: 12px;">이번 달 imPD 게시 <%= number_with_delimiter(@month_posts) %>건 · SNS 발행 <%= number_with_delimiter(@month_sns_posts) %>건</p><p style="margin-top: 8px; line-height: 1.6; color: var(--impd-muted);">SocialDoctors 매체별 발행 수는 연동되면 여기에 함께 보여요.</p></section>
   </div>
 </div>

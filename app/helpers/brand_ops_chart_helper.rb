@@ -25,8 +25,8 @@ module BrandOpsChartHelper
       end
     end
     legend = content_tag(:div, safe_join(labels.each_with_index.map { |label, i| content_tag(:span, "● #{label}", style: "color:#{colors[i % colors.size]}") }), class: "ops-legend")
-    ticks = content_tag(:div, safe_join([ maximum, (maximum.even? ? maximum / 2 : maximum / 2.0), 0 ].map { |n| content_tag(:span, number_with_delimiter(n)) }), class: "ops-y-ticks#{bars ? ' ops-ticks-grouped' : ''}")
-    ticks += content_tag(:div, safe_join([ stacked_maximum, (stacked_maximum.even? ? stacked_maximum / 2 : stacked_maximum / 2.0), 0 ].map { |n| content_tag(:span, number_with_delimiter(n)) }), class: "ops-y-ticks ops-ticks-stacked") if bars
+    ticks = content_tag(:div, safe_join([ maximum, maximum / 2, 0 ].map { |n| content_tag(:span, number_with_delimiter(n)) }), class: "ops-y-ticks#{bars ? ' ops-ticks-grouped' : ''}")
+    ticks += content_tag(:div, safe_join([ stacked_maximum, stacked_maximum / 2, 0 ].map { |n| content_tag(:span, number_with_delimiter(n)) }), class: "ops-y-ticks ops-ticks-stacked") if bars
     grid = safe_join([ 0, 50, 100 ].map { |y| content_tag(:span, "", class: "ops-gridline", style: "top:#{y}%") })
     svg = content_tag(:svg, safe_join(pieces), viewBox: "0 0 100 100", preserveAspectRatio: "none", role: "img", "aria-label": "주간 추이: #{labels.join(', ')}")
     ends = bars ? "" : safe_join(keys.each_index.map do |k|
@@ -41,10 +41,10 @@ module BrandOpsChartHelper
   end
 
   def ops_nice_max(value)
-    return 5 if value <= 5
+    return [ 2, 4, 6, 10 ].find { |tick| tick >= value } if value <= 10
     scale = 1
     loop do
-      ticks = scale == 1 ? [ 10, 15, 20, 25, 30, 40, 50, 60, 80 ] : [ 10, 12, 15, 20, 25, 30, 40, 50, 60, 80 ]
+      ticks = scale == 1 ? [ 20, 30, 40, 60, 80 ] : [ 10, 12, 16, 20, 30, 40, 60, 80 ]
       ticks.each do |tick|
         return tick * scale if tick * scale >= value
       end

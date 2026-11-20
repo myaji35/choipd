@@ -29,8 +29,6 @@
         <%= link_to member_brand_ops_path(slug: featured.slug), class: "ops-brand-link" do %>이 브랜드가 운영되는 모습 보기 <%= lni_icon "arrow-right" %><% end %>
       </article>
     <% end %>
-  </header>
-  <% communication = %i[visits inquiries reviews posts sns_posts] %>
   <div class="ops-key-grid">
     <% [["누적 회원", :members_total], ["활성 회원", :members_active], ["이번 주 가입", :signups]].each do |label, key| %>
       <% value = key == :signups ? @summary[:members_total][:delta] : @summary[key][:value] %>
@@ -39,6 +37,8 @@
     <% end %>
     <section class="ops-surface-card"><p>이번 달 새로 시작</p><strong><%= number_with_delimiter(@new_member_count) %>명</strong><p><%= @new_member_delta.zero? ? "지난달과 같아요" : "지난달보다 #{number_with_delimiter(@new_member_delta.abs)}명 #{@new_member_delta.positive? ? '늘었어요' : '줄었어요'}" %></p></section>
   </div>
+  </header>
+  <% communication = %i[visits inquiries reviews posts sns_posts] %>
   <% if @recent_professions.any? %><p class="ops-recent-professions">최근 시작 분야: <%= @recent_professions.join(" · ") %></p><% end %>
   <p style="margin-top:16px;">이번 주 회원 페이지에서 방문 <%= number_with_delimiter(@summary[:visits][:value]) %>회, 문의 <%= number_with_delimiter(@summary[:inquiries][:value]) %>건, 게시 <%= number_with_delimiter(@summary[:posts][:value]) %>건이 오갔어요</p>
   <p style="margin:10px 0 48px;color:#52635b;font-size:13px;">로봇·운영자 방문 제외 · 집계 시점 <%= @now.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %> (KST)</p>

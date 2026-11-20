@@ -11,6 +11,11 @@ class BrandOpsTest < ActionDispatch::IntegrationTest
     assert_select "svg[role=img]"
     assert_select "table"
     assert_select ".ops-y-ticks span", minimum: 3
+    assert_select ".ops-y-ticks span" do |ticks|
+      ticks.each { |tick| assert_no_match(/\./, tick.text) }
+    end
+    assert_select ".ops-hero > .ops-key-grid", count: 1
+    assert_match(/@media\(max-width:640px\).*\.ops-hero \.ops-key-grid\{[^}]*order:1\}\.ops-hero \.ops-featured\{order:2\}/, Rails.root.join("app/assets/stylesheets/brand_ops.css").read)
     assert_select "svg .ops-area"
     assert_select ".ops-activity-grid section", count: 5
     assert_select ".ops-brand-card", 0..6
