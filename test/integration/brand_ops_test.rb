@@ -15,6 +15,8 @@ class BrandOpsTest < ActionDispatch::IntegrationTest
     assert_select ".ops-activity-grid section", count: 5
     assert_select ".ops-brand-card", 0..6
     assert_select "a", text: "내 페이지 만들기"
+    assert_select ".ops-key-grid section", count: 4
+    assert_not_includes response.body, "미만건"
   end
   test "brand page requires consent and hides inquiry details" do
     get "/ops-page/brand"
@@ -35,9 +37,19 @@ class BrandOpsTest < ActionDispatch::IntegrationTest
     assert_select ".ops-media-chip", text: /SocialDoctors/
     assert_select "a[href=?]", "/ops-page", text: "프로필 보기"
     assert_select ".impd-frap", count: 0
+    assert_not_includes response.body, "미만건"
     assert_not_includes response.body, "비밀 문의 내용"
     assert_not_includes response.body, "private@example.com"
   end
+  test "count with unit protects small counts" do
+    %w[건 회].each do |unit|
+      assert_equal "0#{unit}", BrandOps::Display.count_with_unit(0, unit)
+      assert_equal "3건 미만", BrandOps::Display.count_with_unit(1, unit)
+      assert_equal "3건 미만", BrandOps::Display.count_with_unit(2, unit)
+      assert_equal "12#{unit}", BrandOps::Display.count_with_unit(12, unit)
+    end
+  end
+
   test "chart fallback is visually hidden" do
     css = Rails.root.join("app/assets/stylesheets/brand_ops.css").read
     assert_match(/\.ops-sr-only\s*\{[^}]*position\s*:\s*absolute/, css)
@@ -49,6 +61,7 @@ class BrandOpsTest < ActionDispatch::IntegrationTest
     get "/ops-page/brand"
     assert_select "a", text: "내 브랜드 관리로 가기"
     assert_select "a", text: "나도 이렇게 운영하기", count: 0
+    assert_select "a", text: "이 분께 문의하기", count: 0
   end
 
   test "owner sees brand activity" do

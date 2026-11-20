@@ -3,9 +3,13 @@ module BrandOpsChartHelper
     colors = area ? %w[#46534e #006241 #9ba9a3 #687a73 #bdc9c3] : %w[#00754A #687a73 #9ba9a3 #46534e #bdc9c3]
     values = series.map { |row| keys.map { |key| row[key].to_i } }
     plotted = values.map { |row| row.map { |n| protected_counts && n.between?(1, 2) ? 3 : n } }
-    raw_max = [ bars ? plotted.map(&:sum).max.to_i : plotted.flatten.max.to_i, 1 ].max
-    step = 10**Math.log10(raw_max / 2.0).floor
-    maximum = (raw_max / (2.0 * step)).ceil * 2 * step
+    nice_max = lambda do |value|
+      raw_max = [ value, 1 ].max
+      step = 10**Math.log10(raw_max / 2.0).floor
+      (raw_max / (2.0 * step)).ceil * 2 * step
+    end
+    maximum = nice_max.call(plotted.flatten.max.to_i)
+    stacked_maximum = bars ? nice_max.call(plotted.map(&:sum).max.to_i) : maximum
     pieces = []
     keys.each_with_index do |key, k|
       points = plotted.each_with_index.map { |row, i| [ 100.0 * i / [ series.size - 1, 1 ].max, 100.0 - 100.0 * row[k] / maximum ] }
@@ -15,8 +19,8 @@ module BrandOpsChartHelper
         plotted.each_with_index do |row, i|
           bar_width = 90.0 / [ series.size, 1 ].max
           x = (i + 0.5) * 100.0 / [ series.size, 1 ].max - bar_width / 2
-          bar_height = 100.0 * row[k] / maximum
-          y = 100.0 - 100.0 * row.first(k + 1).sum / maximum
+          bar_height = 100.0 * row[k] / stacked_maximum
+          y = 100.0 - 100.0 * row.first(k + 1).sum / stacked_maximum
           pieces << tag.rect(x: x, y: y, width: bar_width, height: bar_height, fill: colors[k % colors.size], class: "ops-bar-stacked")
         end
       else
@@ -26,7 +30,8 @@ module BrandOpsChartHelper
       end
     end
     legend = content_tag(:div, safe_join(labels.each_with_index.map { |label, i| content_tag(:span, "● #{label}", style: "color:#{colors[i % colors.size]}") }), class: "ops-legend")
-    ticks = content_tag(:div, safe_join([ maximum, maximum / 2, 0 ].map { |n| content_tag(:span, number_with_delimiter(n)) }), class: "ops-y-ticks")
+    ticks = content_tag(:div, safe_join([ maximum, maximum / 2, 0 ].map { |n| content_tag(:span, number_with_delimiter(n)) }), class: "ops-y-ticks#{bars ? ' ops-ticks-grouped' : ''}")
+    ticks += content_tag(:div, safe_join([ stacked_maximum, stacked_maximum / 2, 0 ].map { |n| content_tag(:span, number_with_delimiter(n)) }), class: "ops-y-ticks ops-ticks-stacked") if bars
     grid = safe_join([ 0, 50, 100 ].map { |y| content_tag(:span, "", class: "ops-gridline", style: "top:#{y}%") })
     svg = content_tag(:svg, safe_join(pieces), viewBox: "0 0 100 100", preserveAspectRatio: "none", role: "img", "aria-label": "주간 추이: #{labels.join(', ')}")
     ends = bars ? "" : safe_join(keys.each_index.map do |k|

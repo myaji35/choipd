@@ -4,6 +4,8 @@ class GrowthController < ApplicationController
     @now = Time.current
     new_members = Member.where(created_at: @now.beginning_of_month..@now)
     @new_member_count = new_members.count
+    previous_month = @now.prev_month
+    @new_member_delta = @new_member_count - Member.where(created_at: previous_month.beginning_of_month...@now.beginning_of_month).count
     @recent_professions = new_members.order(created_at: :desc, id: :desc).limit(3).map(&:profession_label)
     @weeks = params[:weeks] == "26" ? 26 : 12
     @series = BrandOps::WeeklyStats.platform(weeks: @weeks, now: @now)
