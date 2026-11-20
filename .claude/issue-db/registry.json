@@ -498,13 +498,45 @@
       "id": "ISS-481",
       "type": "FEATURE",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "title": "[브랜드 운영 현황 공개] /growth 시계열(회원·활성)·주간 소통량 + 회원 브랜드 운영 페이지 + 내 브랜드 그래프 — kang-seung-sig 1차, 반복 평가 10회+",
       "description": "대표님 지시 2026-11-20. 기획 docs/brand-ops-showcase-plan.md, 평가 기록 docs/brand-ops-loop.md",
       "created_at": "2026-11-20T11:25:27",
       "payload": {
-        "files_changed": []
-      }
+        "files_changed": [],
+        "result": {
+          "stage": "1 개발 완료(미배포)",
+          "score_history": [
+            63,
+            72,
+            78,
+            84,
+            87,
+            89,
+            91,
+            94,
+            96,
+            97
+          ],
+          "proof": [
+            {
+              "cmd": "PARALLEL_WORKERS=1 bin/rails test; rubocop; brakeman",
+              "exit_code": 0,
+              "output": "122 runs 0 failures; 350 files no offenses; Security Warnings 0"
+            },
+            {
+              "cmd": "rails runner DB 대조",
+              "exit_code": 0,
+              "output": "누적 23=23, 주 방문 105, kang-seung-sig 4주 방문 38=원자료, 4주 문의 2=2"
+            }
+          ],
+          "pending": [
+            "운영 실데이터 내보내기 실행(읽기 전용) — 대표님 확인",
+            "운영 배포 — ISS-478 이후 대표님 확인"
+          ]
+        }
+      },
+      "completed_at": "2026-11-20T12:04:16"
     }
   ],
   "hooks": {

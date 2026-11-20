@@ -46,6 +46,12 @@ class BrandOpsTest < ActionDispatch::IntegrationTest
     assert_select ".ops-featured a[href=?]", "/kang-seung-sig/brand", text: /이 브랜드가 운영되는 모습 보기/
   end
 
+  test "growth brand cards have compact mobile layout" do
+    ProConsent.create!(owner_id: @member.id, consent_type: "socialdoctors_exposure", consented: true)
+    get "/growth"
+    assert_select ".ops-brand-card.ops-brand-card-compact .ops-brand-heading"
+  end
+
   test "brand page requires consent and hides inquiry details" do
     get "/ops-page/brand"
     assert_response :not_found
@@ -55,6 +61,7 @@ class BrandOpsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "main", count: 1
     assert_select "details summary", text: "숫자는 이렇게 셌어요"
+    assert_select "header a.ops-growth-chip[href=?]", "/growth", text: /imPD 전체 운영 현황 보기/
     assert_select "h1", text: "운영 회원"
     assert_match(/imPD에서 1개월째 운영 중 · 최근 4주 방문 0회 · 게시 0건/, response.body)
     assert_select "a.impd-btn-primary", text: "나도 이렇게 운영하기"
