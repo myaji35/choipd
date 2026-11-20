@@ -18,6 +18,23 @@ class BrandOpsTest < ActionDispatch::IntegrationTest
     assert_select ".ops-key-grid section", count: 4
     assert_not_includes response.body, "미만건"
   end
+  test "period selection marks the active link" do
+    get "/growth"
+    assert_select ".ops-period a[aria-current=true]", text: "12주"
+    get "/growth", params: { weeks: 26 }
+    assert_select ".ops-period a[aria-current=true]", text: "26주"
+    assert_select ".ops-period a[aria-current]", count: 1
+  end
+
+  test "featured case uses the first consented member" do
+    @member.update!(slug: "kang-seung-sig")
+    get "/growth"
+    assert_select ".ops-featured", count: 0
+    ProConsent.create!(owner_id: @member.id, consent_type: "socialdoctors_exposure", consented: true)
+    get "/growth"
+    assert_select ".ops-featured a[href=?]", "/kang-seung-sig/brand", text: /이 브랜드가 운영되는 모습 보기/
+  end
+
   test "brand page requires consent and hides inquiry details" do
     get "/ops-page/brand"
     assert_response :not_found

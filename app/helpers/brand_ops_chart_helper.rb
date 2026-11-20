@@ -3,13 +3,8 @@ module BrandOpsChartHelper
     colors = area ? %w[#46534e #006241 #9ba9a3 #687a73 #bdc9c3] : %w[#00754A #687a73 #9ba9a3 #46534e #bdc9c3]
     values = series.map { |row| keys.map { |key| row[key].to_i } }
     plotted = values.map { |row| row.map { |n| protected_counts && n.between?(1, 2) ? 3 : n } }
-    nice_max = lambda do |value|
-      raw_max = [ value, 1 ].max
-      step = 10**Math.log10(raw_max / 2.0).floor
-      (raw_max / (2.0 * step)).ceil * 2 * step
-    end
-    maximum = nice_max.call(plotted.flatten.max.to_i)
-    stacked_maximum = bars ? nice_max.call(plotted.map(&:sum).max.to_i) : maximum
+    maximum = ops_nice_max(plotted.flatten.max.to_i)
+    stacked_maximum = bars ? ops_nice_max(plotted.map(&:sum).max.to_i) : maximum
     pieces = []
     keys.each_with_index do |key, k|
       points = plotted.each_with_index.map { |row, i| [ 100.0 * i / [ series.size - 1, 1 ].max, 100.0 - 100.0 * row[k] / maximum ] }
@@ -30,8 +25,8 @@ module BrandOpsChartHelper
       end
     end
     legend = content_tag(:div, safe_join(labels.each_with_index.map { |label, i| content_tag(:span, "● #{label}", style: "color:#{colors[i % colors.size]}") }), class: "ops-legend")
-    ticks = content_tag(:div, safe_join([ maximum, maximum / 2, 0 ].map { |n| content_tag(:span, number_with_delimiter(n)) }), class: "ops-y-ticks#{bars ? ' ops-ticks-grouped' : ''}")
-    ticks += content_tag(:div, safe_join([ stacked_maximum, stacked_maximum / 2, 0 ].map { |n| content_tag(:span, number_with_delimiter(n)) }), class: "ops-y-ticks ops-ticks-stacked") if bars
+    ticks = content_tag(:div, safe_join([ maximum, (maximum.even? ? maximum / 2 : maximum / 2.0), 0 ].map { |n| content_tag(:span, number_with_delimiter(n)) }), class: "ops-y-ticks#{bars ? ' ops-ticks-grouped' : ''}")
+    ticks += content_tag(:div, safe_join([ stacked_maximum, (stacked_maximum.even? ? stacked_maximum / 2 : stacked_maximum / 2.0), 0 ].map { |n| content_tag(:span, number_with_delimiter(n)) }), class: "ops-y-ticks ops-ticks-stacked") if bars
     grid = safe_join([ 0, 50, 100 ].map { |y| content_tag(:span, "", class: "ops-gridline", style: "top:#{y}%") })
     svg = content_tag(:svg, safe_join(pieces), viewBox: "0 0 100 100", preserveAspectRatio: "none", role: "img", "aria-label": "주간 추이: #{labels.join(', ')}")
     ends = bars ? "" : safe_join(keys.each_index.map do |k|
@@ -43,6 +38,18 @@ module BrandOpsChartHelper
     table = content_tag(:table, content_tag(:caption, "주간 추이 표") + content_tag(:thead, content_tag(:tr, content_tag(:th, "주 시작일") + safe_join(labels.map { |l| content_tag(:th, l) }))) + content_tag(:tbody, safe_join(rows)), class: "ops-fallback-table")
     chart = content_tag(:div, ticks + content_tag(:div, grid + svg + ends, class: "ops-plot") + weeks, class: "ops-chart", style: ("min-width:#{(series.size * 8 / 0.9).ceil + 105}px" if bars))
     content_tag(:div, legend + content_tag(:div, chart, class: "ops-chart-scroll") + content_tag(:div, table, class: "ops-sr-only"), class: "ops-chart-wrapper")
+  end
+
+  def ops_nice_max(value)
+    return 5 if value <= 5
+    scale = 1
+    loop do
+      ticks = scale == 1 ? [ 10, 15, 20, 25, 30, 40, 50, 60, 80 ] : [ 10, 12, 15, 20, 25, 30, 40, 50, 60, 80 ]
+      ticks.each do |tick|
+        return tick * scale if tick * scale >= value
+      end
+      scale *= 10
+    end
   end
 
   def ops_delta(delta, unit = "명")
