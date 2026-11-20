@@ -1,0 +1,47 @@
+module BrandOpsChartHelper
+  def ops_line_chart(series, keys:, labels:, height: 220, protected_counts: false, area: nil, bars: false)
+    colors = area ? %w[#46534e #006241 #9ba9a3 #687a73 #bdc9c3] : %w[#00754A #687a73 #9ba9a3 #46534e #bdc9c3]
+    values = series.map { |row| keys.map { |key| row[key].to_i } }
+    plotted = values.map { |row| row.map { |n| protected_counts && n.between?(1, 2) ? 3 : n } }
+    raw_max = [ bars ? plotted.map(&:sum).max.to_i : plotted.flatten.max.to_i, 1 ].max
+    step = 10**Math.log10(raw_max / 2.0).floor
+    maximum = (raw_max / (2.0 * step)).ceil * 2 * step
+    pieces = []
+    keys.each_with_index do |key, k|
+      points = plotted.each_with_index.map { |row, i| [ 100.0 * i / [ series.size - 1, 1 ].max, 100.0 - 100.0 * row[k] / maximum ] }
+      if bars
+        width = 70.0 / [ series.size, 1 ].max / keys.size
+        points.each { |x, y| pieces << tag.rect(x: x - width * keys.size / 2 + width * k, y: y, width: width, height: 100 - y, fill: colors[k % colors.size], class: "ops-bar-grouped") }
+        plotted.each_with_index do |row, i|
+          bar_width = 90.0 / [ series.size, 1 ].max
+          x = (i + 0.5) * 100.0 / [ series.size, 1 ].max - bar_width / 2
+          bar_height = 100.0 * row[k] / maximum
+          y = 100.0 - 100.0 * row.first(k + 1).sum / maximum
+          pieces << tag.rect(x: x, y: y, width: bar_width, height: bar_height, fill: colors[k % colors.size], class: "ops-bar-stacked")
+        end
+      else
+        coords = points.map { |x, y| "#{x},#{y}" }.join(" ")
+        pieces << tag.polygon(points: "0,100 #{coords} 100,100", fill: "#00754A", "fill-opacity": "0.18", class: "ops-area") if key == area
+        pieces << tag.polyline(points: coords, fill: "none", stroke: colors[k % colors.size], "stroke-width": 3, "vector-effect": "non-scaling-stroke")
+      end
+    end
+    legend = content_tag(:div, safe_join(labels.each_with_index.map { |label, i| content_tag(:span, "● #{label}", style: "color:#{colors[i % colors.size]}") }), class: "ops-legend")
+    ticks = content_tag(:div, safe_join([ maximum, maximum / 2, 0 ].map { |n| content_tag(:span, number_with_delimiter(n)) }), class: "ops-y-ticks")
+    grid = safe_join([ 0, 50, 100 ].map { |y| content_tag(:span, "", class: "ops-gridline", style: "top:#{y}%") })
+    svg = content_tag(:svg, safe_join(pieces), viewBox: "0 0 100 100", preserveAspectRatio: "none", role: "img", "aria-label": "주간 추이: #{labels.join(', ')}")
+    ends = bars ? "" : safe_join(keys.each_index.map do |k|
+      value = values.last&.[](k).to_i
+      content_tag(:span, protected_counts ? BrandOps::Display.count(value) : number_with_delimiter(value), class: "ops-end-value", style: "top:#{100 - 100.0 * plotted.last&.[](k).to_i / maximum}%;color:#{colors[k % colors.size]}")
+    end)
+    weeks = content_tag(:div, safe_join(series.each_with_index.map { |row, i| content_tag(:span, row[:week_start].strftime("%-m/%-d"), class: (i.even? || i == series.size - 1 ? "" : "ops-week-odd")) }), class: "ops-weeks")
+    rows = series.each_with_index.map { |row, i| content_tag(:tr, content_tag(:th, row[:week_start].to_s) + safe_join(values[i].map { |v| content_tag(:td, protected_counts ? BrandOps::Display.count(v) : v) })) }
+    table = content_tag(:table, content_tag(:caption, "주간 추이 표") + content_tag(:thead, content_tag(:tr, content_tag(:th, "주 시작일") + safe_join(labels.map { |l| content_tag(:th, l) }))) + content_tag(:tbody, safe_join(rows)), class: "ops-sr-only")
+    chart = content_tag(:div, ticks + content_tag(:div, grid + svg + ends, class: "ops-plot") + weeks, class: "ops-chart", style: ("min-width:#{(series.size * 8 / 0.9).ceil + 105}px" if bars))
+    safe_join([ legend, content_tag(:div, chart, class: "ops-chart-scroll"), table ])
+  end
+
+  def ops_delta(delta, unit = "명")
+    return "지난주와 같아요" if delta.zero?
+    "지난주보다 #{number_with_delimiter(delta.abs)}#{unit} #{delta.positive? ? '늘었어요' : '줄었어요'}"
+  end
+end

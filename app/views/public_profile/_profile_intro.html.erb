@@ -37,3 +37,5 @@
   async function copyMemberLink(button) { try { await navigator.clipboard.writeText(location.href); button.textContent = '복사했어요'; } catch (_) { const input = document.createElement('textarea'); input.value = location.href; document.body.appendChild(input); input.select(); document.execCommand('copy'); input.remove(); button.textContent = '복사했어요'; } }
   async function shareMemberPage(button) { if (navigator.share) { try { await navigator.share({ title: document.title, url: location.href }); } catch (_) {} } else { await copyMemberLink(button); } }
 </script>
+
+<% if ProConsent.has_consent?(owner_id: member.id, type: "socialdoctors_exposure") %><p class="public-member-inner"><%= link_to "브랜드 운영 현황 보기 →", member_brand_ops_path(slug: member.slug), style: "color:#00754A;display:inline-block;padding:12px 0;" %></p><% end %>

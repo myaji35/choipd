@@ -62,7 +62,7 @@ class PublicProfileController < ApplicationController
       page_path: "/#{member.slug}#{category == "card_summary" ? "/card" : ""}",
       page_title: member.name,
       user_id: session[:member_id]&.to_s,
-      user_type: session[:member_id] == member.id ? "pd" : "anonymous",
+      user_type: admin_user_signed_in? ? "admin" : (session[:member_id] == member.id ? "pd" : "anonymous"),
       ip_address: request.remote_ip,
       user_agent: request.user_agent,
       device_type: request.user_agent.to_s.downcase.match?(/mobile|android|iphone/) ? "mobile" : "desktop"

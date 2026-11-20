@@ -1,0 +1,31 @@
+<% content_for :title, "imPD는 지금" %>
+<%= stylesheet_link_tag "brand_ops" %>
+<main style="max-width:1100px;margin:auto;padding:56px 20px;">
+  <header style="margin-bottom:48px;">
+    <p style="color:#00754A;font-weight:700;">imPD는 지금</p>
+    <h1 class="impd-display" style="font-size:clamp(32px,5vw,56px);margin:14px 0;">imPD는 지금 이렇게 자라고 있어요</h1>
+    <p style="line-height:1.8;">혼자 일하는 사람들의 페이지가 모여 더 많은 만남을 만들고 있어요.</p>
+    <%= link_to "내 페이지 만들기", member_signup_path, class: "impd-btn impd-btn-primary", style: "display:inline-block;margin-top:24px;" %>
+    <p style="margin-top:12px;">지금 가입하면 첫 페이지 제작 무료</p>
+    <% if Rails.env.development? && BrandOps::DemoSeed.present? %><p style="margin-top:16px;color:#00754A;font-weight:700;">예시 데이터</p><% end %>
+  </header>
+  <% communication = %i[visits inquiries reviews posts sns_posts] %>
+  <div class="ops-key-grid">
+    <% [["누적 회원", :members_total], ["활성 회원", :members_active], ["이번 주 가입", :signups]].each do |label, key| %>
+      <% value = key == :signups ? @summary[:members_total][:delta] : @summary[key][:value] %>
+      <% delta = key == :signups ? value - (@series[-2][:members_total] - @series[-3][:members_total]) : @summary[key][:delta] %>
+      <section class="impd-card"><p><%= label %></p><strong><%= number_with_delimiter(value) %>명</strong><p><%= ops_delta(delta) %></p></section>
+    <% end %>
+  </div>
+  <p style="margin-top:16px;">이번 주 회원 페이지에서 방문 <%= number_with_delimiter(@summary[:visits][:value]) %>회, 문의 <%= number_with_delimiter(@summary[:inquiries][:value]) %>건, 게시 <%= number_with_delimiter(@summary[:posts][:value]) %>건이 오갔어요</p>
+  <p style="margin:10px 0 48px;color:#52635b;font-size:13px;">로봇·운영자 방문 제외 · 집계 시점 <%= @now.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %> (KST)</p>
+  <section class="impd-card" style="margin-bottom:24px;"><h2>회원과 활성 회원</h2><p style="margin:12px 0;">최근 30일 안에 페이지를 수정하거나 활동한 회원이에요. 활성 비율 <%= @summary[:members_total][:value].positive? ? (@summary[:members_active][:value] * 100.0 / @summary[:members_total][:value]).round : 0 %>%</p><nav aria-label="기간 선택" style="margin:12px 0;"><%= link_to "12주", growth_path(weeks: 12), style: "display:inline-block;padding:12px;color:#00754A;", aria: { current: @weeks == 12 ? "page" : nil } %> <%= link_to "26주", growth_path(weeks: 26), style: "display:inline-block;padding:12px;color:#00754A;", aria: { current: @weeks == 26 ? "page" : nil } %></nav><%= ops_line_chart @series, keys: %i[members_total members_active], labels: ["누적 회원", "활성 회원"], area: :members_active %></section>
+  <section class="impd-card" style="margin-bottom:48px;"><h2>주간 소통량</h2><p style="margin:12px 0;">매주 이곳에서 일어나는 만남과 활동이에요.</p>
+    <div class="ops-activity-grid"><% communication.zip(["방문", "문의", "후기", "게시", "SNS 발행"]).each do |key, label| %><section class="impd-card"><p><%= label %></p><strong><%= number_with_delimiter(@summary[key][:value]) %></strong><p><%= @summary[key][:delta].negative? ? "▼" : (@summary[key][:delta].positive? ? "▲" : "–") %> <%= number_with_delimiter(@summary[key][:delta].abs) %></p></section><% end %></div>
+    <h3>방문</h3><%= ops_line_chart @series, keys: [:visits], labels: ["방문"] %>
+    <h3>문의와 활동</h3><%= ops_line_chart @series, keys: %i[inquiries reviews posts sns_posts], labels: ["문의", "후기", "게시", "SNS 발행"], bars: true %>
+  </section>
+  <section><h2 style="font-size:28px;margin-bottom:20px;">운영 중인 브랜드</h2><div class="ops-card-grid">
+    <% @members.each do |member| %><% brand = Brand.where(member_id: member.id, published: true).first %><% recent = @member_series[member].last(4) %><article class="impd-card ops-brand-card"><p><%= member.profession_label %></p><h3 style="font-size:22px;margin:8px 0;"><%= member.name %></h3><% if brand && brand.name != member.name %><p><%= brand.name %></p><% end %><% counts = recent.map { |row| row[:visits].to_i }; max = [counts.max.to_i, 1].max %><p class="ops-spark-label">최근 4주</p><svg class="ops-spark" viewBox="0 0 100 40" preserveAspectRatio="none" role="img" aria-label="최근 방문 추이"><line x1="0" y1="39" x2="100" y2="39" stroke="#d6ded9" stroke-width="1" vector-effect="non-scaling-stroke" /><polyline points="<%= counts.each_with_index.map { |v, i| "#{i * 100.0 / [counts.size - 1, 1].max},#{40 - v * 38.0 / max}" }.join(' ') %>" fill="none" stroke="#00754A" stroke-width="1.5" vector-effect="non-scaling-stroke" /></svg><p>이번 달 게시 <%= BrandOps::Display.count(recent.sum { |r| r[:posts] }) %> · 방문 <%= BrandOps::Display.count(recent.sum { |r| r[:visits] }) %></p><%= link_to "브랜드 운영 보기 →", member_brand_ops_path(slug: member.slug), style: "display:inline-block;padding:12px 0;color:#00754A;" %></article><% end %>
+  </div><p style="margin-top:20px;"><%= link_to "모든 회원 둘러보기", "/explore", style: "color:#00754A;" %></p></section>
+</main>

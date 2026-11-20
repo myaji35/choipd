@@ -1,4 +1,5 @@
 <% content_for :title, "내 브랜드" %>
+<%= stylesheet_link_tag "brand_ops" %>
 <div style="max-width: 1000px; margin: auto; padding: 40px 20px;">
   <header style="margin-bottom: 28px;"><h1 class="impd-display" style="font-size: 36px;">내 브랜드</h1><p style="margin-top: 12px;">브랜드 정보와 홍보 연결 상태를 확인하세요.</p></header>
   <h2 style="margin-bottom: 12px;">브랜드</h2>
@@ -7,6 +8,7 @@
     <% @brands.each do |brand| %><article class="impd-card"><h3><%= brand.name %></h3><p style="margin-top: 8px;"><%= [['업종', brand.business_type], ['지역', brand.region]].filter_map { |label, value| "#{label}: #{value}" if value.present? }.join(' · ') %></p><p style="margin-top: 8px; white-space: pre-line;"><%= brand.description %></p><% if (url = http_url(brand.website_url)) %><p style="margin-top: 8px;"><%= link_to url, url, target: '_blank', rel: 'noopener', style: 'color: var(--impd-accent); text-decoration: underline;' %></p><% end %></article><% end %>
   </div>
   <p style="margin: 16px 0 32px;">브랜드는 운영팀이 등록을 도와드려요 — <%= link_to '문의하기', new_inquiry_path, style: 'color: var(--impd-accent); text-decoration: underline;' %></p>
+  <section class="impd-card" style="margin:32px 0;"><h2>내 브랜드 운영 현황</h2><p style="margin:12px 0;">최근 12주 활동이에요.</p><%= ops_line_chart @series, keys: %i[visits inquiries posts sns_posts], labels: ["방문", "문의 건수", "게시", "SNS 발행"] %><p style="margin-top:12px;line-height:1.7;">공개 페이지에는 이름과 브랜드, 주간 활동 건수, 연결 매체와 최근 게시물 제목이 보여요. 문의 내용과 연락처는 공개하지 않아요. 로봇·운영자·본인 방문 제외. 집계 시점: <%= Time.current.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %> (한국 시간)</p><p style="margin-top:12px;"><% if @consented && @member.approved? %><%= link_to "공개 페이지 보기", member_brand_ops_path(slug: @member.slug) %><% else %><%= link_to "공개 동의 확인", slug_admin_brand_consents_path(slug: @member.slug) %><% end %></p></section>
   <h2 style="margin-bottom: 12px;">연결 상태</h2>
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px;">
     <% [['SocialDoctors', 'socialdoctors_exposure'], ['Townin 지역 광고', 'townin_local_ads']].each do |label, type| %><section class="impd-card"><h3><%= label %></h3><p style="margin: 12px 0;"><%= lni_icon(ProConsent.current_for(@member.id, type) ? 'check-circle-1' : 'xmark-circle') %> <%= ProConsent.current_for(@member.id, type) ? '동의함' : '동의 안 함' %></p><%= link_to '동의 상태 확인', slug_admin_brand_consents_path(slug: @member.slug), style: 'color: var(--impd-accent); text-decoration: underline;' %></section><% end %>

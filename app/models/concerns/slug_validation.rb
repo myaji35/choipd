@@ -13,7 +13,7 @@ module SlugValidation
     about contact member members users user
     distributors distributor reports impd www
     auth up education works community inquiries leads
-    rails welcome
+    rails welcome growth
   ].to_set.freeze
 
   included do

@@ -1,0 +1,1 @@
+개발 환경에서 `bin/rails 'impd:import_activity[/path/to/activity.json]'`로 합계를 가져온 뒤 `BRAND_OPS_IMPORT=1 bin/rails server`로 실행하면 해당 회원과 전체 주간 집계에 파일을 사용합니다. 가져오기는 개발 환경에서만 사용할 수 있습니다. `bin/rails 'impd:export_activity[slug]'`는 개인정보 없는 집계 JSON을 표준 출력에 씁니다.

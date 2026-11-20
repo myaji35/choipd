@@ -474,6 +474,16 @@
       "created_at": "2026-11-19T16:00:00",
       "completed_at": null,
       "assign_to": "codex"
+    },
+    {
+      "id": "ISS-481",
+      "type": "FEATURE",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "title": "[브랜드 운영 현황 공개] /growth 시계열(회원·활성)·주간 소통량 + 회원 브랜드 운영 페이지 + 내 브랜드 그래프 — kang-seung-sig 1차, 반복 평가 10회+",
+      "description": "대표님 지시 2026-11-20. 기획 docs/brand-ops-showcase-plan.md, 평가 기록 docs/brand-ops-loop.md",
+      "created_at": "2026-11-20T11:25:27",
+      "payload": {}
     }
   ],
   "hooks": {

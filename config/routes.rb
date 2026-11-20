@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   get "/privacy", to: "legal#privacy", as: :privacy
   get "/terms", to: "legal#terms", as: :terms
   get "/sitemap.xml", to: "sitemaps#show", defaults: { format: "xml" }, as: :sitemap
+  get "/growth", to: "growth#show", as: :growth
   get "/explore", to: "explore#index", as: :explore
 
   # ── imPD 프로모 시네마틱 (30s HTML 영상) ─────────────
@@ -393,6 +394,8 @@ Rails.application.routes.draw do
         slug = req.path_parameters[:slug].to_s
         slug.match?(/\A[a-z0-9][a-z0-9\-]{1,}\z/) && !SlugValidation::RESERVED_SLUGS.include?(slug)
       }
+
+  get "/:slug/brand", to: "member_brand_ops#show", as: :member_brand_ops, constraints: ->(req) { req.path_parameters[:slug].to_s.match?(/\A[a-z0-9][a-z0-9\-]{1,}\z/) && !SlugValidation::RESERVED_SLUGS.include?(req.path_parameters[:slug].to_s) }
 
   # ── Vanity URL: /<slug> → 회원 또는 분양사 공개 페이지 (가장 마지막) ───
   # CRIT-4: SlugValidation::RESERVED_SLUGS 단일 source of truth.

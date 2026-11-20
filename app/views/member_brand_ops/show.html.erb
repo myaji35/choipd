@@ -1,0 +1,14 @@
+<% content_for :title, "#{@member.name} 브랜드 운영" %>
+<%= stylesheet_link_tag "brand_ops" %>
+<% content_for :head do %><style>#main-content { min-height: 0; padding-bottom: 0; }</style><% end %>
+<main style="max-width:1000px;margin:auto;padding:56px 20px;">
+  <p style="color:#00754A;"><%= @member.profession_label %></p><h1 class="impd-display" style="font-size:clamp(32px,5vw,52px);margin:12px 0;"><%= @member.name %></h1><% if @brand && @brand.name != @member.name %><p><%= @brand.name %></p><% end %><p>이 브랜드는 이렇게 운영돼요</p><%= link_to "프로필 보기", "/#{@member.slug}", class: "ops-profile-link" %>
+  <section class="impd-card" style="margin:32px 0;"><h2>최근 12주 활동</h2><p>최근 4주 활동</p><div class="ops-activity-grid"><% %i[visits inquiries posts sns_posts].zip(["방문", "문의 건수", "게시", "SNS 발행"]).each do |key, label| %><section class="impd-card"><p><%= label %></p><strong><%= BrandOps::Display.count(@series.last(4).sum { |row| row[key].to_i }) %></strong></section><% end %></div><% public_series = @series.map { |row| row.merge(publications: row[:posts].to_i + row[:sns_posts].to_i) } %><%= ops_line_chart public_series, keys: %i[visits publications], labels: ["방문", "게시+SNS 발행"], protected_counts: true %><p style="line-height:1.7;">1~2건은 3건 미만으로 표시합니다. 로봇·운영자·본인 방문을 제외했어요. 집계 시점: <%= @now.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %> (한국 시간)</p></section>
+  <section style="margin:32px 0;"><h2>연결 매체</h2><div class="ops-media-chips">
+    <% if @exposure %><%= link_to ENV.fetch("SOCIALDOCTORS_BASE_URL", "https://socialdoctors.kr"), class: "ops-media-chip" do %><%= lni_icon "link-2-angular-right" %> SocialDoctors<% end %><% end %>
+    <% if @townin %><%= link_to "https://townin.net", class: "ops-media-chip" do %><%= lni_icon "link-2-angular-right" %> Townin<% end %><% end %>
+    <% unless @exposure || @townin %><p>아직 연결된 매체가 없어요</p><% end %>
+  </div></section>
+  <% if @posts.any? %><section><h2>최근 게시물</h2><ul style="margin:16px 0;line-height:2;"><% @posts.each do |post| %><li><%= post.title %> · <%= post.published_at.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d") %></li><% end %></ul></section><% end %>
+  <p style="margin-top:32px;"><%= link_to "이 분께 문의하기", "/#{@member.slug}#contact", class: "impd-btn impd-btn-primary" %> <%= link_to "나도 이렇게 운영하기", member_signup_path, style: "display:inline-block;padding:12px;color:#00754A;" %></p><p style="margin-top:24px;"><%= link_to "imPD 성장 이야기", growth_path, style: "color:#00754A;" %></p>
+</main>
