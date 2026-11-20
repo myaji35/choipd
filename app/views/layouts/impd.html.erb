@@ -281,7 +281,7 @@
 
     <%= render "shared/flash" unless action_name == "new" && %w[member_auth member_sessions].include?(controller_path) %>
 
-    <% hide_frap = controller_path == "public_profile" || (action_name == "new" && %w[member_signups member_auth member_sessions].include?(controller_path)) || request.path.match?(%r{\A/[^/]+/admin(?:/|\z)}) %>
+    <% hide_frap = %w[public_profile growth member_brand_ops].include?(controller_path) || (action_name == "new" && %w[member_signups member_auth member_sessions].include?(controller_path)) || request.path.match?(%r{\A/[^/]+/admin(?:/|\z)}) %>
     <main id="main-content" tabindex="-1" class="<%= "impd-main-with-frap" unless hide_frap %>">
       <%= yield %>
     </main>
