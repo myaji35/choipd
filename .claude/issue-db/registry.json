@@ -461,19 +461,38 @@
         "tests": "85 runs 0 failures",
         "verified": "수정 후 비밀번호 없는 회원: 관리화면 직접접근·빈 비밀번호 로그인 모두 302 로그인 화면. 정상 회원 비밀번호 로그인 200"
       },
-      "blocked_reason": "운영 배포는 대표님 확인(hotfix/ISS-478 브랜치 준비)"
+      "blocked_reason": "운영 배포는 대표님 확인 + 비밀값 위치 회신 대기(imPD_보호책임자연락처_비밀값위치_재확인_컨펌_261120.pdf 2번)",
+      "payload": {
+        "user_decision": {
+          "at": "2026-11-20",
+          "source": "컨펌 imPD_배포비밀값복구_컨펌_261119.pdf",
+          "선택": "A — 다른 장비의 imPD 폴더 위치 알려 주기",
+          "위치": "미기재",
+          "확인": "m6(Mac mini) /Volumes/GH_APFS/0008_choi-pd·0033_옵시디안/AgenticOS/0008_choi-pd 에 master.key·.env 없음(존재만 확인, 값 미열람)"
+        }
+      }
     },
     {
       "id": "ISS-480",
       "type": "FIX_BUG",
       "priority": "P1",
-      "status": "AWAITING_USER",
+      "status": "READY",
       "parent": null,
       "title": "[법적 고지] 이용약관·개인정보처리방침 하단 사업자 정보 자리표시 5개가 운영에 공개 + 사업자등록번호 불일치(715-84 vs 기록 715-86)",
       "description": "운영 /terms 에 '[대표자 — 공개 전 입력 필요]' 등 5개 노출(2026-11-19 확인). 기록(09-Paperclip/CLO 가가호호 기본정보): 대표 강승식, 본점 서울 중구 남대문로9길 24 10층, 사업자 715-86-00843 — 원본 대조 전 확인 필요. 대표님 확인 후 반영.",
       "created_at": "2026-11-19T16:00:00",
       "completed_at": null,
-      "assign_to": "codex"
+      "assign_to": "codex",
+      "payload": {
+        "user_decision": {
+          "at": "2026-11-20",
+          "source": "컨펌 imPD_개인정보보호책임자_컨펌_261119.pdf (iPad 필기)",
+          "보호책임자_성명": "강승식 ✓",
+          "보호책임자_직책": "대표이사 ✓",
+          "이메일_전화": "미기재 → imPD_보호책임자연락처_비밀값위치_재확인_컨펌_261120.pdf 1번"
+        }
+      },
+      "blocked_reason": "코드 반영(privacy.html.erb 보호책임자 성명·직책)은 Codex 위임. 연락처는 재확인 컨펌 대기. 운영 배포는 ISS-478 비밀값 복구 후"
     },
     {
       "id": "ISS-481",
@@ -483,7 +502,9 @@
       "title": "[브랜드 운영 현황 공개] /growth 시계열(회원·활성)·주간 소통량 + 회원 브랜드 운영 페이지 + 내 브랜드 그래프 — kang-seung-sig 1차, 반복 평가 10회+",
       "description": "대표님 지시 2026-11-20. 기획 docs/brand-ops-showcase-plan.md, 평가 기록 docs/brand-ops-loop.md",
       "created_at": "2026-11-20T11:25:27",
-      "payload": {}
+      "payload": {
+        "files_changed": []
+      }
     }
   ],
   "hooks": {

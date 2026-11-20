@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<title>imPD 재확인 컨펌 261120</title>
+<style>
+@page{size:A4;margin:14mm 14mm 13mm}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:#000;font-family:"Apple SD Gothic Neo",system-ui,sans-serif;font-size:10pt;line-height:1.55}
+h1{font-size:15.5pt;margin:0 0 2px}
+.sub{font-size:9.3pt;margin-bottom:9px}
+.q{border:1.5px solid #000;border-radius:5px;padding:8px 12px;margin-bottom:9px;page-break-inside:avoid}
+.q h3{font-size:10.8pt;margin:0 0 4px}
+.ctx{font-size:9.3pt;margin-bottom:5px}
+.box{display:inline-block;width:13px;height:13px;border:1.5px solid #000;vertical-align:-2px;margin-right:6px}
+.opt{display:inline-block;margin:3px 16px 2px 0}
+.note{border-top:1px dashed #000;margin-top:6px;height:70px;font-size:8.5pt;padding-top:2px}
+.done{font-size:9pt;border-top:2px solid #000;padding-top:5px;margin-top:10px}
+</style></head><body>
+
+<h1>imPD 재확인 컨펌 · 2026-11-20</h1>
+<div class="sub">11-19 문서 2건의 표시를 반영했습니다(맨 끝). 표시는 있었는데 <b>적을 칸이 비어 있던 것</b> 2가지만 다시 여쭙니다.</div>
+
+<div class="q"><h3>1. 개인정보 보호책임자(강승식 대표이사)의 연락처</h3>
+<div class="ctx"><b>무엇을 왜:</b> 성명·직책은 체크해 주셔서 그대로 넣습니다. 개인정보처리방침에는 보호책임자 <b>연락처(이메일 또는 전화) 1개 이상</b>을 함께 공개해야 하는데 그 칸이 비어 있었습니다.<br>
+<b>미루면:</b> 연락처 자리에 "사이트 문의하기" 안내만 나갑니다. <b>기다리는 동안:</b> 성명·직책은 반영 준비를 계속합니다.</div>
+<span class="opt"><span class="box"></span>① 여백의 이메일로 공개 (추천 — 전화는 안 적어도 됨)</span><br>
+<span class="opt"><span class="box"></span>② 여백의 이메일 + 전화 둘 다 공개</span>
+<div class="note">공개할 이메일 / 전화:</div></div>
+
+<div class="q"><h3>2. imPD 배포 비밀값이 있는 장비와 폴더</h3>
+<div class="ctx"><b>무엇을 왜:</b> "A. 다른 장비에 있는 imPD 폴더 위치를 알려 주기"에 체크하셨는데 위치 칸이 비어 있었습니다. <b>이 Mac mini(m6)는 찾아봤지만 없습니다</b> — <code>master.key</code>·<code>.env</code> 가 두 imPD 폴더 어디에도 없습니다(값은 열어 보지 않았습니다).<br>
+<b>미루면:</b> 보안 수정(무단 로그인 차단)과 약관 수정이 운영에 올라가지 못합니다. <b>기다리는 동안:</b> 로컬 개발·화면 개선은 계속합니다.</div>
+<span class="opt"><span class="box"></span>① MacBook Air</span>
+<span class="opt"><span class="box"></span>② 다른 장비 (여백에)</span>
+<span class="opt"><span class="box"></span>③ 어디에도 없음 → B(GitHub 비밀값 직접 등록)로 바꿈</span>
+<div class="note">장비 / 폴더 경로 (예: ~/Projects/choi-pd):</div></div>
+
+<div class="done"><b>11-20 반영한 것</b> — 보호책임자 성명 <b>강승식</b>·직책 <b>대표이사</b> 확정(ISS-480, 코드 반영은 Codex 위임 대기) · 배포 비밀값 복구 방식 <b>A</b> 선택 기록(ISS-478).</div>
+</body></html>
