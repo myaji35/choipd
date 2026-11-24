@@ -5,8 +5,8 @@ module NaverPeople
     end
 
     def sites
-      registered = Array(@sources.from("naver")["sites"]).map { |url| normalize(url) }
-      rows = { "imPD" => Array(@sources.from("impd")["sites"]), "LinkedIn" => [ @sources.linkedin_url ].compact }
+      registered = Array(@sources.values_for("naver")["sites"]).map { |url| normalize(url) }
+      rows = { "imPD" => Array(@sources.values_for("impd")["sites"]), "LinkedIn" => [ @sources.linkedin_url ].compact }
       rows.flat_map do |source, urls|
         urls.map { |url| { source: source, url: url, registered: registered.include?(normalize(url)) } }
       end

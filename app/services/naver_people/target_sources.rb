@@ -14,7 +14,7 @@ module NaverPeople
       @account = account
     end
 
-    def from(source)
+    def values_for(source)
       case source
       when "naver" then naver
       when "linkedin" then linkedin

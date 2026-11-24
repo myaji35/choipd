@@ -19,7 +19,7 @@ class Pd::ProfileAccountsController < Pd::BaseController
     if @account.platform == "naver_people"
       target = @account.naver_people_target
       if target&.status == "approved"
-        current = NaverPeople::TargetSources.new(@account).from("naver")
+        current = NaverPeople::TargetSources.new(@account).values_for("naver")
         diff = NaverPeople::TargetDiff.new(current, target.values)
       end
       @naver_target_status = target&.approval_label(diff) || "초안"

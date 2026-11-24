@@ -7,7 +7,7 @@ class Pd::NaverPeopleTargetsController < Pd::BaseController
   def show
     sources = NaverPeople::TargetSources.new(@account)
     @values = @target.values
-    @diff = NaverPeople::TargetDiff.new(sources.from("naver"), @values)
+    @diff = NaverPeople::TargetDiff.new(sources.values_for("naver"), @values)
     @approval_label = @target.approval_label(@diff)
     @approval_stale = @target.approval_stale?(@diff)
     @cross_check = NaverPeople::CrossCheck.new(@account, sources: sources)
@@ -16,12 +16,12 @@ class Pd::NaverPeopleTargetsController < Pd::BaseController
   def edit
     source = params[:source]
     if SOURCES.key?(source)
-      @values = NaverPeople::TargetSources.new(@account).from(source)
+      @values = NaverPeople::TargetSources.new(@account).values_for(source)
       flash.now[:notice] = "#{SOURCES.fetch(source)}에서 불러왔습니다. 확인 후 저장하세요."
     elsif @target.persisted?
       @values = @target.values
     else
-      @values = NaverPeople::TargetSources.new(@account).from("naver")
+      @values = NaverPeople::TargetSources.new(@account).values_for("naver")
     end
   end
 
@@ -41,7 +41,7 @@ class Pd::NaverPeopleTargetsController < Pd::BaseController
   def approve
     approved = @account.with_lock do
       set_target
-      current = NaverPeople::TargetSources.new(@account).from("naver")
+      current = NaverPeople::TargetSources.new(@account).values_for("naver")
       diff = NaverPeople::TargetDiff.new(current, @target.values)
       next false if diff.items.empty?
 
