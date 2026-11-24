@@ -164,27 +164,52 @@ class Member < ApplicationRecord
 
     # 1) provider+uid로 기존 회원 찾기
     existing = find_by(provider: auth.provider, uid: auth.uid.to_s)
-    return existing if existing
+    if existing
+      existing.fill_profile_image(auth.info&.image)
+      return existing
+    end
 
     # 2) email로 기존 회원 찾아 연결
-    info  = auth.info || {}
-    email = info.email.to_s.downcase.presence
+    info  = auth.info
+    email = info&.email.to_s.downcase.presence
     if email
       member = find_by("LOWER(email) = ?", email)
       if member
-        member.update(
+        connected = member.update(
           provider: auth.provider,
           uid: auth.uid.to_s,
           oauth_email_verified: info.email_verified ? 1 : 0,
           oauth_connected_at: Time.current,
           oauth_raw: auth.extra&.raw_info&.to_json,
         )
+        member.fill_profile_image(info.image) if connected
         return member
       end
     end
 
     # 3) 신규 Member 생성
     create_from_oauth!(auth)
+  end
+
+  def self.https_profile_image_url?(image)
+    return false unless image.is_a?(String)
+
+    uri = URI.parse(image)
+    uri.is_a?(URI::HTTPS) && uri.host.present?
+  rescue URI::InvalidURIError
+    false
+  end
+
+  def fill_profile_image(image)
+    return false unless profile_image.blank? && self.class.https_profile_image_url?(image)
+
+    # Preserve a photo uploaded after this member was loaded.
+    updated = self.class.where(id: id, profile_image: profile_image).update_all(profile_image: image)
+    return false unless updated == 1
+
+    self.profile_image = image
+    clear_attribute_changes([:profile_image])
+    true
   end
 
   # 신규 Member를 OAuth 콜백으로부터 생성.
