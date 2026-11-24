@@ -34,7 +34,7 @@
       "Bash(bin/*)",
       "Bash(jq *)",
       "Bash(rm /tmp/harness-freeze.env)",
-      "Bash(/Users/gangseungsig/.claude/skills/gstack/browse/dist/browse *)",
+      "Bash(/Users/gangmini/.claude/skills/gstack/browse/dist/browse *)",
       "Read(*)",
       "Write(*)",
       "Edit(*)",

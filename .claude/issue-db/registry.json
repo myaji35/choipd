@@ -226,7 +226,7 @@
       "id": "ISS-408",
       "type": "UX_FIX",
       "priority": "P2",
-      "status": "BLOCKED",
+      "status": "READY",
       "parent": null,
       "title": "신규 가입 직후 회원페이지 히어로 하단 504px 여백 (빈 프로필 한정)",
       "description": "가입 직후 masthead-grid 좌측 컬럼은 제목만 있고 우측 사이드바(QR/명함)는 665px 라 좌측 하단에 504px 공백이 생김. 콘텐츠가 있는 회원(bumhee-choi)은 424/360/679 로 균형 정상 → 빈 프로필 전용 문제. 빈 상태용 안내 카드(예: '사진을 올리면 이 자리가 채워집니다' + 에디터 CTA)로 채우는 방안 권장. 오버플로 등 기능 결함 아님 — 레이아웃/디자인 판단 필요하여 별도 이슈로 분리.",
@@ -238,7 +238,20 @@
       "created_at": "2026-07-20T13:20:45",
       "completed_at": null,
       "assign_to": "check-harness",
-      "blocked_reason": "배포(fbe35b6) 진행 중 — 프로덕션 검증 완료 전 UI 변경 금지. 또한 빈 상태 히어로를 무엇으로 채울지는 브랜드 표현 판단이라 방향 확인 후 착수. 보류 시각 2026-07-20T13:29:59"
+      "blocked_reason": "배포(fbe35b6) 진행 중 — 프로덕션 검증 완료 전 UI 변경 금지. 또한 빈 상태 히어로를 무엇으로 채울지는 브랜드 표현 판단이라 방향 확인 후 착수. 보류 시각 2026-07-20T13:29:59",
+      "payload": {
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「신규 가입 직후 회원페이지 히어로 하단 504px 여백 (빈 프로필 한정)」(UX_FIX, P2)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "updated_at": "2026-11-24T10:10:52.796Z"
     },
     {
       "id": "ISS-460",
@@ -268,26 +281,182 @@
     {
       "type": "FEATURE",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "parent": "ISS-460",
       "created_at": "2026-11-19T14:30:00",
-      "completed_at": null,
+      "completed_at": "2026-11-24T19:27:02.329502",
       "assign_to": "codex",
       "id": "ISS-461",
       "title": "[LinkedIn] 활동 모니터링 — 대시보드 지표 일별 수집·추이 + 내 게시물/글 목록·게시물별 노출 추적 + 주간 활동 권장",
-      "description": "docs/linkedin-management-plan.md 1·6~10. 화면 본문 원문 저장 + Ruby 해석기."
+      "description": "docs/linkedin-management-plan.md 1·6~10. 화면 본문 원문 저장 + Ruby 해석기.",
+      "payload": {
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「[LinkedIn] 활동 모니터링 — 대시보드 지표 일별 수집·추이 + 내 게시물/글 목록·게시물별 노출 추적 + 주간 활동 권장」(FEATURE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "읽기 전용 수집(대시보드·활동 화면 본문 원문)과 앱 안 해석·그래프라 외부로 나가는 행위가 없다. 새 표 없이 기존 사본(profile_snapshots)에 원문을 담고 Ruby 해석기로 숫자를 뽑아, 화면 구조가 바뀌어도 해석기만 고치면 되게 한다.",
+          "risk": "중간 — LinkedIn 화면 문구가 바뀌면 해석 실패. 원문 보관으로 재해석 가능",
+          "effort": "M",
+          "by": "factory-runner",
+          "at": "2026-11-24T10:13:30Z"
+        },
+        "acceptance_criteria": [
+          "LinkedIn 점검을 돌리면 대시보드 지표 6종(게시물 노출·총 팔로워·프로필 조회자·검색 노출·뉴스레터 글 조회·신규 구독자)이 원문과 함께 사본에 저장된다",
+          "LinkedIn 계정 상세 화면에 지표별 최근 값과 이전 사본 대비 증감, 날짜별 추이가 보인다",
+          "내 게시물·글 목록(고유 번호·주소·노출 수)이 화면에 보이고 사본 간 노출 변화가 보인다",
+          "최근 7일 게시 여부로 '주 1회 게시' 권장 달성 여부가 표시된다",
+          "해석기 테스트가 실측 원문 형식으로 통과한다"
+        ]
+      },
+      "updated_at": "2026-11-24T19:13:30+09:00",
+      "result": {
+        "commit": "f525205",
+        "files_created": [
+          "app/services/linkedin/dashboard_parser.rb",
+          "app/services/linkedin/activity_parser.rb",
+          "app/services/linkedin/monitor.rb",
+          "app/views/pd/profile_accounts/_linkedin_activity.html.erb"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "점검 시 대시보드 지표 6종이 원문과 함께 사본에 저장",
+            "met": true,
+            "how": "linkedin_check.mjs 가 dashboard·activity 본문을 data.pages 에 저장. 실측 원문을 해석기에 넣어 노출26·팔로워17·프로필조회7·검색노출3·뉴스레터조회0·신규구독1 확인"
+          },
+          {
+            "criterion": "계정 상세 화면에 지표별 최근 값·이전 대비 증감·날짜별 추이",
+            "met": true,
+            "how": "_linkedin_activity 활동 지표·날짜별 추이 구역, monitor_test delta 검사, 컨트롤러 테스트 화면 문구 검사"
+          },
+          {
+            "criterion": "내 게시물·글 목록(고유 번호·주소·노출)과 사본 간 노출 변화",
+            "met": true,
+            "how": "실측 원문 6건 제목·노출·게시일·글 주소 해석, monitor_test impressions_delta"
+          },
+          {
+            "criterion": "최근 7일 게시 여부로 주 1회 게시 권장 표시",
+            "met": true,
+            "how": "weekly_recommendation + 화면 주간 활동 권장 구역, 정보 없을 때 확인 못 함"
+          },
+          {
+            "criterion": "해석기 테스트가 실측 원문 형식으로 통과",
+            "met": true,
+            "how": "가상 인물로 바꾼 실측 원문 fixture, 23 runs 0 failures"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/services/linkedin test/services/ego_profile test/controllers/pd/profile_accounts_controller_test.rb",
+            "exit_code": 0,
+            "output": "23 runs, 136 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "bin/rubocop app/services/linkedin test/services/linkedin",
+            "exit_code": 0,
+            "output": "no offenses detected"
+          }
+        ],
+        "review": "Gemini hydrogen-high 6건 중 5건 맞음(일반 게시물 제목·중복 링크·주간 구역·nil 메시지·실패 사본) → Codex 재위임 수정, 1건(노출 숫자 위치) 실측 원문과 달라 틀림",
+        "note": "실제 대표님 계정 정기 점검은 기존 bin/rails profile_accounts:check[linkedin] 로 돈다. 이번 회차에서는 읽기 전용 실측 1회만 하고 앱 DB에는 쓰지 않았다."
+      }
     },
     {
       "type": "FEATURE",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "parent": "ISS-460",
       "created_at": "2026-11-19T14:30:00",
-      "completed_at": null,
+      "completed_at": "2026-11-24T19:37:23.380014",
       "assign_to": "codex",
       "id": "ISS-462",
       "title": "[LinkedIn] 프로필 상세 사본(소개·경력·학력·기술·자격증)·변경 추적·완성도 점검·네이버 인물정보 대조",
-      "description": "plan 2~5, 20"
+      "description": "plan 2~5, 20",
+      "payload": {
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「[LinkedIn] 프로필 상세 사본(소개·경력·학력·기술·자격증)·변경 추적·완성도 점검·네이버 인물정보 대조」(FEATURE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "프로필 상세(경력·학력·기술·자격증) 화면 본문을 읽어 사본으로 저장하고 앱에서 완성도·변경 내역·네이버 인물정보와의 차이를 계산한다. 프로필 수정은 하지 않는다(기획 20번 범위 밖).",
+          "risk": "중간 — 화면 문구 변경 시 해석 실패. 원문 보관",
+          "effort": "M",
+          "by": "factory-runner",
+          "at": "2026-11-24T10:13:30Z"
+        },
+        "acceptance_criteria": [
+          "LinkedIn 점검 시 헤드라인·소개·위치와 경력·학력·기술·자격증 목록이 사본에 저장된다",
+          "계정 상세 화면에 항목별 정리와 이전 사본 대비 추가·삭제·변경 내역이 보인다",
+          "완성도 점검표(빈 항목 안내)가 보인다",
+          "같은 회원의 네이버 인물정보 사본이 있으면 경력·직함 불일치가 표시된다",
+          "해석기·화면 테스트가 통과한다"
+        ]
+      },
+      "updated_at": "2026-11-24T19:13:30+09:00",
+      "result": {
+        "commit": "7d8b315",
+        "files_created": [
+          "app/services/linkedin/profile_parser.rb",
+          "app/services/linkedin/profile_presenter.rb",
+          "app/services/linkedin/profile_differ.rb",
+          "app/services/linkedin/naver_comparison.rb",
+          "app/views/pd/profile_accounts/_linkedin_profile.html.erb"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "점검 시 헤드라인·소개·위치와 경력·학력·기술·자격증이 사본에 저장",
+            "met": true,
+            "how": "실제 bin/rails profile_accounts:check[linkedin] 1회 — 사본 pages 7개(profile·experience·education·skills·certifications 포함) 저장, 해석 결과 경력5·학력1·기술10·자격증0"
+          },
+          {
+            "criterion": "항목별 정리와 이전 사본 대비 추가·삭제·변경",
+            "met": true,
+            "how": "ProfileDiffer(경력·학력·기술·자격증, 키 중복 구분) + profile_differ_test"
+          },
+          {
+            "criterion": "완성도 점검표",
+            "met": true,
+            "how": "ProfilePresenter completeness, 실측 78%(현재 경력 설명·자격증 미기재 안내)"
+          },
+          {
+            "criterion": "네이버 인물정보 사본과 경력·직함 불일치 표시",
+            "met": true,
+            "how": "NaverComparison + naver_comparison_test, 비교 불가 시 안내 문구"
+          },
+          {
+            "criterion": "해석기·화면 테스트 통과",
+            "met": true,
+            "how": "43 runs 0 failures"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/services/linkedin test/services/naver_people test/services/ego_profile test/controllers/pd/profile_accounts_controller_test.rb",
+            "exit_code": 0,
+            "output": "43 runs, 259 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "bin/rubocop app/services/linkedin test/services/linkedin app/controllers/pd/profile_accounts_controller.rb",
+            "exit_code": 0,
+            "output": "15 files inspected, no offenses detected"
+          }
+        ],
+        "review": "Gemini hydrogen-high 7건 중 6건 맞음(항목 경계·학력 머리글·위치 오분류·짧은 소개·차이 키·실패 사본) → Codex 재위임, 1건(회원 번호 없을 때 테넌트 대조)은 PD 본인 계정용 의도 설계로 틀림. 자체 검수: 기술 표시 줄이 설명으로 잡히던 결함 수정"
+      }
     },
     {
       "type": "FEATURE",
@@ -299,7 +468,20 @@
       "assign_to": "codex",
       "id": "ISS-463",
       "title": "[LinkedIn] 인맥 관리 — 1촌·팔로우·초대 수 추이, 받은 1촌 신청 목록과 승인 후 수락/건너뛰기 실행, 미확인 메시지·알림 수",
-      "description": "plan 11~13. 수락·건너뛰기는 대표님 승인 버튼 클릭 건만 실행"
+      "description": "plan 11~13. 수락·건너뛰기는 대표님 승인 버튼 클릭 건만 실행",
+      "payload": {
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「[LinkedIn] 인맥 관리 — 1촌·팔로우·초대 수 추이, 받은 1촌 신청 목록과 승인 후 수락/건너뛰기 실행, 미확인 메시지·알림 수」(FEATURE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "updated_at": "2026-11-24T10:10:52.796Z"
     },
     {
       "type": "FEATURE",
@@ -311,7 +493,20 @@
       "assign_to": "codex",
       "id": "ISS-464",
       "title": "[LinkedIn] 뉴스레터 관리 — 구독자 추이, 발행 글 목록·조회, 글 초안 작성·보관",
-      "description": "plan 14~16"
+      "description": "plan 14~16",
+      "payload": {
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「[LinkedIn] 뉴스레터 관리 — 구독자 추이, 발행 글 목록·조회, 글 초안 작성·보관」(FEATURE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "updated_at": "2026-11-24T10:10:52.796Z"
     },
     {
       "type": "FEATURE",
@@ -323,7 +518,20 @@
       "assign_to": "codex",
       "id": "ISS-465",
       "title": "[LinkedIn] 정보 공유 — 게시물·뉴스레터 초안/예약 + 승인 건만 ego로 게시하고 결과 주소 기록",
-      "description": "plan 17~18. 게시는 승인 게이트 필수"
+      "description": "plan 17~18. 게시는 승인 게이트 필수",
+      "payload": {
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「[LinkedIn] 정보 공유 — 게시물·뉴스레터 초안/예약 + 승인 건만 ego로 게시하고 결과 주소 기록」(FEATURE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "updated_at": "2026-11-24T10:10:52.796Z"
     },
     {
       "type": "FEATURE",
@@ -335,19 +543,60 @@
       "assign_to": "codex",
       "id": "ISS-466",
       "title": "[LinkedIn] 주간 리포트 — 지표·게시·인맥·뉴스레터 요약",
-      "description": "plan 19"
+      "description": "plan 19",
+      "payload": {
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「[LinkedIn] 주간 리포트 — 지표·게시·인맥·뉴스레터 요약」(FEATURE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "updated_at": "2026-11-24T10:10:52.796Z"
     },
     {
       "id": "ISS-467",
       "type": "UX_FIX",
       "priority": "P3",
-      "status": "READY",
+      "status": "DONE",
       "parent": "ISS-460",
       "title": "PD 관리 화면 휴대폰 너비에서 왼쪽 메뉴(240px)가 접히지 않아 본문이 150px로 좁아짐",
       "description": "390px 실측. layouts/pd.html.erb 사이드바 반응형(햄버거) 필요. 모든 PD 화면 공통, ISS-460 이전부터 존재.",
       "created_at": "2026-11-19T14:45:00",
-      "completed_at": null,
-      "assign_to": "codex"
+      "completed_at": "2026-11-24T19:37:53.141827",
+      "assign_to": "codex",
+      "payload": {
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「PD 관리 화면 휴대폰 너비에서 왼쪽 메뉴(240px)가 접히지 않아 본문이 150px로 좁아짐」(UX_FIX, P3)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "이미 41~44회차 커밋 ac54dd2 에서 휴대폰 너비 메뉴 접기(햄버거·배경 닫기·Esc)와 본문 여백 0 처리가 들어갔고, 50회차 ego 실측(390px) 가로 넘침 30/30 통과 기록이 있어 완료로 정리한다.",
+          "risk": "없음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-24T10:37:53Z"
+        },
+        "acceptance_criteria": [
+          "휴대폰 너비(390px)에서 PD 왼쪽 메뉴가 기본으로 접히고 메뉴 버튼으로 열고 닫을 수 있다",
+          "휴대폰 너비에서 본문이 화면 폭을 다 쓴다(왼쪽 240px 여백 없음)"
+        ]
+      },
+      "updated_at": "2026-11-24T19:37:53+09:00",
+      "result": {
+        "raw": "{\"commit\":\"ac54dd2\",\"note\":\"앞선 회차에 이미 해결됨 — 완료 근거 정리\",\"criteria_check\":[{\"criterion\":\"390px 에서 메뉴 접힘·버튼으로 열고 닫기\",\"met\":true,\"how\":\"layouts/pd.html.erb @media (max-width:767px) [data-pd-menu] translateX(-100%), pd-menu-button(aria-controls=pd-navigation, impd-nav#toggle, Esc 닫기), docs/ux-50-rounds.md 44회차 ✅\"},{\"criterion\":\"휴대폰에서 본문 전체 폭\",\"met\":true,\"how\":\".pd-main.ml-60 { margin-left: 0 } + 50회차 ego 실측 390px 가로 넘침 30/30\"}],\"proof\":[{\"cmd\":\"grep -c \"pd-menu-button\\|pd-main.ml-60 { margin-left: 0; }\" app/views/layouts/pd.html.erb\",\"exit_code\":0,\"output\":\"3\"}]}"
+      }
     },
     {
       "type": "FEATURE",
@@ -375,7 +624,20 @@
       "assign_to": "codex",
       "id": "ISS-471",
       "title": "[네이버 인물정보] 검색 노출 점검 — 검색어별 인물정보 박스 노출 기록, 검색 화면 사본 대조, 동명이인",
-      "description": "plan 7~9"
+      "description": "plan 7~9",
+      "payload": {
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「[네이버 인물정보] 검색 노출 점검 — 검색어별 인물정보 박스 노출 기록, 검색 화면 사본 대조, 동명이인」(FEATURE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "updated_at": "2026-11-24T10:10:52.796Z"
     },
     {
       "type": "FEATURE",
@@ -387,7 +649,20 @@
       "assign_to": "codex",
       "id": "ISS-472",
       "title": "[네이버 인물정보] 신청 진행/완료 내역·반려 사유 수집 + 권한 위임 종료 임박 알림",
-      "description": "plan 2,10,11. api/result-list?status=ING|END"
+      "description": "plan 2,10,11. api/result-list?status=ING|END",
+      "payload": {
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「[네이버 인물정보] 신청 진행/완료 내역·반려 사유 수집 + 권한 위임 종료 임박 알림」(FEATURE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "updated_at": "2026-11-24T10:10:52.796Z"
     },
     {
       "type": "FEATURE",
@@ -399,7 +674,20 @@
       "assign_to": "codex",
       "id": "ISS-473",
       "title": "[네이버 인물정보] 목표 프로필·차이·수정 신청 초안 + 사이트/LinkedIn 대조 + 증빙 체크리스트",
-      "description": "plan 12~16"
+      "description": "plan 12~16",
+      "payload": {
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「[네이버 인물정보] 목표 프로필·차이·수정 신청 초안 + 사이트/LinkedIn 대조 + 증빙 체크리스트」(FEATURE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "updated_at": "2026-11-24T10:10:52.796Z"
     },
     {
       "type": "FEATURE",
@@ -411,7 +699,20 @@
       "assign_to": "codex",
       "id": "ISS-474",
       "title": "[네이버 인물정보] 승인한 초안을 ego로 수정 신청 화면에 입력 → 대표님 확인 후 제출",
-      "description": "plan 17. 제출은 승인 게이트 필수"
+      "description": "plan 17. 제출은 승인 게이트 필수",
+      "payload": {
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「[네이버 인물정보] 승인한 초안을 ego로 수정 신청 화면에 입력 → 대표님 확인 후 제출」(FEATURE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "updated_at": "2026-11-24T10:10:52.796Z"
     },
     {
       "id": "ISS-475",
@@ -419,21 +720,109 @@
       "description": "SD 명세 0017/docs/impd-brand-consent-api-spec.md 그대로. SD ISS-198 막힘 해소. 대표님 지시 2026-11-19(imPD 프로필·브랜드 / SD 매체·콘텐츠 / Townin 지역 광고, 1차 보험설계사). 역할 정의서: /Volumes/GH_APFS/0008_choi-pd/docs/ecosystem-roles.md",
       "type": "FEATURE",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "created_at": "2026-11-19T15:40:00",
-      "completed_at": null,
-      "assign_to": "codex"
+      "completed_at": "2026-11-24T19:16:03.208254",
+      "assign_to": "codex",
+      "payload": {
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「[연동] 동의 2종(socialdoctors_exposure·townin_local_ads) + 회원 동의 화면 + consented-brands API」(FEATURE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "동의 2종·회원 동의 화면·consented-brands API 는 앞선 회차(ac54dd2 등)에 이미 구현돼 SD 명세와 맞는다. 명세의 필수 3원칙 중 '동의하지 않은 회원은 목록에서 뺀다'만 테스트가 없어 그 테스트를 보강하고 마감한다.",
+          "risk": "낮음 — 테스트 추가만",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-24T10:13:30Z"
+        },
+        "acceptance_criteria": [
+          "회원이 내 관리 화면의 동의 페이지에서 SocialDoctors 노출·Townin 지역 광고 동의를 하고 철회할 수 있으며 기록이 남는다",
+          "consented-brands API 는 API 키 없이 부르면 거절된다",
+          "API 응답에 이메일·전화번호가 없고, 철회·탈퇴한 회원은 표시와 함께 포함되며, 동의하지 않은 회원은 빠진다",
+          "관련 테스트가 모두 통과한다"
+        ]
+      },
+      "updated_at": "2026-11-24T19:13:30+09:00",
+      "result": {
+        "commit": "6907fbc",
+        "files_modified": [
+          "test/controllers/api/socialdoctors/consented_brands_controller_test.rb"
+        ],
+        "note": "동의 2종·회원 동의 화면·consented-brands API 본체는 앞선 커밋(ac54dd2 등)에 구현돼 있어 명세 대조 후 빠진 테스트만 보강",
+        "criteria_check": [
+          {
+            "criterion": "회원 동의 화면에서 동의·철회와 기록",
+            "met": true,
+            "how": "brand_consents_controller_test screen grants and revokes with evidence 통과(ip·user_agent·revoked_at)"
+          },
+          {
+            "criterion": "API 키 없으면 거절",
+            "met": true,
+            "how": "authentication and configuration 테스트 401·503"
+          },
+          {
+            "criterion": "연락처 제외·철회/탈퇴 포함·미동의 제외",
+            "met": true,
+            "how": "contract 테스트(email·phone 없음, revokedAt) + 신규 2건(미동의 2명 제외, withdrawnAt 포함)"
+          },
+          {
+            "criterion": "관련 테스트 통과",
+            "met": true,
+            "how": "6 runs 0 failures"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/controllers/api/socialdoctors/consented_brands_controller_test.rb test/controllers/member_admin/brand_consents_controller_test.rb",
+            "exit_code": 0,
+            "output": "6 runs, 32 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      }
     },
     {
       "id": "ISS-476",
       "title": "[연동] 회원용 '내 브랜드' 운영 화면 — 브랜드·동의·매체·콘텐츠·Townin 성과 한 화면",
       "priority": "P1",
       "type": "FEATURE",
-      "status": "READY",
+      "status": "BLOCKED",
       "created_at": "2026-11-19T15:40:00",
       "completed_at": null,
       "assign_to": "codex",
-      "description": " 대표님 지시 2026-11-19(imPD 프로필·브랜드 / SD 매체·콘텐츠 / Townin 지역 광고, 1차 보험설계사). 역할 정의서: /Volumes/GH_APFS/0008_choi-pd/docs/ecosystem-roles.md"
+      "description": " 대표님 지시 2026-11-19(imPD 프로필·브랜드 / SD 매체·콘텐츠 / Townin 지역 광고, 1차 보험설계사). 역할 정의서: /Volumes/GH_APFS/0008_choi-pd/docs/ecosystem-roles.md",
+      "payload": {
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「[연동] 회원용 '내 브랜드' 운영 화면 — 브랜드·동의·매체·콘텐츠·Townin 성과 한 화면」(FEATURE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "depends_on_external": "0017_SocialDoctors ISS-521 (GET /api/brands/{externalId}/summary)",
+        "ask_kind": "external_wait",
+        "ask_prompt": "SocialDoctors 쪽 '브랜드 성과 요약 API'(SD ISS-521)가 완료되면 [회신 왔음]을 눌러 주세요. 그때 내 브랜드 화면에 매체별 발행 수와 Townin 성과를 붙입니다.",
+        "recommendation": {
+          "verdict": "보류 권장",
+          "reason": "남은 부분은 SD 요약 API 계약이 정해져야 한다. 계약 없이 imPD 쪽만 지어내면 나중에 다시 고쳐야 한다. 이미 된 부분(브랜드·동의·콘텐츠·운영 그래프)은 회원이 지금 쓸 수 있다.",
+          "risk": "낮음",
+          "effort": "M",
+          "by": "factory-runner",
+          "at": "2026-11-24T10:16:15Z"
+        }
+      },
+      "updated_at": "2026-11-24T19:16:16+09:00",
+      "blocked_reason": "성과 칸(매체별 발행 수·Townin 읽음·사용 포인트)은 SocialDoctors 브랜드 요약 API(0017 ISS-521, 현재 AWAITING_USER)가 있어야 붙일 수 있다. 브랜드·동의 상태·imPD 콘텐츠 수·4주 운영 그래프는 ac54dd2·ISS-481 에서 이미 한 화면에 들어갔다."
     },
     {
       "id": "ISS-477",
@@ -444,18 +833,31 @@
       "created_at": "2026-11-19T15:40:00",
       "completed_at": null,
       "assign_to": "codex",
-      "description": " 대표님 지시 2026-11-19(imPD 프로필·브랜드 / SD 매체·콘텐츠 / Townin 지역 광고, 1차 보험설계사). 역할 정의서: /Volumes/GH_APFS/0008_choi-pd/docs/ecosystem-roles.md"
+      "description": " 대표님 지시 2026-11-19(imPD 프로필·브랜드 / SD 매체·콘텐츠 / Townin 지역 광고, 1차 보험설계사). 역할 정의서: /Volumes/GH_APFS/0008_choi-pd/docs/ecosystem-roles.md",
+      "payload": {
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「[연동] 보험설계사 샘플 여정 12단계 로컬 통합 시험 + UX 점수표(95% 판정)」(FEATURE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "updated_at": "2026-11-24T10:10:52.796Z"
     },
     {
       "id": "ISS-478",
       "type": "FIX_BUG",
       "priority": "P0",
-      "status": "AWAITING_USER",
+      "status": "DONE",
       "parent": null,
       "title": "[보안] 회원 관리 로그인(/:slug/login)이 비밀번호 없는 회원(구글 가입 등)을 빈 비밀번호로 통과시킴 — 운영(impd.townin.net)에도 노출",
       "description": "MemberSessionsController#create: member.password_digest.blank? 이면 무조건 로그인. 로그인 화면에 '데모 모드' 문구. 2026-11-19 운영 로그인 화면 GET으로 문구 확인(로그인 시도 안 함). 수정 후 운영 배포는 대표님 확인.",
       "created_at": "2026-11-19T16:10:00",
-      "completed_at": null,
+      "completed_at": "2026-11-20T12:44:25",
       "assign_to": "codex",
       "result": {
         "tests": "85 runs 0 failures",
@@ -469,6 +871,24 @@
           "선택": "A — 다른 장비의 imPD 폴더 위치 알려 주기",
           "위치": "미기재",
           "확인": "m6(Mac mini) /Volumes/GH_APFS/0008_choi-pd·0033_옵시디안/AgenticOS/0008_choi-pd 에 master.key·.env 없음(존재만 확인, 값 미열람)"
+        },
+        "deployed_at": "2026-11-20T12:44:25",
+        "deployed_commit": "4fe87d3",
+        "result": {
+          "secrets": "운영 컨테이너 env에서 RAILS_MASTER_KEY·GOOGLE_OAUTH_CLIENT_ID/SECRET·IMPD_HANDOFF_SECRET 복구 → E_SSD …/choi-pd-rails/.env(600), impd-hotfix-478/config/master.key(600, gitignore)",
+          "proof": [
+            {
+              "cmd": "bin/kamal deploy (impd-hotfix-478)",
+              "exit_code": 0,
+              "output": "First web container is healthy; Finished all in 1356.9 seconds; container choipd-web-4fe87d3…"
+            },
+            {
+              "cmd": "curl https://impd.townin.net/kang-seung-sig/login + POST password=\"\"",
+              "exit_code": 0,
+              "output": "데모 모드 문구 0건; 빈 비밀번호 POST → 302 /auth/login; /kang-seung-sig/admin/dashboard → 302 login"
+            }
+          ],
+          "note": "운영은 hotfix(origin/main 4fe87d3). 로컬 main(UX 50회차·브랜드 운영 현황 등)은 아직 미배포."
         }
       }
     },
@@ -476,12 +896,12 @@
       "id": "ISS-480",
       "type": "FIX_BUG",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "parent": null,
       "title": "[법적 고지] 이용약관·개인정보처리방침 하단 사업자 정보 자리표시 5개가 운영에 공개 + 사업자등록번호 불일치(715-84 vs 기록 715-86)",
       "description": "운영 /terms 에 '[대표자 — 공개 전 입력 필요]' 등 5개 노출(2026-11-19 확인). 기록(09-Paperclip/CLO 가가호호 기본정보): 대표 강승식, 본점 서울 중구 남대문로9길 24 10층, 사업자 715-86-00843 — 원본 대조 전 확인 필요. 대표님 확인 후 반영.",
       "created_at": "2026-11-19T16:00:00",
-      "completed_at": null,
+      "completed_at": "2026-11-24T19:14:42.297112",
       "assign_to": "codex",
       "payload": {
         "user_decision": {
@@ -490,9 +910,38 @@
           "보호책임자_성명": "강승식 ✓",
           "보호책임자_직책": "대표이사 ✓",
           "이메일_전화": "미기재 → imPD_보호책임자연락처_비밀값위치_재확인_컨펌_261120.pdf 1번"
-        }
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「[법적 고지] 이용약관·개인정보처리방침 하단 사업자 정보 자리표시 5개가 운영에 공개 + 사업자등록번호 불일치(715-84 vs 기록 715-86)」은 P1 사용자 영향 결함이므로 우선 해결이 필요합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "대표님이 컨펌(2026-11-20)으로 확정한 보호책임자 성명(강승식)·직책(대표이사)만 반영하고, 아직 답이 없는 이메일 자리표시는 기존 약관처럼 '문의하기' 창구 연결로 바꿔 공개 화면에서 자리표시 문구를 없앤다. 이메일 값은 재확인 컨펌(261120) 답을 받으면 넣는다.",
+          "risk": "낮음 — 문구 변경, 되돌릴 수 있음. 운영 반영은 실행기 배포 순서를 따른다.",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-24T10:13:30Z"
+        },
+        "acceptance_criteria": [
+          "/privacy 화면에 '공개 전 입력 필요' 자리표시 문구가 하나도 없다",
+          "개인정보 보호책임자 표에 성명 강승식, 직책 대표이사가 보인다",
+          "보호책임자 이메일 칸·본문 안내는 문의하기 링크로 연결된다(미확정 이메일을 지어내지 않는다)",
+          "/terms 하단 사업자 정보(대표자·사업자등록번호 715-86-00843·본점)가 그대로 유지된다"
+        ],
+        "recall_used": "07-AI-Knowledge/대표님-답변/컨펌/2026-11-20.md"
       },
-      "blocked_reason": "코드 반영(privacy.html.erb 보호책임자 성명·직책)은 Codex 위임. 연락처는 재확인 컨펌 대기. 운영 배포는 ISS-478 비밀값 복구 후"
+      "blocked_reason": "코드 반영(privacy.html.erb 보호책임자 성명·직책)은 Codex 위임. 연락처는 재확인 컨펌 대기. 운영 배포는 ISS-478 비밀값 복구 후",
+      "updated_at": "2026-11-24T19:13:30+09:00",
+      "result": {
+        "raw": "{\"commit\":\"5bdedd8\",\"files_modified\":[\"app/views/legal/privacy.html.erb\",\"test/controllers/legal_controller_test.rb\"],\"criteria_check\":[{\"criterion\":\"/privacy 화면에 공개 전 입력 필요 자리표시가 없다\",\"met\":true,\"how\":\"grep -c 결과 privacy·terms 모두 0, 테스트 refute_includes 통과\"},{\"criterion\":\"보호책임자 표에 성명 강승식·직책 대표이사\",\"met\":true,\"how\":\"테스트 assert_includes 강승식·대표이사 통과\"},{\"criterion\":\"이메일 칸·안내는 문의하기 링크(이메일을 지어내지 않음)\",\"met\":true,\"how\":\"diff 3곳 모두 link_to 문의하기 new_inquiry_path\"},{\"criterion\":\"/terms 사업자 정보 유지\",\"met\":true,\"how\":\"테스트 715-86-00843 포함 통과\"}],\"proof\":[{\"cmd\":\"bin/rails test test/controllers/legal_controller_test.rb\",\"exit_code\":0,\"output\":\"2 runs, 9 assertions, 0 failures, 0 errors, 0 skips\"},{\"cmd\":\"grep -c \"공개 전 입력 필요\" app/views/legal/privacy.html.erb\",\"exit_code\":1,\"output\":\"0\"}],\"review\":\"Gemini hydrogen-high 독립 검수: 결함 없음\",\"remaining\":\"보호책임자 공개 이메일은 재확인 컨펌(imPD_보호책임자연락처_비밀값위치_재확인_컨펌_261120.pdf) 답 대기 → ISS-483\"}"
+      }
     },
     {
       "id": "ISS-481",
@@ -537,12 +986,315 @@
         }
       },
       "completed_at": "2026-11-20T12:04:16"
+    },
+    {
+      "id": "ISS-482",
+      "title": "[맡김] 브랜드 채널 관리(대행 계정 정보) 1단계",
+      "status": "DONE",
+      "type": "FEATURE",
+      "priority": "P2",
+      "assign_to": "agent-harness",
+      "created_at": "2026-11-24T18:39:46.859479+09:00",
+      "updated_at": "2026-11-24T19:28:51.244894+09:00",
+      "payload": {
+        "origin": "chat-delegate",
+        "delegated": {
+          "at": "2026-11-24T18:39:46.859479+09:00",
+          "session": null,
+          "notify": "buzz"
+        },
+        "plain_summary": "의뢰받은 회원 브랜드의 네이버 블로그·인물정보·LinkedIn·페북·인스타·쓰레드 채널 정보를 브랜드별로 관리한다. 기획: docs/brand-channel-management-plan.md. 비밀번호 값은 DB에 저장하지 않고 키체인 이름표(credential_ref)만 둔다.",
+        "acceptance_criteria": [
+          "brand_channels 표·BrandChannel 모델(기획 1절 칸, platform·connection_method·session_status 값 검사) + Brand has_many :brand_channels 마이그레이션",
+          "운영자 /admin/brands/:id 에서 채널 목록·추가·수정·삭제, 로그인 필요 상태 빨강 표시",
+          "회원 /:slug/admin/brand 에서 내 브랜드 채널 보기·핸들/주소 수정·위탁 동의 체크, credential_ref 미노출, 다른 회원 브랜드 접근 차단",
+          "비밀번호·토큰 입력 칸 없음(검색으로 확인), 위탁 동의 없는 채널은 예약 게시 불가 검증",
+          "모델·컨트롤러 테스트 추가, bin/rails test·rubocop·brakeman 통과, 운영 배포는 하지 않음(로컬 커밋까지)"
+        ],
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:10:52.796Z",
+            "by": "auto",
+            "reason": "「[맡김] 브랜드 채널 관리(대행 계정 정보) 1단계」(FEATURE, P2)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:10:52.796Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "note": "대화 세션 구현·Gemini 검수·테스트 170/0·rubocop 0·brakeman 0, 로컬 커밋. 배포 전"
+      }
+    },
+    {
+      "id": "ISS-483",
+      "title": "[Plan:테스트] ISS-480 변경사항 검증",
+      "type": "RUN_TESTS",
+      "status": "DONE",
+      "priority": "P1",
+      "assign_to": "test-harness",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": "ISS-480",
+      "depends_on": [],
+      "created_at": "2026-11-24T19:14:42.297112",
+      "payload": {
+        "files": [],
+        "source_issue": "ISS-480",
+        "scope": "changed",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:14:44.336Z",
+            "by": "auto",
+            "reason": "「[Plan:테스트] ISS-480 변경사항 검증」(RUN_TESTS, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:14:44.336Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "회차 끝 전체 테스트로 확인한다.",
+          "risk": "낮음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-24T19:14:56+09:00"
+        },
+        "acceptance_criteria": [
+          "전체 테스트가 실패 0건으로 통과한다",
+          "rubocop 위반 0건"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "total": 187,
+        "failed_count": 0,
+        "criteria_check": [
+          {
+            "criterion": "전체 테스트 실패 0건",
+            "met": true,
+            "how": "bin/rails test 187 runs 0 failures 0 errors 1 skip"
+          },
+          {
+            "criterion": "rubocop 위반 0건",
+            "met": true,
+            "how": "378 files no offenses"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test",
+            "exit_code": 0,
+            "output": "187 runs, 1083 assertions, 0 failures, 0 errors, 1 skips"
+          },
+          {
+            "cmd": "bin/rubocop",
+            "exit_code": 0,
+            "output": "378 files inspected, no offenses detected"
+          },
+          {
+            "cmd": "bundle exec brakeman --no-pager -q --no-exit-on-warn",
+            "exit_code": 0,
+            "output": "Security Warnings: 0"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-24T19:38:53+09:00",
+      "completed_at": "2026-11-24T19:38:53.154856"
+    },
+    {
+      "id": "ISS-484",
+      "title": "[Plan:도메인분석] ISS-480 비즈니스 규칙/시나리오 도출",
+      "type": "DOMAIN_ANALYZE",
+      "status": "CLOSED_SKIP",
+      "priority": "P1",
+      "assign_to": "domain-analyst",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": "ISS-480",
+      "depends_on": [],
+      "created_at": "2026-11-24T19:14:42.297112",
+      "payload": {
+        "files": [],
+        "source_issue": "ISS-480",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:14:44.336Z",
+            "by": "auto",
+            "reason": "「[Plan:도메인분석] ISS-480 비즈니스 규칙/시나리오 도출」(DOMAIN_ANALYZE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:14:44.336Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "반려 권장",
+          "reason": "ISS-480 변경은 개인정보처리방침 문구 4줄 교체뿐이라 도메인 규칙·시나리오 도출 대상이 아니다.",
+          "risk": "없음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-24T19:14:56+09:00"
+        }
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-24T10:14:44.336Z",
+      "completed_at": "2026-11-24T19:14:56+09:00"
+    },
+    {
+      "id": "ISS-485",
+      "type": "FIX_BUG",
+      "priority": "P2",
+      "status": "AWAITING_USER",
+      "parent": "ISS-480",
+      "title": "[법적 고지] 개인정보처리방침 보호책임자 공개 이메일(또는 전화) 기입",
+      "description": "ISS-480에서 성명·직책은 반영했고 이메일 칸 3곳은 임시로 '문의하기' 연결. 개인정보보호법상 보호책임자 연락처(전화·이메일 중 하나 이상) 공개가 필요하다.",
+      "created_at": "2026-11-24T19:15:07+09:00",
+      "completed_at": null,
+      "assign_to": "codex",
+      "payload": {
+        "ask_kind": "provide_value",
+        "ask_prompt": "개인정보처리방침에 공개할 보호책임자 연락처(이메일 또는 전화) 하나를 적어 주세요. 이미 올린 컨펌 문서 imPD_보호책임자연락처_비밀값위치_재확인_컨펌_261120.pdf 1번 칸에 적으셔도 됩니다.",
+        "plain_summary": "법에 따라 개인정보 담당자 연락처를 공개해야 하는데, 어떤 주소를 공개할지 아직 정해지지 않아 지금은 '문의하기' 창구로 대신 연결해 두었습니다.",
+        "if_not_decided": "방침에 연락처 칸이 '문의하기' 링크로 남습니다. 서비스는 그대로 돌아가지만 법정 기재 항목이 덜 채워진 상태입니다.",
+        "reversible": true,
+        "recall_used": "07-AI-Knowledge/대표님-답변/컨펌/2026-11-20.md (연락처 빈칸)",
+        "files": [
+          "app/views/legal/privacy.html.erb"
+        ],
+        "recommendation": {
+          "verdict": "대표님 결정 필요",
+          "reason": "공개할 연락처는 대표님만 정할 수 있는 값이다. 기억·볼트 검색에서 확정값을 찾지 못했다(11-20 컨펌 연락처 칸 빈칸).",
+          "risk": "낮음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-24T19:15:07+09:00"
+        }
+      },
+      "updated_at": "2026-11-24T19:15:07+09:00"
+    },
+    {
+      "id": "ISS-486",
+      "title": "[Plan:디자인리뷰] ISS-467 시각적 완성도 검증",
+      "type": "DESIGN_REVIEW",
+      "status": "CLOSED_SKIP",
+      "priority": "P1",
+      "assign_to": "design-critic",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": "ISS-467",
+      "depends_on": [],
+      "created_at": "2026-11-24T19:37:53.141827",
+      "payload": {
+        "files": [],
+        "source_issue": "ISS-467",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:37:56.041Z",
+            "by": "auto",
+            "reason": "「[Plan:디자인리뷰] ISS-467 시각적 완성도 검증」(DESIGN_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:37:56.041Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "반려 권장",
+          "reason": "ISS-467 은 이번 회차 코드 변경이 없고(앞선 ac54dd2 정리), 같은 화면이 UX 50회차에서 ego 캡처 비교·390px 실측으로 이미 디자인 검증을 거쳤다.",
+          "risk": "없음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-24T19:38:00+09:00"
+        }
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-24T19:38:00+09:00",
+      "completed_at": "2026-11-24T19:38:00+09:00"
+    },
+    {
+      "id": "ISS-487",
+      "title": "[Plan:품질평가] ISS-483 품질 점수 산출",
+      "type": "SCORE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "eval-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-483",
+      "depends_on": [],
+      "created_at": "2026-11-24T19:38:53.154856",
+      "payload": {
+        "test_result": {
+          "passed": true,
+          "total": 187,
+          "coverage": null
+        },
+        "source_issue": "ISS-483",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:38:56.147Z",
+            "by": "auto",
+            "reason": "「[Plan:품질평가] ISS-483 품질 점수 산출」(SCORE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:38:56.147Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "전체 테스트 187건·rubocop·brakeman 통과 후 하네스 기본 흐름의 품질 점수 산출. 다음 회차 eval 로 처리.",
+          "risk": "낮음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-24T10:39:00Z"
+        }
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-24T19:39:00+09:00"
     }
   ],
   "hooks": {
     "on_create": [],
     "on_start": [],
-    "on_complete": [],
+    "on_complete": [
+      {
+        "issue_id": "ISS-480",
+        "issue_type": "FIX_BUG",
+        "plan_created": 2,
+        "timestamp": "2026-11-24T19:14:42.297112"
+      },
+      {
+        "issue_id": "ISS-475",
+        "issue_type": "FEATURE",
+        "plan_created": 0,
+        "timestamp": "2026-11-24T19:16:03.208254"
+      },
+      {
+        "issue_id": "ISS-461",
+        "issue_type": "FEATURE",
+        "plan_created": 0,
+        "timestamp": "2026-11-24T19:27:02.329502"
+      },
+      {
+        "issue_id": "ISS-462",
+        "issue_type": "FEATURE",
+        "plan_created": 0,
+        "timestamp": "2026-11-24T19:37:23.380014"
+      },
+      {
+        "issue_id": "ISS-467",
+        "issue_type": "UX_FIX",
+        "plan_created": 1,
+        "timestamp": "2026-11-24T19:37:53.141827"
+      },
+      {
+        "issue_id": "ISS-483",
+        "issue_type": "RUN_TESTS",
+        "plan_created": 1,
+        "timestamp": "2026-11-24T19:38:53.154856"
+      }
+    ],
     "on_fail": [],
     "on_learn": []
   },
@@ -1737,9 +2489,20 @@
     ]
   },
   "stats": {
-    "total_issues": 3,
-    "completed": 0,
+    "total_issues": 487,
+    "completed": 6,
     "failed": 0,
     "evolved": 74
-  }
+  },
+  "pending_opportunity_signals": [
+    {
+      "source_issue": "ISS-483",
+      "source_type": "RUN_TESTS",
+      "result": {
+        "passed": true,
+        "total": 187,
+        "coverage": null
+      }
+    }
+  ]
 }
