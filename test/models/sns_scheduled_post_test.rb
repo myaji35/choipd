@@ -1,6 +1,28 @@
 require "test_helper"
 
 class SnsScheduledPostTest < ActiveSupport::TestCase
+  test "validates Naver Blog content, channel delegation and member ownership" do
+    owner = Member.create!(name: "채널 소유자", email: "blog-owner@example.com", slug: "blog-owner")
+    other = Member.create!(name: "다른 회원", email: "blog-other@example.com", slug: "blog-other")
+    channel = Brand.create!(name: "블로그 브랜드", member_id: owner.id).brand_channels.create!(platform: "naver_blog")
+    post = SnsScheduledPost.new(platform: "naver_blog", brand_channel: channel, member: other,
+      title: "가" * 101, scheduled_at: Time.current)
+
+    assert_not post.valid?
+    assert post.errors[:title].any?
+    assert post.errors[:message].any?
+    assert post.errors[:brand_channel].any?
+    assert_includes post.errors[:base], "브랜드 채널의 운영 위탁 동의가 필요합니다."
+
+    post.assign_attributes(member: owner, title: "제목", message: "본문")
+    channel.update!(platform: "naver_people", delegation_consent_at: Time.current)
+    assert_not post.valid?
+    assert_includes post.errors[:brand_channel], "네이버 블로그 채널을 선택해 주세요."
+
+    channel.update!(platform: "naver_blog")
+    assert post.valid?
+  end
+
   setup do
     @member = Member.create!(name: "예약 회원", email: "scheduled@example.com", slug: "scheduled-member")
     @brand = Brand.create!(name: "예약 브랜드", member_id: @member.id)

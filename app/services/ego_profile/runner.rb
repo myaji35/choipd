@@ -18,10 +18,12 @@ module EgoProfile
       run_script("const INPUT = #{input.except(:default_search_accounts).to_json};\n" + File.read(Rails.root.join("lib/ego", script)), timeout: timeout)
     end
 
-    def run_script(script, timeout:)
+    def run_script(script, timeout:, server_name: nil)
       executable = self.class.binary or raise Error, "ego 브라우저를 찾을 수 없습니다."
+      arguments = []
+      arguments << "--ego-server-name=#{server_name}" if server_name.present?
       stdout, stderr, = Timeout.timeout(timeout) do
-        Open3.capture3(executable, "nodejs", stdin_data: script)
+        Open3.capture3(executable, *arguments, "nodejs", stdin_data: script)
       end
       line = [ stdout, stderr ].filter_map { |output| output.lines.reverse.find { |entry| entry.start_with?("EGO_RESULT ") } }.first
       diagnostic = stderr.lines.reject { |entry| entry.start_with?("EGO_RESULT ") }.join.last(300)

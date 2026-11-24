@@ -35,6 +35,10 @@
     <p class="text-xs text-gray-500 mt-1">키체인 항목의 이름만 입력해 주세요. 예시 impd-brand-<%= @brand.id %>-naver_blog</p>
   </div>
   <div>
+    <%= f.label :ego_server_name, "Ego 서버 이름" %>
+    <%= f.text_field :ego_server_name, maxlength: 64, pattern: "[A-Za-z0-9_.\\-]+", class: input_class %>
+  </div>
+  <div>
     <%= f.label :sns_account_id, "연결할 SNS 계정 ID" %>
     <%= f.number_field :sns_account_id, min: 1, class: input_class %>
   </div>

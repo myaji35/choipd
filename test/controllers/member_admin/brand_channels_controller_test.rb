@@ -8,7 +8,7 @@ class MemberAdmin::BrandChannelsControllerTest < ActionDispatch::IntegrationTest
       status: "approved", password: "password1234", password_confirmation: "password1234")
     @other_member = Member.create!(name: "다른 회원", email: "other-channel@example.com", slug: "other-channel")
     @brand = Brand.create!(name: "내 채널 브랜드", member_id: @member.id)
-    @channel = @brand.brand_channels.create!(platform: "naver_blog", account_handle: "my-channel", credential_ref: "private-label")
+    @channel = @brand.brand_channels.create!(platform: "naver_blog", account_handle: "my-channel", credential_ref: "private-label", ego_server_name: "private-ego-server")
     @other_channel = Brand.create!(name: "다른 채널 브랜드", member_id: @other_member.id)
       .brand_channels.create!(platform: "other", account_handle: "other-channel-handle")
     post "/auth/login", params: { email: @member.email, password: "password1234" }
@@ -41,12 +41,14 @@ class MemberAdmin::BrandChannelsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "my-channel"
     assert_not_includes response.body, "other-channel-handle"
     assert_not_includes response.body, "private-label"
+    assert_not_includes response.body, "private-ego-server"
 
     get edit_slug_admin_brand_brand_channel_path(slug: @member.slug, id: @channel.id)
     assert_response :success
     assert_select 'input[type="checkbox"][name="brand_channel[delegation_consent]"]'
-    assert_select 'input[name="brand_channel[credential_ref]"], input[type="password"]', count: 0
+    assert_select 'input[name="brand_channel[credential_ref]"], input[name="brand_channel[ego_server_name]"], input[type="password"]', count: 0
     assert_not_includes response.body, "private-label"
+    assert_not_includes response.body, "private-ego-server"
   end
 
   test "updates allowed fields, preserves consent on subsequent edits and supports withdrawal" do
@@ -54,7 +56,7 @@ class MemberAdmin::BrandChannelsControllerTest < ActionDispatch::IntegrationTest
     account = SnsAccount.create!(member: @member, platform: "facebook", account_name: "내 페이지")
     patch path, params: { brand_channel: {
       account_handle: "updated-channel", profile_url: "https://example.com/channel", delegation_consent: "1",
-      credential_ref: "replacement", connection_method: "manual", session_status: "connected", sns_account_id: account.id,
+      credential_ref: "replacement", ego_server_name: "replacement-server", connection_method: "manual", session_status: "connected", sns_account_id: account.id,
       platform: "other", brand_id: @other_channel.brand_id
     } }
     assert_redirected_to slug_admin_brand_path(slug: @member.slug)
@@ -62,6 +64,7 @@ class MemberAdmin::BrandChannelsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "updated-channel", @channel.account_handle
     assert_equal "https://example.com/channel", @channel.profile_url
     assert_equal "private-label", @channel.credential_ref
+    assert_equal "private-ego-server", @channel.ego_server_name
     assert_equal "ego_session", @channel.connection_method
     assert_equal "unknown", @channel.session_status
     assert_nil @channel.sns_account_id

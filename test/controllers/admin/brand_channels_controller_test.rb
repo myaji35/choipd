@@ -22,7 +22,7 @@ class Admin::BrandChannelsControllerTest < ActionDispatch::IntegrationTest
     assert_difference("BrandChannel.count") do
       post admin_brand_brand_channels_path(@brand), params: {
         brand_channel: { platform: "naver_blog", account_handle: "운영계정", session_status: "logged_out",
-                         credential_ref: "impd-admin-label", delegation_consent_at: Time.current }
+                         credential_ref: "impd-admin-label", ego_server_name: "m6.brand", delegation_consent_at: Time.current }
       }
     end
     assert_redirected_to admin_brand_path(@brand)
@@ -30,6 +30,7 @@ class Admin::BrandChannelsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "ego_session", channel.connection_method
     assert_equal @brand.tenant_id, channel.tenant_id
     assert_not channel.delegated?
+    assert_equal "m6.brand", channel.ego_server_name
 
     follow_redirect!
     assert_select ".bg-red-100.text-red-700", text: "로그인 필요"
@@ -37,6 +38,7 @@ class Admin::BrandChannelsControllerTest < ActionDispatch::IntegrationTest
     get edit_admin_brand_brand_channel_path(@brand, channel)
     assert_response :success
     assert_select 'input[name="brand_channel[credential_ref]"][value="impd-admin-label"]'
+    assert_select 'input[name="brand_channel[ego_server_name]"][value="m6.brand"]'
 
     patch admin_brand_brand_channel_path(@brand, channel), params: { brand_channel: { session_status: "error" } }
     assert_redirected_to admin_brand_path(@brand)

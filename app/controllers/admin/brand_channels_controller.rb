@@ -42,7 +42,7 @@ class Admin::BrandChannelsController < Admin::BaseController
 
   def brand_channel_params
     params.require(:brand_channel).permit(:platform, :account_handle, :profile_url, :connection_method,
-      :credential_ref, :sns_account_id, :profile_account_id, :session_status, :last_checked_at,
+      :credential_ref, :ego_server_name, :sns_account_id, :profile_account_id, :session_status, :last_checked_at,
       :last_error, :posting_cadence, :notes)
   end
 end

@@ -42,15 +42,31 @@ class EgoProfile::RunnerTest < ActiveSupport::TestCase
       assert error.message.end_with?(("a" * 400 + "\n" + "b" * 200).last(300))
     end
   end
+  test "places the named Ego server before the nodejs subcommand" do
+    calls = []
+    with_capture("EGO_RESULT {}\n", "", calls: calls) do
+      runner = EgoProfile::Runner.new
+      runner.run_script("script", timeout: 120, server_name: "m6.brand")
+      runner.run_script("script", timeout: 120)
+    end
+    assert_equal [
+      [ "/fake/ego-browser", "--ego-server-name=m6.brand", "nodejs" ],
+      [ "/fake/ego-browser", "nodejs" ]
+    ], calls
+  end
+
   private
 
-  def with_capture(stdout, stderr)
+  def with_capture(stdout, stderr, calls: [])
     runner_class = EgoProfile::Runner.singleton_class
     open3_class = Open3.singleton_class
     runner_class.alias_method :original_binary_for_test, :binary
     open3_class.alias_method :original_capture3_for_test, :capture3
     runner_class.define_method(:binary) { "/fake/ego-browser" }
-    open3_class.define_method(:capture3) { |*args, **kwargs| [ stdout, stderr, nil ] }
+    open3_class.define_method(:capture3) do |*args, **kwargs|
+      calls << args
+      [ stdout, stderr, nil ]
+    end
     yield
   ensure
     runner_class.alias_method :binary, :original_binary_for_test

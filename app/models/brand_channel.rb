@@ -39,7 +39,7 @@ class BrandChannel < ApplicationRecord
   belongs_to :sns_account, optional: true
   belongs_to :profile_account, optional: true
 
-  normalizes :credential_ref, :profile_url, with: ->(value) { value.presence }
+  normalizes :credential_ref, :profile_url, :ego_server_name, with: ->(value) { value.presence }
 
   before_validation :set_default_connection_method, on: :create
   before_validation :sync_tenant_id
@@ -50,6 +50,7 @@ class BrandChannel < ApplicationRecord
   validates :credential_ref,
     format: { with: /\A[a-zA-Z0-9_.-]+\z/, message: "보관 위치 이름표에는 영문, 숫자, 하이픈, 밑줄, 마침표만 사용할 수 있습니다." },
     length: { maximum: 64, message: "보관 위치 이름표는 64자 이하여야 합니다." }, allow_nil: true
+  validates :ego_server_name, format: { with: /\A[A-Za-z0-9_.-]{1,64}\z/ }, allow_nil: true
   validate :validate_profile_url
   validate :validate_account_ownership
   validate :validate_instagram_connection_method

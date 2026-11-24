@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_24_240000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_25_000000) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -189,6 +189,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_240000) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "ego_server_name", limit: 64
     t.index ["brand_id", "platform", "account_handle"], name: "idx_on_brand_id_platform_account_handle_9bbbe91828"
     t.index ["brand_id"], name: "index_brand_channels_on_brand_id"
   end
@@ -1203,6 +1204,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_240000) do
     t.datetime "published_at"
     t.string "published_url"
     t.string "result_message"
+    t.bigint "brand_channel_id"
+    t.string "title"
+    t.index ["brand_channel_id"], name: "index_sns_scheduled_posts_on_brand_channel_id"
     t.index ["member_id"], name: "index_sns_scheduled_posts_on_member_id"
     t.index ["profile_account_id"], name: "index_sns_scheduled_posts_on_profile_account_id"
     t.index ["sns_account_id"], name: "index_sns_scheduled_posts_on_sns_account_id"
