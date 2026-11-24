@@ -49,6 +49,8 @@
       .admin-nav-links { display: flex; align-items: center; gap: 22px; flex: 1; }
       .admin-nav-link { font-size: 13px; color: var(--impd-muted); padding: 8px 0; border-bottom: 2px solid transparent; }
       .admin-nav-link[aria-current="page"] { color: var(--impd-accent); border-bottom-color: var(--impd-accent); font-weight: 700; }
+      .admin-subnav { display: flex; gap: 22px; padding: 0 40px; border-top: 1px solid var(--impd-rule); overflow-x: auto; white-space: nowrap; }
+      .admin-subnav .admin-nav-link { flex: none; }
       .admin-identity { display: flex; flex-direction: column; align-items: flex-end; font-size: 13px; }
       .admin-email { font-size: 12px; color: var(--impd-muted); }
       .admin-menu-button, .admin-mobile-panel { display: none; }
@@ -57,18 +59,40 @@
         .admin-nav-links, .admin-email, .admin-logout { display: none; }
         .admin-identity { margin-left: auto; }
         .admin-menu-button { display: inline-flex; border: 0; background: transparent; padding: 8px; font-size: 22px; }
-        .admin-mobile-panel:not([hidden]) { display: flex; flex-direction: column; padding: 0 18px 16px; }
+        .admin-subnav { padding: 0 18px; }
+        .admin-mobile-panel:not([hidden]) { display: block; padding: 0 18px 16px; max-height: 60dvh; overflow-y: auto; }
+        .admin-mobile-panel h2 { margin-top: 12px; font-size: 13px; color: var(--impd-muted); }
         .admin-mobile-panel .admin-nav-link { min-height: 44px; display: flex; align-items: center; gap: 6px; }
       }
     </style>
     <% if @member %>
-      <% nav_items = [
-        ["대시보드", slug_admin_dashboard_path(slug: @member.slug), controller_path == "member_admin/dashboard"],
-        ["에디터", slug_admin_editor_path(slug: @member.slug), controller_path == "member_admin/editor"],
-        ["고객(문의함)", slug_admin_inquiries_path(slug: @member.slug), controller_path == "member_admin/inquiries"],
-        ["내 브랜드", slug_admin_brand_path(slug: @member.slug), controller_path == "member_admin/brands"],
-        ["노출·광고 동의", slug_admin_brand_consents_path(slug: @member.slug), controller_path == "member_admin/brand_consents"]
-      ] %>
+      <% slug = @member.slug
+         nav_groups = {
+           "대시보드" => [
+             ["대시보드", slug_admin_dashboard_path(slug:), %w[dashboard]]
+           ],
+           "내 페이지" => [
+             ["에디터", slug_admin_editor_path(slug:), %w[editor photos documents]],
+             ["서비스", slug_admin_services_path(slug:), %w[services]],
+             ["FAQ", slug_admin_faqs_path(slug:), %w[faqs]],
+             ["소식", slug_admin_posts_path(slug:), %w[posts]]
+           ],
+           "고객" => [
+             ["문의함", slug_admin_inquiries_path(slug:), %w[inquiries]],
+             ["후기", slug_admin_reviews_path(slug:), %w[reviews]],
+             ["예약 링크", slug_admin_bookings_path(slug:), %w[bookings]]
+           ],
+           "홍보" => [
+             ["내 브랜드", slug_admin_brand_path(slug:), %w[brands brand_channels]],
+             ["SNS 연결", slug_admin_sns_accounts_path(slug:), %w[sns_accounts facebook_connections]],
+             ["예약 발행", slug_admin_scheduled_posts_path(slug:), %w[sns_scheduled_posts]],
+             ["노출·광고 동의", slug_admin_brand_consents_path(slug:), %w[brand_consents]]
+           ]
+         }
+         active_item = nav_groups.values.flatten(1).find do |_, _, controllers|
+           controllers.any? { |controller| controller_path == "member_admin/#{controller}" }
+         end
+         active_group = nav_groups.find { |_, items| items.include?(active_item) }&.first %>
     <% end %>
     <% acting_user = impersonating_admin_user %>
     <header class="admin-header">
@@ -87,8 +111,8 @@
           <%= link_to "imPD.", (@member ? slug_admin_dashboard_path(slug: @member.slug) : root_path), style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 20px;" %>
           <% if @member %>
             <div class="admin-nav-links">
-              <% nav_items.each do |label, path, active| %>
-                <%= link_to label, path, class: "admin-nav-link", aria: { current: ("page" if active) } %>
+              <% nav_groups.each do |label, items| %>
+                <%= link_to label, items.first[1], class: "admin-nav-link", aria: { current: ("page" if label == active_group) } %>
               <% end %>
               <%= link_to "/#{@member.slug}", target: "_blank", rel: "noopener", class: "admin-nav-link" do %>내 페이지 보기 <%= lni_icon "arrow-angular-top-right" %><% end %>
             </div>
@@ -109,9 +133,21 @@
           <% end %>
         </div>
         <% if @member %>
+          <% if active_group && active_group != "대시보드" %>
+            <div class="admin-subnav" role="group" aria-label="<%= active_group %> 메뉴">
+              <% nav_groups.fetch(active_group).each do |item| %>
+                <% label, path = item %>
+                <%= link_to label, path, class: "admin-nav-link", aria: { current: ("page" if item == active_item) } %>
+              <% end %>
+            </div>
+          <% end %>
           <div id="admin-mobile-menu" class="admin-mobile-panel" data-impd-nav-target="panel" data-action="click->impd-nav#closeOnLink" hidden>
-            <% nav_items.each do |label, path, active| %>
-              <%= link_to label, path, class: "admin-nav-link", aria: { current: ("page" if active) } %>
+            <% nav_groups.each do |heading, items| %>
+              <h2><%= heading %></h2>
+              <% items.each do |item| %>
+                <% label, path = item %>
+                <%= link_to label, path, class: "admin-nav-link", aria: { current: ("page" if item == active_item) } %>
+              <% end %>
             <% end %>
             <%= link_to "/#{@member.slug}", target: "_blank", rel: "noopener", class: "admin-nav-link" do %>내 페이지 보기 <%= lni_icon "arrow-angular-top-right" %><% end %>
             <% unless acting_user %>
