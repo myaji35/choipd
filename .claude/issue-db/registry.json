@@ -1829,6 +1829,36 @@
       },
       "result": null,
       "spawn_rules": []
+    },
+    {
+      "id": "ISS-492",
+      "title": "[Meta] ISS-480 이슈 체인 근본 원인 분석",
+      "type": "PATTERN_ANALYSIS",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "meta-agent",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": null,
+      "depends_on": [],
+      "created_at": "2026-11-24T19:49:31.672460",
+      "payload": {
+        "parent_id": "ISS-480",
+        "chain_length": 4,
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T10:49:33.052Z",
+            "by": "auto",
+            "reason": "「[Meta] ISS-480 이슈 체인 근본 원인 분석」(PATTERN_ANALYSIS, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T10:49:33.052Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-24T10:49:33.052Z"
     }
   ],
   "hooks": {
@@ -3536,14 +3566,42 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 93,
+        "timestamp": "2026-11-24T19:49:31.672518",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3054시간",
+          "🟡 장기 대기: ISS-463 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-464 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-466 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-471 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-472 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-473 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 124시간"
+        ],
+        "issues_created": [
+          "ISS-492"
+        ],
+        "stats_snapshot": {
+          "total": 38,
+          "done": 20,
+          "in_progress": 0,
+          "ready": 13,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
   "stats": {
-    "total_issues": 491,
+    "total_issues": 492,
     "completed": 10,
     "failed": 0,
-    "evolved": 92
+    "evolved": 93
   },
   "pending_opportunity_signals": [
     {
