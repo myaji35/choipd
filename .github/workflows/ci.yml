@@ -7,7 +7,7 @@ on:
 
 jobs:
   scan_ruby:
-    # ubuntu-26.04 러너에는 Ruby 3.3.10 사전 빌드가 없어 고정 (.ruby-version·Dockerfile 과 일치)
+    # ubuntu-26.04 러너에는 Ruby 3.3.14 사전 빌드가 없어 고정 (.ruby-version·Dockerfile 과 일치)
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
