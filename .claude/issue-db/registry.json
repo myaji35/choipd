@@ -3759,6 +3759,133 @@
           ]
         }
       }
+    },
+    {
+      "id": "ISS-502",
+      "type": "FIX_BUG",
+      "priority": "P1",
+      "status": "READY",
+      "assign_to": "codex",
+      "origin": "user-test",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": null,
+      "depends_on": [],
+      "created_at": "2026-11-24T17:23:54Z",
+      "updated_at": "2026-11-24T17:23:56.478Z",
+      "title": "[사용자 테스트] 문의하기(/inquiries/new) 제목이 배경에 묻히고 '문의 접수하기' 버튼에 배경이 없으며 오류 문구가 영어로 나옴",
+      "description": "문의하기 화면은 어두운 배경(rgb 10,14,26)인데 제목 h1 이 text-navy(rgb 17,24,39)라 거의 안 보이고, 제출 버튼의 bg-primary 가 투명(rgba 0,0,0,0)으로 계산돼 버튼처럼 보이지 않는다. 빈 채로 제출하면 \"Name can't be blank\" 등 영어 오류가 나온다. 문의는 B2B/B2G 매출 입구라 사용자가 망설이는 지점이다.",
+      "payload": {
+        "origin": "user-test",
+        "holdout_id": null,
+        "manual_check_id": "manual:inquiries-new-readability",
+        "judge_note": "숨긴 시나리오 판정 없음(판정 스크립트가 ship-guard 훅에 막혀 실행 안 됨 — exit 3 과 같이 처리, 브라우저 직접 사용 점검)",
+        "observations": [
+          {
+            "at": "2026-11-24T17:23:54Z",
+            "by": "user-test-nightly",
+            "url": "http://127.0.0.1:3008",
+            "observed": [
+              "데스크톱 1280·모바일 390 모두: h1 '문의하기' 색 rgb(17,24,39) / 본문 배경 rgb(10,14,26) — 대비 약 1.1:1, 눈으로 거의 안 보임",
+              "'문의 접수하기' 버튼 class 'bg-primary' 의 계산된 배경 rgba(0,0,0,0) — 흰 글자만 떠 있어 버튼으로 안 보임(hover:bg-primary-dark 도 같은 문제 추정)",
+              "빈 폼 제출(POST /inquiries) → 오류 상자에 'Name can't be blank / Email can't be blank / Email is invalid / Message can't be blank / Inquiry type can't be blank' 영어로 표시",
+              "입력칸에 required 속성이 없어 브라우저 단계 확인 없이 서버까지 감(문제는 아님, 참고)",
+              "라벨(이름·이메일 등)과 '선택하세요' 글자도 어두운 배경 위 대비가 낮음"
+            ]
+          }
+        ],
+        "files": [
+          "app/views/chopd/inquiries/new.html.erb",
+          "app/views/chopd/inquiries/_form.html.erb",
+          "config/locales/"
+        ],
+        "acceptance_criteria": [
+          "/inquiries/new 제목이 배경과 WCAG AA(4.5:1) 이상 대비로 보인다",
+          "'문의 접수하기' 버튼에 채워진 배경색이 계산된다(투명 아님)",
+          "빈 폼 제출 시 오류 문구가 한국어로 나온다(이름·이메일·문의 내용·문의 유형)",
+          "데스크톱·모바일 스크린샷으로 확인"
+        ],
+        "recommendation": {
+          "verdict": "FIX",
+          "reason": "문의 접수는 매출 입구인데 제목·버튼이 안 보이고 오류가 영어라 이탈 위험",
+          "risk": "뷰 클래스·로케일만 바꾸는 범위 — 데이터 영향 없음",
+          "effort": "S",
+          "by": "user-test-nightly",
+          "at": "2026-11-24T17:23:54Z"
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T17:23:56.478Z",
+            "by": "auto",
+            "reason": "「[사용자 테스트] 문의하기(/inquiries/new) 제목이 배경에 묻히고 '문의 접수하기' 버튼에 배경이 없으며 오류 문구가 영어로 나옴」은 P1 사용자 영향 결함이므로 우선 해결이 필요합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T17:23:56.478Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      }
+    },
+    {
+      "id": "ISS-503",
+      "type": "FIX_BUG",
+      "priority": "P1",
+      "status": "READY",
+      "assign_to": "codex",
+      "origin": "user-test",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": null,
+      "depends_on": [],
+      "created_at": "2026-11-24T17:23:54Z",
+      "updated_at": "2026-11-24T17:23:56.478Z",
+      "title": "[사용자 테스트] 상단 메뉴 '예시'와 첫 화면 '예시 먼저 보기'가 고정 주소 /choi-pd 로 가서 404",
+      "description": "impd 레이아웃 상단 메뉴의 '예시'(app/views/layouts/impd.html.erb:214)와 첫 화면 하단 CTA '예시 먼저 보기'(app/views/chopd/home/index.html.erb:369)가 회원 slug 'choi-pd' 를 고정으로 쓴다. 그 회원이 없는 환경에서는 Routing Error 404. 같은 첫 화면의 '예시 보기' 버튼(index.html.erb:90)은 @featured_members 첫 회원으로 대체하는 방식이라 정상 동작한다(/na-seolgye).",
+      "payload": {
+        "origin": "user-test",
+        "holdout_id": null,
+        "manual_check_id": "manual:home-example-link-404",
+        "judge_note": "숨긴 시나리오 판정 없음(판정 스크립트가 ship-guard 훅에 막혀 실행 안 됨 — exit 3 과 같이 처리, 브라우저 직접 사용 점검)",
+        "observations": [
+          {
+            "at": "2026-11-24T17:23:54Z",
+            "by": "user-test-nightly",
+            "url": "http://127.0.0.1:3008",
+            "observed": [
+              "첫 화면 내부 링크 59개 확인 중 '/choi-pd' 1개만 404 — 상단 메뉴 '예시'(nav 2곳: 데스크톱·모바일)와 섹션 CTA '예시 먼저 보기'",
+              "GET /choi-pd → 404 'Routing Error / Not Found'(public_profile_controller)",
+              "같은 화면 '예시 보기' 버튼은 /na-seolgye 로 정상 이동 — 대체 로직이 한쪽에만 있음",
+              "로컬 DB 기준 관찰. 운영에 choi-pd 회원이 있으면 운영에선 안 보일 수 있으나, 그 회원이 비공개·삭제되면 같은 404"
+            ]
+          }
+        ],
+        "files": [
+          "app/views/layouts/impd.html.erb",
+          "app/views/chopd/home/index.html.erb"
+        ],
+        "acceptance_criteria": [
+          "상단 메뉴 '예시'와 '예시 먼저 보기'가 존재하는 공개 회원 페이지로 이동한다(choi-pd 없으면 '예시 보기'와 같은 대체 규칙)",
+          "첫 화면에서 나가는 내부 링크 중 404 가 0개",
+          "관련 요청 테스트 1건 추가"
+        ],
+        "recommendation": {
+          "verdict": "FIX",
+          "reason": "모든 impd 화면 상단 메뉴에 걸린 링크라 첫 방문자가 '예시'를 누르면 바로 오류 화면을 봄",
+          "risk": "이미 있는 대체 로직을 재사용하는 작은 변경",
+          "effort": "S",
+          "by": "user-test-nightly",
+          "at": "2026-11-24T17:23:54Z"
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T17:23:56.478Z",
+            "by": "auto",
+            "reason": "「[사용자 테스트] 상단 메뉴 '예시'와 첫 화면 '예시 먼저 보기'가 고정 주소 /choi-pd 로 가서 404」은 P1 사용자 영향 결함이므로 우선 해결이 필요합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T17:23:56.478Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      }
     }
   ],
   "hooks": {
@@ -7632,14 +7759,32 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 198,
+        "timestamp": "2026-11-24T22:05:50.675562",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (ux-harness, brand-guardian, test-harness, domain-analyst, agent-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
   "stats": {
-    "total_issues": 501,
+    "total_issues": 503,
     "completed": 27,
     "failed": 0,
-    "evolved": 197
+    "evolved": 198
   },
   "pending_opportunity_signals": [
     {
