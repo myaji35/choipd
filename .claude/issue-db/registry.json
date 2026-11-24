@@ -6787,6 +6787,24 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 155,
+        "timestamp": "2026-11-24T21:52:40.461858",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (agent-harness, domain-analyst, test-harness, ux-harness, brand-guardian)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
@@ -6794,7 +6812,7 @@
     "total_issues": 501,
     "completed": 27,
     "failed": 0,
-    "evolved": 154
+    "evolved": 155
   },
   "pending_opportunity_signals": [
     {
