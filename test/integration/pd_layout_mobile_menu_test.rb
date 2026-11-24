@@ -18,6 +18,15 @@ class PdLayoutMobileMenuTest < ActionDispatch::IntegrationTest
     assert_select 'aside#pd-navigation button.pd-menu-close[aria-label="메뉴 닫기"][data-action="impd-nav#close"]'
     assert_select ".pd-backdrop[hidden]"
 
+    assert_select ".pd-mobile-links a.text-gray-500[href=?][target='_blank'][rel='noopener']", root_path, count: 1 do
+      assert_select "i.lni.lni-globe-1", count: 1
+      assert_select "span", text: "공개 사이트 보기"
+    end
+    assert_select ".pd-mobile-links a.text-gray-500[href=?]", admin_root_path, count: 1 do
+      assert_select "i.lni.lni-shield-2", count: 1
+      assert_select "span", text: "Admin"
+    end
+
     assert_includes response.body, "@media (max-width: 767px)"
     assert_includes response.body, "[data-pd-menu] { transform: translateX(-100%)"
     assert_includes response.body, ".pd-main.ml-60 { margin-left: 0; }"
