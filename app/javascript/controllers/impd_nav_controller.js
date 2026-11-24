@@ -8,7 +8,10 @@ export default class extends Controller {
   }
 
   close() {
+    if (this.panelTarget.hidden) return
+
     this.setOpen(false)
+    this.buttonTarget.focus()
   }
 
   closeOnLink(event) {
