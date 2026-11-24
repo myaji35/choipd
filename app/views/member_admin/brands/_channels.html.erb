@@ -1,0 +1,21 @@
+<section style="margin-top: 16px;">
+  <h4>브랜드 채널</h4>
+  <% if brand.brand_channels.empty? %>
+    <p>등록된 채널이 없습니다.</p>
+  <% else %>
+    <ul>
+      <% brand.brand_channels.each do |channel| %>
+        <li style="margin-top: 12px;">
+          <strong><%= BrandChannel::PLATFORMS.fetch(channel.platform) %></strong>
+          <%= channel.account_handle %>
+          <p><%= BrandChannel::SESSION_STATUSES.fetch(channel.session_status) %> · 운영 위탁 <%= channel.delegated? ? "동의함" : "동의 안 함" %></p>
+          <% if (url = http_url(channel.profile_url)) %>
+            <p><%= link_to url, url, style: "color: var(--impd-accent); text-decoration: underline;" %></p>
+          <% end %>
+          <%= link_to "채널 수정", edit_slug_admin_brand_brand_channel_path(slug: @member.slug, id: channel.id),
+              class: "impd-btn impd-btn-secondary" %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>

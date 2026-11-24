@@ -197,7 +197,9 @@ Rails.application.routes.draw do
       member { post :resend }
     end
     resources :courses
-    resources :brands
+    resources :brands do
+      resources :brand_channels, only: [ :new, :create, :edit, :update, :destroy ]
+    end
     resources :posts
     resources :works
     resources :inquiries,    only: [ :index, :show, :update ]
@@ -327,7 +329,9 @@ Rails.application.routes.draw do
       end
       resources :faqs, controller: "faqs", only: [ :index, :create, :update, :destroy ]
       resources :bookings, only: [ :index, :create, :update, :destroy ]
-      resource :brand, only: [ :show ]
+      resource :brand, only: [ :show ] do
+        resources :brand_channels, path: "channels", only: [ :edit, :update ]
+      end
       resource :brand_consents, path: "consents", only: [ :show, :update ]
       resources :sns_accounts, only: [ :index, :create, :update, :destroy ] do
         resources :follower_snapshots, controller: "sns_follower_snapshots", only: [ :create ]

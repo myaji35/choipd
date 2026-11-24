@@ -5,7 +5,17 @@
   <h2 style="margin-bottom: 12px;">브랜드</h2>
   <% if @brands.empty? %><div class="impd-card">아직 등록된 브랜드가 없어요.</div><% end %>
   <div style="display: grid; gap: 12px;">
-    <% @brands.each do |brand| %><article class="impd-card"><h3><%= brand.name %></h3><p style="margin-top: 8px;"><%= [['업종', brand.business_type], ['지역', brand.region]].filter_map { |label, value| "#{label}: #{value}" if value.present? }.join(' · ') %></p><p style="margin-top: 8px; white-space: pre-line;"><%= brand.description %></p><% if (url = http_url(brand.website_url)) %><p style="margin-top: 8px;"><%= link_to url, url, target: '_blank', rel: 'noopener', style: 'color: var(--impd-accent); text-decoration: underline;' %></p><% end %></article><% end %>
+    <% @brands.each do |brand| %>
+      <article class="impd-card">
+        <h3><%= brand.name %></h3>
+        <p style="margin-top: 8px;"><%= [['업종', brand.business_type], ['지역', brand.region]].filter_map { |label, value| "#{label}: #{value}" if value.present? }.join(' · ') %></p>
+        <p style="margin-top: 8px; white-space: pre-line;"><%= brand.description %></p>
+        <% if (url = http_url(brand.website_url)) %>
+          <p style="margin-top: 8px;"><%= link_to url, url, target: '_blank', rel: 'noopener', style: 'color: var(--impd-accent); text-decoration: underline;' %></p>
+        <% end %>
+        <%= render "channels", brand: brand if @show_brand_channels %>
+      </article>
+    <% end %>
   </div>
   <% if @brands.empty? %><p style="margin: 16px 0 32px;">브랜드는 운영팀이 등록을 도와드려요 — <%= link_to '문의하기', new_inquiry_path, style: 'color: var(--impd-accent); text-decoration: underline;' %></p><% end %>
   <section class="impd-card" style="margin:32px 0;">

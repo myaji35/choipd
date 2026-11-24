@@ -1,0 +1,64 @@
+<% content_for :title, @brand.name %>
+
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <%= link_to "브랜드 목록", admin_brands_path, class: "text-sm text-primary" %>
+    <h1 class="text-2xl font-bold text-navy"><%= @brand.name %></h1>
+  </div>
+  <%= link_to "브랜드 수정", edit_admin_brand_path(@brand), class: "text-sm text-primary" %>
+</div>
+
+<section class="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-bold text-navy">브랜드 채널</h2>
+    <%= link_to "채널 추가", new_admin_brand_brand_channel_path(@brand),
+        class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium" %>
+  </div>
+  <% if @brand_channels.empty? %>
+    <p class="text-sm text-gray-500">등록된 채널이 없습니다.</p>
+  <% else %>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-gray-50">
+          <tr>
+            <% ["채널", "계정", "연결 방식", "연결 상태", "운영 위탁", "게시 주기", "관리"].each do |label| %>
+              <th scope="col" class="px-4 py-3"><%= label %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody class="divide-y">
+          <% @brand_channels.each do |channel| %>
+            <tr>
+              <td class="px-4 py-3"><%= BrandChannel::PLATFORMS.fetch(channel.platform) %></td>
+              <td class="px-4 py-3">
+                <% if (url = http_url(channel.profile_url)) %>
+                  <%= link_to channel.account_handle.presence || "채널 열기", url, class: "text-primary underline" %>
+                <% else %>
+                  <%= channel.account_handle.presence || "—" %>
+                <% end %>
+              </td>
+              <td class="px-4 py-3"><%= BrandChannel::CONNECTION_METHODS.fetch(channel.connection_method) %></td>
+              <td class="px-4 py-3">
+                <% label = BrandChannel::SESSION_STATUSES.fetch(channel.session_status) %>
+                <% if channel.session_status.in?(%w[logged_out error]) %>
+                  <span class="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700"><%= label %></span>
+                <% else %>
+                  <%= label %>
+                <% end %>
+              </td>
+              <td class="px-4 py-3"><%= channel.delegated? ? "동의함" : "동의 안 함" %></td>
+              <td class="px-4 py-3"><%= channel.posting_cadence.presence || "—" %></td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <%= link_to "수정", edit_admin_brand_brand_channel_path(@brand, channel), class: "text-primary" %>
+                  <%= button_to "삭제", admin_brand_brand_channel_path(@brand, channel), method: :delete,
+                      class: "text-red-600", form: { data: { turbo_confirm: "채널을 삭제하시겠습니까?" } } %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</section>

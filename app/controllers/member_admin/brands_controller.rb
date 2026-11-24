@@ -13,5 +13,7 @@ class MemberAdmin::BrandsController < MemberAdmin::BaseController
     @month_sns_posts = SnsPostHistory.joins(:sns_scheduled_post).where(status: "success", sns_scheduled_posts: { member_id: @member.id }, created_at: month).count
     @consented = ProConsent.has_consent?(owner_id: @member.id, type: "socialdoctors_exposure")
     @brands = Brand.where(member_id: @member.id).order(:name)
+    @show_brand_channels = current_member&.id == @member.id
+    @brands = @brands.includes(:brand_channels) if @show_brand_channels
   end
 end

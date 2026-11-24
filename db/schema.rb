@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_19_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_000000) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -169,6 +169,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_000000) do
     t.text "workflow_template", null: false
     t.index ["category"], name: "index_automation_templates_on_category"
     t.index ["tenant_id"], name: "index_automation_templates_on_tenant_id"
+  end
+
+  create_table "brand_channels", force: :cascade do |t|
+    t.integer "brand_id", null: false
+    t.integer "tenant_id", default: 1, null: false
+    t.string "platform", null: false
+    t.string "account_handle"
+    t.string "profile_url"
+    t.string "connection_method", null: false
+    t.string "credential_ref", limit: 64
+    t.bigint "sns_account_id"
+    t.bigint "profile_account_id"
+    t.datetime "delegation_consent_at"
+    t.string "session_status", default: "unknown", null: false
+    t.datetime "last_checked_at"
+    t.text "last_error"
+    t.string "posting_cadence"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand_id", "platform", "account_handle"], name: "idx_on_brand_id_platform_account_handle_9bbbe91828"
+    t.index ["brand_id"], name: "index_brand_channels_on_brand_id"
   end
 
   create_table "brands", force: :cascade do |t|
@@ -978,21 +1000,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_000000) do
   end
 
   create_table "profile_accounts", force: :cascade do |t|
-    t.string "auth_status"
-    t.datetime "created_at", null: false
-    t.string "display_name"
+    t.integer "tenant_id", default: 1, null: false
+    t.integer "member_id"
+    t.string "platform", null: false
+    t.string "login_id"
     t.string "external_id"
+    t.string "display_name"
     t.string "headline"
-    t.boolean "is_active", default: true, null: false
+    t.string "profile_url"
+    t.string "auth_status"
+    t.string "session_status", default: "unknown", null: false
     t.datetime "last_checked_at"
     t.text "last_error"
-    t.string "login_id"
-    t.integer "member_id"
+    t.boolean "is_active", default: true, null: false
     t.text "notes"
-    t.string "platform", null: false
-    t.string "profile_url"
-    t.string "session_status", default: "unknown", null: false
-    t.integer "tenant_id", default: 1, null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["member_id"], name: "index_profile_accounts_on_member_id"
     t.index ["tenant_id", "platform", "external_id"], name: "idx_on_tenant_id_platform_external_id_cd4e0e5117", unique: true
@@ -1000,12 +1022,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_000000) do
   end
 
   create_table "profile_snapshots", force: :cascade do |t|
-    t.datetime "captured_at", null: false
-    t.datetime "created_at", null: false
-    t.text "data"
     t.integer "profile_account_id", null: false
-    t.string "source", default: "ego", null: false
     t.integer "tenant_id", default: 1, null: false
+    t.datetime "captured_at", null: false
+    t.string "source", default: "ego", null: false
+    t.text "data"
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["profile_account_id", "captured_at"], name: "index_profile_snapshots_on_profile_account_id_and_captured_at"
   end
@@ -1227,6 +1249,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_000000) do
   add_foreign_key "ab_test_participants", "ab_tests", on_delete: :cascade
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "brand_channels", "brands"
   add_foreign_key "cohort_users", "cohorts", on_delete: :cascade
   add_foreign_key "distributor_activity_logs", "distributors"
   add_foreign_key "enrollments", "courses", on_delete: :cascade

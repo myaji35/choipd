@@ -36,7 +36,7 @@
         <% end %>
         <div class="p-4">
           <div class="flex items-start justify-between mb-2">
-            <h3 class="font-bold text-navy line-clamp-1"><%= brand.name %></h3>
+            <h3 class="font-bold text-navy line-clamp-1"><%= link_to brand.name, admin_brand_path(brand) %></h3>
             <% if brand.published? %>
               <span class="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded shrink-0">공개</span>
             <% else %>
@@ -102,7 +102,7 @@
                   <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs"><%= lni_icon "bookmark-1" %></div>
                 <% end %>
                 <div>
-                  <span class="font-medium text-navy block"><%= brand.name %></span>
+                  <span class="font-medium text-navy block"><%= link_to brand.name, admin_brand_path(brand) %></span>
                   <span class="text-xs text-gray-400 line-clamp-1"><%= brand.description %></span>
                 </div>
               </div>

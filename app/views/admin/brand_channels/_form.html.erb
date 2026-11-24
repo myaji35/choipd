@@ -1,0 +1,69 @@
+<% content_for :title, title %>
+<h1 class="text-2xl font-bold text-navy mb-4"><%= title %></h1>
+<p class="text-sm text-gray-500 mb-4"><%= @brand.name %></p>
+
+<%= form_with model: [:admin, @brand, @brand_channel], class: "bg-white rounded-lg border border-gray-200 p-4 space-y-4" do |f| %>
+  <% if @brand_channel.errors.any? %>
+    <ul role="alert" class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+      <% @brand_channel.errors.each do |error| %>
+        <li><%= error.message %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <% input_class = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+  <div>
+    <%= f.label :platform, "채널 종류" %>
+    <%= f.select :platform, BrandChannel::PLATFORMS.invert.to_a, { include_blank: "선택해 주세요" }, class: input_class, required: true %>
+  </div>
+  <div>
+    <%= f.label :account_handle, "계정 핸들" %>
+    <%= f.text_field :account_handle, class: input_class %>
+  </div>
+  <div>
+    <%= f.label :profile_url, "채널 주소" %>
+    <%= f.url_field :profile_url, class: input_class %>
+  </div>
+  <div>
+    <%= f.label :connection_method, "연결 방식" %>
+    <%= f.select :connection_method, BrandChannel::CONNECTION_METHODS.invert.to_a,
+        { include_blank: @brand_channel.new_record? ? "채널별 기본값" : false }, class: input_class %>
+  </div>
+  <div>
+    <%= f.label :credential_ref, "보관 위치 이름표" %>
+    <%= f.text_field :credential_ref, maxlength: 64, pattern: "[A-Za-z0-9_.\\-]+", autocomplete: "off", class: input_class %>
+    <p class="text-xs text-gray-500 mt-1">키체인 항목의 이름만 입력해 주세요. 예시 impd-brand-<%= @brand.id %>-naver_blog</p>
+  </div>
+  <div>
+    <%= f.label :sns_account_id, "연결할 SNS 계정 ID" %>
+    <%= f.number_field :sns_account_id, min: 1, class: input_class %>
+  </div>
+  <div>
+    <%= f.label :profile_account_id, "연결할 인물정보 계정 ID" %>
+    <%= f.number_field :profile_account_id, min: 1, class: input_class %>
+  </div>
+  <div>
+    <%= f.label :session_status, "연결 상태" %>
+    <%= f.select :session_status, BrandChannel::SESSION_STATUSES.invert.to_a, {}, class: input_class %>
+  </div>
+  <div>
+    <%= f.label :last_checked_at, "마지막 점검 시각" %>
+    <%= f.datetime_local_field :last_checked_at, class: input_class %>
+  </div>
+  <div>
+    <%= f.label :last_error, "마지막 오류" %>
+    <%= f.text_area :last_error, rows: 2, class: input_class %>
+  </div>
+  <div>
+    <%= f.label :posting_cadence, "게시 주기" %>
+    <%= f.text_field :posting_cadence, class: input_class %>
+  </div>
+  <div>
+    <%= f.label :notes, "메모" %>
+    <%= f.text_area :notes, rows: 3, class: input_class %>
+  </div>
+  <div class="flex items-center gap-3">
+    <%= f.submit "저장", class: "bg-primary text-white px-4 py-2 rounded-lg cursor-pointer" %>
+    <%= link_to "취소", admin_brand_path(@brand), class: "text-sm text-primary" %>
+  </div>
+<% end %>

@@ -208,7 +208,7 @@ class Member < ApplicationRecord
     return false unless updated == 1
 
     self.profile_image = image
-    clear_attribute_changes([:profile_image])
+    clear_attribute_changes([ :profile_image ])
     true
   end
 

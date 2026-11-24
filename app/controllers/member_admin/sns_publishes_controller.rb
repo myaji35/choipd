@@ -17,21 +17,25 @@ class MemberAdmin::SnsPublishesController < MemberAdmin::BaseController
       return
     end
 
-    link = params[:link].presence
-    result = FacebookOauth.publish_to_page(
-      page_id: account.external_id,
-      page_access_token: account.access_token,
-      message: message,
-      link: link
-    )
-
-    scheduled_post = @member.sns_scheduled_posts.create!(
+    scheduled_post = @member.sns_scheduled_posts.build(
       sns_account: account,
       message: message,
       platform: "facebook",
-      scheduled_at: Time.current,
-      status: result[:success] ? "published" : "failed"
+      scheduled_at: Time.current
     )
+    unless scheduled_post.valid?
+      redirect_to sns_accounts_path, alert: scheduled_post.errors.full_messages.join(", ")
+      return
+    end
+
+    result = FacebookOauth.publish_to_page(
+      page_id: account.external_id,
+      page_access_token: account.access_token,
+      link: params[:link].presence,
+      message: message
+    )
+
+    scheduled_post.update!(status: result[:success] ? "published" : "failed")
     scheduled_post.sns_post_histories.create!(
       action: "publish",
       status: result[:success] ? "success" : "failed",
