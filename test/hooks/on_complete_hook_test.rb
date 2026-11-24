@@ -9,8 +9,8 @@ class OnCompleteHookTest < ActiveSupport::TestCase
     criterion = 'a "따옴표" b'
     output = '{"k":"v"} 경로 C:\\tmp'
     registry = run_hook("DESIGN_FIX", {
-      "criteria_check" => [{ "criterion" => criterion, "met" => true }],
-      "proof" => [{ "cmd" => "x", "output" => output }]
+      "criteria_check" => [ { "criterion" => criterion, "met" => true } ],
+      "proof" => [ { "cmd" => "x", "output" => output } ]
     })
 
     result = registry.fetch("issues").find { |issue| issue.fetch("id") == "ISS-1" }.fetch("result")
@@ -22,17 +22,17 @@ class OnCompleteHookTest < ActiveSupport::TestCase
   test "does not create derivative issues when the fix is already complete" do
     registry = run_hook("DESIGN_FIX", { "resolution" => "already_fixed" })
 
-    assert_equal ["ISS-1"], registry.fetch("issues").map { |issue| issue.fetch("id") }
+    assert_equal [ "ISS-1" ], registry.fetch("issues").map { |issue| issue.fetch("id") }
   end
 
   test "does not create derivative issues when skip_derivatives is empty and the fix is already complete" do
     registry = run_hook("DESIGN_FIX", { "skip_derivatives" => "", "resolution" => "already_fixed" })
 
-    assert_equal ["ISS-1"], registry.fetch("issues").map { |issue| issue.fetch("id") }
+    assert_equal [ "ISS-1" ], registry.fetch("issues").map { |issue| issue.fetch("id") }
   end
 
   test "creates test and domain analysis issues for a design fix" do
-    registry = run_hook("DESIGN_FIX", { "files_modified" => ["app/views/x.html.erb"] })
+    registry = run_hook("DESIGN_FIX", { "files_modified" => [ "app/views/x.html.erb" ] })
 
     derivatives = registry.fetch("issues").select { |issue| issue["parent_id"] == "ISS-1" }
     types = derivatives.map { |issue| issue.fetch("type") }
@@ -50,21 +50,21 @@ class OnCompleteHookTest < ActiveSupport::TestCase
     Dir.mktmpdir do |tmp|
       registry_path = File.join(tmp, ".claude/issue-db/registry.json")
       hooks_path = File.join(tmp, ".claude/hooks")
-      FileUtils.mkdir_p([File.dirname(registry_path), hooks_path])
+      FileUtils.mkdir_p([ File.dirname(registry_path), hooks_path ])
       FileUtils.cp(Rails.root.join(".claude/hooks/on_complete.sh"), hooks_path)
       dispatch_path = File.join(hooks_path, "dispatch-ready.sh")
       File.write(dispatch_path, "#!/bin/bash\nexit 0\n")
       File.chmod(0o755, dispatch_path)
       File.write(registry_path, JSON.generate({
         stats: { total_issues: 1 },
-        issues: [{
+        issues: [ {
           id: "ISS-1",
           type: issue_type,
           status: "IN_PROGRESS",
           priority: "P1",
           title: "t",
-          payload: { files: ["app/views/x.html.erb"] }
-        }]
+          payload: { files: [ "app/views/x.html.erb" ] }
+        } ]
       }))
 
       output, status = Open3.capture2e("bash", ".claude/hooks/on_complete.sh", "ISS-1", issue_type, JSON.generate(result), chdir: tmp)
