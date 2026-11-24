@@ -97,9 +97,11 @@
               <%= lni_icon "globe-1", class: "w-4 h-4" %>
               <span>공개 사이트 보기</span>
             <% end %>
-            <%= link_to admin_root_path, class: "flex items-center space-x-2 px-3 py-2 rounded text-sm transition-colors text-gray-500 hover:text-navy hover:bg-gray-50" do %>
-              <%= lni_icon "shield-2", class: "w-4 h-4" %>
-              <span>Admin</span>
+            <% if current_admin_user&.admin? %>
+              <%= link_to admin_root_path, class: "flex items-center space-x-2 px-3 py-2 rounded text-sm transition-colors text-gray-500 hover:text-navy hover:bg-gray-50" do %>
+                <%= lni_icon "shield-2", class: "w-4 h-4" %>
+                <span>Admin</span>
+              <% end %>
             <% end %>
           </div>
           <%= link_to destroy_admin_user_session_path, data: { turbo_method: :delete },
@@ -115,13 +117,18 @@
     <div class="pd-main ml-60 flex-1 flex flex-col min-h-screen min-w-0">
       <header class="bg-white border-b px-6 py-3 flex items-center justify-between sticky top-0 z-30">
         <button type="button" class="pd-menu-button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="pd-navigation" data-impd-nav-target="button" data-action="impd-nav#toggle"><span data-impd-nav-target="menuIcon"><%= lni_icon "menu-hamburger-1" %></span><span data-impd-nav-target="closeIcon" hidden><%= lni_icon "xmark" %></span></button>
-        <span class="pd-header-title text-sm font-semibold text-gray-700"><%= content_for?(:title) ? yield(:title) : "대시보드" %></span>
+        <div class="flex min-w-0 items-center gap-2">
+          <span class="pd-header-title text-sm font-semibold text-gray-700"><%= content_for?(:title) ? yield(:title) : "대시보드" %></span>
+          <span class="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-navy">PD</span>
+        </div>
         <div class="pd-header-links flex items-center space-x-3">
           <%= link_to root_path, target: "_blank", class: "text-xs text-gray-500 hover:text-primary" do %>
             공개 사이트 보기
           <% end %>
-          <%= link_to admin_root_path, class: "text-xs text-gray-500 hover:text-primary" do %>
-            Admin
+          <% if current_admin_user&.admin? %>
+            <%= link_to admin_root_path, class: "text-xs text-gray-500 hover:text-primary" do %>
+              Admin
+            <% end %>
           <% end %>
         </div>
       </header>

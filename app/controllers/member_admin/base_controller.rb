@@ -23,6 +23,11 @@ class MemberAdmin::BaseController < ApplicationController
     request.env["warden"]
   end
 
+  def impersonating_admin_user
+    warden.user(:admin_user) if @member && session[:member_id] != @member.id
+  end
+  helper_method :impersonating_admin_user
+
   def current_member
     @current_member ||= Member.find_by(id: session[:member_id])
   end

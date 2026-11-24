@@ -41,7 +41,10 @@
   <body>
     <a class="skip-link" href="#main-content">본문 바로가기</a>
     <style>
-      .admin-nav { position: sticky; top: 0; z-index: 20; background: var(--impd-paper); border-bottom: 1px solid var(--impd-rule); }
+      .admin-header { position: sticky; top: 0; z-index: 20; }
+      .admin-impersonation-banner { padding: 10px 18px; background: var(--impd-ink); color: var(--impd-paper); font-size: 13px; line-height: 1.5; }
+      .admin-impersonation-banner a { display: inline-block; font-weight: 700; text-decoration: underline; }
+      .admin-nav { background: var(--impd-paper); border-bottom: 1px solid var(--impd-rule); }
       .admin-nav-bar { padding: 14px 40px; display: flex; align-items: center; gap: 24px; }
       .admin-nav-links { display: flex; align-items: center; gap: 22px; flex: 1; }
       .admin-nav-link { font-size: 13px; color: var(--impd-muted); padding: 8px 0; border-bottom: 2px solid transparent; }
@@ -67,33 +70,57 @@
         ["노출·광고 동의", slug_admin_brand_consents_path(slug: @member.slug), controller_path == "member_admin/brand_consents"]
       ] %>
     <% end %>
-    <nav class="admin-nav" data-controller="impd-nav" aria-label="회원 관리 메뉴">
-      <div class="admin-nav-bar">
-        <%= link_to "imPD.", (@member ? slug_admin_dashboard_path(slug: @member.slug) : root_path), style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 20px;" %>
+    <% acting_user = impersonating_admin_user %>
+    <header class="admin-header">
+      <% if acting_user %>
+        <div class="admin-impersonation-banner">
+          <%= acting_user.admin? ? "운영자" : "PD" %> 권한으로 <%= @member.name %>님(/<%= @member.slug %>) 관리 화면을 보고 있습니다. 여기서 바꾼 내용은 회원 페이지에 바로 반영됩니다.
+          <% if acting_user.admin? %>
+            <%= link_to "운영자 화면으로 돌아가기", admin_member_path(@member) %>
+          <% else %>
+            <%= link_to "PD 대시보드로 돌아가기", pd_root_path %>
+          <% end %>
+        </div>
+      <% end %>
+      <nav class="admin-nav" data-controller="impd-nav" aria-label="회원 관리 메뉴">
+        <div class="admin-nav-bar">
+          <%= link_to "imPD.", (@member ? slug_admin_dashboard_path(slug: @member.slug) : root_path), style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 20px;" %>
+          <% if @member %>
+            <div class="admin-nav-links">
+              <% nav_items.each do |label, path, active| %>
+                <%= link_to label, path, class: "admin-nav-link", aria: { current: ("page" if active) } %>
+              <% end %>
+              <%= link_to "/#{@member.slug}", target: "_blank", rel: "noopener", class: "admin-nav-link" do %>내 페이지 보기 <%= lni_icon "arrow-angular-top-right" %><% end %>
+            </div>
+            <div class="admin-identity">
+              <span><%= @member.name %>님</span>
+              <% if acting_user %>
+                <span class="impd-label">대리 접속</span>
+              <% else %>
+                <span class="admin-email"><%= @member.email %></span>
+              <% end %>
+            </div>
+            <% unless acting_user %>
+              <div class="admin-logout"><%= button_to "로그아웃", logout_member_path(slug: @member.slug), method: :delete, class: "impd-btn impd-btn-secondary", style: "height: 32px; padding: 0 12px; font-size: 12px;" %></div>
+            <% end %>
+            <button type="button" class="admin-menu-button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="admin-mobile-menu" data-impd-nav-target="button" data-action="impd-nav#toggle">
+              <span data-impd-nav-target="menuIcon"><%= lni_icon "menu-hamburger-1" %></span><span data-impd-nav-target="closeIcon" hidden><%= lni_icon "xmark" %></span>
+            </button>
+          <% end %>
+        </div>
         <% if @member %>
-          <div class="admin-nav-links">
+          <div id="admin-mobile-menu" class="admin-mobile-panel" data-impd-nav-target="panel" data-action="click->impd-nav#closeOnLink" hidden>
             <% nav_items.each do |label, path, active| %>
               <%= link_to label, path, class: "admin-nav-link", aria: { current: ("page" if active) } %>
             <% end %>
             <%= link_to "/#{@member.slug}", target: "_blank", rel: "noopener", class: "admin-nav-link" do %>내 페이지 보기 <%= lni_icon "arrow-angular-top-right" %><% end %>
+            <% unless acting_user %>
+              <%= button_to "로그아웃", logout_member_path(slug: @member.slug), method: :delete, class: "impd-btn impd-btn-secondary" %>
+            <% end %>
           </div>
-          <div class="admin-identity"><span><%= @member.name %>님</span><span class="admin-email"><%= @member.email %></span></div>
-          <div class="admin-logout"><%= button_to "로그아웃", logout_member_path(slug: @member.slug), method: :delete, class: "impd-btn impd-btn-secondary", style: "height: 32px; padding: 0 12px; font-size: 12px;" %></div>
-          <button type="button" class="admin-menu-button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="admin-mobile-menu" data-impd-nav-target="button" data-action="impd-nav#toggle">
-            <span data-impd-nav-target="menuIcon"><%= lni_icon "menu-hamburger-1" %></span><span data-impd-nav-target="closeIcon" hidden><%= lni_icon "xmark" %></span>
-          </button>
         <% end %>
-      </div>
-      <% if @member %>
-        <div id="admin-mobile-menu" class="admin-mobile-panel" data-impd-nav-target="panel" data-action="click->impd-nav#closeOnLink" hidden>
-          <% nav_items.each do |label, path, active| %>
-            <%= link_to label, path, class: "admin-nav-link", aria: { current: ("page" if active) } %>
-          <% end %>
-          <%= link_to "/#{@member.slug}", target: "_blank", rel: "noopener", class: "admin-nav-link" do %>내 페이지 보기 <%= lni_icon "arrow-angular-top-right" %><% end %>
-          <%= button_to "로그아웃", logout_member_path(slug: @member.slug), method: :delete, class: "impd-btn impd-btn-secondary" %>
-        </div>
-      <% end %>
-    </nav>
+      </nav>
+    </header>
 
     <%= render "shared/flash" %>
 

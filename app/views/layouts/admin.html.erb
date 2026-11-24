@@ -43,24 +43,32 @@
             테이블·컨트롤러·라우트는 보존 중이므로 /admin/distributors 로 직접 접근은 가능.
             복구가 필요하면 이 주석을 풀면 된다. (2026-08-10) %>
         <%#= render "layouts/admin_nav_item", icon: "users", label: "추천 회원 관리", path: admin_distributors_path %>
+
+        <h2 class="text-[11px] uppercase tracking-wide text-white/40 px-3 pt-4 pb-1">회원</h2>
+        <%= render "layouts/admin_nav_item", icon: "user-check", label: "회원 관리(승인·정지)", path: admin_members_path %>
         <%= render "layouts/admin_nav_item", icon: "users", label: "추천 회원", path: admin_referrals_path %>
-        <%= render "layouts/admin_nav_item", icon: "user-check", label: "회원 관리", path: admin_members_path %>
-        <%= render "layouts/admin_nav_item", icon: "trello", label: "칸반 보드", path: admin_kanban_path %>
-        <%= render "layouts/admin_nav_item", icon: "book", label: "강좌 관리", path: admin_courses_path %>
-        <%= render "layouts/admin_nav_item", icon: "image", label: "브랜드 관리", path: admin_brands_path %>
-        <%= render "layouts/admin_nav_item", icon: "file-text", label: "게시글 관리", path: admin_posts_path %>
-        <%# 히어로 이미지는 회원별 콘텐츠 → /pd/hero-images(PD 대시보드)에서 관리 %>
         <%= render "layouts/admin_nav_item", icon: "folder", label: "추천 회원 자료", path: admin_resources_path %>
+        <%= render "layouts/admin_nav_item", icon: "star", label: "회원 Pro 구독", path: admin_pro_subscriptions_path %>
+        <%= render "layouts/admin_nav_item", icon: "message-circle", label: "카카오 인박스 (Pro)", path: admin_kakao_inbox_index_path %>
+
+        <h2 class="text-[11px] uppercase tracking-wide text-white/40 px-3 pt-4 pb-1">콘텐츠</h2>
+        <%= render "layouts/admin_nav_item", icon: "image", label: "브랜드 관리", path: admin_brands_path %>
+        <%# 히어로 이미지는 회원별 콘텐츠 → /pd/hero-images(PD 대시보드)에서 관리 %>
+        <%= render "layouts/admin_nav_item", icon: "file-text", label: "게시글 관리", path: admin_posts_path %>
+        <%= render "layouts/admin_nav_item", icon: "book", label: "강좌 관리", path: admin_courses_path %>
         <%= render "layouts/admin_nav_item", icon: "mail", label: "뉴스레터", path: admin_newsletter_index_path %>
         <%= render "layouts/admin_nav_item", icon: "message-square", label: "문의 관리", path: admin_inquiries_path %>
+
+        <h2 class="text-[11px] uppercase tracking-wide text-white/40 px-3 pt-4 pb-1">매출·분석</h2>
         <%= render "layouts/admin_nav_item", icon: "credit-card", label: "결제 내역", path: admin_payments_path %>
         <%= render "layouts/admin_nav_item", icon: "bar-chart-2", label: "분석", path: admin_analytics_path %>
+
+        <h2 class="text-[11px] uppercase tracking-wide text-white/40 px-3 pt-4 pb-1">업무·시스템</h2>
+        <%= render "layouts/admin_nav_item", icon: "trello", label: "칸반 보드", path: admin_kanban_path %>
         <%= render "layouts/admin_nav_item", icon: "zap", label: "자동화", path: admin_workflows_path %>
         <%= render "layouts/admin_nav_item", icon: "link", label: "외부 연동", path: admin_integrations_path %>
         <%= render "layouts/admin_nav_item", icon: "anchor", label: "웹훅", path: admin_webhooks_path %>
         <%= render "layouts/admin_nav_item", icon: "cpu", label: "AI 도구", path: admin_ai_path %>
-        <%= render "layouts/admin_nav_item", icon: "message-circle", label: "카카오 인박스 (Pro)", path: admin_kakao_inbox_index_path %>
-        <%= render "layouts/admin_nav_item", icon: "star", label: "Pro 구독", path: admin_pro_subscriptions_path %>
 
         <div class="pt-4 mt-4 border-t border-white/10">
           <%= link_to destroy_admin_user_session_path, method: :delete, data: { turbo_method: :delete },
@@ -85,9 +93,10 @@
           <% if current_admin_user&.personal_page? %>
             <%= link_to slug_admin_dashboard_path(slug: current_admin_user.member.slug), class: "text-xs text-gray-500 hover:text-primary flex items-center space-x-1" do %>
               <%= lni_icon "arrow-angular-top-right" %>
-              <span>내 페이지 관리</span>
+              <span>내 회원 페이지 관리</span>
             <% end %>
           <% end %>
+          <span class="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-navy">운영자</span>
           <span class="text-xs text-gray-500"><%= current_admin_user&.email %></span>
         </div>
       </header>

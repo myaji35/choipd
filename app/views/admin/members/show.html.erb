@@ -7,18 +7,25 @@
     <% if @member.slug.present? %>
       <p class="text-sm text-gray-500 mt-1">
         공개 URL: <%= link_to "/#{@member.slug}", "/#{@member.slug}", target: "_blank", rel: "noopener noreferrer", class: "text-primary hover:underline font-mono" %>
+        <% unless @member.status == "approved" %>
+          <span class="ml-2 rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">승인 전 비공개</span>
+        <% end %>
       </p>
+      <div class="mt-2 flex flex-wrap gap-2">
+        <%= link_to "/#{@member.slug}",
+            target: "_blank", rel: "noopener noreferrer",
+            title: "#{@member.name}님의 공개 페이지를 새 탭에서 열기",
+            class: "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-green-700 text-white text-sm font-semibold hover:bg-green-800 transition" do %>
+          <%= lni_icon "arrow-angular-top-right" %>
+          공개 페이지 보기 ↗
+        <% end %>
+        <%= link_to "회원 화면 열기 (운영자 권한)", slug_admin_dashboard_path(slug: @member.slug),
+            class: "inline-flex items-center px-3.5 py-2 rounded-full border border-gray-400 text-gray-800 text-sm font-semibold hover:bg-gray-900 hover:text-white transition" %>
+      </div>
     <% end %>
   </div>
   <div class="flex items-center gap-2 flex-wrap">
     <% if @member.slug.present? %>
-      <%= link_to "/#{@member.slug}",
-          target: "_blank", rel: "noopener noreferrer",
-          title: "#{@member.name}님의 공개 페이지를 새 탭에서 열기",
-          class: "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-green-700 text-white text-sm font-semibold hover:bg-green-800 transition" do %>
-        <%= lni_icon "arrow-angular-top-right" %>
-        공개 페이지 ↗
-      <% end %>
       <%= link_to "/#{@member.slug}/card",
           target: "_blank", rel: "noopener noreferrer",
           title: "명함 상세 페이지",
@@ -152,7 +159,7 @@
       <h2 class="font-semibold text-navy mb-4">상태</h2>
       <div class="mb-3">
         <% color = case @member.status; when 'approved' then 'green'; when 'pending_approval' then 'yellow'; when 'rejected' then 'red'; when 'suspended' then 'gray'; else 'gray'; end %>
-        <span class="text-sm px-3 py-1 rounded-full bg-<%= color %>-100 text-<%= color %>-700 font-semibold"><%= @member.status %></span>
+        <span class="text-sm px-3 py-1 rounded-full bg-<%= color %>-100 text-<%= color %>-700 font-semibold"><%= member_status_label(@member.status) %></span>
       </div>
       <% if @member.pending? %>
         <div class="space-y-2">
@@ -167,12 +174,12 @@
       <% end %>
     </div>
 
-    <!-- IMPD 검증 -->
+    <!-- IMPD 인증 -->
     <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
-      <h2 class="font-semibold text-navy mb-3 text-sm">IMPD 검증 (의지 필터)</h2>
+      <h2 class="font-semibold text-navy mb-3 text-sm">IMPD 인증</h2>
       <% icolor = case @member.impd_status; when 'completed' then 'green'; when 'in_progress' then 'blue'; when 'rejected' then 'red'; else 'gray'; end %>
       <div class="mb-2">
-        <span class="text-xs px-2 py-0.5 rounded bg-<%= icolor %>-100 text-<%= icolor %>-700"><%= @member.impd_status %></span>
+        <span class="text-xs px-2 py-0.5 rounded bg-<%= icolor %>-100 text-<%= icolor %>-700"><%= impd_status_label(@member.impd_status) %></span>
       </div>
       <% if @member.impd_started_at %>
         <p class="text-xs text-gray-500">시작: <%= @member.impd_started_at.strftime("%Y.%m.%d") %></p>
