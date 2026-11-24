@@ -38,4 +38,27 @@ class Api::Socialdoctors::ConsentedBrandsControllerTest < ActionDispatch::Integr
     item = response.parsed_body["brands"].find { |b| b["externalId"] == "m_#{@member.id}" }
     assert item["revokedAt"].present?
   end
+
+  test "excludes members without exposure consent" do
+    no_consent_member = Member.create!(name: "미동의 회원", email: "api-#{SecureRandom.hex(4)}@example.com", slug: "api-#{SecureRandom.hex(4)}", bio: "소개", social_links: '{"instagram":"https://example.com"}')
+    local_ads_member = Member.create!(name: "지역 광고 동의 회원", email: "api-#{SecureRandom.hex(4)}@example.com", slug: "api-#{SecureRandom.hex(4)}", bio: "소개", social_links: '{"instagram":"https://example.com"}')
+    ProConsent.create!(owner_id: local_ads_member.id, consent_type: "townin_local_ads", consented: true, consented_at: Time.current)
+
+    get "/api/socialdoctors/consented-brands", headers: { "X-Api-Key" => "test-key" }
+    assert_response :success
+    external_ids = response.parsed_body["brands"].pluck("externalId")
+    assert_not_includes external_ids, "m_#{no_consent_member.id}"
+    assert_not_includes external_ids, "m_#{local_ads_member.id}"
+    assert_includes external_ids, "m_#{@member.id}"
+  end
+
+  test "includes withdrawn members with withdrawnAt" do
+    @member.update_column(:withdrawn_at, Time.current)
+
+    get "/api/socialdoctors/consented-brands", headers: { "X-Api-Key" => "test-key" }
+    assert_response :success
+    item = response.parsed_body["brands"].find { |brand| brand["externalId"] == "m_#{@member.id}" }
+    assert item, "Expected the withdrawn member in brands"
+    assert item["withdrawnAt"].present?
+  end
 end
