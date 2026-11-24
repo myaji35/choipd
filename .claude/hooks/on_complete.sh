@@ -34,6 +34,12 @@ next_num = registry['stats']['total_issues'] + 1
 
 def add_issue(title, itype, priority, assign_to, payload=None):
     global next_num
+    # ISS-492: 재검증으로 같은 카드가 두 번 완료되면 분석 카드가 두 벌 생기던 문제
+    if itype not in ('RUN_TESTS', 'RETEST', 'SCORE', 'LINT_CHECK', 'TYPE_CHECK', 'REGRESSION_CHECK'):
+        for iss in registry['issues']:
+            if iss.get('title') == title and iss.get('parent_id') == issue_id:
+                print(f"[중복 건너뜀] {title} (기존 {iss['id']} {iss['status']})")
+                return
     # 중복 체크
     for iss in registry['issues']:
         if iss.get('title') == title and iss.get('status') in ('READY', 'IN_PROGRESS'):
