@@ -8,6 +8,63 @@
   <div class="flex gap-3"><%= link_to "수정", edit_pd_profile_account_path(@account), class: "text-primary text-sm" %><%= button_to "삭제", pd_profile_account_path(@account), method: :delete, class: "text-red-600 text-sm", data: { turbo_confirm: "삭제하시겠습니까?" } %></div>
   <% if @account.platform == "naver_people" && @latest_snapshot %>
     <% presenter = NaverPeople::Presenter.new(@latest_snapshot.data) %>
+    <% applications = NaverPeople::Applications.new(@latest_snapshot.data) %>
+    <% delegation = applications.delegation %>
+    <% if delegation[:expired] || delegation[:expiring] %>
+      <p class="border border-amber-300 bg-amber-50 rounded-lg p-4 text-sm font-semibold text-amber-900">
+        <% if delegation[:expired] %>
+          권한 위임이 끝났습니다 (<%= delegation[:end_on] %>). 본인참여 사이트에서 연장하세요.
+        <% else %>
+          권한 위임이 <%= delegation[:days_left] %>일 뒤(<%= delegation[:end_on] %>) 끝납니다. 본인참여 사이트에서 연장하세요.
+        <% end %>
+      </p>
+    <% end %>
+    <section class="border border-gray-100 rounded-lg p-4">
+      <h2 class="font-semibold text-navy">신청 내역</h2>
+      <% if applications.collected? %>
+        <% errors = applications.errors %>
+        <% [
+          ["ING", "진행 중", applications.in_progress, "진행 중인 신청이 없습니다."],
+          ["END", "완료", applications.completed, "완료된 신청이 없습니다."]
+        ].each do |status, label, entries, empty_message| %>
+          <% if errors.key?(status) %>
+            <h3 class="mt-3 text-sm font-medium"><%= label %></h3>
+            <p class="text-sm text-red-600">수집 오류: <%= errors[status] %></p>
+          <% else %>
+            <h3 class="mt-3 text-sm font-medium"><%= label %> <%= entries.size %>건</h3>
+            <% if entries.empty? %>
+              <p class="text-sm text-gray-500"><%= empty_message %></p>
+            <% else %>
+              <ul class="mt-2 space-y-2 text-sm list-disc list-inside">
+                <% entries.each do |entry| %>
+                  <li>
+                    <%= entry[:item].presence || "-" %> · <%= entry[:applied_on].presence || "-" %> · <%= entry[:status].presence || "-" %>
+                    <% if entry[:rejected] %>
+                      <p class="ml-5 text-red-600">반려 사유: <%= entry[:reject_reason].presence || "확인할 수 없음" %></p>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+          <% end %>
+        <% end %>
+        <% if (previous_snapshot = @snapshots.second) %>
+          <% changes = applications.changes_from(previous_snapshot.data) %>
+          <h3 class="mt-3 text-sm font-medium">최근 신청 변화</h3>
+          <% if changes.empty? %>
+            <p class="text-sm text-gray-500">확인된 신청 변화가 없습니다.</p>
+          <% else %>
+            <ul class="mt-2 text-sm list-disc list-inside">
+              <% changes.each do |change| %>
+                <li><%= { "new" => "새 신청", "status_changed" => "상태 변경", "finished" => "완료" }.fetch(change[:kind]) %> · <%= change[:item].presence || "-" %> · <%= change[:before].presence || "-" %> → <%= change[:after].presence || "-" %></li>
+              <% end %>
+            </ul>
+          <% end %>
+        <% end %>
+      <% else %>
+        <p class="mt-2 text-sm text-gray-500">다음 점검부터 신청 내역을 모읍니다.</p>
+      <% end %>
+    </section>
     <section class="border border-gray-100 rounded-lg p-4">
       <h2 class="font-semibold text-navy">완성도 <%= presenter.completeness_score %>%</h2><progress class="w-full mt-2" max="100" value="<%= presenter.completeness_score %>" aria-label="네이버 완성도"></progress>
       <ul class="mt-3 space-y-2 text-sm"><% presenter.completeness.each do |check| %>

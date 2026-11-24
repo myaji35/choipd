@@ -23,7 +23,21 @@
       <tbody>
         <% accounts.each do |account| %>
           <tr class="border-b border-gray-100 align-top">
-            <td class="px-4 py-3"><%= account.display_name %><% if account.platform == "naver_people" && account.latest_snapshot %><p class="text-xs text-gray-500">완성도 <%= NaverPeople::Presenter.new(account.latest_snapshot.data).completeness_score %>%</p><progress class="w-full" max="100" value="<%= NaverPeople::Presenter.new(account.latest_snapshot.data).completeness_score %>" aria-label="네이버 완성도"></progress><% end %><% if account.last_error.present? %><p class="text-xs text-red-600 mt-1"><%= account.last_error %></p><% end %></td>
+            <td class="px-4 py-3">
+              <%= account.display_name %>
+              <% if account.platform == "naver_people" && (snapshot = account.latest_snapshot) %>
+                <% score = NaverPeople::Presenter.new(snapshot.data).completeness_score %>
+                <p class="text-xs text-gray-500">완성도 <%= score %>%</p>
+                <progress class="w-full" max="100" value="<%= score %>" aria-label="네이버 완성도"></progress>
+                <% delegation = NaverPeople::Applications.new(snapshot.data).delegation %>
+                <% if delegation[:expired] %>
+                  <p class="mt-1 text-xs font-medium text-red-700">위임 종료됨</p>
+                <% elsif delegation[:expiring] %>
+                  <p class="mt-1 text-xs font-medium text-amber-800">위임 종료 임박 D-<%= delegation[:days_left] %></p>
+                <% end %>
+              <% end %>
+              <% if account.last_error.present? %><p class="text-xs text-red-600 mt-1"><%= account.last_error %></p><% end %>
+            </td>
             <td class="px-4 py-3 break-all"><%= account.login_id.presence || "-" %></td><td class="px-4 py-3"><div class="max-w-[10rem] truncate font-mono text-xs" title="<%= account.external_id %>"><%= account.external_id.presence || "-" %></div></td><td class="px-4 py-3"><div class="max-w-xs line-clamp-2 break-words" title="<%= account.headline %>"><%= account.headline.presence || "-" %></div></td><td class="px-4 py-3"><%= account.auth_status.presence || "-" %></td>
             <% badge = { "logged_in" => "bg-green-100 text-green-700", "logged_out" => "bg-amber-100 text-amber-700", "error" => "bg-red-100 text-red-700", "unknown" => "bg-gray-100 text-gray-500" }[account.session_status] %>
             <td class="px-4 py-3 whitespace-nowrap"><span class="<%= badge %> text-sm px-3 py-2 rounded-full"><%= lni_icon(account.session_status == "logged_in" ? "check-circle-1" : "xmark-circle") %> <%= account.session_status_label %></span></td>

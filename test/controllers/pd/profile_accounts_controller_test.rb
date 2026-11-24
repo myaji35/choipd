@@ -35,6 +35,45 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "완성도 0%"
   end
 
+  test "naver displays applications, rejection reason, changes and delegation warning" do
+    travel_to Time.zone.local(2026, 11, 24, 12)
+    account = ProfileAccount.create!(platform: "naver_people", display_name: "가상 인물", external_id: "fake-naver")
+    account.profile_snapshots.create!(captured_at: 1.day.ago, data: {
+      "applications" => { "ING" => [], "END" => [] }
+    })
+    account.profile_snapshots.create!(captured_at: Time.current, data: {
+      "auth" => { "delegEndDate" => "2026-12-01" },
+      "applications" => {
+        "ING" => { "content" => [ { "applyId" => 1, "itemName" => "직업", "applyDate" => "2026-11-23", "statusName" => "접수" } ] },
+        "END" => [ { "applyId" => 2, "itemName" => "소속", "applyDate" => "2026-11-20", "statusName" => "반려", "rejectReason" => "증빙 자료 필요" } ]
+      }
+    })
+
+    get pd_profile_account_path(account)
+    assert_response :success
+    assert_select "h2", text: "신청 내역"
+    assert_select "h3", text: "진행 중 1건"
+    assert_select "h3", text: "완료 1건"
+    assert_select "li", text: "직업 · 2026-11-23 · 접수"
+    assert_select "p.text-red-600", text: "반려 사유: 증빙 자료 필요"
+    assert_select "h3", text: "최근 신청 변화"
+    assert_select "li", text: "새 신청 · 직업 · - → 접수"
+    assert_select "p", text: "권한 위임이 7일 뒤(2026-12-01) 끝납니다. 본인참여 사이트에서 연장하세요."
+
+    get pd_profile_accounts_path
+    assert_response :success
+    assert_select "td p", text: "위임 종료 임박 D-7"
+  end
+
+  test "naver show explains how applications will appear for old snapshots" do
+    account = ProfileAccount.create!(platform: "naver_people", display_name: "가상 인물", external_id: "fake-naver")
+    account.profile_snapshots.create!(captured_at: Time.current, data: { "people" => {} })
+
+    get pd_profile_account_path(account)
+    assert_response :success
+    assert_select "p", text: "다음 점검부터 신청 내역을 모읍니다."
+  end
+
   test "linkedin show displays activity metrics and posts from snapshots" do
     dashboard = file_fixture("linkedin/dashboard.txt").read
     activity = file_fixture("linkedin/activity.txt").read
