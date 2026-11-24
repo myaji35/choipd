@@ -1,10 +1,13 @@
 module Linkedin
   class Monitor
     TIME_ZONE = "Asia/Seoul"
+    NETWORK_SERIES_KEYS = NetworkParser::LABELS.keys.freeze
+    NETWORK_KEYS = (NETWORK_SERIES_KEYS + %i[unread_messages unread_notifications]).freeze
 
     def initialize(snapshots)
       snapshots = snapshots.to_a
       @dashboard_snapshots = snapshots.select { |snapshot| page(snapshot, "dashboard") }
+      @network_snapshots = snapshots.select { |snapshot| page(snapshot, "network") }
       @activity_snapshots = snapshots.select { |snapshot| page(snapshot, "activity") }
     end
 
@@ -24,6 +27,24 @@ module Linkedin
         next unless (today - 29..today).cover?(day)
 
         { date: day, values: dashboard(snapshot).metrics.transform_values { |metric| metric[:value] } }
+      end
+    end
+
+    def latest_network
+      latest = @network_snapshots.first
+      previous = @network_snapshots.drop(1).find { |snapshot| date(snapshot) < date(latest) }
+      values = network(latest)
+      before = network(previous)
+      values.merge(deltas: NETWORK_KEYS.index_with { |key| difference(values[key], before[key]) })
+    end
+
+    def network_series
+      today = Time.current.in_time_zone(TIME_ZONE).to_date
+      @network_snapshots.uniq { |snapshot| date(snapshot) }.filter_map do |snapshot|
+        day = date(snapshot)
+        next unless (today - 29..today).cover?(day)
+
+        { date: day, values: network(snapshot).slice(*NETWORK_SERIES_KEYS) }
       end
     end
 
@@ -68,6 +89,11 @@ module Linkedin
 
     def dashboard(snapshot)
       DashboardParser.new(page(snapshot, "dashboard")&.fetch("text"))
+    end
+
+    def network(snapshot)
+      data = snapshot&.data
+      NetworkParser.new(data&.fetch("pages", nil), data&.fetch("nav_badges", nil)).to_h
     end
 
     def activity(snapshot)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_24_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_100000) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -664,6 +664,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_000000) do
     t.index ["tenant_id", "email"], name: "idx_leads_tenant_email", unique: true
   end
 
+  create_table "linkedin_invitation_actions", force: :cascade do |t|
+    t.integer "tenant_id", default: 1, null: false
+    t.integer "profile_account_id", null: false
+    t.string "invitation_key", null: false
+    t.string "kind"
+    t.string "name", null: false
+    t.string "headline"
+    t.string "action", null: false
+    t.string "status", default: "approved", null: false
+    t.datetime "approved_at"
+    t.datetime "executed_at"
+    t.text "result_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["profile_account_id", "invitation_key", "action"], name: "idx_on_profile_account_id_invitation_key_action_0c86140d2b"
+  end
+
   create_table "llm_call_logs", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "duration_ms"
@@ -1262,6 +1279,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_000000) do
   add_foreign_key "kakao_summaries", "kakao_channels", on_delete: :cascade
   add_foreign_key "kanban_columns", "kanban_projects"
   add_foreign_key "kanban_tasks", "kanban_columns"
+  add_foreign_key "linkedin_invitation_actions", "profile_accounts"
   add_foreign_key "member_bookings", "members", on_delete: :cascade
   add_foreign_key "member_documents", "members", on_delete: :cascade
   add_foreign_key "member_faqs", "members"

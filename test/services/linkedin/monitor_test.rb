@@ -62,7 +62,35 @@ class Linkedin::MonitorTest < ActiveSupport::TestCase
     end
   end
 
+  test "compares the newest network sample with the previous Seoul date and limits its series to 30 days" do
+    travel_to Time.utc(2026, 11, 24, 15, 30) do
+      samples = [
+        ProfileSnapshot.new(captured_at: Time.current, data: { "pages" => { "network" => { "error" => "timeout" } } }),
+        network_snapshot(5.minutes.ago, 15, 3),
+        network_snapshot(15.minutes.ago, 14, 2),
+        network_snapshot(1.hour.ago, 12, 1),
+        network_snapshot(30.days.ago, 6, 0)
+      ]
+      monitor = Linkedin::Monitor.new(samples)
+
+      assert_equal 15, monitor.latest_network[:connections]
+      assert_equal 3, monitor.latest_network[:deltas][:connections]
+      assert_equal 2, monitor.latest_network[:deltas][:unread_notifications]
+      assert_equal [
+        { date: Date.new(2026, 11, 25), values: { connections: 15, following: 9, invitations_sent: 12 } },
+        { date: Date.new(2026, 11, 24), values: { connections: 12, following: 9, invitations_sent: 12 } }
+      ], monitor.network_series
+    end
+  end
+
   private
+
+  def network_snapshot(captured_at, connections, notifications)
+    ProfileSnapshot.new(captured_at: captured_at, data: {
+      "pages" => { "network" => { "text" => "12\n초대 보냄\n#{connections}\n1촌\n9\n팔로우중" } },
+      "nav_badges" => { "notifications" => notifications }
+    })
+  end
 
   def snapshot(captured_at, dashboard, activity, links)
     ProfileSnapshot.new(captured_at: captured_at, data: {

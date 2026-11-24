@@ -1,0 +1,81 @@
+<% network = monitor.latest_network %>
+<% series = monitor.network_series %>
+<% labels = { connections: "1촌", following: "팔로우 중", invitations_sent: "보낸 초대", unread_messages: "새 메시지", unread_notifications: "새 알림" } %>
+
+<section class="border border-gray-100 rounded-lg p-4">
+  <h2 class="font-semibold text-navy">LinkedIn 인맥</h2>
+  <dl class="mt-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+    <% labels.each do |key, label| %>
+      <% delta = network[:deltas][key] %>
+      <div class="rounded-lg border border-gray-100 p-3">
+        <dt class="text-gray-500"><%= label %></dt>
+        <dd class="text-lg font-semibold text-navy"><%= number_with_delimiter(network[key]) || "—" %></dd>
+        <dd>이전 사본 날짜 대비 <%= delta.nil? ? "비교 자료 없음" : (delta.zero? ? "변화 없음" : format("%+d", delta)) %></dd>
+      </div>
+    <% end %>
+  </dl>
+
+  <h3 class="mt-4 text-sm font-medium text-navy">인맥 날짜별 추이</h3>
+  <% if series.empty? %>
+    <p class="mt-2 text-sm text-gray-500">최근 30일 동안 저장된 인맥 사본이 없습니다.</p>
+  <% else %>
+    <div class="mt-3 overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-navy">
+          <tr>
+            <th scope="col" class="p-2 text-left">날짜</th>
+            <% Linkedin::Monitor::NETWORK_SERIES_KEYS.each do |key| %>
+              <th scope="col" class="p-2 text-right"><%= labels.fetch(key) %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% series.each do |row| %>
+            <tr class="border-t border-gray-100">
+              <th scope="row" class="p-2 text-left font-medium"><%= row[:date].iso8601 %></th>
+              <% row[:values].each_value do |value| %>
+                <td class="p-2 text-right"><%= number_with_delimiter(value) || "—" %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+  <h3 class="mt-4 text-sm font-medium text-navy">받은 신청</h3>
+  <p class="mt-2 text-sm text-gray-500">버튼을 누른 건만 LinkedIn 에 실행됩니다.</p>
+  <% if network[:invitations].empty? %>
+    <p class="mt-2 text-sm text-gray-500">저장된 받은 신청이 없습니다.</p>
+  <% else %>
+    <ul class="mt-2 divide-y divide-gray-100 text-sm">
+      <% network[:invitations].each do |invitation| %>
+        <% action = actions[invitation[:key]] %>
+        <li class="py-3">
+          <p class="font-medium text-navy"><%= invitation[:name] %> · <%= invitation[:kind] == "newsletter" ? "뉴스레터 초대" : "1촌 신청" %></p>
+          <% if invitation[:headline] %><p><%= invitation[:headline] %></p><% end %>
+          <% if invitation[:mutual] %><p class="text-gray-500"><%= invitation[:mutual] %></p><% end %>
+          <% if action&.status == "done" %>
+            <p><%= action.action == "accept" ? "수락함" : "건너뜀" %> (<%= action.executed_at&.in_time_zone(Linkedin::Monitor::TIME_ZONE)&.strftime("%Y-%m-%d %H:%M") %>)</p>
+          <% elsif action&.status == "failed" %>
+            <p class="text-red-600">실패: <%= action.result_message %></p>
+          <% elsif action&.status == "approved" %>
+            <p>승인됨 · 실행 결과 확인 대기 중</p>
+          <% else %>
+            <% confirmation_subject = invitation[:kind] == "newsletter" ? "#{invitation[:name]} 뉴스레터 구독 초대를" : "#{invitation[:name]} 님의 1촌 신청을 LinkedIn 에서" %>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <%= button_to "수락 승인", invitation_action_pd_profile_account_path(account),
+                    params: { invitation_key: invitation[:key], decision: "accept" },
+                    class: "bg-primary text-white px-4 py-2 rounded-lg text-sm cursor-pointer",
+                    form: { data: { turbo_confirm: "#{confirmation_subject} 수락합니다. 되돌릴 수 없습니다." } } %>
+              <%= button_to "건너뛰기 승인", invitation_action_pd_profile_account_path(account),
+                    params: { invitation_key: invitation[:key], decision: "ignore" },
+                    class: "bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm cursor-pointer",
+                    form: { data: { turbo_confirm: "#{confirmation_subject} 건너뜁니다. 되돌릴 수 없습니다." } } %>
+            </div>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>

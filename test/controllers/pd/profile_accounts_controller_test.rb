@@ -141,6 +141,92 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_select "p", text: "다른 점이 없습니다.", count: 0
   end
 
+  test "linkedin show displays network counts and approval forms" do
+    create_network_snapshot
+
+    get pd_profile_account_path(@account)
+
+    assert_response :success
+    assert_select "h2", text: "LinkedIn 인맥"
+    assert_select "dt", text: "1촌"
+    assert_select "dd", text: "15"
+    assert_select "td", text: "12"
+    assert_select "form[action=?][data-turbo-confirm]", invitation_action_pd_profile_account_path(@account), count: 2 do
+      assert_select "button", text: "수락 승인"
+      assert_select "button", text: "건너뛰기 승인"
+    end
+  end
+
+  test "invitation action records an approval before executing and displays completion" do
+    create_network_snapshot
+    execute = lambda do |approval|
+      assert_equal "approved", approval.reload.status
+      assert approval.approved_at
+      assert_equal "accept", approval.action
+      assert_equal "가상 신청자", approval.name
+      { "ok" => true }
+    end
+
+    with_invitation_executor(execute) do
+      post invitation_action_pd_profile_account_path(@account), params: { invitation_key: "connection:가상 신청자:개발자", decision: "accept" }
+    end
+
+    assert_redirected_to pd_profile_account_path(@account)
+    assert_equal "LinkedIn 신청을 수락했습니다.", flash[:notice]
+    approval = @account.linkedin_invitation_actions.sole
+    assert_equal "done", approval.status
+    assert approval.executed_at
+    follow_redirect!
+    assert_select "p", text: /수락함 \(/
+    assert_select "button", text: "수락 승인", count: 0
+  end
+
+  test "invitation action records and displays a browser failure" do
+    create_network_snapshot
+    reason = "같은 이름 버튼이 여러 개"
+    with_invitation_executor(->(_) { { "ok" => false, "reason" => reason } }) do
+      post invitation_action_pd_profile_account_path(@account), params: { invitation_key: "connection:가상 신청자:개발자", decision: "ignore" }
+    end
+
+    assert_redirected_to pd_profile_account_path(@account)
+    assert_equal reason, flash[:alert]
+    approval = @account.linkedin_invitation_actions.sole
+    assert_equal "failed", approval.status
+    assert_equal reason, approval.result_message
+    assert approval.executed_at
+    follow_redirect!
+    assert_select "p", text: "실패: #{reason}"
+    assert_select "button", text: "건너뛰기 승인", count: 0
+  end
+
+  test "invitation action rejects a key absent from the latest network snapshot" do
+    create_network_snapshot
+    with_invitation_executor(->(_) { flunk "unexpected execution" }) do
+      assert_no_difference "LinkedinInvitationAction.count" do
+        post invitation_action_pd_profile_account_path(@account), params: { invitation_key: "connection:없는 신청:", decision: "accept" }
+      end
+    end
+
+    assert_redirected_to pd_profile_account_path(@account)
+    assert_equal "목록에 없는 신청입니다", flash[:alert]
+  end
+
+  test "invitation action does not execute a done key even for a different decision" do
+    create_network_snapshot
+    @account.linkedin_invitation_actions.create!(
+      invitation_key: "connection:가상 신청자:개발자", name: "가상 신청자", action: "accept", status: "done", executed_at: Time.current
+    )
+
+    with_invitation_executor(->(_) { flunk "unexpected execution" }) do
+      assert_no_difference "LinkedinInvitationAction.count" do
+        post invitation_action_pd_profile_account_path(@account), params: { invitation_key: "connection:가상 신청자:개발자", decision: "ignore" }
+      end
+    end
+
+    assert_redirected_to pd_profile_account_path(@account)
+    assert_equal "이미 처리한 신청입니다.", flash[:alert]
+  end
+
   test "check reports missing browser" do
     original = EgoProfile::Runner.method(:available?)
     EgoProfile::Runner.define_singleton_method(:available?) { false }
@@ -164,5 +250,27 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
       delete pd_profile_account_path(created)
     end
     assert_redirected_to pd_profile_accounts_path
+  end
+
+  private
+
+  def create_network_snapshot
+    @account.profile_snapshots.create!(captured_at: Time.current, data: {
+      "pages" => {
+        "network" => { "text" => "12\n초대 보냄\n15\n1촌\n9\n팔로우중" },
+        "invitations" => { "text" => "가상 신청자 님이 1촌이 되고 싶어 함\n개발자\n건너뛰기\n수락" }
+      },
+      "nav_badges" => { "messages" => 0, "notifications" => 3 }
+    })
+  end
+
+  def with_invitation_executor(execute)
+    executor = Object.new
+    executor.define_singleton_method(:call) { |approval| execute.call(approval) }
+    original = EgoProfile::InvitationExecutor.method(:new)
+    EgoProfile::InvitationExecutor.define_singleton_method(:new) { executor }
+    yield
+  ensure
+    EgoProfile::InvitationExecutor.define_singleton_method(:new, original)
   end
 end
