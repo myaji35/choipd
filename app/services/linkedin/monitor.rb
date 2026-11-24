@@ -4,6 +4,13 @@ module Linkedin
     NETWORK_SERIES_KEYS = NetworkParser::LABELS.keys.freeze
     NETWORK_KEYS = (NETWORK_SERIES_KEYS + %i[unread_messages unread_notifications]).freeze
 
+    def self.page(snapshot, key)
+      data = snapshot&.data
+      pages = data["pages"] if data.is_a?(Hash)
+      page = pages[key] if pages.is_a?(Hash)
+      page if page.is_a?(Hash) && !page.key?("error") && page["text"].is_a?(String) && page["text"].present?
+    end
+
     def initialize(snapshots)
       snapshots = snapshots.to_a
       @dashboard_snapshots = snapshots.select { |snapshot| page(snapshot, "dashboard") }
@@ -112,10 +119,7 @@ module Linkedin
     end
 
     def page(snapshot, key)
-      data = snapshot&.data
-      pages = data["pages"] if data.is_a?(Hash)
-      page = pages[key] if pages.is_a?(Hash)
-      page if page.is_a?(Hash) && !page.key?("error") && page["text"].is_a?(String) && page["text"].present?
+      self.class.page(snapshot, key)
     end
 
     def dashboard(snapshot)

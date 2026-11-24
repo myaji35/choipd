@@ -6,6 +6,13 @@ class Pd::ProfileAccountsController < Pd::BaseController
     @ego_available = EgoProfile::Runner.available?
   end
 
+  def weekly_report
+    @today = ProfileAccounts::WeeklyReport.today
+    @earliest_week_end = Date.new(2020, 1, 1)
+    week_end = report_week_end(params[:week_end])
+    @report = ProfileAccounts::WeeklyReport.new(week_end: week_end).to_h
+  end
+
   def show
     @snapshots = @account.profile_snapshots.recent.limit(@account.platform == "linkedin" ? 60 : 20).to_a
     @latest_snapshot = @snapshots.first
@@ -85,6 +92,15 @@ class Pd::ProfileAccountsController < Pd::BaseController
   end
 
   private
+
+  def report_week_end(value)
+    return @today unless value.is_a?(String) && value.match?(/\A\d{4}-\d{2}-\d{2}\z/)
+
+    date = Date.iso8601(value)
+    (@earliest_week_end..@today).cover?(date) ? date : @today
+  rescue Date::Error
+    @today
+  end
 
   def approve_invitation(key, decision)
     return "목록에 없는 신청입니다" unless @account.platform == "linkedin"

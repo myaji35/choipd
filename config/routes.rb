@@ -212,7 +212,10 @@ Rails.application.routes.draw do
     resource  :profile,          only: [ :edit, :update ]
     resources :sns_accounts
     resources :profile_accounts, path: "people_accounts" do
-      collection { post :check }
+      collection do
+        post :check
+        get :weekly_report
+      end
       member { post :invitation_action }
       resources :newsletter_drafts, only: [ :create, :edit, :update ], controller: "profile_account_newsletter_drafts" do
         member do

@@ -13,12 +13,71 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", count: 1
     assert_includes response.body, "가상 인물"
+    assert_select "a[href=?]", weekly_report_pd_profile_accounts_path, text: "주간 리포트"
     get pd_profile_account_path(@account)
     assert_response :success
     get new_pd_profile_account_path
     assert_response :success
     get edit_pd_profile_account_path(@account)
     assert_response :success
+  end
+
+  test "weekly report renders both platforms and the date form" do
+    travel_to Time.utc(2026, 11, 23, 15, 30)
+    @account.profile_snapshots.create!(captured_at: Time.current, data: {
+      "pages" => { "dashboard" => { "text" => file_fixture("linkedin/dashboard.txt").read } }
+    })
+    account = ProfileAccount.create!(platform: "naver_people", display_name: "가상 인물")
+    account.profile_snapshots.create!(captured_at: Time.current, data: { "people" => { "name" => "가상 인물" } })
+
+    get weekly_report_pd_profile_accounts_path
+
+    assert_response :success
+    assert_select "h1", text: "인물정보 주간 리포트 2026-11-18 ~ 2026-11-24"
+    assert_select "input[type=date][name=week_end][value='2026-11-24']"
+    assert_select "h2", text: "LinkedIn"
+    assert_select "h2", text: "네이버 인물정보"
+    assert_select "td", text: "26"
+    assert_select "p", text: "이번 주 게시물이 없습니다."
+    assert_select "p", text: "이번 주 변경이 없습니다."
+    assert_select "a", text: "다음 주", count: 0
+  end
+
+  test "weekly report links to dates seven days away" do
+    travel_to Time.utc(2026, 11, 23, 15, 30)
+    get weekly_report_pd_profile_accounts_path, params: { week_end: "2026-11-17" }
+
+    assert_response :success
+    assert_select "h1", text: "인물정보 주간 리포트 2026-11-11 ~ 2026-11-17"
+    assert_select "a[href=?]", weekly_report_pd_profile_accounts_path(week_end: "2026-11-10"), text: "이전 주"
+    assert_select "a[href=?]", weekly_report_pd_profile_accounts_path(week_end: "2026-11-24"), text: "다음 주"
+    assert_select "p", text: "이 기간의 사본이 없습니다."
+  end
+
+  test "weekly report renders account cards as siblings after a card without snapshots" do
+    travel_to Time.utc(2026, 11, 23, 15, 30)
+    %w[linkedin naver_people].each do |platform|
+      ProfileAccount.create!(platform: platform, display_name: "A 사본 없음")
+      account = ProfileAccount.create!(platform: platform, display_name: "Z 사본 있음")
+      account.profile_snapshots.create!(captured_at: Time.current, data: { "people" => {}, "pages" => {} })
+    end
+
+    get weekly_report_pd_profile_accounts_path
+
+    assert_response :success
+    assert_select "section > section > section", count: 0
+    assert_select "section > section > p", text: "이 기간의 사본이 없습니다.", count: 3
+    assert_select "section > section > h3", text: "Z 사본 있음", count: 2
+  end
+
+  test "weekly report falls back to Seoul today for invalid dates" do
+    travel_to Time.utc(2026, 11, 23, 15, 30)
+    [ "2026-02-30", "2026-1-01", "2026-11-25", "2019-12-31", "잘못된 날짜", [ "2026-11-17" ] ].each do |value|
+      get weekly_report_pd_profile_accounts_path, params: { week_end: value }
+
+      assert_response :success
+      assert_select "h1", text: "인물정보 주간 리포트 2026-11-18 ~ 2026-11-24"
+    end
   end
 
   test "naver show displays completeness and snapshot changes" do

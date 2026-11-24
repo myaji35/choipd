@@ -1,0 +1,149 @@
+<% title = "인물정보 주간 리포트 #{@report[:week_start]} ~ #{@report[:week_end]}" %>
+<% content_for :title, title %>
+<% week_end = @report[:week_end] %>
+<% button_class = "bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50" %>
+<% value = ->(number) { number_with_delimiter(number) || "자료 없음" } %>
+<% delta = ->(number) { number.nil? ? "자료 없음" : (number.zero? ? "변화 없음" : format("%+d", number)) } %>
+<% change_value = ->(entry) { entry.presence || "자료 없음" } %>
+<div class="mb-6">
+  <%= link_to "← 인물정보 계정", pd_profile_accounts_path, class: "text-primary text-sm" %>
+  <h1 class="text-xl font-bold text-navy mt-2"><%= title %></h1>
+  <div class="mt-3 flex flex-wrap items-center gap-3">
+    <% if week_end - 7 >= @earliest_week_end %>
+      <%= link_to "이전 주", weekly_report_pd_profile_accounts_path(week_end: week_end - 7), class: button_class %>
+    <% end %>
+    <% if week_end + 7 <= @today %>
+      <%= link_to "다음 주", weekly_report_pd_profile_accounts_path(week_end: week_end + 7), class: button_class %>
+    <% end %>
+    <%= form_with url: weekly_report_pd_profile_accounts_path, method: :get, class: "flex flex-wrap items-center gap-2" do |form| %>
+      <%= form.label :week_end, "주말 날짜", class: "text-sm text-gray-700" %>
+      <%= form.date_field :week_end, value: week_end, min: @earliest_week_end, max: @today, class: "border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+      <%= form.submit "조회", class: button_class %>
+    <% end %>
+  </div>
+</div>
+
+<section class="mb-6 bg-white rounded-lg border border-gray-100 shadow-sm p-4 space-y-4">
+  <h2 class="font-semibold text-navy">LinkedIn</h2>
+  <% if @report[:linkedin].empty? %><p class="text-sm text-gray-500">활성 계정이 없습니다.</p><% end %>
+  <% @report[:linkedin].each do |account| %>
+    <section class="border border-gray-100 rounded-lg p-4 space-y-3">
+      <h3 class="font-semibold text-navy"><%= account[:display_name] %></h3>
+      <% if account[:has_snapshot] %>
+        <% network = account[:network] %>
+        <% network_labels = ProfileAccounts::WeeklyReport::NETWORK_LABELS %>
+        <% network_rows = network.slice(*Linkedin::Monitor::NETWORK_SERIES_KEYS).map { |key, row| [network_labels.fetch(key), row[:start], row[:end], row[:delta]] } %>
+        <% metric_rows = account[:metrics].values.map { |row| row.values_at(:label, :start, :end, :delta) } %>
+        <% newsletter_rows = account[:newsletters].map { |row| ["#{row[:name]} · #{row[:role] == 'author' ? '글쓴이' : '구독 중'}", row[:start_subscribers], row[:end_subscribers], row[:delta]] } %>
+        <% [["지표", metric_rows], ["인맥", network_rows], ["뉴스레터", newsletter_rows]].each do |heading, rows| %>
+          <h4 class="text-sm font-medium text-navy"><%= heading %></h4>
+          <% if rows.empty? %>
+            <p class="text-sm text-gray-500">자료 없음</p>
+          <% else %>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50 text-navy">
+                  <tr>
+                    <th scope="col" class="p-2 text-left"><%= heading == "뉴스레터" ? "뉴스레터 (구독자)" : "항목" %></th>
+                    <% ["주초", "주말", "변화"].each do |column| %>
+                      <th scope="col" class="p-2 text-right whitespace-nowrap"><%= column %></th>
+                    <% end %>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% rows.each do |label, start_value, end_value, change| %>
+                    <tr class="border-t border-gray-100">
+                      <th scope="row" class="p-2 text-left font-medium"><%= label %></th>
+                      <td class="p-2 text-right whitespace-nowrap"><%= value.call(start_value) %></td>
+                      <td class="p-2 text-right whitespace-nowrap"><%= value.call(end_value) %></td>
+                      <td class="p-2 text-right whitespace-nowrap"><%= delta.call(change) %></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% end %>
+          <% if heading == "인맥" %>
+            <p class="text-sm text-gray-700">새 메시지 <%= value.call(network[:unread_messages]) %> · 새 알림 <%= value.call(network[:unread_notifications]) %></p>
+          <% end %>
+        <% end %>
+
+        <h4 class="text-sm font-medium text-navy">이번 주 게시</h4>
+        <% if account[:posts].empty? %>
+          <p class="text-sm text-gray-500">이번 주 게시물이 없습니다.</p>
+        <% else %>
+          <ul class="text-sm divide-y divide-gray-100">
+            <% account[:posts].each do |post| %>
+              <li class="py-2">
+                <% post_title = change_value.call(post[:title]) %>
+                <% if (url = http_url(post[:url])) %>
+                  <%= link_to post_title, url, target: "_blank", rel: "noopener", class: "text-primary" %>
+                <% else %>
+                  <%= post_title %>
+                <% end %>
+                <p class="text-gray-500">
+                  <%= post[:kind] == "article" ? "글" : "게시물" %> ·
+                  <%= post[:posted_at].in_time_zone(ProfileAccounts::WeeklyReport::TIME_ZONE).to_date %> ·
+                  노출 <%= value.call(post[:impressions]) %>
+                </p>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+        <% goal = account[:weekly_goal] %>
+        <% weekly = goal[:linkedin_weekly] %>
+        <% statuses = { true => "달성", false => "미달성", nil => "자료 없음" } %>
+        <h4 class="text-sm font-medium text-navy">주간 목표</h4>
+        <p class="text-sm">이번 주 게시 <%= statuses[goal[:posted]] %></p>
+        <p class="text-sm">LinkedIn <%= weekly&.dig(:range) %> · 게시 <%= statuses[weekly&.dig(:posted)] %> · 댓글 <%= statuses[weekly&.dig(:commented)] %></p>
+      <% else %>
+        <p class="text-sm text-gray-500">이 기간의 사본이 없습니다.</p>
+      <% end %>
+    </section>
+  <% end %>
+</section>
+
+<section class="mb-6 bg-white rounded-lg border border-gray-100 shadow-sm p-4 space-y-4">
+  <h2 class="font-semibold text-navy">네이버 인물정보</h2>
+  <% if @report[:naver_people].empty? %><p class="text-sm text-gray-500">활성 계정이 없습니다.</p><% end %>
+  <% @report[:naver_people].each do |account| %>
+    <section class="border border-gray-100 rounded-lg p-4 space-y-3">
+      <h3 class="font-semibold text-navy"><%= account[:display_name] %></h3>
+      <% if account[:has_snapshot] %>
+        <% scores = account[:completeness].values_at(:start, :end).map { |score| score.nil? ? "자료 없음" : "#{score}%" } %>
+        <p class="text-sm">완성도 <%= scores.join(" → ") %></p>
+        <h4 class="text-sm font-medium text-navy">항목 변경</h4>
+        <% if account[:changes].empty? %>
+          <p class="text-sm text-gray-500">이번 주 변경이 없습니다.</p>
+        <% else %>
+          <ul class="text-sm list-disc list-inside space-y-2">
+            <% account[:changes].each do |change| %>
+              <li><%= change[:label] %> · <%= change_value.call(change[:before]) %> → <%= change_value.call(change[:after]) %></li>
+            <% end %>
+          </ul>
+        <% end %>
+
+        <% applications = account[:applications] %>
+        <h4 class="text-sm font-medium text-navy">신청 내역</h4>
+        <p class="text-sm">
+          <% counts = ProfileAccounts::WeeklyReport::APPLICATION_LABELS.map do |key, label|
+               count = applications[key]
+               "#{label} #{count.nil? ? '자료 없음' : "#{value.call(count)}건"}"
+             end %>
+          <%= counts.join(" · ") %>
+        </p>
+        <% if applications[:changes].empty? %>
+          <p class="text-sm text-gray-500">확인된 신청 변화가 없습니다.</p>
+        <% else %>
+          <ul class="text-sm list-disc list-inside space-y-2">
+            <% applications[:changes].each do |change| %>
+              <li><%= ProfileAccounts::WeeklyReport::APPLICATION_CHANGE_LABELS.fetch(change[:kind]) %> · <%= change_value.call(change[:item]) %> · <%= change_value.call(change[:before]) %> → <%= change_value.call(change[:after]) %></li>
+            <% end %>
+          </ul>
+        <% end %>
+      <% else %>
+        <p class="text-sm text-gray-500">이 기간의 사본이 없습니다.</p>
+      <% end %>
+    </section>
+  <% end %>
+</section>
