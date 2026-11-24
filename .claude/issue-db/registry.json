@@ -1904,11 +1904,18 @@
         "reversible": "보류는 언제든 풀 수 있고 비용이 거의 없습니다. 임시 형식으로 진행했다가 되돌리면 그 부분을 다시 만드는 비용이 듭니다.",
         "explained_by": "decision-explain",
         "explained_at": "2026-11-24T20:07:51.752693+09:00",
-        "rechecked": {
-          "at": "2026-11-24T22:04:43+09:00",
-          "by": "factory-runner",
-          "result": "SD ISS-521 여전히 AWAITING_USER(deploy-review, factory/ISS-521 main 미병합). 관제 결정 A(보류) 유지."
-        },
+        "rechecked": [
+          {
+            "at": "2026-11-24T22:04:43+09:00",
+            "by": "factory-runner",
+            "result": "SD ISS-521 여전히 AWAITING_USER(deploy-review, factory/ISS-521 main 미병합). 관제 결정 A(보류) 유지."
+          },
+          {
+            "at": "2026-11-24T13:05:39+00:00",
+            "by": "factory-runner",
+            "note": "SD ISS-521 여전히 AWAITING_USER(0017_SocialDoctors registry) — 선행 미완료, 막힘 유지"
+          }
+        ],
         "decision": {
           "choice": "A",
           "label": "보류 — 데이터 형식이 정해질 때까지 남은 부분만 멈춤",
@@ -1958,11 +1965,18 @@
           "12단계×화면 기준 5개=60칸 판정이 화면 캡처와 함께 docs/ecosystem-ux-scorecard.md 에 기록되고 통과율이 계산된다",
           "95% 미만이면 미달 칸마다 개선 이슈가 생긴다"
         ],
-        "rechecked": {
-          "at": "2026-11-24T22:04:43+09:00",
-          "by": "factory-runner",
-          "result": "SD ISS-521 AWAITING_USER, imPD ISS-476 BLOCKED 그대로. 막힘 사유 유효 — 유지."
-        }
+        "rechecked": [
+          {
+            "at": "2026-11-24T22:04:43+09:00",
+            "by": "factory-runner",
+            "result": "SD ISS-521 AWAITING_USER, imPD ISS-476 BLOCKED 그대로. 막힘 사유 유효 — 유지."
+          },
+          {
+            "at": "2026-11-24T13:05:39+00:00",
+            "by": "factory-runner",
+            "note": "SD ISS-521 여전히 AWAITING_USER(0017_SocialDoctors registry) — 선행 미완료, 막힘 유지"
+          }
+        ]
       },
       "updated_at": "2026-11-24T12:06:43Z",
       "blocked_reason": "12단계 중 6·7(SD→Townin 발행)·10(SD 성과 수집)·11(imPD 내 브랜드 Townin 성과)은 SocialDoctors ISS-521(Townin 매체·발행 어댑터·브랜드 요약 API)이 있어야 시험할 수 있다. SD ISS-521 은 현재 AWAITING_USER, imPD ISS-476 도 같은 이유로 BLOCKED. 나머지 선행(imPD ISS-475, Townin ISS-722, SD ISS-522)은 DONE."
@@ -2595,11 +2609,18 @@
         "recommended_why": "연락처 값은 대표님만 정할 수 있어 제가 대신 정할 수 없고, 스팸을 피하려면 개인 메일이 아닌 업무용 공개 이메일 하나가 가장 간단합니다. (어떤 주소가 있는지는 확인 필요)",
         "explained_by": "decision-explain",
         "explained_at": "2026-11-24T20:07:51.752693+09:00",
-        "rechecked": {
-          "at": "2026-11-24T22:04:43+09:00",
-          "by": "factory-runner",
-          "result": "imPD_보호책임자연락처_비밀값위치_재확인_컨펌_261120.pdf 가 컨펌/ 루트(필기 전)에 그대로 있음. 값 없음 — 보류 유지."
-        },
+        "rechecked": [
+          {
+            "at": "2026-11-24T22:04:43+09:00",
+            "by": "factory-runner",
+            "result": "imPD_보호책임자연락처_비밀값위치_재확인_컨펌_261120.pdf 가 컨펌/ 루트(필기 전)에 그대로 있음. 값 없음 — 보류 유지."
+          },
+          {
+            "at": "2026-11-24T13:05:39+00:00",
+            "by": "factory-runner",
+            "note": "recall 재검색 결과 새 연락처 값 없음(대표님 결정 D 보류 유지) — 막힘 유지"
+          }
+        ],
         "decision": {
           "choice": "D",
           "label": "보류 — 지금은 정하지 않음",
@@ -7593,6 +7614,24 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 197,
+        "timestamp": "2026-11-24T22:04:55.752833",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (test-harness, ux-harness, brand-guardian, agent-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
@@ -7600,7 +7639,7 @@
     "total_issues": 501,
     "completed": 27,
     "failed": 0,
-    "evolved": 196
+    "evolved": 197
   },
   "pending_opportunity_signals": [
     {
