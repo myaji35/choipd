@@ -84,6 +84,24 @@ ready_issues = [
     if iss.get("status") == "READY"
 ]
 
+import os
+
+# 공장 실행에서 집을 수 없는 카드 때문에 Stop 훅이 무한히 다시 깨우는 문제 방지
+if os.environ.get("FACTORY_RUNNER") == "1":
+    factory_ready_issues = []
+    for iss in ready_issues:
+        payload = iss.get("payload") or {}
+        if (
+            iss.get("type") in ("DEPLOY_READY", "DECISION")
+            or (iss.get("title") or "").startswith("[CONFIRM]")
+            or payload.get("requires_user_confirm")
+            or payload.get("needs_interactive_session")
+            or (payload.get("recommendation") or {}).get("verdict") == "대표님 결정 필요"
+        ):
+            continue
+        factory_ready_issues.append(iss)
+    ready_issues = factory_ready_issues
+
 if not ready_issues:
     sys.exit(0)
 
