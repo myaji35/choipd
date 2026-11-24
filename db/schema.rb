@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_24_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_200000) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -681,6 +681,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_100000) do
     t.index ["profile_account_id", "invitation_key", "action"], name: "idx_on_profile_account_id_invitation_key_action_0c86140d2b"
   end
 
+  create_table "linkedin_newsletter_drafts", force: :cascade do |t|
+    t.integer "tenant_id", default: 1, null: false
+    t.integer "profile_account_id", null: false
+    t.string "newsletter_name"
+    t.string "title", null: false
+    t.text "body"
+    t.string "status", default: "draft", null: false
+    t.datetime "archived_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index [ "profile_account_id", "status" ], name: "idx_on_profile_account_id_status_f34fdcc080"
+  end
+
   create_table "llm_call_logs", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "duration_ms"
@@ -1280,6 +1293,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_100000) do
   add_foreign_key "kanban_columns", "kanban_projects"
   add_foreign_key "kanban_tasks", "kanban_columns"
   add_foreign_key "linkedin_invitation_actions", "profile_accounts"
+  add_foreign_key "linkedin_newsletter_drafts", "profile_accounts"
   add_foreign_key "member_bookings", "members", on_delete: :cascade
   add_foreign_key "member_documents", "members", on_delete: :cascade
   add_foreign_key "member_faqs", "members"

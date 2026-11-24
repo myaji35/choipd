@@ -8,6 +8,7 @@ module Linkedin
       snapshots = snapshots.to_a
       @dashboard_snapshots = snapshots.select { |snapshot| page(snapshot, "dashboard") }
       @network_snapshots = snapshots.select { |snapshot| page(snapshot, "network") }
+      @newsletter_snapshots = snapshots.select { |snapshot| page(snapshot, "newsletters") }
       @activity_snapshots = snapshots.select { |snapshot| page(snapshot, "activity") }
     end
 
@@ -45,6 +46,36 @@ module Linkedin
         next unless (today - 29..today).cover?(day)
 
         { date: day, values: network(snapshot).slice(*NETWORK_SERIES_KEYS) }
+      end
+    end
+
+    def newsletters_collected?
+      @newsletter_snapshots.any?
+    end
+
+    def newsletters
+      latest = @newsletter_snapshots.first
+      previous = @newsletter_snapshots.drop(1).find { |snapshot| date(snapshot) < date(latest) }
+      before = parsed_newsletters(previous).index_by { |entry| entry[:name] }
+      articles = posts.select { |post| post[:article_url] }.index_by { |post| normalized_article_url(post[:article_url]) }
+
+      parsed_newsletters(latest).partition { |entry| entry[:role] == "author" }.flatten(1).map do |entry|
+        editions = entry[:editions].map do |edition|
+          article = articles[normalized_article_url(edition[:url])]
+          edition.merge(impressions: article&.fetch(:impressions))
+        end
+        entry.merge(subscribers_delta: difference(entry[:subscribers], before.dig(entry[:name], :subscribers)), editions: editions)
+      end
+    end
+
+    def newsletter_series
+      today = Time.current.in_time_zone(TIME_ZONE).to_date
+      @newsletter_snapshots.uniq { |snapshot| date(snapshot) }.filter_map do |snapshot|
+        day = date(snapshot)
+        next unless (today - 29..today).cover?(day)
+
+        values = parsed_newsletters(snapshot).to_h { |entry| [ entry[:name], entry[:subscribers] ] }
+        { date: day, values: values }
       end
     end
 
@@ -94,6 +125,15 @@ module Linkedin
     def network(snapshot)
       data = snapshot&.data
       NetworkParser.new(data&.fetch("pages", nil), data&.fetch("nav_badges", nil)).to_h
+    end
+
+    def parsed_newsletters(snapshot)
+      @parsed_newsletters ||= {}
+      @parsed_newsletters[snapshot] ||= NewsletterParser.new(snapshot&.data&.fetch("pages", nil)).to_h[:newsletters]
+    end
+
+    def normalized_article_url(url)
+      URI::DEFAULT_PARSER.unescape(url.split(/[?#]/, 2).first.sub(%r{/+\z}, "")) if url
     end
 
     def activity(snapshot)

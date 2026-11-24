@@ -214,6 +214,12 @@ Rails.application.routes.draw do
     resources :profile_accounts, path: "people_accounts" do
       collection { post :check }
       member { post :invitation_action }
+      resources :newsletter_drafts, only: [ :create, :edit, :update ], controller: "profile_account_newsletter_drafts" do
+        member do
+          patch :archive
+          patch :restore
+        end
+      end
     end
     resources :scheduled_posts,  controller: "sns_scheduled_posts"
     resources :hero_images

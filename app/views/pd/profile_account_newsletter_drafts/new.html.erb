@@ -1,0 +1,6 @@
+<% content_for :title, "뉴스레터 초안 작성" %>
+<section class="border border-gray-100 rounded-lg p-4 bg-white">
+  <h1 class="text-xl font-bold text-navy">뉴스레터 초안 작성</h1>
+  <p class="mt-2 text-sm text-gray-500">이 초안은 앱에만 저장되며 LinkedIn 에 게시되지 않습니다.</p>
+  <%= render "form", form_url: pd_profile_account_newsletter_drafts_path(@account) %>
+</section>

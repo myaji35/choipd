@@ -1,0 +1,33 @@
+1 신규 구독자
+50%
+최근 7일
+분석 보기
+ 뉴스레터
+XimTier Dev Notes
+
+XimTier 데이터 분석·예측 엔진 개발기 | Build notes from XimTier, a data analysis and prediction engine (KO/EN)
+
+글에 뉴스레터 사진을 등록하세요.
+
+이미지는 언제든지 변경할 수 있습니다.
+
+글쓴이: 강승식
+
+GAGAHOHO · 누리팜 대표이사 | XimTier CTO — LLM이 못 푸는 수치를 역산하는 설명가능 AI(XAI) | 제조·공공 의사결정 분석 | 가천대 컴퓨터공학
+
+매일 발행
+
+구독자 6명
+수정
+공유
+2
+에디션
+새 에디션 만들기
+피드 게시물
+발행일: 1개월 전
+From Defaults to Delivery: Making Analysis Workflows Deterministic and Safe
+강승식
+피드 게시물
+발행일: 1개월 전
+확정 지표를 기본값으로: 분석·처방 파이프라인의 신뢰성을 다시 세우다
+강승식

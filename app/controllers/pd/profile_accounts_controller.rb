@@ -9,8 +9,11 @@ class Pd::ProfileAccountsController < Pd::BaseController
   def show
     @snapshots = @account.profile_snapshots.recent.limit(@account.platform == "linkedin" ? 60 : 20).to_a
     @latest_snapshot = @snapshots.first
-    if @account.platform == "linkedin" && @latest_snapshot
+    if @account.platform == "linkedin"
       @linkedin_monitor = Linkedin::Monitor.new(@snapshots)
+      @linkedin_newsletter_drafts = @account.linkedin_newsletter_drafts.order(updated_at: :desc, id: :desc)
+      return unless @latest_snapshot
+
       @linkedin_invitation_actions = @account.linkedin_invitation_actions.order(id: :asc).index_by(&:invitation_key)
       accounts = ProfileAccount.active.for_platform("naver_people").where(tenant_id: @account.tenant_id)
       accounts = accounts.where(member_id: @account.member_id) if @account.member_id

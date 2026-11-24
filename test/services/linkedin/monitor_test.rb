@@ -83,6 +83,35 @@ class Linkedin::MonitorTest < ActiveSupport::TestCase
     end
   end
 
+  test "compares newsletter counts across Seoul dates and matches latest article impressions by URL" do
+    travel_to Time.utc(2026, 11, 24, 15, 30) do
+      url = "https://www.linkedin.com/newsletters/dev-notes-123/"
+      articles = JSON.parse(file_fixture("linkedin/newsletter_page_links.json").read)
+      editions = file_fixture("linkedin/newsletter_page.txt").read
+      samples = [ [ Time.current, 6 ], [ 15.minutes.ago, 5 ], [ 1.hour.ago, 4 ], [ 30.days.ago, 2 ] ].map do |captured_at, count|
+        ProfileSnapshot.new(captured_at: captured_at, data: {
+          "pages" => {
+            "newsletters" => { "text" => "Dev Notes · 글쓴이\n구독자 #{count}", "links" => [ url ] },
+            "newsletter_pages" => [ { "url" => url, "text" => editions.sub("구독자 6명", "구독자 #{count}명"), "links" => articles } ]
+          }
+        })
+      end
+      samples.first.data["pages"]["activity"] = {
+        "text" => "피드 게시물\n홍길동\n2일 •\nDev Notes\nArticle\n홍길동\n노출 12",
+        "links" => [ "#{URI::DEFAULT_PARSER.unescape(articles.first)}/?trk=activity", "https://www.linkedin.com/analytics/post-summary/urn:li:activity:7513750005350400000/" ]
+      }
+
+      monitor = Linkedin::Monitor.new(samples)
+      newsletter = monitor.newsletters.sole
+      assert_equal 2, newsletter[:subscribers_delta]
+      assert_equal [ 12, nil ], newsletter[:editions].pluck(:impressions)
+      assert_equal [
+        { date: Date.new(2026, 11, 25), values: { "Dev Notes" => 6 } },
+        { date: Date.new(2026, 11, 24), values: { "Dev Notes" => 4 } }
+      ], monitor.newsletter_series
+    end
+  end
+
   private
 
   def network_snapshot(captured_at, connections, notifications)

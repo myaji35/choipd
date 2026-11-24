@@ -157,6 +157,37 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "linkedin show displays the newsletter section and account drafts" do
+    draft = @account.linkedin_newsletter_drafts.create!(title: "앱에 저장한 초안")
+    get pd_profile_account_path(@account)
+    assert_response :success
+    assert_select "p", text: "다음 점검부터 뉴스레터를 모읍니다."
+
+    url = "https://www.linkedin.com/newsletters/ximtier-dev-notes-7513833935739547648/"
+    subscriber_url = "https://www.linkedin.com/newsletters/목표를-달성하는-협업의-힘-7018115202437054464/"
+    edition_links = JSON.parse(file_fixture("linkedin/newsletter_page_links.json").read)
+    @account.profile_snapshots.create!(captured_at: Time.current, data: {
+      "pages" => {
+        "newsletters" => { "text" => file_fixture("linkedin/newsletters.txt").read, "links" => [ url, subscriber_url ] },
+        "newsletter_pages" => [ { "url" => url, "text" => file_fixture("linkedin/newsletter_page.txt").read, "links" => edition_links } ]
+      }
+    })
+    get pd_profile_account_path(@account)
+
+    assert_response :success
+    assert_select "h2", text: "LinkedIn 뉴스레터"
+    assert_select "h3", text: "구독자 날짜별 추이"
+    assert_select "a[href=?][target=_blank]", url.delete_suffix("/"), text: "XimTier Dev Notes"
+    assert_select "a[href=?]", edition_links.first
+    assert_select "#newsletter-drafts" do
+      assert_select "h2", text: "뉴스레터 글 초안"
+      assert_select "p", text: "앱에 저장한 초안"
+      assert_select "a[href=?]", edit_pd_profile_account_newsletter_draft_path(@account, draft)
+      assert_select "select option", text: "XimTier Dev Notes"
+      assert_select "select option", text: "목표를 달성하는 협업의 힘", count: 0
+    end
+  end
+
   test "invitation action records an approval before executing and displays completion" do
     create_network_snapshot
     execute = lambda do |approval|

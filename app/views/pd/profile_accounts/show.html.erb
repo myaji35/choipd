@@ -90,20 +90,23 @@
       <% end %><% end %>
     </section>
   <% end %>
-  <% if @account.platform == "linkedin" && @latest_snapshot %>
-    <% profile_snapshots = @snapshots.lazy.filter_map do |snapshot|
-         pages = snapshot.data.is_a?(Hash) ? snapshot.data["pages"] : nil
-         next unless pages.is_a?(Hash) && pages.values_at("profile", "experience", "education", "skills", "certifications").any? { |page|
-           page.is_a?(Hash) && !page.key?("error") && page["text"].is_a?(String)
-         }
+  <% if @account.platform == "linkedin" %>
+    <% if @latest_snapshot %>
+      <% profile_snapshots = @snapshots.lazy.filter_map do |snapshot|
+           pages = snapshot.data.is_a?(Hash) ? snapshot.data["pages"] : nil
+           next unless pages.is_a?(Hash) && pages.values_at("profile", "experience", "education", "skills", "certifications").any? { |page|
+             page.is_a?(Hash) && !page.key?("error") && page["text"].is_a?(String)
+           }
 
-         [snapshot, Linkedin::ProfileParser.new(pages).to_h]
-       end.first(10) %>
-    <% if profile_snapshots.any? %>
-      <%= render "linkedin_profile", profile_snapshots: profile_snapshots, naver_snapshot: @naver_snapshot %>
+           [snapshot, Linkedin::ProfileParser.new(pages).to_h]
+         end.first(10) %>
+      <% if profile_snapshots.any? %>
+        <%= render "linkedin_profile", profile_snapshots: profile_snapshots, naver_snapshot: @naver_snapshot %>
+      <% end %>
+      <%= render "linkedin_activity", monitor: @linkedin_monitor %>
+      <%= render "linkedin_network", monitor: @linkedin_monitor, account: @account, actions: @linkedin_invitation_actions %>
     <% end %>
-    <%= render "linkedin_activity", monitor: @linkedin_monitor %>
-    <%= render "linkedin_network", monitor: @linkedin_monitor, account: @account, actions: @linkedin_invitation_actions %>
+    <%= render "linkedin_newsletters", monitor: @linkedin_monitor, account: @account, drafts: @linkedin_newsletter_drafts %>
   <% end %>
   <h2 class="font-semibold text-navy">최근 사본</h2>
   <% if @snapshots.empty? %><p class="text-sm text-gray-500">저장된 사본이 없습니다.</p><% else %><ul class="text-sm text-gray-700"><% @snapshots.each do |snapshot| %><li><%= snapshot.captured_at.localtime.strftime("%Y-%m-%d %H:%M:%S") %> · <%= snapshot.source %></li><% end %></ul><details><summary class="cursor-pointer text-primary text-sm">최신 사본 데이터 보기</summary><pre class="overflow-auto max-h-96 bg-gray-50 p-4 text-xs"><%= JSON.pretty_generate(@latest_snapshot.data) %></pre></details><% end %>
