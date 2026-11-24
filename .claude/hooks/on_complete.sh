@@ -11,11 +11,12 @@ REGISTRY=".claude/issue-db/registry.json"
 ISSUE_ID="$1"
 ISSUE_TYPE="$2"
 RESULT="$3"
+export ON_COMPLETE_RESULT="$RESULT"
 
 echo "[Hook:on_complete] 이슈 완료: $ISSUE_ID ($ISSUE_TYPE)"
 
 python3 << PYEOF
-import json, datetime, sys
+import json, datetime, os, sys
 
 try:
     with open('$REGISTRY', 'r') as f:
@@ -26,7 +27,7 @@ except:
 
 issue_id = '$ISSUE_ID'
 issue_type = '$ISSUE_TYPE'
-result_raw = '''$RESULT'''
+result_raw = os.environ.get('ON_COMPLETE_RESULT', '')
 
 now = datetime.datetime.now().isoformat()
 new_issues = []
@@ -124,13 +125,22 @@ except:
 
 target_issue['result'] = result
 
+skip_reason = None
+if isinstance(result, dict):
+    skip_derivatives = result.get('skip_derivatives')
+    resolution = result.get('resolution')
+    if skip_derivatives or resolution in ('already_fixed', 'verified_rerun', 'no_change'):
+        skip_reason = skip_derivatives if isinstance(skip_derivatives, str) and skip_derivatives else f'resolution={resolution}'
+
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # 결과 분석 → Plan 수립 → 파생 이슈 생성
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 print(f"\n[분석] {issue_type} 결과 기반 Plan 수립:")
 
-if issue_type == 'SCREEN_GAP':
+if skip_reason:
+    print(f'[Plan] 파생 검증 카드 생략: {skip_reason}')
+elif issue_type == 'SCREEN_GAP':
     # 화면 갭 → 빠진 기능별 USER_STORY 생성
     missing = result.get('missing_features', target_issue.get('payload', {}).get('missing_features', []))
     route = result.get('route', target_issue.get('payload', {}).get('route', ''))
