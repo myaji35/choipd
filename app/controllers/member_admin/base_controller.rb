@@ -14,7 +14,12 @@ class MemberAdmin::BaseController < ApplicationController
 
   def require_member_or_admin
     return if warden.user(:admin_user)
-    return if session[:member_id] == @member.id
+    if session[:member_id] == @member.id && !@member.can_sign_in?
+      session.delete(:member_id)
+      return reject_unapproved_member(@member)
+    end
+
+    return if current_member&.id == @member.id
 
     redirect_to login_member_path(slug: @member.slug), alert: "로그인이 필요합니다"
   end
@@ -24,12 +29,7 @@ class MemberAdmin::BaseController < ApplicationController
   end
 
   def impersonating_admin_user
-    warden.user(:admin_user) if @member && session[:member_id] != @member.id
+    warden.user(:admin_user) if @member && current_member&.id != @member.id
   end
   helper_method :impersonating_admin_user
-
-  def current_member
-    @current_member ||= Member.find_by(id: session[:member_id])
-  end
-  helper_method :current_member
 end

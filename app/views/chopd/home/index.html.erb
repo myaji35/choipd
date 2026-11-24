@@ -288,7 +288,7 @@
           <span class="impd-label" style="display: inline-block; border: 1px solid var(--impd-rule); padding: 4px 10px;">예시</span>
           <h3 class="impd-display" style="font-size: var(--impd-size-h3); margin: 24px 0 12px;"><%= title %></h3>
           <p style="font-size: 16px; line-height: 1.4; color: var(--impd-ink);"><%= description %></p>
-          <% if slug && Member.find_by(slug: slug, status: "approved") %>
+          <% if slug && Member.publicly_visible.exists?(slug: slug) %>
             <a href="/<%= slug %>" style="display: inline-block; margin-top: 24px;">예시 페이지 보기 <%= lni_icon "arrow-right" %></a>
           <% end %>
         </div>

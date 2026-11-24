@@ -18,9 +18,9 @@ module Admin::MembersHelper
   end
 
   def member_capabilities(member)
-    public_profile = !member.withdrawn? && member.slug.present?
+    public_profile = member.approved? && !member.withdrawn?
     {
-      password_login: !member.withdrawn? && member.approved? && member.password_digest.present?,
+      login_and_edit: member.can_sign_in?,
       public_profile: public_profile,
       townin_section: public_profile && member.partner_active?
     }

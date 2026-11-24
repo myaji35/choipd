@@ -101,6 +101,8 @@ class Member < ApplicationRecord
     status == "approved"
   end
 
+  def can_sign_in? = approved? && !withdrawn?
+
   # ── Townin 파트너 계층 ──────────────────────────
   # status=approved → 일반 회원 (소소한 활동, 본인 페이지 편집 가능)
   # partner_status=active → Townin 파트너 (공개 페이지에 파트너 활동 섹션 자동 노출)
@@ -323,6 +325,7 @@ class Member < ApplicationRecord
   private :revenue_range_label
 
   scope :active,    -> { where(withdrawn_at: nil) }
+  scope :publicly_visible, -> { active.where(status: "approved") }
   scope :withdrawn, -> { where.not(withdrawn_at: nil) }
 
   def withdrawn?

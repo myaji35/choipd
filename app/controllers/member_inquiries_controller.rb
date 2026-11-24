@@ -1,6 +1,6 @@
 class MemberInquiriesController < ApplicationController
   def create
-    member = Member.active.find_by!(slug: params[:slug])
+    member = Member.publicly_visible.find_by!(slug: params[:slug])
 
     if params[:website].present?
       redirect_back fallback_location: public_profile_path(slug: member.slug),

@@ -1,14 +1,13 @@
 # 회원 가입 (ISS-332).
 # /auth/signup (GET/POST) — 이메일·비밀번호 기반 신규 회원 가입.
-# 가입 직후 status="pending_approval" 로 저장. 관리자가 /admin/members 에서 승인해야
-# 공개 페이지가 열리고 로그인도 가능.
+# 이메일 가입은 승인 상태로 생성하여 가입 직후 편집 흐름으로 연결한다.
 #
 # Google OAuth 가입은 기존 OmniauthCallbacksController 가 처리. 중복 없음.
 class MemberSignupsController < ApplicationController
   layout "application"
 
   def new
-    if session[:member_id].present? && Member.exists?(id: session[:member_id])
+    if member_signed_in?
       redirect_to root_path, notice: "이미 로그인되어 있습니다." and return
     end
     @member = Member.new(signup_defaults)

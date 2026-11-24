@@ -32,7 +32,7 @@ class MemberReviewsController < ApplicationController
   private
 
   def set_member
-    @member = Member.active.find_by!(slug: params[:slug])
+    @member = Member.publicly_visible.find_by!(slug: params[:slug])
   end
 
   def review_params

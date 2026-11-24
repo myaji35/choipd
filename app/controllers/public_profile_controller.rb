@@ -2,7 +2,7 @@ class PublicProfileController < ApplicationController
   layout "impd"
 
   def show
-    @member = Member.active.find_by(slug: params[:slug])
+    @member = Member.publicly_visible.find_by(slug: params[:slug])
     if @member
       @awards = []  # talent 도메인에서 확장 예정
       @services = @member.member_services.active.sorted
@@ -39,8 +39,8 @@ class PublicProfileController < ApplicationController
   # 요약 카드 뷰 — 짧은 URL /s/:hash 기본 타겟.
   # 한 화면(뷰포트 fit)에 이름·직함·명함·QR·연락 3버튼 + "전체 프로필 보기 →".
   def card
-    @member = Member.find_by(slug: params[:slug])
-    raise ActionController::RoutingError.new("Not Found") if @member.nil? || @member.status != "approved"
+    @member = Member.publicly_visible.find_by(slug: params[:slug])
+    raise ActionController::RoutingError.new("Not Found") if @member.nil?
 
     @short_link = ShortLink.resolve_or_create(target_path: "/#{@member.slug}/card", member: @member)
     @skills_top = @member.member_skills
@@ -61,8 +61,8 @@ class PublicProfileController < ApplicationController
       event_category: category,
       page_path: "/#{member.slug}#{category == "card_summary" ? "/card" : ""}",
       page_title: member.name,
-      user_id: session[:member_id]&.to_s,
-      user_type: admin_user_signed_in? ? "admin" : (session[:member_id] == member.id ? "pd" : "anonymous"),
+      user_id: current_member&.id&.to_s,
+      user_type: admin_user_signed_in? ? "admin" : (current_member&.id == member.id ? "pd" : "anonymous"),
       ip_address: request.remote_ip,
       user_agent: request.user_agent,
       device_type: request.user_agent.to_s.downcase.match?(/mobile|android|iphone/) ? "mobile" : "desktop"

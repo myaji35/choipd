@@ -9,8 +9,8 @@ class PublicPhotosController < ApplicationController
   layout "impd"
 
   def show
-    @member = Member.find_by(slug: params[:slug])
-    head :not_found and return if @member.blank? || @member.status != "approved"
+    @member = Member.publicly_visible.find_by(slug: params[:slug])
+    head :not_found and return if @member.blank?
 
     @photo = @member.member_photos.find_by(id: params[:photo_id])
     head :not_found and return if @photo.blank? || !@photo.image.attached?
@@ -37,8 +37,8 @@ class PublicPhotosController < ApplicationController
       event_category: "photo",
       page_path: "/p/#{@member.slug}/#{@photo.id}",
       page_title: @photo.caption.presence || "#{@member.name} 사진",
-      user_id: session[:member_id]&.to_s,
-      user_type: session[:member_id] == @member.id ? "pd" : "anonymous",
+      user_id: current_member&.id&.to_s,
+      user_type: current_member&.id == @member.id ? "pd" : "anonymous",
       ip_address: request.remote_ip,
       user_agent: request.user_agent,
       device_type: request.user_agent.to_s.downcase.match?(/mobile|android|iphone/) ? "mobile" : "desktop"

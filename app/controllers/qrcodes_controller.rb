@@ -5,9 +5,7 @@ class QrcodesController < ApplicationController
   # 공개 엔드포인트. 존재하지 않는 slug 는 404.
   def show
     slug = params[:slug]
-    member = Member.find_by(slug: slug)
-    # 공개 프로필(#show)과 동일한 접근성 — status 게이트는 회원 자체가 존재하면 QR 제공.
-    # (profile 뷰가 렌더되면 QR도 렌더되어야 공유 경로가 깨지지 않음)
+    member = Member.publicly_visible.find_by(slug: slug)
     if member.blank?
       head :not_found and return
     end

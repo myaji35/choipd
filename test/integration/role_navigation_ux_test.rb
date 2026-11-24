@@ -102,15 +102,15 @@ class RoleNavigationUxTest < ActionDispatch::IntegrationTest
     assert_select "p", text: "거부 사유: 신청 정보 확인 필요"
   end
 
-  test "승인 대기 회원 상세에 로그인 방식별 편집 가능 여부와 공개 상태를 표시한다" do
+  test "승인 대기 회원 상세에 로그인·편집 가능 여부와 공개 상태를 표시한다" do
     member = create_member(status: "pending_approval")
     sign_in staff_user("admin")
 
     get admin_member_path(member)
 
     assert_response :success
-    assert_select "li", text: /로그인·내 페이지 편집 —\s*비밀번호 로그인 불가\s*Google 로그인 성공 시 또는 기존 로그인 세션으로 편집 가능/
-    assert_select "li", text: /공개 페이지 \(\/#{member.slug}\) 노출 —\s*공개/
+    assert_select "li", text: /로그인·내 페이지 편집 —\s*불가/
+    assert_select "li", text: /공개 페이지 \(\/#{member.slug}\) 노출 —\s*비공개/
   end
 
   test "운영자 모바일 메뉴 버튼의 aria-controls가 사이드바를 가리킨다" do

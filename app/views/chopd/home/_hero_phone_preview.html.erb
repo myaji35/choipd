@@ -33,7 +33,7 @@
 </style>
 
 <div class="hero-phone-preview">
-  <% sample_member = Member.find_by(slug: "na-seolgye", status: "approved") %>
+  <% sample_member = Member.publicly_visible.find_by(slug: "na-seolgye") %>
   <%= content_tag(sample_member ? :a : :div, class: sample_member ? "hero-phone-link" : nil, href: sample_member ? "/na-seolgye" : nil, aria: sample_member ? { label: "예시 페이지 보기" } : nil) do %>
     <div class="hero-phone">
       <div class="hero-phone-screen">

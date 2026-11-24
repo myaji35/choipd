@@ -48,14 +48,9 @@ class MemberAuthController < ApplicationController
   private
 
   def redirect_if_signed_in
-    return false if session[:member_id].blank?
-    m = Member.find_by(id: session[:member_id])
-    return false unless m
-    if m.status == "approved"
-      redirect_to "/#{m.slug}"
-    else
-      redirect_to root_path, notice: "#{m.name}님, 관리자 승인 대기 중입니다."
-    end
-    true
+    member = current_member
+    return false unless member
+
+    redirect_to "/#{member.slug}"
   end
 end

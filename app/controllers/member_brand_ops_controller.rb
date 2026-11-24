@@ -1,7 +1,7 @@
 class MemberBrandOpsController < ApplicationController
   layout "impd"
   def show
-    @member = Member.find_by!(slug: params[:slug], status: "approved")
+    @member = Member.publicly_visible.find_by!(slug: params[:slug])
     unless brand_ops_public? || brand_ops_admin_preview?
       return redirect_to slug_admin_brand_path(slug: @member.slug) if viewing_as_owner?(@member)
       raise ActiveRecord::RecordNotFound

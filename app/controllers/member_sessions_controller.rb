@@ -4,7 +4,7 @@ class MemberSessionsController < ApplicationController
 
   def new
     @slug = params[:slug]
-    @member = Member.find_by(slug: @slug)
+    @member = Member.publicly_visible.find_by(slug: @slug)
   end
 
   def create
@@ -29,11 +29,4 @@ class MemberSessionsController < ApplicationController
     session.delete(:member_id)
     redirect_to slug ? "/#{slug}" : "/", notice: "로그아웃됨"
   end
-
-  private
-
-  def current_member
-    @current_member ||= Member.find_by(id: session[:member_id])
-  end
-  helper_method :current_member
 end

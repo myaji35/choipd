@@ -166,11 +166,10 @@
       <ul class="mb-4 space-y-1 text-xs text-gray-700">
         <li>
           로그인·내 페이지 편집 —
-          <span class="<%= capabilities[:password_login] ? 'text-green-700' : 'text-gray-500' %>">
-            <% if capabilities[:password_login] %><%= lni_icon "check" %><% end %>
-            비밀번호 로그인 <%= capabilities[:password_login] ? "가능" : "불가" %>
+          <span class="<%= capabilities[:login_and_edit] ? 'text-green-700' : 'text-gray-500' %>">
+            <% if capabilities[:login_and_edit] %><%= lni_icon "check" %><% end %>
+            <%= capabilities[:login_and_edit] ? "가능" : "불가" %>
           </span>
-          <span class="block text-green-700"><%= lni_icon "check" %> Google 로그인 성공 시 또는 기존 로그인 세션으로 편집 가능</span>
         </li>
         <li>
           공개 페이지 (/<%= @member.slug %>) 노출 —
@@ -194,21 +193,21 @@
           <% end %>
           <div>
             <%= button_to safe_join([lni_icon("check"), @member.pending? ? "승인" : "다시 승인"], " "), approve_admin_member_path(@member), class: "w-full bg-green-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-600" %>
-            <p class="mt-1 text-[11px] text-gray-500">승인 상태로 바뀌어 비밀번호 로그인 제한이 풀리고 명함 페이지가 열립니다.</p>
+            <p class="mt-1 text-[11px] text-gray-500">로그인·편집과 공개 페이지가 열립니다</p>
           </div>
           <% if @member.pending? %>
             <%= form_with url: reject_admin_member_path(@member), class: "space-y-1" do |form| %>
               <%= form.text_field :reason, placeholder: "거부 사유(선택, 회원에게 보이지 않음)", aria: { label: "거부 사유(선택)" }, class: "w-full rounded border border-gray-300 px-2 py-2 text-xs" %>
               <%= form.button safe_join([lni_icon("xmark"), "거부"], " "), class: "w-full bg-red-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-600" %>
-              <p class="text-[11px] text-gray-500">거부 상태로 바뀌고 입력한 사유는 운영자 화면에서 확인할 수 있습니다.</p>
+              <p class="text-[11px] text-gray-500">로그인·편집·공개가 막힙니다</p>
             <% end %>
           <% end %>
         <% elsif @member.approved? %>
-          <%= button_to "정지", suspend_admin_member_path(@member), class: "w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-orange-600", form: { data: { turbo_confirm: "정지하면 비밀번호 로그인과 명함 페이지 접근이 막힙니다. 공개 프로필과 Google 로그인, 기존 로그인 세션은 유지됩니다. 계속할까요?" } } %>
-          <p class="mt-1 text-[11px] text-gray-500">비밀번호 로그인과 명함 페이지 접근이 막히며 공개 프로필과 Google 로그인, 기존 로그인 세션은 유지됩니다.</p>
+          <%= button_to "정지", suspend_admin_member_path(@member), class: "w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-orange-600", form: { data: { turbo_confirm: "Google 로그인 포함 모든 로그인과 편집이 막히고 이미 로그인한 세션도 끊기며 공개 페이지가 내려갑니다. 계속할까요?" } } %>
+          <p class="mt-1 text-[11px] text-gray-500">Google 로그인 포함 모든 로그인과 편집이 막히고 이미 로그인한 세션도 끊기며 공개 페이지가 내려갑니다</p>
         <% elsif @member.status == "suspended" %>
           <%= button_to "재활성화", activate_admin_member_path(@member), class: "w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600" %>
-          <p class="mt-1 text-[11px] text-gray-500">승인 상태로 돌아가 비밀번호 로그인 제한이 풀리고 명함 페이지가 다시 열립니다.</p>
+          <p class="mt-1 text-[11px] text-gray-500">로그인·편집과 공개 페이지가 열립니다</p>
         <% end %>
       </div>
     </div>

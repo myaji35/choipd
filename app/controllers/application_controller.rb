@@ -27,7 +27,14 @@ class ApplicationController < ActionController::Base
   # ApplicationController 에 올려 helper_method 로 뷰 공개.
   def current_member
     return @current_member if defined?(@current_member)
-    @current_member = Member.find_by(id: session[:member_id])
+    member_id = session[:member_id]
+    return @current_member = nil if member_id.blank?
+
+    member = Member.find_by(id: member_id)
+    return @current_member = member if member&.can_sign_in?
+
+    session.delete(:member_id)
+    @current_member = nil
   end
   helper_method :current_member
 
@@ -68,7 +75,7 @@ class ApplicationController < ActionController::Base
   end
 
   def reject_unapproved_member(member)
-    return false if member.status == "approved"
+    return false if member.can_sign_in?
 
     case member.status
     when "pending_approval"

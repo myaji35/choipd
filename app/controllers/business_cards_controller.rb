@@ -9,7 +9,7 @@
 # - 브라우저/카톡 OG 이미지로 동작 확인 필요. SVG 미지원 채널은 PNG 변환 후속 과제(P1).
 class BusinessCardsController < ApplicationController
   def show
-    member = Member.find_by(slug: params[:slug])
+    member = Member.publicly_visible.find_by(slug: params[:slug])
     head :not_found and return if member.blank?
 
     svg = render_card_svg(member)

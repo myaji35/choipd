@@ -2,7 +2,7 @@ class ExploreController < ApplicationController
   layout "impd"
 
   def index
-    available = Member.active.where(status: "approved")
+    available = Member.publicly_visible
     @total_count = available.count
     @professions = available.distinct.pluck(:profession).compact
     @regions = available.where.not(region: [ nil, "" ]).distinct.pluck(:region).sort

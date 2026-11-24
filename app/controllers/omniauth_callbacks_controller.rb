@@ -21,8 +21,12 @@ class OmniauthCallbacksController < ApplicationController
       return
     end
 
-    session[:member_id] = member.id
-    member.update(last_sign_in_at: Time.current) rescue nil
+    if member.can_sign_in?
+      session[:member_id] = member.id
+      member.update(last_sign_in_at: Time.current) rescue nil
+    else
+      session.delete(:member_id)
+    end
 
     # 2) 같은 이메일의 AdminUser가 있으면 Devise 세션도 함께 생성 (운영자 겸 회원 케이스)
     email = auth.info&.email.to_s.downcase.presence
@@ -38,10 +42,12 @@ class OmniauthCallbacksController < ApplicationController
     #    (c) pending_approval이면 루트 + 안내
     if admin&.admin?
       redirect_to admin_root_path, notice: "관리자로 로그인되었습니다, #{admin.email}."
-    elsif member.status == "approved"
+    elsif member.can_sign_in?
       redirect_to "/#{member.slug}/admin/dashboard", notice: "다시 오신 걸 환영합니다, #{member.name}님."
-    else
+    elsif member.pending? && !member.withdrawn?
       redirect_to root_path, notice: "환영합니다, #{member.name}님! 관리자 승인 후 페이지를 편집할 수 있습니다."
+    else
+      reject_unapproved_member(member)
     end
   rescue StandardError => e
     Rails.logger.error "[OAuth] #{e.class}: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
