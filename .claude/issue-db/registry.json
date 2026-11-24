@@ -164,7 +164,8 @@
       "production_impact": "none",
       "created_at": "2026-04-24T11:30:00Z",
       "completed_at": "2026-04-24T11:31:00Z",
-      "assign_to": "agent-harness"
+      "assign_to": "agent-harness",
+      "payload": {}
     },
     {
       "id": "ISS-405",
@@ -181,7 +182,8 @@
       "production_impact": "none",
       "created_at": "2026-04-24T11:32:00Z",
       "completed_at": "2026-04-24T11:33:00Z",
-      "assign_to": "agent-harness"
+      "assign_to": "agent-harness",
+      "payload": {}
     },
     {
       "id": "ISS-406",
@@ -200,7 +202,8 @@
       "completed_at": "2026-07-20T13:20:45",
       "assign_to": "opus",
       "deployed_at": "2026-07-20T13:39:31",
-      "deploy_verification": "fbe35b6 프로덕션 반영 확인(컨테이너 실측). dependent :destroy 반영, 프로덕션 7명 전원 short_link 보유(=이전엔 전원 삭제불가), demo-pd-a 롤백 dry-run 삭제 성공. choi-pd는 문의 7건으로 restrict_with_error 정상 차단(의도된 정책)."
+      "deploy_verification": "fbe35b6 프로덕션 반영 확인(컨테이너 실측). dependent :destroy 반영, 프로덕션 7명 전원 short_link 보유(=이전엔 전원 삭제불가), demo-pd-a 롤백 dry-run 삭제 성공. choi-pd는 문의 7건으로 restrict_with_error 정상 차단(의도된 정책).",
+      "payload": {}
     },
     {
       "id": "ISS-407",
@@ -220,7 +223,8 @@
       "completed_at": "2026-07-20T13:20:45",
       "assign_to": "opus",
       "deployed_at": "2026-07-20T13:39:31",
-      "deploy_verification": "fbe35b6 프로덕션 반영 확인(컨테이너 실측). 375px overflow 0 / stats 2열 / wrap padding 20px / topnav-identity 규칙 서빙 확인"
+      "deploy_verification": "fbe35b6 프로덕션 반영 확인(컨테이너 실측). 375px overflow 0 / stats 2열 / wrap padding 20px / topnav-identity 규칙 서빙 확인",
+      "payload": {}
     },
     {
       "id": "ISS-408",
@@ -350,7 +354,8 @@
         "tests": "66 runs 0 failures (병렬)",
         "real_run": "네이버 2840091 ME/ACCEPT, LinkedIn 승식-강-7b957635 로그인됨, 재점검 시 변경 없으면 사본 미생성 확인",
         "ui": "/pd/people_accounts 2750·1024 너비 가로 넘침 없음"
-      }
+      },
+      "payload": {}
     },
     {
       "type": "FEATURE",
@@ -1226,7 +1231,8 @@
       "result": {
         "tests": "74 runs 0 failures",
         "real": "완성도 70%(수상·자격증·사이트 비어 있음), 검색 링크 os=42140857"
-      }
+      },
+      "payload": {}
     },
     {
       "type": "FEATURE",
@@ -1855,20 +1861,26 @@
             "at": "2026-11-24T10:10:52.796Z",
             "by": "auto",
             "reason": "「[연동] 회원용 '내 브랜드' 운영 화면 — 브랜드·동의·매체·콘텐츠·Townin 성과 한 화면」(FEATURE, P1)을 다음 실행에 착수할 만합니다."
+          },
+          {
+            "action": "decide",
+            "at": "2026-11-24T12:59:59.469Z",
+            "by": "대표님(헤르메스)",
+            "note": "관제 자율 결정"
           }
         ],
-        "approved_at": "2026-11-24T10:10:52.796Z",
-        "approved_by": "자동 승인(추천: 승인 권장)",
+        "approved_at": "2026-11-24T12:59:59.469Z",
+        "approved_by": "대표님(헤르메스)",
         "depends_on_external": "0017_SocialDoctors ISS-521 (GET /api/brands/{externalId}/summary)",
         "ask_kind": "external_wait",
         "ask_prompt": "SocialDoctors 쪽 '브랜드 성과 요약 API'(SD ISS-521)가 완료되면 [회신 왔음]을 눌러 주세요. 그때 내 브랜드 화면에 매체별 발행 수와 Townin 성과를 붙입니다.",
         "recommendation": {
           "verdict": "보류 권장",
-          "reason": "남은 부분은 SD 요약 API 계약이 정해져야 한다. 계약 없이 imPD 쪽만 지어내면 나중에 다시 고쳐야 한다. 이미 된 부분(브랜드·동의·콘텐츠·운영 그래프)은 회원이 지금 쓸 수 있다.",
+          "reason": "대표님 관제 결정 A(보류). 남은 Townin 성과 칸은 SD 브랜드 요약 API(ISS-521) 형식이 main 에 들어와야 붙일 수 있어, 지금 만들면 재작업 위험이 크다.",
           "risk": "낮음",
-          "effort": "M",
+          "effort": "S",
           "by": "factory-runner",
-          "at": "2026-11-24T10:16:15Z"
+          "at": "2026-11-24T23:30:00+09:00"
         },
         "question": "약속(요약 데이터 형식)이 정해질 때까지 남은 Townin 성과 부분을 멈춰 둘까요?",
         "options": [
@@ -1893,12 +1905,20 @@
         "explained_by": "decision-explain",
         "explained_at": "2026-11-24T20:07:51.752693+09:00",
         "rechecked": {
-          "at": "2026-11-24T22:00:00+09:00",
+          "at": "2026-11-24T23:30:00+09:00",
           "by": "factory-runner",
-          "result": "SD ISS-521 은 여전히 AWAITING_USER(배포 검토, 브랜치 factory/ISS-521, main 미병합). 막힘 사유 유효 — 유지."
+          "result": "관제 결정 A(보류) 반영. SD ISS-521 여전히 AWAITING_USER(factory/ISS-521, main 미병합). 이미 된 부분(브랜드·동의·콘텐츠 수·4주 그래프)은 운영 중, Townin 성과 칸만 대기."
+        },
+        "decision": {
+          "choice": "A",
+          "label": "보류 — 데이터 형식이 정해질 때까지 남은 부분만 멈춤",
+          "text": "관제 자율 결정",
+          "question": "약속(요약 데이터 형식)이 정해질 때까지 남은 Townin 성과 부분을 멈춰 둘까요?",
+          "by": "대표님(헤르메스)",
+          "at": "2026-11-24T12:59:59.469Z"
         }
       },
-      "updated_at": "2026-11-24T19:16:16+09:00",
+      "updated_at": "2026-11-24T23:30:00+09:00",
       "blocked_reason": "성과 칸(매체별 발행 수·Townin 읽음·사용 포인트)은 SocialDoctors 브랜드 요약 API(0017 ISS-521, 현재 AWAITING_USER)가 있어야 붙일 수 있다. 브랜드·동의 상태·imPD 콘텐츠 수·4주 운영 그래프는 ac54dd2·ISS-481 에서 이미 한 화면에 들어갔다."
     },
     {
@@ -1939,9 +1959,9 @@
           "95% 미만이면 미달 칸마다 개선 이슈가 생긴다"
         ],
         "rechecked": {
-          "at": "2026-11-24T22:00:00+09:00",
+          "at": "2026-11-24T23:30:00+09:00",
           "by": "factory-runner",
-          "result": "SD ISS-521 은 여전히 AWAITING_USER(배포 검토, 브랜치 factory/ISS-521, main 미병합). 막힘 사유 유효 — 유지."
+          "result": "SD ISS-521 여전히 AWAITING_USER(main 미병합), imPD ISS-476 BLOCKED. 막힘 사유 유효 — 유지."
         }
       },
       "updated_at": "2026-11-24T12:06:43Z",
@@ -2467,7 +2487,7 @@
       "id": "ISS-485",
       "type": "FIX_BUG",
       "priority": "P2",
-      "status": "AWAITING_USER",
+      "status": "BLOCKED",
       "parent": "ISS-480",
       "title": "[법적 고지] 개인정보처리방침 보호책임자 공개 이메일(또는 전화) 기입",
       "description": "ISS-480에서 성명·직책은 반영했고 이메일 칸 3곳은 임시로 '문의하기' 연결. 개인정보보호법상 보호책임자 연락처(전화·이메일 중 하나 이상) 공개가 필요하다.",
@@ -2483,12 +2503,12 @@
           "app/views/legal/privacy.html.erb"
         ],
         "recommendation": {
-          "verdict": "대표님 결정 필요",
-          "reason": "공개 연락처 값은 대표님만 정할 수 있고 볼트에 값이 없다(연락처 칸 빈칸, 재확인 문서 미필기). 값이 오면 privacy.html.erb 3곳의 문의하기 링크를 값으로 바꾸면 끝(작음).",
-          "risk": "낮음",
-          "effort": "작음",
+          "verdict": "보류 권장",
+          "reason": "대표님 관제 결정 D(보류). 공개 연락처 값은 대표님만 정할 수 있고, 값이 오면 방침 페이지 3곳 교체로 바로 끝난다.",
+          "risk": "낮음(법적 고지 미완성 상태 유지)",
+          "effort": "XS",
           "by": "factory-runner",
-          "at": "2026-11-24T10:42:30Z"
+          "at": "2026-11-24T23:30:00+09:00"
         },
         "recall_checked": {
           "at": "2026-11-24T10:41:13Z",
@@ -2531,12 +2551,18 @@
             "at": "2026-11-24T10:41:13.559Z",
             "by": "auto",
             "reason": "볼트 기억에서 답을 찾아 대표님께 묻지 않고 진행: 대표님 일일 컨펌 — 2026-11-20 (07-AI-Knowledge/대표님-답변/컨펌/2026-11-20.md). recall_hits 를 읽고 그 값으로 이어서 진행하라. 기억과 맞지 않거나 부족하면 그때만 ask_kind=provide_value 로 다시 물어라."
+          },
+          {
+            "action": "decide",
+            "at": "2026-11-24T13:00:07.150Z",
+            "by": "대표님(헤르메스)",
+            "note": "관제 자율 결정"
           }
         ],
-        "approved_at": "2026-11-24T10:41:13.559Z",
-        "approved_by": "자동 승인(추천: 승인 권장)",
+        "approved_at": "2026-11-24T13:00:07.150Z",
+        "approved_by": "대표님(헤르메스)",
         "ask_kind": "provide_value",
-        "ask_prompt": "개인정보처리방침에 공개할 보호책임자 연락처(이메일 또는 전화) 하나를 적어 주세요. 이미 올린 컨펌 문서 imPD_보호책임자연락처_비밀값위치_재확인_컨펌_261120.pdf 1번 칸에 적으셔도 됩니다.",
+        "ask_prompt": "개인정보처리방침에 공개할 보호책임자 연락처(업무용 이메일 또는 전화) 하나를 정하시면 입력칸에 적어 주세요. 지금은 보류로 두셨으므로 다시 묻지 않고 기다립니다.",
         "recall_gate_note": "기억 검색이 찾았다고 판정했지만 실제 내용은 연락처 빈칸 + 재확인 컨펌 문서가 11-21~11-24 매일 대기 목록에 남아 있다는 기록뿐이다(값 없음). 컨펌/ 루트에 아직 필기 전 상태로 있음.",
         "question": "개인정보 보호책임자 문의용으로 공개할 이메일(또는 전화번호)은 무엇입니까?",
         "options": [
@@ -2570,12 +2596,21 @@
         "explained_by": "decision-explain",
         "explained_at": "2026-11-24T20:07:51.752693+09:00",
         "rechecked": {
-          "at": "2026-11-24T22:00:00+09:00",
+          "at": "2026-11-24T23:30:00+09:00",
           "by": "factory-runner",
-          "result": "컨펌 PDF imPD_보호책임자연락처_비밀값위치_재확인_컨펌_261120.pdf 가 아직 컨펌/ 루트(필기 전)에 있음. 값 없음 — 대기 유지."
+          "result": "관제 결정 D(보류) 반영. 컨펌 PDF imPD_보호책임자연락처_비밀값위치_재확인_컨펌_261120.pdf 는 아직 컨펌/ 루트(필기 전). 값 없이는 구현할 것이 없어 대기."
+        },
+        "decision": {
+          "choice": "D",
+          "label": "보류 — 지금은 정하지 않음",
+          "text": "관제 자율 결정",
+          "question": "개인정보 보호책임자 문의용으로 공개할 이메일(또는 전화번호)은 무엇입니까?",
+          "by": "대표님(헤르메스)",
+          "at": "2026-11-24T13:00:07.150Z"
         }
       },
-      "updated_at": "2026-11-24T10:42:30Z"
+      "updated_at": "2026-11-24T23:30:00+09:00",
+      "blocked_reason": "공개 연락처 값 대기(관제 결정 D 보류). 성명·직책은 ISS-480 에서 반영, 이메일 칸 3곳은 임시로 문의하기 연결."
     },
     {
       "id": "ISS-486",
@@ -7126,6 +7161,168 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 173,
+        "timestamp": "2026-11-24T21:54:36.496049",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (domain-analyst, test-harness, agent-harness, brand-guardian, ux-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 174,
+        "timestamp": "2026-11-24T21:54:39.893208",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (ux-harness, brand-guardian, agent-harness, test-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 175,
+        "timestamp": "2026-11-24T21:54:41.432033",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (test-harness, agent-harness, domain-analyst, ux-harness, brand-guardian)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 176,
+        "timestamp": "2026-11-24T21:54:42.498458",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (agent-harness, test-harness, ux-harness, brand-guardian, domain-analyst)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 177,
+        "timestamp": "2026-11-24T21:54:43.816335",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (test-harness, brand-guardian, ux-harness, domain-analyst, agent-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 178,
+        "timestamp": "2026-11-24T21:54:45.320059",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (agent-harness, brand-guardian, test-harness, ux-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 179,
+        "timestamp": "2026-11-24T21:54:46.430689",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (test-harness, agent-harness, brand-guardian, domain-analyst, ux-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 180,
+        "timestamp": "2026-11-24T21:54:47.883792",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (ux-harness, test-harness, brand-guardian, agent-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 181,
+        "timestamp": "2026-11-24T21:54:48.722059",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (ux-harness, agent-harness, brand-guardian, test-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
@@ -7133,7 +7330,7 @@
     "total_issues": 501,
     "completed": 27,
     "failed": 0,
-    "evolved": 172
+    "evolved": 181
   },
   "pending_opportunity_signals": [
     {
