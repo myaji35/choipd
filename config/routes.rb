@@ -220,6 +220,10 @@ Rails.application.routes.draw do
         post :invitation_action
         patch :search_queries
       end
+      resource :naver_target, only: [ :show, :edit, :update ], controller: "naver_people_targets" do
+        patch :approve
+        patch :unapprove
+      end
       resources :newsletter_drafts, only: [ :create, :edit, :update ], controller: "profile_account_newsletter_drafts" do
         member do
           patch :archive

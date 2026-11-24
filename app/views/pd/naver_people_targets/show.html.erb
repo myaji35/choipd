@@ -1,0 +1,86 @@
+<% content_for :title, "목표 프로필·수정 신청 초안" %>
+<%= link_to "← #{@account.display_name}", pd_profile_account_path(@account), class: "text-primary text-sm" %>
+<h1 class="text-xl font-bold text-navy mt-2 mb-4">목표 프로필·수정 신청 초안</h1>
+
+<div class="bg-white rounded-lg border border-gray-100 shadow-sm p-6 space-y-4">
+  <section class="border border-gray-100 rounded-lg p-4 space-y-2">
+    <h2 class="font-semibold text-navy">목표 프로필</h2>
+    <%= link_to "목표 프로필 편집", edit_pd_profile_account_naver_target_path(@account), class: "text-primary text-sm" %>
+    <%= render "source_links" %>
+    <% if @values.empty? %>
+      <p class="text-sm text-gray-500">입력된 목표 항목이 없습니다.</p>
+    <% else %>
+      <dl class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+        <% NaverPeopleTarget::FIELDS.each do |field, label| %>
+          <% if @values[field].present? %>
+            <div class="min-w-0">
+              <dt class="text-gray-500"><%= label %></dt>
+              <dd class="whitespace-pre-line break-all"><%= Array(@values[field]).join("\n") %></dd>
+            </div>
+          <% end %>
+        <% end %>
+      </dl>
+    <% end %>
+  </section>
+
+  <section class="border border-gray-100 rounded-lg p-4 space-y-2">
+    <h2 class="font-semibold text-navy">수정 신청 초안</h2>
+    <p class="text-sm">승인 상태 <strong><%= @approval_label %></strong></p>
+    <% if @diff.items.empty? %>
+      <p class="text-sm text-gray-500">바꿀 항목이 없습니다.</p>
+    <% else %>
+      <% if @approval_stale %>
+        <p class="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900" role="alert">승인 이후 내용이 바뀌었습니다. 다시 승인하세요.</p>
+      <% end %>
+      <% actions = { "add" => "추가", "remove" => "삭제", "change" => "수정" } %>
+      <% rows = @diff.items.map { |item| [item[:label], actions.fetch(item[:action]), item[:before], item[:after], item[:evidence].join(", ")] } %>
+      <%= render "table", title: "수정 신청 초안", headings: %w[항목 구분 현재 목표 증빙], rows: rows %>
+    <% end %>
+    <div class="flex flex-wrap gap-3">
+      <% if @diff.items.any? && (@target.status != "approved" || @approval_stale) %>
+        <%= button_to "초안 승인", approve_pd_profile_account_naver_target_path(@account), method: :patch, class: "px-4 py-2 rounded-lg bg-primary text-white text-sm" %>
+      <% end %>
+      <% if @target.status == "approved" %>
+        <%= button_to "승인 취소", unapprove_pd_profile_account_naver_target_path(@account), method: :patch, class: "px-4 py-2 rounded-lg border border-gray-300 text-sm" %>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="border border-gray-100 rounded-lg p-4 space-y-2">
+    <h2 class="font-semibold text-navy">준비할 증빙 서류</h2>
+    <p class="text-sm text-gray-600">일반 기준이며 네이버 신청 화면에서 최종 확인하세요. 체크 표시는 이 화면에서만 유지됩니다.</p>
+    <% if @diff.checklist.empty? %>
+      <p class="text-sm text-gray-500">준비할 증빙 서류가 없습니다.</p>
+    <% else %>
+      <ul class="space-y-2 text-sm">
+        <% @diff.checklist.each do |entry| %>
+          <li><label><input type="checkbox" class="mr-2"><%= entry[:document] %> · <%= entry[:for].join(", ") %></label></li>
+        <% end %>
+      </ul>
+    <% end %>
+  </section>
+
+  <section class="border border-gray-100 rounded-lg p-4 space-y-2">
+    <h2 class="font-semibold text-navy">사이트 정보 대조</h2>
+    <% sites = @cross_check.sites %>
+    <% if sites.empty? %>
+      <p class="text-sm text-gray-500">대조할 사이트 주소가 없습니다.</p>
+    <% else %>
+      <% rows = sites.map { |site| [site[:source], site[:url], site[:registered] ? "등록됨" : "미등록"] } %>
+      <%= render "table", title: "사이트 정보 대조", headings: ["출처", "주소", "네이버 등록 여부"], rows: rows %>
+    <% end %>
+  </section>
+
+  <section class="border border-gray-100 rounded-lg p-4 space-y-2">
+    <h2 class="font-semibold text-navy">LinkedIn 과 다른 곳</h2>
+    <% mismatches = @cross_check.linkedin_mismatches %>
+    <% if mismatches.nil? %>
+      <p class="text-sm text-gray-500">LinkedIn 사본이 없습니다.</p>
+    <% elsif mismatches.empty? %>
+      <p class="text-sm text-gray-500">확인된 차이가 없습니다.</p>
+    <% else %>
+      <%= render "table", title: "LinkedIn 과 다른 곳", headings: %w[항목 LinkedIn 네이버 차이],
+        rows: mismatches.map { |entry| entry.values_at(:topic, :linkedin, :naver, :note) } %>
+    <% end %>
+  </section>
+</div>

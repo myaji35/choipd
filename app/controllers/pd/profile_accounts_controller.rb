@@ -16,6 +16,14 @@ class Pd::ProfileAccountsController < Pd::BaseController
   def show
     @snapshots = @account.profile_snapshots.recent.limit(@account.platform == "linkedin" ? 60 : 20).to_a
     @latest_snapshot = @snapshots.first
+    if @account.platform == "naver_people"
+      target = @account.naver_people_target
+      if target&.status == "approved"
+        current = NaverPeople::TargetSources.new(@account).from("naver")
+        diff = NaverPeople::TargetDiff.new(current, target.values)
+      end
+      @naver_target_status = target&.approval_label(diff) || "초안"
+    end
     if @account.platform == "linkedin"
       @linkedin_monitor = Linkedin::Monitor.new(@snapshots)
       @linkedin_newsletter_drafts = @account.linkedin_newsletter_drafts.order(updated_at: :desc, id: :desc)

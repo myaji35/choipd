@@ -1,0 +1,5 @@
+<nav class="flex flex-wrap gap-3 text-sm" aria-label="목표 프로필 불러오기">
+  <% Pd::NaverPeopleTargetsController::SOURCES.each do |source, label| %>
+    <%= link_to "#{label}에서 불러오기", edit_pd_profile_account_naver_target_path(@account, source: source), class: "text-primary" %>
+  <% end %>
+</nav>

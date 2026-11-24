@@ -1,0 +1,38 @@
+<% content_for :title, "목표 프로필 편집" %>
+<%= link_to "← 목표 프로필·수정 신청 초안", pd_profile_account_naver_target_path(@account), class: "text-primary text-sm" %>
+<h1 class="text-xl font-bold text-navy mt-2 mb-4"><%= @account.display_name %> 목표 프로필 편집</h1>
+<section class="bg-white rounded-lg border border-gray-100 shadow-sm p-6 space-y-4">
+  <%= render "source_links" %>
+  <p class="text-sm text-gray-600">목록은 한 줄에 하나씩 입력하세요. 비워 둔 항목은 네이버 현재 값을 유지합니다.</p>
+  <% if @target.errors.any? %>
+    <ul class="text-sm text-red-600 list-disc list-inside" role="alert">
+      <% @target.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  <% end %>
+  <% examples = {
+    "jobs" => "기업인",
+    "offices" => "주식회사 가가호호 | 대표이사",
+    "careers" => "2024.08~현재 | 누리팜 대표 또는 2000.03~2007.02 | 가천대학교 컴퓨터공학과 겸임교수",
+    "schools" => "가천대학교 | 전자계산과 | 전문학사",
+    "prizes" => "상 이름 | 2020",
+    "licenses" => "자격 이름 | 2020",
+    "sites" => "https://… (http 또는 https 주소)"
+  } %>
+  <%= form_with url: pd_profile_account_naver_target_path(@account), method: :patch, scope: :naver_people_target, class: "space-y-4" do |form| %>
+    <% NaverPeopleTarget::FIELDS.each do |field, label| %>
+      <div>
+        <%= form.label field, label, class: "block text-sm font-medium text-navy" %>
+        <% if field == "ename" %>
+          <%= form.text_field field, value: @values[field], maxlength: 100, class: "mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" %>
+        <% else %>
+          <p id="format-<%= field %>" class="mt-1 text-sm text-gray-500"><%= examples.fetch(field) %></p>
+          <%= form.text_area field, value: Array(@values[field]).join("\n"), rows: 3,
+            aria: { describedby: "format-#{field}" }, class: "mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" %>
+        <% end %>
+      </div>
+    <% end %>
+    <%= form.submit "목표 프로필 저장", class: "px-4 py-2 rounded-lg bg-primary text-white text-sm" %>
+  <% end %>
+</section>

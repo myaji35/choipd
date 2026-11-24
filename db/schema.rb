@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_24_210000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_220000) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -956,6 +956,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_210000) do
     t.index ["withdrawn_at"], name: "index_members_on_withdrawn_at"
   end
 
+  create_table "naver_people_targets", force: :cascade do |t|
+    t.integer "tenant_id", default: 1, null: false
+    t.integer "profile_account_id", null: false
+    t.text "data"
+    t.string "status", default: "draft", null: false
+    t.datetime "approved_at"
+    t.string "approved_draft_digest"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index [ "profile_account_id" ], name: "index_naver_people_targets_on_profile_account_id", unique: true
+  end
+
   create_table "notifications", force: :cascade do |t|
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.boolean "is_read", default: false, null: false
@@ -1307,6 +1319,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_210000) do
   add_foreign_key "member_services", "members", on_delete: :cascade
   add_foreign_key "member_skills", "members", on_delete: :cascade
   add_foreign_key "member_skills", "skills", on_delete: :cascade
+  add_foreign_key "naver_people_targets", "profile_accounts"
   add_foreign_key "payments", "distributors"
   add_foreign_key "profile_snapshots", "profile_accounts"
   add_foreign_key "short_links", "members"
