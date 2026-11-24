@@ -2510,6 +2510,31 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 76,
+        "timestamp": "2026-11-24T19:39:48.308965",
+        "findings": [
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3054시간",
+          "🟡 장기 대기: ISS-463 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-464 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-466 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-471 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-472 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-473 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 124시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 33,
+          "done": 18,
+          "in_progress": 0,
+          "ready": 11,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
@@ -2517,7 +2542,7 @@
     "total_issues": 487,
     "completed": 6,
     "failed": 0,
-    "evolved": 75
+    "evolved": 76
   },
   "pending_opportunity_signals": [
     {
