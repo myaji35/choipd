@@ -1,4 +1,5 @@
 <% content_for :title, @member.name %>
+<% capabilities = member_capabilities(@member) %>
 
 <div class="mb-6 flex items-center justify-between flex-wrap gap-3">
   <div>
@@ -7,8 +8,8 @@
     <% if @member.slug.present? %>
       <p class="text-sm text-gray-500 mt-1">
         공개 URL: <%= link_to "/#{@member.slug}", "/#{@member.slug}", target: "_blank", rel: "noopener noreferrer", class: "text-primary hover:underline font-mono" %>
-        <% unless @member.status == "approved" %>
-          <span class="ml-2 rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">승인 전 비공개</span>
+        <% unless capabilities[:public_profile] %>
+          <span class="ml-2 rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">비공개</span>
         <% end %>
       </p>
       <div class="mt-2 flex flex-wrap gap-2">
@@ -17,7 +18,7 @@
             title: "#{@member.name}님의 공개 페이지를 새 탭에서 열기",
             class: "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-green-700 text-white text-sm font-semibold hover:bg-green-800 transition" do %>
           <%= lni_icon "arrow-angular-top-right" %>
-          공개 페이지 보기 ↗
+          공개 페이지 보기
         <% end %>
         <%= link_to "회원 화면 열기 (운영자 권한)", slug_admin_dashboard_path(slug: @member.slug),
             class: "inline-flex items-center px-3.5 py-2 rounded-full border border-gray-400 text-gray-800 text-sm font-semibold hover:bg-gray-900 hover:text-white transition" %>
@@ -154,24 +155,62 @@
   </div>
 
   <div class="space-y-4">
-    <!-- 상태 -->
+    <!-- 가입 승인 상태 -->
     <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
-      <h2 class="font-semibold text-navy mb-4">상태</h2>
+      <h2 class="font-semibold text-navy mb-4">가입 승인 상태</h2>
       <div class="mb-3">
         <% color = case @member.status; when 'approved' then 'green'; when 'pending_approval' then 'yellow'; when 'rejected' then 'red'; when 'suspended' then 'gray'; else 'gray'; end %>
         <span class="text-sm px-3 py-1 rounded-full bg-<%= color %>-100 text-<%= color %>-700 font-semibold"><%= member_status_label(@member.status) %></span>
       </div>
-      <% if @member.pending? %>
-        <div class="space-y-2">
-          <%= button_to safe_join([lni_icon("check"), "승인 (소소한 활동 허용)"], " "), approve_admin_member_path(@member), class: "w-full bg-green-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-600" %>
-          <p class="text-[11px] text-gray-500 leading-relaxed">본인 페이지 편집·사진 업로드 등 기본 활동을 허용합니다. Townin 파트너 연결은 우측 "Townin 파트너" 카드에서 별도 관리.</p>
-          <%= button_to safe_join([lni_icon("xmark"), "거부"], " "), reject_admin_member_path(@member), class: "w-full bg-red-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-600" %>
-        </div>
-      <% elsif @member.approved? %>
-        <%= button_to "정지", suspend_admin_member_path(@member), class: "w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-orange-600", data: { turbo_confirm: "정지하시겠습니까?" } %>
-      <% elsif @member.status == "suspended" %>
-        <%= button_to "재활성화", activate_admin_member_path(@member), class: "w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600" %>
-      <% end %>
+      <h3 class="mb-1 text-xs font-semibold text-gray-700">지금 이 회원이 할 수 있는 것</h3>
+      <ul class="mb-4 space-y-1 text-xs text-gray-700">
+        <li>
+          로그인·내 페이지 편집 —
+          <span class="<%= capabilities[:password_login] ? 'text-green-700' : 'text-gray-500' %>">
+            <% if capabilities[:password_login] %><%= lni_icon "check" %><% end %>
+            비밀번호 로그인 <%= capabilities[:password_login] ? "가능" : "불가" %>
+          </span>
+          <span class="block text-green-700"><%= lni_icon "check" %> Google 로그인 성공 시 또는 기존 로그인 세션으로 편집 가능</span>
+        </li>
+        <li>
+          공개 페이지 (/<%= @member.slug %>) 노출 —
+          <span class="<%= capabilities[:public_profile] ? 'text-green-700' : 'text-gray-500' %>">
+            <% if capabilities[:public_profile] %><%= lni_icon "check" %><% end %>
+            <%= capabilities[:public_profile] ? "공개" : "비공개" %>
+          </span>
+        </li>
+        <li>
+          Townin 파트너 섹션 노출 —
+          <span class="<%= capabilities[:townin_section] ? 'text-green-700' : 'text-gray-500' %>">
+            <% if capabilities[:townin_section] %><%= lni_icon "check" %><% end %>
+            <%= capabilities[:townin_section] ? "공개" : "비공개" %>
+          </span>
+        </li>
+      </ul>
+      <div class="space-y-3">
+        <% if @member.pending? || @member.status == "rejected" %>
+          <% if @member.status == "rejected" && @member.rejection_reason.present? %>
+            <p class="text-xs text-gray-700 break-words">거부 사유: <%= @member.rejection_reason %></p>
+          <% end %>
+          <div>
+            <%= button_to safe_join([lni_icon("check"), @member.pending? ? "승인" : "다시 승인"], " "), approve_admin_member_path(@member), class: "w-full bg-green-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-600" %>
+            <p class="mt-1 text-[11px] text-gray-500">승인 상태로 바뀌어 비밀번호 로그인 제한이 풀리고 명함 페이지가 열립니다.</p>
+          </div>
+          <% if @member.pending? %>
+            <%= form_with url: reject_admin_member_path(@member), class: "space-y-1" do |form| %>
+              <%= form.text_field :reason, placeholder: "거부 사유(선택, 회원에게 보이지 않음)", aria: { label: "거부 사유(선택)" }, class: "w-full rounded border border-gray-300 px-2 py-2 text-xs" %>
+              <%= form.button safe_join([lni_icon("xmark"), "거부"], " "), class: "w-full bg-red-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-600" %>
+              <p class="text-[11px] text-gray-500">거부 상태로 바뀌고 입력한 사유는 운영자 화면에서 확인할 수 있습니다.</p>
+            <% end %>
+          <% end %>
+        <% elsif @member.approved? %>
+          <%= button_to "정지", suspend_admin_member_path(@member), class: "w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-orange-600", form: { data: { turbo_confirm: "정지하면 비밀번호 로그인과 명함 페이지 접근이 막힙니다. 공개 프로필과 Google 로그인, 기존 로그인 세션은 유지됩니다. 계속할까요?" } } %>
+          <p class="mt-1 text-[11px] text-gray-500">비밀번호 로그인과 명함 페이지 접근이 막히며 공개 프로필과 Google 로그인, 기존 로그인 세션은 유지됩니다.</p>
+        <% elsif @member.status == "suspended" %>
+          <%= button_to "재활성화", activate_admin_member_path(@member), class: "w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600" %>
+          <p class="mt-1 text-[11px] text-gray-500">승인 상태로 돌아가 비밀번호 로그인 제한이 풀리고 명함 페이지가 다시 열립니다.</p>
+        <% end %>
+      </div>
     </div>
 
     <!-- IMPD 인증 -->

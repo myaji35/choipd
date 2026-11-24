@@ -90,6 +90,49 @@ class RoleNavigationUxTest < ActionDispatch::IntegrationTest
     assert_select "nav a[href=?].bg-primary", admin_members_path, count: 1
   end
 
+  test "거부된 회원 상세에 다시 승인 버튼과 거부 사유를 표시한다" do
+    member = create_member(status: "rejected")
+    member.update!(rejection_reason: "신청 정보 확인 필요")
+    sign_in staff_user("admin")
+
+    get admin_member_path(member)
+
+    assert_response :success
+    assert_select "form[action=?][method=post] button", approve_admin_member_path(member), text: "다시 승인"
+    assert_select "p", text: "거부 사유: 신청 정보 확인 필요"
+  end
+
+  test "승인 대기 회원 상세에 로그인 방식별 편집 가능 여부와 공개 상태를 표시한다" do
+    member = create_member(status: "pending_approval")
+    sign_in staff_user("admin")
+
+    get admin_member_path(member)
+
+    assert_response :success
+    assert_select "li", text: /로그인·내 페이지 편집 —\s*비밀번호 로그인 불가\s*Google 로그인 성공 시 또는 기존 로그인 세션으로 편집 가능/
+    assert_select "li", text: /공개 페이지 \(\/#{member.slug}\) 노출 —\s*공개/
+  end
+
+  test "운영자 모바일 메뉴 버튼의 aria-controls가 사이드바를 가리킨다" do
+    sign_in staff_user("admin")
+
+    get admin_root_path
+
+    assert_response :success
+    buttons = assert_select "button.admin-menu-button[aria-controls][aria-expanded=false]", count: 1
+    assert_select "aside[id=?][data-admin-menu]", buttons.first["aria-controls"], count: 1
+  end
+
+  test "로그인한 운영자가 로그인 화면을 다시 열면 한국어로 안내한다" do
+    sign_in staff_user("admin")
+
+    get "/admin/login"
+
+    assert_redirected_to admin_root_path
+    follow_redirect!
+    assert_includes response.body, "이미 로그인되어 있습니다."
+  end
+
   private
 
   def staff_user(role)

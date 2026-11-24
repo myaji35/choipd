@@ -17,6 +17,15 @@ module Admin::MembersHelper
     MEMBER_STATUS_LABELS.fetch(status.to_s, status)
   end
 
+  def member_capabilities(member)
+    public_profile = !member.withdrawn? && member.slug.present?
+    {
+      password_login: !member.withdrawn? && member.approved? && member.password_digest.present?,
+      public_profile: public_profile,
+      townin_section: public_profile && member.partner_active?
+    }
+  end
+
   def impd_status_label(status)
     IMPD_STATUS_LABELS.fetch(status.to_s, status)
   end

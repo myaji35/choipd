@@ -20,21 +20,37 @@
         }
       }
     </script>
+    <style>
+      .admin-menu-button, .admin-menu-close { display: none; }
+      @media (max-width: 767px) {
+        [data-admin-menu] { visibility: hidden; transform: translateX(-100%); transition: transform .2s, visibility .2s; }
+        body:has(.admin-backdrop:not([hidden])) [data-admin-menu] { visibility: visible; transform: translateX(0); }
+        .admin-backdrop:not([hidden]) { display: block; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 35; }
+        .admin-main.ml-60 { margin-left: 0; min-width: 0; }
+        .admin-menu-button, .admin-menu-close { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex: 0 0 44px; font-size: 22px; }
+        .admin-header-title { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        header.admin-header { justify-content: flex-start; flex-wrap: wrap; column-gap: .5rem; padding-inline: 1rem; }
+        .admin-header .admin-header-links { flex-basis: 100%; flex-wrap: wrap; row-gap: .25rem; overflow-wrap: anywhere; }
+        .admin-main main { padding: 16px; }
+      }
+    </style>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
-  <body class="bg-surface min-h-screen flex">
+  <body class="bg-surface min-h-screen flex" data-controller="impd-nav" data-action="keydown.esc@window->impd-nav#close">
+    <div class="admin-backdrop" data-impd-nav-target="panel" data-action="click->impd-nav#close" hidden></div>
     <!-- 사이드바 -->
-    <aside class="w-60 bg-navy text-white flex-shrink-0 fixed top-0 left-0 h-full overflow-y-auto z-40">
-      <div class="p-4 border-b border-white/10">
+    <aside id="admin-navigation" data-admin-menu data-action="click->impd-nav#closeOnLink" class="w-60 bg-navy text-white flex-shrink-0 fixed top-0 left-0 h-full overflow-y-auto z-40">
+      <div class="p-4 border-b border-white/10 flex items-center justify-between">
         <a href="<%= admin_root_path %>" class="flex items-center space-x-2">
           <div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
             <span class="text-white font-bold text-xs">iA</span>
           </div>
           <span class="font-bold text-sm">imPD Admin</span>
         </a>
+        <button type="button" class="admin-menu-close" aria-label="메뉴 닫기" aria-controls="admin-navigation" data-action="impd-nav#close"><%= lni_icon "xmark" %></button>
       </div>
 
       <nav class="p-3 space-y-1">
@@ -81,11 +97,12 @@
     </aside>
 
     <!-- 메인 영역 -->
-    <div class="ml-60 flex-1 flex flex-col min-h-screen">
+    <div class="admin-main ml-60 flex-1 flex flex-col min-h-screen">
       <!-- 상단 바 -->
-      <header class="bg-white border-b px-6 py-3 flex items-center justify-between sticky top-0 z-30">
-        <h1 class="text-sm font-semibold text-gray-700"><%= content_for?(:title) ? yield(:title) : "대시보드" %></h1>
-        <div class="flex items-center space-x-3">
+      <header class="admin-header bg-white border-b px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+        <button type="button" class="admin-menu-button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="admin-navigation" data-impd-nav-target="button" data-action="impd-nav#toggle"><span data-impd-nav-target="menuIcon"><%= lni_icon "menu-hamburger-1" %></span><span data-impd-nav-target="closeIcon" hidden><%= lni_icon "xmark" %></span></button>
+        <h1 class="admin-header-title text-sm font-semibold text-gray-700"><%= content_for?(:title) ? yield(:title) : "대시보드" %></h1>
+        <div class="admin-header-links flex items-center space-x-3">
           <%= link_to root_path, target: "_blank", class: "text-xs text-gray-500 hover:text-primary flex items-center space-x-1" do %>
             <%= lni_icon "arrow-angular-top-right" %>
             <span>사이트 보기</span>
