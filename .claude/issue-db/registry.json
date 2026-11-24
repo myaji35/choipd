@@ -605,16 +605,46 @@
             "output": "[LinkedIn] 로그인됨 · 계정 1개 · 변경 사본 1개"
           }
         ],
-        "note": "실제 수락·건너뛰기는 공장에서 실행하지 않음 — 대표님이 계정 상세에서 버튼을 누를 때만 실행"
+        "note": "실제 수락·건너뛰기는 공장에서 실행하지 않음 — 대표님이 계정 상세에서 버튼을 누를 때만 실행",
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-24T11:10:24Z",
+          "sha": "197cfbe",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "PARALLEL_WORKERS=1 bin/rails test test/services/linkedin test/services/ego_profile test/controllers/pd/profile_accounts_controller_test.rb test/models",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.10/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "node --check lib/ego/linkedin_invitation_action.mjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": ""
+            },
+            {
+              "cmd": "bin/rails profile_accounts:check[linkedin]",
+              "status": "skipped",
+              "why": "검사 명령 아님: bin/rails profile_accounts:check[linkedi"
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json"
+          ]
+        }
       }
     },
     {
       "type": "FEATURE",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "parent": "ISS-460",
       "created_at": "2026-11-19T14:30:00",
-      "completed_at": null,
+      "completed_at": "2026-11-24T20:23:28.403704",
       "assign_to": "codex",
       "id": "ISS-464",
       "title": "[LinkedIn] 뉴스레터 관리 — 구독자 추이, 발행 글 목록·조회, 글 초안 작성·보관",
@@ -629,9 +659,73 @@
           }
         ],
         "approved_at": "2026-11-24T10:10:52.796Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "읽기 전용 수집 + 앱 안 초안 보관이라 외부로 나가는 행위가 없다. 기존 LinkedIn 점검(ISS-461~463) 구조에 사본 페이지 하나와 초안 표 하나를 더하는 일.",
+          "risk": "낮음",
+          "effort": "M",
+          "by": "factory-runner",
+          "at": "2026-11-24T11:11:13Z"
+        },
+        "acceptance_criteria": [
+          "LinkedIn 점검 시 내 뉴스레터 화면 본문이 사본에 저장되고, 계정 상세에 뉴스레터별 구독자 수·이전 대비 증감·날짜별 추이가 보인다",
+          "계정 상세에 뉴스레터 발행 글 목록(제목·주소·게시일)과 글별 조회(노출) 수가 보인다",
+          "계정 상세에서 뉴스레터 글 초안을 작성·수정·보관(목록에 남음)할 수 있고, LinkedIn 으로는 아무것도 보내지 않는다",
+          "관련 모델·해석기·컨트롤러 테스트와 전체 테스트가 통과한다"
+        ]
       },
-      "updated_at": "2026-11-24T10:10:52.796Z"
+      "updated_at": "2026-11-24T11:11:13Z",
+      "result": {
+        "commit": "36ed05a",
+        "migration": "20261124200000_create_linkedin_newsletter_drafts(main, 개발 DB 적용)",
+        "files_created": [
+          "app/services/linkedin/newsletter_parser.rb",
+          "app/models/linkedin_newsletter_draft.rb",
+          "app/controllers/pd/profile_account_newsletter_drafts_controller.rb",
+          "app/views/pd/profile_accounts/_linkedin_newsletters.html.erb",
+          "app/views/pd/profile_account_newsletter_drafts/edit.html.erb",
+          "app/views/pd/profile_account_newsletter_drafts/new.html.erb"
+        ],
+        "review": {
+          "gemini": "3건 — 1 부분 맞음(주소 정규화 보강, 이름 대체 규칙은 유지), 2 맞음(에디션·링크 수 불일치 시 주소 비움), 3 맞음(새 초안 저장 실패 시 입력 유지 422)",
+          "opus": "뉴스레터 화면 본문 길이 제한 누락 보강"
+        },
+        "criteria_check": [
+          {
+            "criterion": "점검 시 뉴스레터 화면이 사본에 저장되고 상세에 구독자 수·증감·날짜별 추이",
+            "met": true,
+            "how": "실제 bin/rails profile_accounts:check[linkedin] 1회(66초) → 사본 pages.newsletters + newsletter_pages 2개 저장, Monitor.newsletters: XimTier Dev Notes 글쓴이 구독자 6·7일 신규 1, 구독 중 '목표를 달성하는 협업의 힘' 구독자 153, newsletter_series 2026-11-24 행. 증감은 다음 날짜 사본부터(monitor_test 로 증감 확인)"
+          },
+          {
+            "criterion": "발행 글 목록과 글별 조회(노출)",
+            "met": true,
+            "how": "실데이터 XimTier 에디션 2건 — 'From Defaults to Delivery…' 노출 12, '확정 지표를 기본값으로…' 노출 7 (활동 사본 /pulse/ 주소와 연결)"
+          },
+          {
+            "criterion": "앱 안에서 초안 작성·수정·보관, LinkedIn 으로 보내지 않음",
+            "met": true,
+            "how": "profile_account_newsletter_drafts_controller_test(작성·수정·보관·되살리기·다른 계정 404·네이버 계정 거절·실패 시 422 입력 유지), 초안 코드에 외부 호출 없음"
+          },
+          {
+            "criterion": "관련 테스트 통과",
+            "met": true,
+            "how": "55 runs 0 failures, rubocop 0"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/services/linkedin test/controllers/pd test/models/linkedin_newsletter_draft_test.rb",
+            "exit_code": 0,
+            "output": "55 runs, 398 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "bin/rails profile_accounts:check[linkedin]",
+            "exit_code": 0,
+            "output": "[LinkedIn] 로그인됨 · 계정 1개 · 변경 사본 1개"
+          }
+        ]
+      }
     },
     {
       "type": "FEATURE",
@@ -661,10 +755,10 @@
     {
       "type": "FEATURE",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "parent": "ISS-460",
       "created_at": "2026-11-19T14:30:00",
-      "completed_at": null,
+      "completed_at": "2026-11-24T20:32:11.168570",
       "assign_to": "codex",
       "id": "ISS-466",
       "title": "[LinkedIn] 주간 리포트 — 지표·게시·인맥·뉴스레터 요약",
@@ -679,9 +773,82 @@
           }
         ],
         "approved_at": "2026-11-24T10:10:52.796Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "이미 모으는 사본(지표·게시·인맥·뉴스레터·네이버)을 한 주 단위로 묶어 보여 주는 앱 안 계산이라 외부 행위가 없다. 같은 P1 중 외부 게시가 걸린 ISS-465보다 위험이 낮아 먼저 처리.",
+          "risk": "낮음",
+          "effort": "M",
+          "by": "factory-runner",
+          "at": "2026-11-24T11:23:47Z"
+        },
+        "acceptance_criteria": [
+          "인물정보 계정 화면에서 '주간 리포트'를 열면 지난 7일(서울 날짜) LinkedIn 대시보드 지표·인맥 수·뉴스레터 구독자의 주초 대비 변화가 보인다",
+          "그 주에 올린 LinkedIn 게시물·글 목록(제목·게시일·노출)과 주간 게시 권장 달성 여부가 보인다",
+          "네이버 인물정보의 그 주 항목 변경과 신청 현황이 함께 보인다(계획서 18번)",
+          "다른 주를 골라 볼 수 있고, 자료가 없는 칸은 '자료 없음'으로 표시된다",
+          "관련 테스트와 전체 테스트가 통과한다"
+        ]
       },
-      "updated_at": "2026-11-24T10:10:52.796Z"
+      "updated_at": "2026-11-24T11:23:47Z",
+      "result": {
+        "commit": "b57ee6e",
+        "files_created": [
+          "app/services/profile_accounts/weekly_report.rb",
+          "app/views/pd/profile_accounts/weekly_report.html.erb",
+          "test/services/profile_accounts/weekly_report_test.rb"
+        ],
+        "files_modified": [
+          "app/controllers/pd/profile_accounts_controller.rb",
+          "app/services/linkedin/monitor.rb",
+          "app/views/pd/profile_accounts/index.html.erb",
+          "config/routes.rb",
+          "lib/tasks/profile_accounts.rake"
+        ],
+        "review": {
+          "gemini": "2건 모두 맞음 — 사본 없는 계정 카드 section 미닫힘, 그 주 사본이 없어도 지난 사본을 이번 주 값으로 표시 → 수정",
+          "opus": "텍스트 +0 을 '변화 없음'으로"
+        },
+        "criteria_check": [
+          {
+            "criterion": "주간 리포트에 지난 7일 LinkedIn 지표·인맥·뉴스레터 구독자의 주초 대비 변화",
+            "met": true,
+            "how": "실데이터 rake 출력: 7일 게시물 노출 46(+14), 총 팔로워 17(변화 없음), 1촌 15, 뉴스레터 XimTier Dev Notes 구독자 6(자료 없음 — 첫 사본)"
+          },
+          {
+            "criterion": "그 주 게시물 목록과 주간 게시 권장 달성 여부",
+            "met": true,
+            "how": "weekly_report_test 기간 안/밖 게시물 구분, 실데이터 '이번 주 게시물이 없습니다.'·주간 목표 미달성"
+          },
+          {
+            "criterion": "네이버 인물정보 주간 변경·신청 현황",
+            "met": true,
+            "how": "실데이터 완성도 70%→70%, 변경 없음, 신청 진행 0·완료 0; 테스트로 항목 변경·신청 변화 확인"
+          },
+          {
+            "criterion": "다른 주 선택, 자료 없는 칸 '자료 없음'",
+            "met": true,
+            "how": "컨트롤러 테스트 주 이동·잘못된 날짜, 2026-11-10 주 rake 출력 '이 기간의 사본이 없습니다.'"
+          },
+          {
+            "criterion": "테스트 통과",
+            "met": true,
+            "how": "91 runs 0 failures, rubocop 0"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/services test/controllers/pd",
+            "exit_code": 0,
+            "output": "91 runs, 572 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "bin/rails profile_accounts:weekly_report",
+            "exit_code": 0,
+            "output": "7일 동안 게시물 노출수 46 (+14) / 총 팔로워 17 (변화 없음)"
+          }
+        ]
+      }
     },
     {
       "id": "ISS-467",
@@ -835,10 +1002,10 @@
     {
       "type": "FEATURE",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "parent": "ISS-460",
       "created_at": "2026-11-19T15:00:00",
-      "completed_at": null,
+      "completed_at": "2026-11-24T20:42:45.324511",
       "assign_to": "codex",
       "id": "ISS-471",
       "title": "[네이버 인물정보] 검색 노출 점검 — 검색어별 인물정보 박스 노출 기록, 검색 화면 사본 대조, 동명이인",
@@ -853,9 +1020,85 @@
           }
         ],
         "approved_at": "2026-11-24T10:10:52.796Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "네이버 통합검색 공개 화면을 읽어 기록만 하는 읽기 전용 기능. 외부로 쓰는 행위 없음.",
+          "risk": "낮음",
+          "effort": "M",
+          "by": "factory-runner",
+          "at": "2026-11-24T11:32:24Z"
+        },
+        "acceptance_criteria": [
+          "네이버 인물정보 점검 때 등록된 검색어마다 통합검색에 내 인물정보 박스(os 번호)가 나오는지 기록되고, 계정 상세에 검색어별 노출 여부와 날짜별 기록이 보인다",
+          "검색 화면에 실제 보이는 인물정보 박스 내용(이름·직업·소속 등)이 저장되고, 본인참여 데이터와 다른 항목이 표시된다",
+          "같은 이름의 다른 인물(동명이인) 목록(이름·직업·os 번호)이 보인다",
+          "검색어 목록을 화면에서 추가·삭제할 수 있다(기본: 이름+소속, 이름+직업)",
+          "관련 테스트와 전체 테스트가 통과한다"
+        ]
       },
-      "updated_at": "2026-11-24T10:10:52.796Z"
+      "updated_at": "2026-11-24T11:32:24Z",
+      "result": {
+        "commit": "dc6939f",
+        "migration": "20261124210000_add_search_queries_to_profile_accounts(main, 개발 DB 적용)",
+        "files_created": [
+          "app/services/naver_people/search_exposure.rb",
+          "app/views/pd/profile_accounts/_naver_search_exposure.html.erb",
+          "test/services/naver_people/search_exposure_test.rb"
+        ],
+        "files_modified": [
+          "lib/ego/naver_people_check.mjs",
+          "app/services/ego_profile/runner.rb",
+          "app/services/ego_profile/checker.rb",
+          "app/models/profile_account.rb",
+          "app/controllers/pd/profile_accounts_controller.rb",
+          "app/views/pd/profile_accounts/show.html.erb",
+          "config/routes.rb"
+        ],
+        "review": {
+          "gemini": "2건 맞음 — 계정별 검색어 섞임(계정 external_id 별 격리로 수정), href 없는 링크에서 수집 전체 실패(try/catch)",
+          "opus": "실측에서 2건 발견 — 직업 칸에 별칭이 잡힘(마지막 .txt 로 수정), 기본 검색어에 이름 단독이 빠져 동명이인 상황을 못 잡음(맨 앞에 추가)"
+        },
+        "criteria_check": [
+          {
+            "criterion": "검색어별 대표 박스 노출 여부 기록과 상세 화면 날짜별 기록",
+            "met": true,
+            "how": "실제 profile_accounts:check[naver_people] → '강승식' same_name(대표 박스는 가수 os 4058035), '강승식 주식회사 가가호호'·'강승식 기업인' main(os 42140857), 사본 data.search 저장, 상세 화면 최근 10개 사본 기록 표(컨트롤러 테스트)"
+          },
+          {
+            "criterion": "검색 화면 내용 저장과 본인참여 데이터 대조",
+            "met": true,
+            "how": "box_comparison 실데이터 이름·직업·소속·학력·경력 5항목 일치, 테스트로 '다름' 표시 확인"
+          },
+          {
+            "criterion": "동명이인 목록",
+            "met": true,
+            "how": "실데이터 459417 교육자·1964 / 28770271 연구인 / 4058035 가수, 내 번호 제외"
+          },
+          {
+            "criterion": "검색어 추가·삭제",
+            "met": true,
+            "how": "PATCH search_queries 저장(최대 10개·50자·중복 제거), linkedin 계정 거절 테스트"
+          },
+          {
+            "criterion": "테스트 통과",
+            "met": true,
+            "how": "143 runs 0 failures, rubocop 0"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/services test/controllers/pd test/models",
+            "exit_code": 0,
+            "output": "143 runs, 864 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "bin/rails profile_accounts:check[naver_people]",
+            "exit_code": 0,
+            "output": "[네이버 인물정보] 로그인됨 · 계정 1개 · 변경 사본 1개"
+          }
+        ]
+      }
     },
     {
       "type": "FEATURE",
@@ -953,16 +1196,46 @@
             "output": "[네이버 인물정보] 로그인됨 · 계정 1개 · 변경 사본 1개"
           }
         ],
-        "note": "실측 신청 0건이라 반려 사유 필드명은 실제 반려 건이 생기면 확인 필요(여러 후보 키로 방어 해석)"
+        "note": "실측 신청 0건이라 반려 사유 필드명은 실제 반려 건이 생기면 확인 필요(여러 후보 키로 방어 해석)",
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-24T11:10:24Z",
+          "sha": "197cfbe",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rails test test/services/naver_people test/controllers/pd/profile_accounts_controller_test.rb test/services/ego_profile",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.10/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "bin/rubocop app/services/naver_people test/services/naver_people test/controllers/pd",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "Inspecting 7 files\n.......\n\n7 files inspected, no offenses detected"
+            },
+            {
+              "cmd": "bin/rails profile_accounts:check[naver_people]",
+              "status": "skipped",
+              "why": "검사 명령 아님: bin/rails profile_accounts:check[naver_p"
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json"
+          ]
+        }
       }
     },
     {
       "type": "FEATURE",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "parent": "ISS-460",
       "created_at": "2026-11-19T15:00:00",
-      "completed_at": null,
+      "completed_at": "2026-11-24T20:58:02.217999",
       "assign_to": "codex",
       "id": "ISS-473",
       "title": "[네이버 인물정보] 목표 프로필·차이·수정 신청 초안 + 사이트/LinkedIn 대조 + 증빙 체크리스트",
@@ -977,9 +1250,80 @@
           }
         ],
         "approved_at": "2026-11-24T10:10:52.796Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "원하는 프로필을 앱 안에서 적고 현재 네이버 값과 비교해 신청 초안·증빙 목록을 만드는 일이라 외부 제출이 없다(제출은 ISS-474 의 대표님 확인 단계). 승인 표시만 남겨 ISS-474 가 이어받게 한다.",
+          "risk": "낮음",
+          "effort": "L",
+          "by": "factory-runner",
+          "at": "2026-11-24T11:43:56Z"
+        },
+        "acceptance_criteria": [
+          "네이버 인물정보 계정에서 '목표 프로필'을 열어 영문명·직업·소속·경력·학력·수상·자격증·사이트를 적어 저장할 수 있고, 네이버 현재 값·LinkedIn 사본·imPD 회원 정보에서 불러올 수 있다",
+          "목표와 현재 네이버 값의 차이가 항목별 추가·삭제·수정 목록(수정 신청 초안)으로 보인다",
+          "imPD SNS·브랜드 채널·LinkedIn 주소가 네이버 사이트 정보에 있는지, LinkedIn 경력·직함과 네이버가 다른 곳이 보인다",
+          "초안 항목마다 준비할 증빙 서류 체크리스트가 보이고, 대표님이 초안을 '승인'으로 표시할 수 있다(네이버로는 아무것도 보내지 않음)",
+          "관련 테스트와 전체 테스트가 통과한다"
+        ]
       },
-      "updated_at": "2026-11-24T10:10:52.796Z"
+      "updated_at": "2026-11-24T11:43:56Z",
+      "result": {
+        "commit": "952776c",
+        "migration": "20261124220000_create_naver_people_targets(main, 개발 DB 적용)",
+        "files_created": [
+          "app/models/naver_people_target.rb",
+          "app/services/naver_people/target_sources.rb",
+          "app/services/naver_people/target_diff.rb",
+          "app/services/naver_people/cross_check.rb",
+          "app/controllers/pd/naver_people_targets_controller.rb",
+          "app/views/pd/naver_people_targets/"
+        ],
+        "review": {
+          "gemini": "3건 — 1 맞음(기간 없는 경력 오류), 2 부분 맞음(회원 미연결 시 LinkedIn 계정이 1개일 때만 사용), 3 맞음(네이버가 목표와 같아지면 '네이버에 모두 반영됨')",
+          "opus": "실데이터에서 3건 — 영문명으로 imPD 회원 매칭, '2024년 - 현재' 기간 변환, 공개 주소가 localhost 로 잡힘 → 운영 https://impd.townin.net/<slug>"
+        },
+        "criteria_check": [
+          {
+            "criterion": "목표 프로필 작성·저장과 네이버·LinkedIn·imPD 불러오기",
+            "met": true,
+            "how": "실데이터 TargetSources: naver(직업 기업인·소속 2·경력 3·학력 1·영문명), linkedin(소속 4·경력 5·학력·LinkedIn 주소), impd(직업 크리에이터·https://impd.townin.net/kang-seung-sig); 컨트롤러 테스트 edit?source=·update·422"
+          },
+          {
+            "criterion": "목표 vs 현재 차이 → 수정 신청 초안",
+            "met": true,
+            "how": "실데이터 LinkedIn 소속·경력을 목표로 넣으면 소속 추가 3·삭제 1, 경력 수정 2·추가 2, 사이트 추가 1 항목 생성; target_diff_test"
+          },
+          {
+            "criterion": "사이트 정보·LinkedIn 경력 대조",
+            "met": true,
+            "how": "CrossCheck 실데이터: imPD 주소·LinkedIn 주소 모두 네이버 미등록, LinkedIn 대비 현재 소속 차이 4·직업 1"
+          },
+          {
+            "criterion": "증빙 체크리스트와 승인 표시(제출 없음)",
+            "met": true,
+            "how": "checklist 실데이터 소속·경력·사이트 3종, approve/unapprove·digest 변경 시 다시 승인·항목 0개면 '네이버에 모두 반영됨' 테스트, 외부 요청 코드 없음"
+          },
+          {
+            "criterion": "테스트 통과",
+            "met": true,
+            "how": "163 runs 0 failures, rubocop 0"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/services test/controllers/pd test/models",
+            "exit_code": 0,
+            "output": "163 runs, 1020 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "curl -s -o /dev/null -w '%{http_code}' https://impd.townin.net/kang-seung-sig",
+            "exit_code": 0,
+            "output": "200"
+          }
+        ],
+        "followup_commit": "8ecf5ec (brakeman 오탐 제거용 메서드 이름 변경, 동작 동일)"
+      }
     },
     {
       "type": "FEATURE",
@@ -2413,6 +2757,30 @@
         "issue_type": "FEATURE",
         "plan_created": 0,
         "timestamp": "2026-11-24T20:08:23.631542"
+      },
+      {
+        "issue_id": "ISS-464",
+        "issue_type": "FEATURE",
+        "plan_created": 0,
+        "timestamp": "2026-11-24T20:23:28.403704"
+      },
+      {
+        "issue_id": "ISS-466",
+        "issue_type": "FEATURE",
+        "plan_created": 0,
+        "timestamp": "2026-11-24T20:32:11.168570"
+      },
+      {
+        "issue_id": "ISS-471",
+        "issue_type": "FEATURE",
+        "plan_created": 0,
+        "timestamp": "2026-11-24T20:42:45.324511"
+      },
+      {
+        "issue_id": "ISS-473",
+        "issue_type": "FEATURE",
+        "plan_created": 0,
+        "timestamp": "2026-11-24T20:58:02.217999"
       }
     ],
     "on_fail": [],
@@ -4415,14 +4783,230 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 107,
+        "timestamp": "2026-11-24T20:09:58.069199",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3055시간",
+          "🟡 장기 대기: ISS-464 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-466 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-471 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-473 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 124시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 25,
+          "in_progress": 0,
+          "ready": 10,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 108,
+        "timestamp": "2026-11-24T20:10:03.449814",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3055시간",
+          "🟡 장기 대기: ISS-464 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-466 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-471 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-473 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 25,
+          "in_progress": 0,
+          "ready": 10,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 109,
+        "timestamp": "2026-11-24T20:10:06.585238",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3055시간",
+          "🟡 장기 대기: ISS-464 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-466 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-471 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-473 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 25,
+          "in_progress": 0,
+          "ready": 10,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 110,
+        "timestamp": "2026-11-24T20:10:09.944768",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3055시간",
+          "🟡 장기 대기: ISS-464 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-466 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-471 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-473 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 25,
+          "in_progress": 0,
+          "ready": 10,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 111,
+        "timestamp": "2026-11-24T20:10:12.743029",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3055시간",
+          "🟡 장기 대기: ISS-464 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-466 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-471 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-473 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 25,
+          "in_progress": 0,
+          "ready": 10,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 112,
+        "timestamp": "2026-11-24T20:10:15.662365",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3055시간",
+          "🟡 장기 대기: ISS-464 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-466 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-471 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-473 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 25,
+          "in_progress": 0,
+          "ready": 10,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 113,
+        "timestamp": "2026-11-24T20:10:18.271985",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3055시간",
+          "🟡 장기 대기: ISS-464 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-466 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-471 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-473 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 25,
+          "in_progress": 0,
+          "ready": 10,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 114,
+        "timestamp": "2026-11-24T20:10:20.720901",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3055시간",
+          "🟡 장기 대기: ISS-464 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-466 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-471 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-473 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 25,
+          "in_progress": 0,
+          "ready": 10,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 115,
+        "timestamp": "2026-11-24T20:10:23.462092",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3055시간",
+          "🟡 장기 대기: ISS-464 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-466 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-471 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-473 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 125시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 25,
+          "in_progress": 0,
+          "ready": 10,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
   "stats": {
     "total_issues": 493,
-    "completed": 14,
+    "completed": 18,
     "failed": 0,
-    "evolved": 106
+    "evolved": 115
   },
   "pending_opportunity_signals": [
     {
