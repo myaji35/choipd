@@ -1905,9 +1905,9 @@
         "explained_by": "decision-explain",
         "explained_at": "2026-11-24T20:07:51.752693+09:00",
         "rechecked": {
-          "at": "2026-11-24T23:30:00+09:00",
+          "at": "2026-11-24T22:04:43+09:00",
           "by": "factory-runner",
-          "result": "관제 결정 A(보류) 반영. SD ISS-521 여전히 AWAITING_USER(factory/ISS-521, main 미병합). 이미 된 부분(브랜드·동의·콘텐츠 수·4주 그래프)은 운영 중, Townin 성과 칸만 대기."
+          "result": "SD ISS-521 여전히 AWAITING_USER(deploy-review, factory/ISS-521 main 미병합). 관제 결정 A(보류) 유지."
         },
         "decision": {
           "choice": "A",
@@ -1959,9 +1959,9 @@
           "95% 미만이면 미달 칸마다 개선 이슈가 생긴다"
         ],
         "rechecked": {
-          "at": "2026-11-24T23:30:00+09:00",
+          "at": "2026-11-24T22:04:43+09:00",
           "by": "factory-runner",
-          "result": "SD ISS-521 여전히 AWAITING_USER(main 미병합), imPD ISS-476 BLOCKED. 막힘 사유 유효 — 유지."
+          "result": "SD ISS-521 AWAITING_USER, imPD ISS-476 BLOCKED 그대로. 막힘 사유 유효 — 유지."
         }
       },
       "updated_at": "2026-11-24T12:06:43Z",
@@ -2596,9 +2596,9 @@
         "explained_by": "decision-explain",
         "explained_at": "2026-11-24T20:07:51.752693+09:00",
         "rechecked": {
-          "at": "2026-11-24T23:30:00+09:00",
+          "at": "2026-11-24T22:04:43+09:00",
           "by": "factory-runner",
-          "result": "관제 결정 D(보류) 반영. 컨펌 PDF imPD_보호책임자연락처_비밀값위치_재확인_컨펌_261120.pdf 는 아직 컨펌/ 루트(필기 전). 값 없이는 구현할 것이 없어 대기."
+          "result": "imPD_보호책임자연락처_비밀값위치_재확인_컨펌_261120.pdf 가 컨펌/ 루트(필기 전)에 그대로 있음. 값 없음 — 보류 유지."
         },
         "decision": {
           "choice": "D",
@@ -7575,6 +7575,24 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 196,
+        "timestamp": "2026-11-24T22:03:58.208794",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (brand-guardian, test-harness, ux-harness, domain-analyst, agent-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
@@ -7582,7 +7600,7 @@
     "total_issues": 501,
     "completed": 27,
     "failed": 0,
-    "evolved": 195
+    "evolved": 196
   },
   "pending_opportunity_signals": [
     {
