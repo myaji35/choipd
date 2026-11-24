@@ -216,7 +216,10 @@ Rails.application.routes.draw do
         post :check
         get :weekly_report
       end
-      member { post :invitation_action }
+      member do
+        post :invitation_action
+        patch :search_queries
+      end
       resources :newsletter_drafts, only: [ :create, :edit, :update ], controller: "profile_account_newsletter_drafts" do
         member do
           patch :archive

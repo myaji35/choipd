@@ -11,9 +11,11 @@ module EgoProfile
 
     def self.available? = binary.present?
 
-    def call(platform)
+    def call(platform, input = {})
       script = SCRIPTS[platform] or raise Error, "알 수 없는 플랫폼: #{platform}"
-      run_script(File.read(Rails.root.join("lib/ego", script)), timeout: 240)
+      query_count = input.fetch(:search_queries_by_account, {}).values.sum { |queries| queries.first(10).size }
+      timeout = 240 + (query_count + input.fetch(:default_search_accounts, 0) * 3) * 18
+      run_script("const INPUT = #{input.except(:default_search_accounts).to_json};\n" + File.read(Rails.root.join("lib/ego", script)), timeout: timeout)
     end
 
     def run_script(script, timeout:)

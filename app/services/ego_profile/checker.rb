@@ -20,13 +20,25 @@ module EgoProfile
 
     def call(platform)
       raise Error, "알 수 없는 플랫폼: #{platform}" unless ProfileAccount::PLATFORMS.key?(platform)
+      accounts = ProfileAccount.where(tenant_id: @tenant_id, platform: platform)
       begin
-        response = @runner.call(platform)
+        response = if platform == "naver_people"
+          known_accounts = accounts.where.not(external_id: [ nil, "" ]).to_a
+          queries_by_account = known_accounts.each_with_object({}) do |account, queries|
+            next unless account.is_active?
+
+            list = account.search_query_list
+            queries[account.external_id.to_s] = list if list.any?
+          end
+          @runner.call(platform, search_queries_by_account: queries_by_account,
+                       default_search_accounts: known_accounts.size - queries_by_account.size)
+        else
+          @runner.call(platform)
+        end
       rescue Error => e
         response = { "error" => e.message }
       end
       now = Time.current
-      accounts = ProfileAccount.where(tenant_id: @tenant_id, platform: platform)
       result = Result.new(platform: platform, logged_in: false, accounts_count: 0, changed_count: 0)
       ProfileAccount.transaction do
         if response["error"].present?

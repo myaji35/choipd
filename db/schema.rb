@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_24_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_210000) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -1046,6 +1046,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_200000) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "search_queries"
     t.index ["member_id"], name: "index_profile_accounts_on_member_id"
     t.index ["tenant_id", "platform", "external_id"], name: "idx_on_tenant_id_platform_external_id_cd4e0e5117", unique: true
     t.index ["tenant_id"], name: "index_profile_accounts_on_tenant_id"

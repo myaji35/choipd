@@ -94,6 +94,74 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "완성도 0%"
   end
 
+  test "naver displays search exposure, history, comparison and namesakes" do
+    account = ProfileAccount.create!(platform: "naver_people", display_name: "강승식")
+    query = "강승식 가가호호"
+    older = { "dss" => 42140857, "search" => { "results" => [ { "query" => query, "main" => nil } ] } }
+    current = {
+      "dss" => 42140857,
+      "people" => { "name" => "강승식", "peopleOffice" => [ { "name" => "이전 회사" } ] },
+      "search" => {
+        "checked_at" => "2026-11-24T12:00:00Z",
+        "results" => [
+          { "query" => query, "main" => { "os" => "42140857", "name" => "강승식", "profile_text" => "소속\n가가호호" } },
+          { "query" => "강승식", "main" => { "os" => "4058035", "name" => "강승식", "job" => "가수" },
+            "same_name" => [ { "os" => "42140857" }, { "os" => "459417", "name" => "강승식", "details" => [ "교육자", "1964" ] } ] },
+          { "query" => "강승식 기업인", "error" => "시간 초과" }
+        ]
+      }
+    }
+    account.profile_snapshots.create!(captured_at: 2.days.ago, data: {})
+    account.profile_snapshots.create!(captured_at: 1.day.ago, data: older)
+    account.profile_snapshots.create!(captured_at: Time.current, data: current)
+
+    get pd_profile_account_path(account)
+
+    assert_response :success
+    assert_select "#naver-search-exposure" do
+      assert_select "h2", text: "검색 노출"
+      assert_select "p", text: /마지막 검색 점검/
+      assert_select "a", text: query
+      assert_select "td", text: "동명이인 목록에만"
+      assert_select "td", text: "강승식 · 가수"
+      assert_select "td", text: "오류 (시간 초과)"
+      assert_select "li", text: "#{query} · 안 나옴 → 대표 박스로 노출"
+      assert_select "td", text: "● 대표 박스로 노출"
+      assert_select "td", text: "– 미수집"
+      assert_select "h3", text: "검색 화면 vs 본인참여 대조"
+      assert_select "tr.bg-amber-50 td", text: "다름"
+      assert_select "h3", text: "같은 이름 다른 인물"
+      assert_select "li", text: /강승식 · 교육자 · 1964/
+      assert_select "a[href*='os=459417']", text: "os=459417"
+      assert_select "a[href*='os=42140857']", count: 0
+    end
+  end
+
+  test "naver search queries can be saved and cleared before a snapshot exists" do
+    account = ProfileAccount.create!(platform: "naver_people", display_name: "강승식")
+    get pd_profile_account_path(account)
+    assert_select "p", text: "다음 점검부터 검색 노출을 기록합니다."
+    assert_select "p", text: /기본 검색어/
+    assert_select "form[action=?] textarea[name=search_queries]", search_queries_pd_profile_account_path(account)
+
+    patch search_queries_pd_profile_account_path(account), params: { search_queries: " 강승식   가가호호 \r\n강승식 가가호호\n\n강승식" }
+    assert_response :see_other
+    assert_redirected_to pd_profile_account_path(account)
+    assert_equal "검색어를 저장했습니다. 다음 점검부터 적용됩니다.", flash[:notice]
+    assert_equal [ "강승식 가가호호", "강승식" ], account.reload.search_query_list
+
+    patch search_queries_pd_profile_account_path(account), params: { search_queries: "" }
+    assert_response :see_other
+    assert_empty account.reload.search_query_list
+  end
+
+  test "search query updates are rejected for linkedin accounts" do
+    patch search_queries_pd_profile_account_path(@account), params: { search_queries: "강승식" }
+
+    assert_response :unprocessable_entity
+    assert_empty @account.reload.search_query_list
+  end
+
   test "naver displays applications, rejection reason, changes and delegation warning" do
     travel_to Time.zone.local(2026, 11, 24, 12)
     account = ProfileAccount.create!(platform: "naver_people", display_name: "가상 인물", external_id: "fake-naver")

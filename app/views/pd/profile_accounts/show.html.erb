@@ -6,6 +6,9 @@
     <div class="min-w-0"><dt class="text-gray-500">프로필 링크</dt><dd class="break-all"><% if (url = http_url(@account.profile_url)) %><%= link_to url, url, target: "_blank", rel: "noopener", class: "text-primary" %><% else %>-<% end %></dd></div>
   </dl>
   <div class="flex gap-3"><%= link_to "수정", edit_pd_profile_account_path(@account), class: "text-primary text-sm" %><%= button_to "삭제", pd_profile_account_path(@account), method: :delete, class: "text-red-600 text-sm", data: { turbo_confirm: "삭제하시겠습니까?" } %></div>
+  <% if @account.platform == "naver_people" && !@latest_snapshot %>
+    <%= render "naver_search_exposure", account: @account, snapshots: @snapshots %>
+  <% end %>
   <% if @account.platform == "naver_people" && @latest_snapshot %>
     <% presenter = NaverPeople::Presenter.new(@latest_snapshot.data) %>
     <% applications = NaverPeople::Applications.new(@latest_snapshot.data) %>
@@ -19,6 +22,7 @@
         <% end %>
       </p>
     <% end %>
+    <%= render "naver_search_exposure", account: @account, snapshots: @snapshots %>
     <section class="border border-gray-100 rounded-lg p-4">
       <h2 class="font-semibold text-navy">신청 내역</h2>
       <% if applications.collected? %>

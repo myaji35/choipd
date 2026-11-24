@@ -1,0 +1,118 @@
+<% exposure = NaverPeople::SearchExposure.new(snapshots.first&.data) %>
+<% statuses = {
+  "main" => ["●", "대표 박스로 노출"],
+  "same_name" => ["◐", "동명이인 목록에만"],
+  "absent" => ["○", "안 나옴"],
+  "error" => ["!", "오류"]
+} %>
+<section class="border border-gray-100 rounded-lg p-4 space-y-3" id="naver-search-exposure">
+  <h2 class="font-semibold text-navy">검색 노출</h2>
+  <% if exposure.collected? %>
+    <% if exposure.checked_at.present? %>
+      <p class="text-sm text-gray-500">마지막 검색 점검 <%= time_tag Time.zone.parse(exposure.checked_at), format: "%Y-%m-%d %H:%M:%S" %></p>
+    <% end %>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left">
+        <thead><tr><th scope="col">검색어</th><th scope="col">결과</th><th scope="col">다른 대표 인물</th></tr></thead>
+        <tbody>
+          <% exposure.results.each do |result| %>
+            <tr class="border-t border-gray-100">
+              <th scope="row" class="py-1 font-normal"><%= link_to result[:query], result[:search_url], target: "_blank", rel: "noopener", class: "text-primary" %></th>
+              <td><%= statuses.fetch(result[:status]).last %><%= " (#{result[:error]})" if result[:error].present? %></td>
+              <td><%= [result[:main_name], result[:main_job]].reject(&:blank?).join(" · ").presence || "–" if result[:status] != "main" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <% if snapshots.second %>
+      <h3 class="text-sm font-medium">직전 사본 대비 노출 변화</h3>
+      <% changes = exposure.changes_from(snapshots.second.data) %>
+      <% if changes.any? %>
+        <ul class="text-sm list-disc list-inside">
+          <% changes.each do |change| %>
+            <li><%= change[:query] %> · <%= statuses.fetch(change[:before]).last %> → <%= statuses.fetch(change[:after]).last %></li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-sm text-gray-500">확인된 노출 변화가 없습니다.</p>
+      <% end %>
+    <% end %>
+
+    <h3 class="text-sm font-medium">사본 날짜별 노출 기록</h3>
+    <% history = snapshots.first(10).map do |snapshot|
+      [snapshot.captured_at, NaverPeople::SearchExposure.new(snapshot.data).results.index_by { |result| result[:query] }]
+    end %>
+    <% queries = history.flat_map { |_, results| results.keys }.uniq %>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left">
+        <thead><tr><th scope="col">사본 날짜</th><% queries.each do |query| %><th scope="col" class="px-2"><%= query %></th><% end %></tr></thead>
+        <tbody>
+          <% history.each do |date, results| %>
+            <tr class="border-t border-gray-100">
+              <th scope="row" class="py-1 whitespace-nowrap font-normal"><%= time_tag date, format: "%Y-%m-%d %H:%M:%S" %></th>
+              <% queries.each do |query| %>
+                <td class="px-2 whitespace-nowrap">
+                  <% if (result = results[query]) %>
+                    <%= statuses.fetch(result[:status]).join(" ") %>
+                  <% else %>
+                    – 미수집
+                  <% end %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="text-sm font-medium">검색 화면 vs 본인참여 대조</h3>
+    <% comparison = exposure.box_comparison %>
+    <% if comparison.any? %>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead><tr><th scope="col">항목</th><th scope="col">검색 화면</th><th scope="col">본인참여</th><th scope="col">대조 결과</th></tr></thead>
+          <tbody>
+            <% comparison.each do |row| %>
+              <tr class="border-t border-gray-100 <%= 'bg-amber-50 text-amber-900' if row[:match] == false %>">
+                <th scope="row" class="py-1"><%= row[:label] %></th>
+                <td class="whitespace-pre-line"><%= row[:search_value].presence || "–" %></td>
+                <td class="whitespace-pre-line"><%= row[:profile_value].presence || "–" %></td>
+                <td><%= { true => "일치", false => "다름", nil => "–" }.fetch(row[:match]) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="text-sm text-gray-500">대조할 대표 박스가 없습니다.</p>
+    <% end %>
+
+    <h3 class="text-sm font-medium">같은 이름 다른 인물</h3>
+    <% namesakes = exposure.namesakes %>
+    <% if namesakes.any? %>
+      <ul class="text-sm list-disc list-inside">
+        <% namesakes.each do |person| %>
+          <li>
+            <%= [person[:name], person[:details]].reject(&:blank?).join(" · ") %>
+            <%= link_to "os=#{person[:os]}", person[:url], target: "_blank", rel: "noopener", class: "text-primary" %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-sm text-gray-500">수집된 동명이인이 없습니다.</p>
+    <% end %>
+  <% else %>
+    <p class="text-sm text-gray-500">다음 점검부터 검색 노출을 기록합니다.</p>
+  <% end %>
+
+  <%= form_with url: search_queries_pd_profile_account_path(account), method: :patch, class: "space-y-2 text-sm" do |form| %>
+    <%= form.label :search_queries, "검색어 (한 줄에 하나, 최대 10개, 각 50자)", class: "block font-medium" %>
+    <%= form.text_area :search_queries, value: account.search_query_list.join("\n"), rows: 4, class: "block w-full rounded border border-gray-300 p-2" %>
+    <% if account.search_query_list.empty? %>
+      <p class="text-gray-500">등록된 검색어가 없으면 기본 검색어인 이름, 이름과 첫 소속 회사명, 이름과 직업을 순서대로 점검합니다.</p>
+    <% end %>
+    <%= form.submit "검색어 저장", class: "rounded bg-primary px-3 py-2 text-white cursor-pointer" %>
+  <% end %>
+</section>

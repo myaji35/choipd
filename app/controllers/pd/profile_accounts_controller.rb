@@ -1,5 +1,5 @@
 class Pd::ProfileAccountsController < Pd::BaseController
-  before_action :set_account, only: [ :show, :edit, :update, :destroy, :invitation_action ]
+  before_action :set_account, only: [ :show, :edit, :update, :destroy, :invitation_action, :search_queries ]
 
   def index
     @accounts = ProfileAccount.order(:platform, :display_name).group_by(&:platform)
@@ -54,6 +54,14 @@ class Pd::ProfileAccountsController < Pd::BaseController
   def destroy
     @account.destroy!
     redirect_to pd_profile_accounts_path, notice: "인물정보 계정이 삭제되었습니다."
+  end
+
+  def search_queries
+    return head :unprocessable_entity unless @account.platform == "naver_people"
+    return head :unprocessable_entity unless params[:search_queries].is_a?(String)
+
+    @account.update!(search_query_list: params[:search_queries].lines)
+    redirect_to pd_profile_account_path(@account), status: :see_other, notice: "검색어를 저장했습니다. 다음 점검부터 적용됩니다."
   end
 
   def invitation_action

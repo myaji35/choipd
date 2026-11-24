@@ -1,6 +1,22 @@
 require "test_helper"
 
 class ProfileAccountTest < ActiveSupport::TestCase
+  test "search queries are normalized and stored as a JSON list" do
+    account = ProfileAccount.create!(platform: "naver_people", display_name: "검색 인물")
+    assert_empty account.search_query_list
+    long_query = "가" * 51
+    account.update!(search_query_list: [ "  강승식   가가호호 ", "강승식 가가호호", "\t", nil, long_query, *("1".."10").to_a ])
+    assert_equal [ "강승식 가가호호", "가" * 50, *("1".."8").to_a ], account.reload.search_query_list
+    assert_equal account.search_query_list, JSON.parse(account.search_queries)
+
+    [ "{깨진 JSON", "{}", "null", "" ].each do |value|
+      account.search_queries = value
+      assert_empty account.search_query_list
+    end
+    account.update!(search_query_list: [])
+    assert_nil account.reload.search_queries
+  end
+
   test "validations and labels" do
     account = ProfileAccount.new(platform: "naver_people", display_name: "가상 인물")
     assert account.valid?

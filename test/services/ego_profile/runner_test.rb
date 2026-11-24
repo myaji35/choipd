@@ -1,6 +1,24 @@
 require "test_helper"
 
 class EgoProfile::RunnerTest < ActiveSupport::TestCase
+  test "prefixes the script with account-specific JSON input and budgets for default searches" do
+    runner = EgoProfile::Runner.new
+    captured = []
+    runner.define_singleton_method(:run_script) { |script, timeout:| captured << [ script, timeout ] }
+    queries = { "123" => [ "강승식", "따옴표 \"와\n줄바꿈" ], "456" => [ "강승식" ] }
+
+    runner.call("naver_people", search_queries_by_account: queries, default_search_accounts: 2)
+    runner.call("linkedin")
+
+    script, timeout = captured.first
+    prefix, body = script.split("\n", 2)
+    assert_equal({ "search_queries_by_account" => queries }, JSON.parse(prefix.delete_prefix("const INPUT = ").delete_suffix(";")))
+    assert_equal 240 + (2 + 1 + 3 * 2) * 18, timeout
+    assert_equal File.read(Rails.root.join("lib/ego/naver_people_check.mjs")), body
+    assert captured.second.first.start_with?("const INPUT = {};\n")
+    assert_equal 240, captured.second.last
+  end
+
   test "parses the last result from stderr" do
     output = "diagnostic\nEGO_RESULT {\"logged_in\":false}\nEGO_RESULT {\"logged_in\":true}\n"
     with_capture("", output) do

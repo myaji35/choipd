@@ -4,7 +4,10 @@ class EgoProfile::CheckerTest < ActiveSupport::TestCase
   class FakeRunner
     attr_accessor :response
     def initialize(response) = @response = response
-    def call(_platform)
+    attr_reader :input
+
+    def call(_platform, input = {})
+      @input = input
       raise response if response.is_a?(Exception)
       response
     end
@@ -25,6 +28,28 @@ class EgoProfile::CheckerTest < ActiveSupport::TestCase
     @runner.response["accounts"][0]["data"] = { "value" => 2 }
     assert_equal 1, @checker.call("linkedin").changed_count
     assert_equal 2, account.profile_snapshots.count
+  end
+
+  test "passes configured queries by active naver account for the tenant" do
+    [
+      [ 7, "naver_people", true, [ "강승식", "강승식 기업인" ] ],
+      [ 7, "naver_people", true, [ "강승식", "강승식 가가호호" ] ],
+      [ 7, "naver_people", true, [] ],
+      [ 7, "naver_people", false, [ "비활성" ] ],
+      [ 8, "naver_people", true, [ "다른 테넌트" ] ],
+      [ 7, "linkedin", true, [ "다른 플랫폼" ] ]
+    ].each_with_index do |(tenant, platform, active, queries), index|
+      ProfileAccount.create!(tenant_id: tenant, platform: platform, external_id: index.to_s, is_active: active,
+                             display_name: "가상 인물", search_query_list: queries)
+    end
+
+    @checker.call("naver_people")
+    assert_equal({ search_queries_by_account: {
+      "0" => [ "강승식", "강승식 기업인" ],
+      "1" => [ "강승식", "강승식 가가호호" ]
+    }, default_search_accounts: 2 }, @runner.input)
+    @checker.call("linkedin")
+    assert_empty @runner.input
   end
 
   test "logged out marks existing accounts" do
