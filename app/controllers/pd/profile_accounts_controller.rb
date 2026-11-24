@@ -7,7 +7,7 @@ class Pd::ProfileAccountsController < Pd::BaseController
   end
 
   def show
-    @snapshots = @account.profile_snapshots.recent.limit(20)
+    @snapshots = @account.profile_snapshots.recent.limit(@account.platform == "linkedin" ? 60 : 20).to_a
     @latest_snapshot = @snapshots.first
   end
 

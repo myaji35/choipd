@@ -1,0 +1,106 @@
+<% metrics = monitor.latest_metrics %>
+<% today = Time.current.in_time_zone(Linkedin::Monitor::TIME_ZONE).to_date %>
+<% series = monitor.daily_series.select { |row| row[:date] >= today - 13 } %>
+<% posts = monitor.posts %>
+<% recommendation = monitor.weekly_recommendation %>
+<% weekly = recommendation[:linkedin_weekly] %>
+<% change_label = ->(delta) { delta.nil? ? "비교 자료 없음" : (delta.zero? ? "변화 없음" : format("%+d", delta)) } %>
+
+<section class="border border-gray-100 rounded-lg p-4">
+  <h2 class="font-semibold text-navy">활동 지표</h2>
+  <dl class="mt-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+    <% metrics.each_value do |metric| %>
+      <div class="rounded-lg border border-gray-100 p-3">
+        <dt class="text-gray-500"><%= metric[:label] %></dt>
+        <dd class="text-lg font-semibold text-navy"><%= number_with_delimiter(metric[:value]) || "—" %></dd>
+        <% if metric[:period].present? %><dd class="text-gray-500"><%= metric[:period] %></dd><% end %>
+        <dd>이전 사본 날짜 대비 <%= change_label.call(metric[:delta]) %></dd>
+        <% if metric[:linkedin_change_pct] %>
+          <dd class="text-gray-500">LinkedIn 표기 <%= number_to_percentage(metric[:linkedin_change_pct], precision: 0) %></dd>
+        <% end %>
+      </div>
+    <% end %>
+  </dl>
+</section>
+
+<section class="border border-gray-100 rounded-lg p-4">
+  <h2 class="font-semibold text-navy">날짜별 추이</h2>
+  <% if series.empty? %>
+    <p class="mt-2 text-sm text-gray-500">최근 14일 동안 저장된 사본이 없습니다.</p>
+  <% else %>
+    <div class="mt-3 overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-navy">
+          <tr>
+            <th scope="col" class="p-2 text-left">날짜</th>
+            <% metrics.each_value do |metric| %>
+              <th scope="col" class="p-2 text-right"><%= metric[:label] %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% series.each do |row| %>
+            <tr class="border-t border-gray-100">
+              <th scope="row" class="p-2 whitespace-nowrap text-left font-medium"><%= row[:date].iso8601 %></th>
+              <% metrics.each_key do |key| %>
+                <td class="p-2 text-right"><%= number_with_delimiter(row[:values][key]) || "—" %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</section>
+
+<section class="border border-gray-100 rounded-lg p-4">
+  <h2 class="font-semibold text-navy">내 게시물·글</h2>
+  <% if posts.empty? %>
+    <p class="mt-2 text-sm text-gray-500">저장된 게시물 정보가 없습니다.</p>
+  <% else %>
+    <ul class="mt-2 divide-y divide-gray-100 text-sm">
+      <% posts.each do |post| %>
+        <li class="py-3">
+          <% title = post[:title].presence || "제목 없음" %>
+          <% if (url = http_url(post[:article_url] || post[:post_url])) %>
+            <%= link_to title, url, target: "_blank", rel: "noopener", class: "font-medium text-primary" %>
+          <% else %>
+            <p class="font-medium text-navy"><%= title %></p>
+          <% end %>
+          <% if post[:newsletter_name].present? %><p class="text-gray-500"><%= post[:newsletter_name] %></p><% end %>
+          <p class="text-gray-500">
+            게시일 <%= post[:posted_at]&.in_time_zone(Linkedin::Monitor::TIME_ZONE)&.strftime("%Y-%m-%d") || "—" %>
+            · 노출 <%= number_with_delimiter(post[:impressions]) || "—" %>
+            · 노출 변화 <%= change_label.call(post[:impressions_delta]) %>
+          </p>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>
+
+<section class="border border-gray-100 rounded-lg p-4">
+  <h2 class="font-semibold text-navy">주간 활동 권장</h2>
+  <% if weekly %>
+    <p class="mt-2 text-sm text-gray-500"><%= weekly[:range] %></p>
+    <ul class="mt-2 space-y-2 text-sm">
+      <li>
+        <% if weekly[:posted].nil? %>
+          게시물 · 확인 못 함
+        <% else %>
+          <%= lni_icon(weekly[:posted] ? "check-circle-1" : "xmark-circle") %> <%= weekly[:posted] ? "이번 주에 게시함" : "이번 주 게시물 없음" %>
+        <% end %>
+      </li>
+      <li>
+        <% if weekly[:commented].nil? %>
+          댓글 · 확인 못 함
+        <% else %>
+          <%= lni_icon(weekly[:commented] ? "check-circle-1" : "xmark-circle") %> <%= weekly[:commented] ? "이번 주에 댓글을 남김" : "이번 주 댓글 없음" %>
+        <% end %>
+      </li>
+    </ul>
+  <% else %>
+    <p class="mt-2 text-sm text-gray-500"><%= recommendation[:posted_last_7_days] ? "최근 7일 동안 게시함" : "최근 7일 동안 확인된 게시물 없음" %> · 댓글 · 확인 못 함</p>
+  <% end %>
+  <p class="mt-2 text-sm"><%= recommendation[:message] %></p>
+</section>

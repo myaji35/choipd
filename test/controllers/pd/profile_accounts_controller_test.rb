@@ -35,6 +35,27 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "완성도 0%"
   end
 
+  test "linkedin show displays activity metrics and posts from snapshots" do
+    dashboard = file_fixture("linkedin/dashboard.txt").read
+    activity = file_fixture("linkedin/activity.txt").read
+    links = JSON.parse(file_fixture("linkedin/activity_links.json").read)
+    @account.profile_snapshots.create!(captured_at: Time.current, data: {
+      "pages" => {
+        "dashboard" => { "text" => dashboard },
+        "activity" => { "text" => activity, "links" => links }
+      }
+    })
+
+    get pd_profile_account_path(@account)
+
+    assert_response :success
+    assert_select "h2", text: "활동 지표"
+    assert_select "h2", text: "날짜별 추이"
+    assert_select "h2", text: "내 게시물·글"
+    assert_select "h2", text: "주간 활동 권장"
+    assert_select "a[href=?]", links.first, text: "Data Pipelines That Explain Themselves"
+  end
+
   test "check reports missing browser" do
     original = EgoProfile::Runner.method(:available?)
     EgoProfile::Runner.define_singleton_method(:available?) { false }
