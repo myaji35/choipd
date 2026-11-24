@@ -4999,6 +4999,26 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 116,
+        "timestamp": "2026-11-24T20:59:40.266440",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3056시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 29,
+          "in_progress": 0,
+          "ready": 6,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
@@ -5006,7 +5026,7 @@
     "total_issues": 493,
     "completed": 18,
     "failed": 0,
-    "evolved": 115
+    "evolved": 116
   },
   "pending_opportunity_signals": [
     {
