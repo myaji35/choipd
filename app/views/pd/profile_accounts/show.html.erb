@@ -116,6 +116,7 @@
       <%= render "linkedin_activity", monitor: @linkedin_monitor %>
       <%= render "linkedin_network", monitor: @linkedin_monitor, account: @account, actions: @linkedin_invitation_actions %>
     <% end %>
+    <%= render "linkedin_posts", account: @account, posts: @linkedin_posts %>
     <%= render "linkedin_newsletters", monitor: @linkedin_monitor, account: @account, drafts: @linkedin_newsletter_drafts %>
   <% end %>
   <h2 class="font-semibold text-navy">최근 사본</h2>

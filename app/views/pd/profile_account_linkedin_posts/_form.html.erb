@@ -1,0 +1,24 @@
+<% if post.errors.any? %>
+  <ul class="mt-2 break-words text-sm text-red-600" role="alert">
+    <% post.errors.full_messages.each do |message| %>
+      <li><%= message %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<%= form_with model: post, url: form_url, class: "mt-3 min-w-0 space-y-3 text-sm" do |f| %>
+  <div>
+    <%= f.label :message, "본문", class: "block font-medium text-navy" %>
+    <%= f.text_area :message, rows: 5, required: true, maxlength: 3000, class: "w-full rounded-lg border border-gray-200 px-3 py-2" %>
+  </div>
+  <div>
+    <%= f.label :scheduled_at, "예약 시각 (한국 시간)", class: "block font-medium text-navy" %>
+    <%= f.datetime_local_field :scheduled_at, value: post.scheduled_at&.in_time_zone(Linkedin::Monitor::TIME_ZONE)&.strftime("%Y-%m-%dT%H:%M"), class: "block w-full min-w-0 max-w-full rounded-lg border border-gray-200 px-3 py-2 sm:w-auto" %>
+  </div>
+  <div class="flex flex-wrap items-center gap-3">
+    <%= f.submit "저장", class: "bg-primary text-white px-4 py-2 rounded-lg cursor-pointer" %>
+    <% if cancel_url %>
+      <%= link_to "취소", cancel_url, class: "text-primary" %>
+    <% end %>
+  </div>
+<% end %>

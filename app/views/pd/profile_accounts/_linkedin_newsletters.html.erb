@@ -2,7 +2,7 @@
 <% series = monitor.newsletter_series %>
 <% names = series.flat_map { |row| row[:values].keys }.uniq %>
 <% authors = newsletters.select { |entry| entry[:role] == "author" } %>
-<% active, archived = drafts.partition { |draft| draft.status == "draft" } %>
+<% archived, active = drafts.partition { |draft| draft.status == "archived" } %>
 
 <section class="border border-gray-100 rounded-lg p-4">
   <h2 class="font-semibold text-navy">LinkedIn 뉴스레터</h2>
@@ -85,7 +85,7 @@
 
 <section id="newsletter-drafts" class="border border-gray-100 rounded-lg p-4">
   <h2 class="font-semibold text-navy">뉴스레터 글 초안</h2>
-  <p class="mt-2 text-sm text-gray-500">이 초안은 앱에만 저장되며 LinkedIn 에 게시되지 않습니다.</p>
+  <p class="mt-2 text-sm text-gray-500">저장한 글은 승인하면 LinkedIn에 발행됩니다.</p>
   <%= form_with model: LinkedinNewsletterDraft.new, url: pd_profile_account_newsletter_drafts_path(account), class: "mt-3 space-y-3 text-sm" do |f| %>
     <div>
       <%= f.label :newsletter_name, "뉴스레터 이름", class: "block font-medium text-navy" %>
@@ -102,19 +102,34 @@
     <%= f.submit "저장", class: "bg-primary text-white px-4 py-2 rounded-lg cursor-pointer" %>
   <% end %>
 
-  <h3 class="mt-4 text-sm font-medium text-navy">작성 중</h3>
+  <h3 class="mt-4 text-sm font-medium text-navy">뉴스레터 글</h3>
   <% if active.empty? %>
-    <p class="mt-2 text-sm text-gray-500">작성 중인 초안이 없습니다.</p>
+    <p class="mt-2 text-sm text-gray-500">저장된 글이 없습니다.</p>
   <% else %>
-    <ul class="mt-2 divide-y divide-gray-100 text-sm">
+    <% labels = { "draft" => "초안", "publishing" => "발행 중", "published" => "발행됨", "failed" => "실패" } %>
+    <ul class="mt-2 divide-y divide-gray-100 break-words text-sm">
       <% active.each do |draft| %>
         <li class="py-2">
           <p class="font-medium text-navy"><%= draft.title %></p>
           <p class="text-gray-500"><%= draft.newsletter_name.presence || "—" %> · 수정 <%= draft.updated_at.in_time_zone(Linkedin::Monitor::TIME_ZONE).strftime("%Y-%m-%d %H:%M") %></p>
-          <div class="mt-1 flex items-center gap-3">
-            <%= link_to "수정", edit_pd_profile_account_newsletter_draft_path(account, draft), class: "text-primary" %>
-            <%= button_to "보관", archive_pd_profile_account_newsletter_draft_path(account, draft), method: :patch, class: "text-gray-700 cursor-pointer" %>
-          </div>
+          <p class="text-gray-600">
+            <strong><%= (draft.status == "published") && draft.published_url.blank? ? "게시됨(확인 필요)" : labels[draft.status] %></strong>
+            <% if draft.published_at %>
+              · 발행 <%= draft.published_at.in_time_zone(Linkedin::Monitor::TIME_ZONE).strftime("%Y-%m-%d %H:%M") %>
+            <% end %>
+          </p>
+          <% if (url = http_url(draft.published_url)) %>
+            <%= link_to "발행 글 열기", url, target: "_blank", rel: "noopener", class: "text-primary" %>
+          <% elsif draft.status.in?(%w[failed published]) %>
+            <p class="<%= draft.status == "failed" ? "text-red-600" : "text-gray-600" %>"><%= draft.result_message %></p>
+          <% end %>
+          <% unless draft.publishing_locked? %>
+            <div class="mt-1 flex flex-wrap items-center gap-3">
+              <%= link_to "수정", edit_pd_profile_account_newsletter_draft_path(account, draft), class: "text-primary" %>
+              <%= button_to "승인하고 발행", publish_pd_profile_account_newsletter_draft_path(account, draft), method: :patch, class: "text-primary cursor-pointer", form: { data: { turbo_confirm: "LinkedIn에 실제로 게시됩니다. 계속할까요?" } } %>
+              <%= button_to "보관", archive_pd_profile_account_newsletter_draft_path(account, draft), method: :patch, class: "text-gray-700 cursor-pointer" %>
+            </div>
+          <% end %>
         </li>
       <% end %>
     </ul>
@@ -125,7 +140,7 @@
     <% if archived.empty? %>
       <p class="mt-2 text-gray-500">보관된 초안이 없습니다.</p>
     <% else %>
-      <ul class="mt-2 divide-y divide-gray-100">
+      <ul class="mt-2 divide-y divide-gray-100 break-words">
         <% archived.each do |draft| %>
           <li class="py-2">
             <p class="font-medium text-navy"><%= draft.title %> · <%= draft.newsletter_name.presence || "—" %></p>

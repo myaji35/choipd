@@ -5,6 +5,7 @@ class ProfileAccount < ApplicationRecord
   belongs_to :member, optional: true
   has_many :profile_snapshots, dependent: :destroy
   has_many :linkedin_invitation_actions, dependent: :destroy
+  has_many :linkedin_share_posts, class_name: "SnsScheduledPost", dependent: :destroy
   has_many :linkedin_newsletter_drafts, dependent: :destroy
   has_one :naver_people_target, dependent: :destroy
 

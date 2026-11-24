@@ -224,10 +224,17 @@ Rails.application.routes.draw do
         patch :approve
         patch :unapprove
       end
+      resources :linkedin_posts, only: [ :create, :edit, :update ], controller: "profile_account_linkedin_posts" do
+        member do
+          patch :approve
+          patch :unapprove
+        end
+      end
       resources :newsletter_drafts, only: [ :create, :edit, :update ], controller: "profile_account_newsletter_drafts" do
         member do
           patch :archive
           patch :restore
+          patch :publish
         end
       end
     end

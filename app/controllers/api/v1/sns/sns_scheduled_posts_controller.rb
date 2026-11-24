@@ -5,7 +5,7 @@ module Api
         before_action :set_post, only: [ :show, :update, :destroy ]
 
         def index
-          posts = SnsScheduledPost.where(tenant_id: tenant_id).order(scheduled_at: :asc)
+          posts = SnsScheduledPost.where(tenant_id: tenant_id, profile_account_id: nil).order(scheduled_at: :asc)
           posts = posts.where(status: params[:status]) if params[:status].present?
           posts = posts.where(platform: params[:platform]) if params[:platform].present?
           render_success(posts.as_json)
@@ -40,7 +40,7 @@ module Api
         private
 
         def set_post
-          @post = SnsScheduledPost.where(tenant_id: tenant_id).find(params[:id])
+          @post = SnsScheduledPost.where(tenant_id: tenant_id, profile_account_id: nil).find(params[:id])
         end
 
         def post_params

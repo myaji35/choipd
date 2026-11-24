@@ -84,4 +84,68 @@ class Pd::ProfileAccountNewsletterDraftsControllerTest < ActionDispatch::Integra
     assert_select "[role=alert] li"
     assert_equal "가상 초안", draft.reload.title
   end
+
+  test "approves, publishes and protects the newsletter with one publisher call" do
+    draft = @account.linkedin_newsletter_drafts.create!(title: "발행 글", body: "본문", newsletter_name: "Dev Notes")
+    url = "https://www.linkedin.com/pulse/example/"
+    calls = []
+    execute = lambda do |**payload|
+      calls << payload
+      assert draft.reload.approved_at?
+      assert_equal "publishing", draft.status
+      { "ok" => true, "url" => url }
+    end
+
+    with_publisher(execute) do
+      2.times do
+        patch publish_pd_profile_account_newsletter_draft_path(@account, draft)
+        assert_redirected_to @return_path
+      end
+    end
+    assert_equal [ { kind: "article", account: @account, title: "발행 글", body: "본문", newsletter_name: "Dev Notes" } ], calls
+    assert_equal "published", draft.reload.status
+    assert draft.published_at?
+    assert_equal url, draft.published_url
+    follow_redirect!
+    assert_select "a[href=?][target=_blank][rel=noopener]", url
+    assert_select "form[action=?]", publish_pd_profile_account_newsletter_draft_path(@account, draft), count: 0
+
+    get edit_pd_profile_account_newsletter_draft_path(@account, draft)
+    assert_redirected_to @return_path
+    patch pd_profile_account_newsletter_draft_path(@account, draft), params: { linkedin_newsletter_draft: { title: "변경" } }
+    assert_redirected_to @return_path
+    patch archive_pd_profile_account_newsletter_draft_path(@account, draft)
+    assert_redirected_to @return_path
+    assert_equal [ "발행 글", "published" ], [ draft.reload.title, draft.status ]
+  end
+
+  test "rejects publishing archived drafts and records publishing failures" do
+    draft = @account.linkedin_newsletter_drafts.create!(title: "발행 글", body: "본문", status: "archived")
+    with_publisher(->(**) { flunk "unexpected publishing" }) do
+      patch publish_pd_profile_account_newsletter_draft_path(@account, draft)
+      assert_redirected_to @return_path
+      assert_nil draft.reload.approved_at
+    end
+
+    draft.update!(status: "draft")
+    with_publisher(->(**) { { "ok" => false, "reason" => "뉴스레터 선택이 다름" } }) do
+      patch publish_pd_profile_account_newsletter_draft_path(@account, draft)
+      assert_redirected_to @return_path
+    end
+    assert_equal "failed", draft.reload.status
+    assert_equal "뉴스레터 선택이 다름", draft.result_message
+    assert_equal draft.result_message, flash[:alert]
+  end
+
+  private
+
+  def with_publisher(execute)
+    publisher = Object.new
+    publisher.define_singleton_method(:call) { |**payload| execute.call(**payload) }
+    original = EgoProfile::LinkedinPublisher.method(:new)
+    EgoProfile::LinkedinPublisher.define_singleton_method(:new) { publisher }
+    yield
+  ensure
+    EgoProfile::LinkedinPublisher.define_singleton_method(:new, original)
+  end
 end

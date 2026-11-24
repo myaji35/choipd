@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_24_220000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_230000) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -691,6 +691,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_220000) do
     t.datetime "archived_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "approved_at"
+    t.datetime "published_at"
+    t.string "published_url"
+    t.string "result_message"
     t.index [ "profile_account_id", "status" ], name: "idx_on_profile_account_id_status_f34fdcc080"
   end
 
@@ -1176,7 +1180,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_220000) do
     t.string "status"
     t.integer "tenant_id", default: 1, null: false
     t.datetime "updated_at", null: false
+    t.integer "profile_account_id"
+    t.datetime "approved_at"
+    t.datetime "published_at"
+    t.string "published_url"
+    t.string "result_message"
     t.index ["member_id"], name: "index_sns_scheduled_posts_on_member_id"
+    t.index ["profile_account_id"], name: "index_sns_scheduled_posts_on_profile_account_id"
     t.index ["sns_account_id"], name: "index_sns_scheduled_posts_on_sns_account_id"
     t.index ["tenant_id"], name: "index_sns_scheduled_posts_on_tenant_id"
   end
@@ -1327,6 +1337,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_220000) do
   add_foreign_key "sns_follower_snapshots", "sns_accounts"
   add_foreign_key "sns_post_histories", "sns_scheduled_posts"
   add_foreign_key "sns_scheduled_posts", "members"
+  add_foreign_key "sns_scheduled_posts", "profile_accounts"
   add_foreign_key "sns_scheduled_posts", "sns_accounts"
   add_foreign_key "webhook_logs", "webhooks", on_delete: :cascade
   add_foreign_key "workflow_executions", "workflows", on_delete: :cascade

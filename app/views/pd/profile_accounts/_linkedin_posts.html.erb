@@ -1,0 +1,40 @@
+<section id="linkedin-posts" class="min-w-0 border border-gray-100 rounded-lg p-4">
+  <h2 class="font-semibold text-navy">LinkedIn 게시물</h2>
+  <%= render "pd/profile_account_linkedin_posts/form", post: SnsScheduledPost.new, form_url: pd_profile_account_linkedin_posts_path(account), cancel_url: nil %>
+
+  <% if posts.empty? %>
+    <p class="mt-4 text-sm text-gray-500">저장된 게시물이 없습니다.</p>
+  <% else %>
+    <% labels = { "draft" => "초안", "scheduled" => "승인됨·예약 대기", "publishing" => "게시 중", "published" => "게시됨", "failed" => "실패" } %>
+    <ul class="mt-4 divide-y divide-gray-100 break-words text-sm">
+      <% posts.each do |post| %>
+        <li class="py-3">
+          <p class="whitespace-pre-wrap text-navy"><%= post.message %></p>
+          <p class="mt-1 text-gray-600">
+            <strong><%= (post.status_published?) && post.published_url.blank? ? "게시됨(확인 필요)" : labels[post.status] %></strong>
+            · 예약 <%= post.scheduled_at&.in_time_zone(Linkedin::Monitor::TIME_ZONE)&.strftime("%Y-%m-%d %H:%M") %>
+            <% if post.published_at %>
+              · 게시 <%= post.published_at.in_time_zone(Linkedin::Monitor::TIME_ZONE).strftime("%Y-%m-%d %H:%M") %>
+            <% end %>
+          </p>
+          <% if (url = http_url(post.published_url)) %>
+            <%= link_to "게시물 열기", url, target: "_blank", rel: "noopener", class: "text-primary" %>
+          <% elsif post.status_failed? || post.status_published? %>
+            <p class="<%= post.status_failed? ? "text-red-600" : "text-gray-600" %>"><%= post.result_message %></p>
+          <% end %>
+          <% unless post.publishing_locked? %>
+            <div class="mt-1 flex flex-wrap items-center gap-3">
+              <%= link_to "수정", edit_pd_profile_account_linkedin_post_path(account, post), class: "text-primary" %>
+              <% unless post.status_scheduled? && post.approved_at? %>
+                <%= button_to "승인하고 게시", approve_pd_profile_account_linkedin_post_path(account, post), method: :patch, class: "text-primary cursor-pointer", form: { data: { turbo_confirm: "LinkedIn에 실제로 게시됩니다. 계속할까요?" } } %>
+              <% end %>
+              <% if post.approved_at? %>
+                <%= button_to "승인 취소", unapprove_pd_profile_account_linkedin_post_path(account, post), method: :patch, class: "text-gray-700 cursor-pointer" %>
+              <% end %>
+            </div>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>

@@ -4,7 +4,7 @@ class SnsScheduledPublishJob < ApplicationJob
   retry_on StandardError, wait: 30.seconds, attempts: 3
 
   def perform
-    SnsScheduledPost.due.includes(:sns_account, :member).find_each do |post|
+    SnsScheduledPost.due.where(profile_account_id: nil).includes(:sns_account, :member).find_each do |post|
       publish_one(post)
     end
   end

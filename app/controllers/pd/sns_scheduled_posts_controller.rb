@@ -2,7 +2,7 @@ class Pd::SnsScheduledPostsController < Pd::BaseController
   before_action :set_post, only: [ :edit, :update, :destroy ]
 
   def index
-    @pagy, @scheduled_posts = pagy(SnsScheduledPost.recent, items: 20)
+    @pagy, @scheduled_posts = pagy(SnsScheduledPost.where(profile_account_id: nil).recent, items: 20)
   end
 
   def new
@@ -41,7 +41,7 @@ class Pd::SnsScheduledPostsController < Pd::BaseController
   private
 
   def set_post
-    @post = SnsScheduledPost.find(params[:id])
+    @post = SnsScheduledPost.where(profile_account_id: nil).find(params[:id])
   end
 
   def post_params

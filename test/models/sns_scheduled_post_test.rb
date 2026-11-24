@@ -40,4 +40,28 @@ class SnsScheduledPostTest < ActiveSupport::TestCase
     assert_includes post.errors[:base], "브랜드 채널의 운영 위탁 동의가 필요합니다."
     assert_equal @account.id, post.reload.sns_account_id
   end
+
+  test "changes to the message or time clear LinkedIn approval" do
+    profile = ProfileAccount.create!(platform: "linkedin", display_name: "공유 계정")
+    record = profile.linkedin_share_posts.create!(platform: "linkedin", message: "초안", scheduled_at: 1.day.from_now, status: "draft")
+    [ { message: "수정" }, { scheduled_at: 2.days.from_now } ].each do |changes|
+      record.update!(approved_at: Time.current, status: "scheduled")
+      record.update!(changes)
+      assert_nil record.reload.approved_at
+      assert record.status_draft?
+    end
+  end
+
+  test "only LinkedIn shares have the 3000 character limit" do
+    profile = ProfileAccount.create!(platform: "linkedin", display_name: "공유 계정")
+    record = profile.linkedin_share_posts.build(platform: "linkedin", message: "가" * 3000, scheduled_at: Time.current)
+    assert_predicate record, :valid?
+
+    record.message += "나"
+    assert_not record.valid?
+    assert record.errors[:message].any?
+
+    record.profile_account = nil
+    assert_predicate record, :valid?
+  end
 end

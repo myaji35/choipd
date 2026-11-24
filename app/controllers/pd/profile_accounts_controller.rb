@@ -26,6 +26,7 @@ class Pd::ProfileAccountsController < Pd::BaseController
     end
     if @account.platform == "linkedin"
       @linkedin_monitor = Linkedin::Monitor.new(@snapshots)
+      @linkedin_posts = @account.linkedin_share_posts.linkedin_shares.recent.order(id: :desc).limit(20)
       @linkedin_newsletter_drafts = @account.linkedin_newsletter_drafts.order(updated_at: :desc, id: :desc)
       return unless @latest_snapshot
 

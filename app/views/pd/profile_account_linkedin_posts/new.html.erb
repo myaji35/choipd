@@ -1,0 +1,5 @@
+<% content_for :title, "LinkedIn 게시물 초안" %>
+<section class="border border-gray-100 rounded-lg p-4 bg-white">
+  <h1 class="text-xl font-bold text-navy">LinkedIn 게시물 초안</h1>
+  <%= render "form", post: @post, form_url: pd_profile_account_linkedin_posts_path(@account), cancel_url: pd_profile_account_path(@account, anchor: "linkedin-posts") %>
+</section>

@@ -16,7 +16,7 @@ class LinkedinNewsletterDraftTest < ActiveSupport::TestCase
   end
 
   test "validates title body and status" do
-    draft = @account.linkedin_newsletter_drafts.build(title: "", status: "published")
+    draft = @account.linkedin_newsletter_drafts.build(title: "", status: "unknown")
     assert_not draft.valid?
     assert draft.errors[:title].any?
     assert draft.errors[:status].any?
@@ -25,5 +25,15 @@ class LinkedinNewsletterDraftTest < ActiveSupport::TestCase
     assert_not draft.valid?
     assert draft.errors[:title].any?
     assert draft.errors[:body].any?
+  end
+
+  test "changes to the title or body clear approval" do
+    draft = @account.linkedin_newsletter_drafts.create!(title: "제목", body: "본문")
+
+    [ { title: "수정 제목" }, { body: "수정 본문" } ].each do |changes|
+      draft.update!(approved_at: Time.current)
+      draft.update!(changes)
+      assert_nil draft.reload.approved_at
+    end
   end
 end
