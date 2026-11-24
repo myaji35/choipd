@@ -8,6 +8,7 @@ class ProfileAccount < ApplicationRecord
   has_many :linkedin_share_posts, class_name: "SnsScheduledPost", dependent: :destroy
   has_many :linkedin_newsletter_drafts, dependent: :destroy
   has_one :naver_people_target, dependent: :destroy
+  has_many :naver_people_submissions, dependent: :destroy
 
   validates :platform, inclusion: { in: PLATFORMS.keys }
   validates :session_status, inclusion: { in: SESSION_STATUSES.keys }

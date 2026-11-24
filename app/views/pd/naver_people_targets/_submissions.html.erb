@@ -1,0 +1,66 @@
+<section id="naver-submission" class="min-w-0 border border-gray-100 rounded-lg p-4 space-y-3">
+  <h2 class="font-semibold text-navy">네이버 수정 신청 입력</h2>
+  <p class="text-sm text-gray-600">앱은 네이버에 제출하지 않습니다. ego 화면에서 확인 후 대표님이 직접 '신청'을 누르세요.</p>
+  <% if @diff.items.empty? %>
+    <p class="text-sm text-gray-500">바꿀 항목이 없습니다.</p>
+  <% elsif @target.approved_current?(@diff.digest) %>
+    <%= button_to "네이버 수정 신청 화면에 입력", pd_profile_account_naver_target_submissions_path(@account),
+      form: { data: { turbo_confirm: "ego 브라우저가 네이버 수정신청 화면에 입력합니다. 제출은 하지 않습니다. 계속할까요?" } },
+      class: "px-4 py-2 rounded-lg bg-primary text-white text-sm whitespace-normal" %>
+  <% elsif @approval_stale %>
+    <p class="text-sm text-amber-900">다시 승인 필요</p>
+  <% else %>
+    <p class="text-sm text-gray-500">승인된 최신 초안이 없습니다.</p>
+  <% end %>
+
+  <h3 class="font-semibold text-sm text-navy">최근 신청 기록</h3>
+  <% actions = { "add" => "추가", "remove" => "삭제", "change" => "수정" } %>
+  <% if @submissions.empty? %>
+    <p class="text-sm text-gray-500">신청 기록이 없습니다.</p>
+  <% end %>
+  <% @submissions.each do |submission| %>
+    <article class="rounded-lg border border-gray-100 p-3 space-y-3 text-sm">
+      <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <strong><%= NaverPeopleSubmission::STATUS_LABELS.fetch(submission.status) %></strong>
+        <time class="text-gray-500" datetime="<%= submission.created_at.iso8601 %>"><%= l submission.created_at, format: :short %></time>
+      </div>
+      <% if submission.ego_space_id.present? %>
+        <p class="break-all">ego 작업 공간 #<%= submission.ego_space_id %></p>
+        <h4 class="font-medium text-navy">자동 입력한 항목</h4>
+        <% if submission.filled_items.any? %>
+          <ul class="list-disc pl-4 space-y-1">
+            <% submission.filled_items.each do |item| %>
+              <li class="break-all"><%= item["label"] %> · <%= item["after"] %></li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-gray-500">자동 입력한 항목이 없습니다.</p>
+        <% end %>
+      <% end %>
+      <% if submission.manual_items.any? %>
+        <h4 class="font-medium text-navy">직접 입력할 항목</h4>
+        <ol class="list-decimal pl-4 space-y-2">
+          <% submission.manual_items.each do |item| %>
+            <li class="break-all">
+              <%= item["tab"] %> → <%= item["label"] %> → <%= actions.fetch(item["action"]) %> → <%= item.values_at("before", "after").compact.join(" → ") %>
+              <% if item["reason"].present? %><p class="text-gray-500"><%= item["reason"] %></p><% end %>
+            </li>
+          <% end %>
+        </ol>
+      <% end %>
+      <% if submission.result_message.present? %>
+        <p class="text-red-700 break-all"><%= submission.result_message %></p>
+      <% end %>
+      <div class="flex flex-wrap gap-2">
+        <% if submission.status == "filled" %>
+          <%= button_to "제출했음", mark_submitted_pd_profile_account_naver_target_submission_path(@account, submission),
+            method: :patch, class: "px-3 py-2 rounded-lg border border-gray-300" %>
+        <% end %>
+        <% if NaverPeopleSubmission::CANCELLABLE_STATUSES.include?(submission.status) %>
+          <%= button_to "취소", cancel_pd_profile_account_naver_target_submission_path(@account, submission),
+            method: :patch, class: "px-3 py-2 rounded-lg border border-gray-300" %>
+        <% end %>
+      </div>
+    </article>
+  <% end %>
+</section>

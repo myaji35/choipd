@@ -10,6 +10,7 @@ class Pd::NaverPeopleTargetsController < Pd::BaseController
     @diff = NaverPeople::TargetDiff.new(sources.values_for("naver"), @values)
     @approval_label = @target.approval_label(@diff)
     @approval_stale = @target.approval_stale?(@diff)
+    @submissions = @account.naver_people_submissions.order(id: :desc).limit(5)
     @cross_check = NaverPeople::CrossCheck.new(@account, sources: sources)
   end
 

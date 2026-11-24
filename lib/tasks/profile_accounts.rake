@@ -1,4 +1,13 @@
 namespace :profile_accounts do
+  desc "네이버 수정 신청 입력 화면 점검 (naver_fill_probe[profile_account_id])"
+  task :naver_fill_probe, [ :profile_account_id ] => :environment do |_task, args|
+    accounts = ProfileAccount.for_platform("naver_people").order(:id)
+    account = args[:profile_account_id].present? ? accounts.find(args[:profile_account_id]) : accounts.first!
+    current = NaverPeople::TargetSources.new(account).values_for("naver")
+    job = account.headline.presence || Array(current["jobs"]).first
+    puts EgoProfile::NaverSubmissionFiller.new.call(account: account, job: job, probe: true).to_json
+  end
+
   desc "게시 시각이 지난 승인된 LinkedIn 게시물 게시"
   task publish_due: :environment do
     Linkedin::SharePublishing.new.publish_due.each do |id, result|

@@ -223,6 +223,12 @@ Rails.application.routes.draw do
       resource :naver_target, only: [ :show, :edit, :update ], controller: "naver_people_targets" do
         patch :approve
         patch :unapprove
+        resources :submissions, only: [ :create ], controller: "naver_people_submissions" do
+          member do
+            patch :mark_submitted
+            patch :cancel
+          end
+        end
       end
       resources :linkedin_posts, only: [ :create, :edit, :update ], controller: "profile_account_linkedin_posts" do
         member do
