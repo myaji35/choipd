@@ -226,7 +226,7 @@
       "id": "ISS-408",
       "type": "UX_FIX",
       "priority": "P2",
-      "status": "READY",
+      "status": "DONE",
       "parent": null,
       "title": "신규 가입 직후 회원페이지 히어로 하단 504px 여백 (빈 프로필 한정)",
       "description": "가입 직후 masthead-grid 좌측 컬럼은 제목만 있고 우측 사이드바(QR/명함)는 665px 라 좌측 하단에 504px 공백이 생김. 콘텐츠가 있는 회원(bumhee-choi)은 424/360/679 로 균형 정상 → 빈 프로필 전용 문제. 빈 상태용 안내 카드(예: '사진을 올리면 이 자리가 채워집니다' + 에디터 CTA)로 채우는 방안 권장. 오버플로 등 기능 결함 아님 — 레이아웃/디자인 판단 필요하여 별도 이슈로 분리.",
@@ -236,7 +236,7 @@
       "root_cause": "빈 프로필에서 좌우 컬럼 높이 불균형, 빈 상태(empty state) 디자인 부재",
       "production_impact": "신규 가입자가 첫 화면에서 '미완성' 인상을 받음. 이탈 요인 가능.",
       "created_at": "2026-07-20T13:20:45",
-      "completed_at": null,
+      "completed_at": "2026-11-24T21:24:54.982488",
       "assign_to": "check-harness",
       "blocked_reason": "배포(fbe35b6) 진행 중 — 프로덕션 검증 완료 전 UI 변경 금지. 또한 빈 상태 히어로를 무엇으로 채울지는 브랜드 표현 판단이라 방향 확인 후 착수. 보류 시각 2026-07-20T13:29:59",
       "payload": {
@@ -249,9 +249,58 @@
           }
         ],
         "approved_at": "2026-11-24T10:10:52.796Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "이미 해소됨 — 회원 공개 페이지 개편(187b0da '빈 영역 숨김', eb2809c)으로 좌우 2열 masthead-grid 와 우측 QR·명함 사이드바가 첫 화면에서 빠져 빈 프로필도 1열 히어로가 되었다. 코드 변경 없이 근거만 남겨 정리.",
+          "risk": "낮음",
+          "effort": "없음",
+          "by": "factory-runner",
+          "at": "2026-11-24T12:24:54Z"
+        },
+        "acceptance_criteria": [
+          "가입 직후(사진·소개 없는) 회원 공개 페이지 첫 화면에 좌측 하단 큰 빈 공간(504px)이 없다",
+          "데스크톱·휴대폰 너비 모두 가로 넘침이 없다",
+          "빈 사진·서비스 영역은 숨겨진다(기존 테스트)"
+        ]
       },
-      "updated_at": "2026-11-24T10:10:52.796Z"
+      "updated_at": "2026-11-24T12:24:54Z",
+      "result": {
+        "resolution": "already_fixed",
+        "fixed_by": [
+          "187b0da",
+          "eb2809c"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "빈 프로필 첫 화면에 504px 빈 공간 없음",
+            "met": true,
+            "how": "로컬 3008 brand-demo-3(사진·소개 없음) 실측: masthead-grid 없음, public-hero 1열(아바타·이름·직업·상담 버튼) 1280px 높이 358px, 390px 314px — 좌우 열 불균형 자체가 없음"
+          },
+          {
+            "criterion": "가로 넘침 없음",
+            "met": true,
+            "how": "1280·390 너비 scrollWidth <= innerWidth"
+          },
+          {
+            "criterion": "빈 사진·서비스 영역 숨김",
+            "met": true,
+            "how": "member_public_profile_ux_test both layouts omit empty photos and services 통과"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/integration/member_public_profile_ux_test.rb test/integration/public_pages_test.rb",
+            "exit_code": 0,
+            "output": "10 runs, 74 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "grep -c masthead-grid app/views/public_profile/member_show.html.erb",
+            "exit_code": 1,
+            "output": "0"
+          }
+        ]
+      }
     },
     {
       "id": "ISS-460",
@@ -724,16 +773,39 @@
             "exit_code": 0,
             "output": "[LinkedIn] 로그인됨 · 계정 1개 · 변경 사본 1개"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-24T12:00:12Z",
+          "sha": "ce02142",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rails test test/services/linkedin test/controllers/pd test/models/linkedin_newsletter_draft_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.10/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "bin/rails profile_accounts:check[linkedin]",
+              "status": "skipped",
+              "why": "검사 명령 아님: bin/rails profile_accounts:check[linkedi"
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json"
+          ]
+        }
       }
     },
     {
       "type": "FEATURE",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "parent": "ISS-460",
       "created_at": "2026-11-19T14:30:00",
-      "completed_at": null,
+      "completed_at": "2026-11-24T21:24:01.602086",
       "assign_to": "codex",
       "id": "ISS-465",
       "title": "[LinkedIn] 정보 공유 — 게시물·뉴스레터 초안/예약 + 승인 건만 ego로 게시하고 결과 주소 기록",
@@ -748,9 +820,27 @@
           }
         ],
         "approved_at": "2026-11-24T10:10:52.796Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "게시는 앱에서 대표님이 '승인하고 게시'를 누른 건만 ego로 실행한다(1촌 수락 ISS-463과 같은 승인 후 실행 구조). 공장에서는 실제 게시를 하지 않고, 화면 요소 확인용 점검 모드(입력·게시 없음)만 실계정에서 돌린다.",
+          "risk": "중간(게시 화면 구조 변경 시 실패 — 실패는 기록만 하고 재시도 없음)",
+          "effort": "M",
+          "by": "factory-runner",
+          "at": "2026-11-24T12:02:03Z"
+        },
+        "acceptance_criteria": [
+          "LinkedIn 계정 상세에서 게시물 초안을 쓰고 고치고 예약 시각을 정할 수 있다(기존 sns_scheduled_posts 를 platform=linkedin 으로 재사용), 목록에 초안·승인됨(예약 대기)·게시됨·실패 상태가 보인다",
+          "대표님이 '승인하고 게시'를 누른 건만 ego로 LinkedIn에 게시되고, 예약 시각이 남은 승인 건은 시각이 지난 뒤 profile_accounts:publish_due 가 게시한다 — 승인 안 한 초안은 어떤 경로로도 게시되지 않는다",
+          "뉴스레터 글 초안(ISS-464)도 '승인하고 발행'을 누르면 ego로 해당 뉴스레터에 발행된다",
+          "게시·발행 결과 주소(게시물·글 URL)·시각·실패 사유가 기록되어 목록에 보인다",
+          "관련 테스트와 전체 테스트가 통과한다(ego는 대역), 실계정에는 입력·게시 없는 점검 모드만 실행한다"
+        ]
       },
-      "updated_at": "2026-11-24T10:10:52.796Z"
+      "updated_at": "2026-11-24T12:02:03Z",
+      "result": {
+        "raw": "{\"commit\":\"fe54db8\",\"migration\":\"20261124230000_add_linkedin_publishing(main, 개발 DB 적용)\",\"files_created\":[\"app/controllers/pd/profile_account_linkedin_posts_controller.rb\",\"app/services/ego_profile/linkedin_publisher.rb\",\"app/services/linkedin/share_publishing.rb\",\"app/views/pd/profile_accounts/_linkedin_posts.html.erb\",\"lib/ego/linkedin_publish.mjs\"],\"review\":{\"gemini\":\"1건 맞음 — 발행 버튼 클릭 뒤 주소 확인만 실패해도 failed 로 남아 다시 승인·중복 발행 가능 → 클릭 뒤 실패는 '게시됨(확인 필요)'로 잠금\",\"opus\":\"실계정 점검에서 글 작성자(뉴스레터) 버튼 미탐지 발견(영문 이름으로 찾음 — 화면은 '강승식 / XimTier Dev Notes') → 2줄 버튼 단일 후보로 수정, 화면 그리기 대기 12초\"},\"criteria_check\":[{\"criterion\":\"LinkedIn 계정 상세에서 게시물 초안 작성·수정·예약, 상태 표시\",\"met\":true,\"how\":\"로컬 3008 실화면에서 초안 저장 → '초안 · 예약 2026-11-24 21:23 / 수정 / 승인하고 게시' 표시, 가로 넘침 없음(검수용 초안은 삭제). 컨트롤러 테스트 생성·수정·승인 취소·다른 계정 404·네이버 계정 거절\"},{\"criterion\":\"승인한 건만 게시, 미래 예약은 publish_due 가 시각 뒤 게시, 미승인은 어떤 경로로도 게시 안 됨\",\"met\":true,\"how\":\"share_publishing_test: 미승인·미래 글 publish_due 실행 0회, update_all 선점으로 같은 글 두 번 승인해도 게시 1회, SnsScheduledPublishJob·API·PD 예약 화면은 profile_account_id 있는 글 제외\"},{\"criterion\":\"뉴스레터 글 초안 승인하고 발행\",\"met\":true,\"how\":\"newsletter_drafts publish 액션 테스트(보관·게시됨·게시 중 거절), 실계정 점검 모드: 제목칸·본문 편집기·다음 버튼·작성자 버튼 '강승식 XimTier Dev Notes' 확인\"},{\"criterion\":\"결과 주소·시각·실패 사유 기록\",\"met\":true,\"how\":\"성공 시 published_url·published_at·SnsPostHistory, 실패 시 failed+사유, 클릭 뒤 확인 실패는 published(URL 없음, '게시됨(확인 필요)') 잠금 테스트\"},{\"criterion\":\"테스트 통과, 실계정은 점검 모드만\",\"met\":true,\"how\":\"전체 283 runs 0 failures, rubocop 0, brakeman 경고 0. 실계정 publish_probe: post editor·게시 버튼 true(입력·게시 없음). 실제 게시는 대표님 승인 클릭 때만\"}],\"proof\":[{\"cmd\":\"bin/rails test test/services/linkedin test/services/ego_profile test/controllers/pd/profile_account_linkedin_posts_controller_test.rb test/controllers/pd/profile_account_newsletter_drafts_controller_test.rb test/jobs test/models/sns_scheduled_post_test.rb\",\"exit_code\":0,\"output\":\"70 runs, 428 assertions, 0 failures, 0 errors, 0 skips\"},{\"cmd\":\"bin/rails test\",\"exit_code\":0,\"output\":\"283 runs, 1856 assertions, 0 failures, 0 errors, 1 skips\"},{\"cmd\":\"bin/rails 'profile_accounts:publish_probe[2]'\",\"exit_code\":0,\"output\":\"{\"kind\":\"post\",\"ok\":true,\"probe\":{\"editor\":true,\"publish_button\":true}} / {\"kind\":\"article\",\"ok\":true,\"probe\":{\"headline\":true,\"editor\":true,\"next_button\":true,\"author_button\":\"강승식 XimTier Dev Notes\"}}\"}],\"note\":\"실제 LinkedIn 게시는 공장에서 하지 않았다(대표님 계정 외부 게시). 예약 게시 자동 실행은 Mac 에서 bin/rails profile_accounts:publish_due 를 주기 실행해야 한다(아직 예약 작업 미등록).\"}"
+      }
     },
     {
       "type": "FEATURE",
@@ -847,7 +937,30 @@
             "exit_code": 0,
             "output": "7일 동안 게시물 노출수 46 (+14) / 총 팔로워 17 (변화 없음)"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-24T12:00:12Z",
+          "sha": "ce02142",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rails test test/services test/controllers/pd",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.10/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "bin/rails profile_accounts:weekly_report",
+              "status": "skipped",
+              "why": "검사 명령 아님: bin/rails profile_accounts:weekly_report"
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json"
+          ]
+        }
       }
     },
     {
@@ -1097,7 +1210,30 @@
             "exit_code": 0,
             "output": "[네이버 인물정보] 로그인됨 · 계정 1개 · 변경 사본 1개"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-24T12:00:12Z",
+          "sha": "ce02142",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rails test test/services test/controllers/pd test/models",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.10/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "bin/rails profile_accounts:check[naver_people]",
+              "status": "skipped",
+              "why": "검사 명령 아님: bin/rails profile_accounts:check[naver_p"
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json"
+          ]
+        }
       }
     },
     {
@@ -1322,16 +1458,39 @@
             "output": "200"
           }
         ],
-        "followup_commit": "8ecf5ec (brakeman 오탐 제거용 메서드 이름 변경, 동작 동일)"
+        "followup_commit": "8ecf5ec (brakeman 오탐 제거용 메서드 이름 변경, 동작 동일)",
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-24T12:00:12Z",
+          "sha": "ce02142",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rails test test/services test/controllers/pd test/models",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.10/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "curl -s -o /dev/null -w '%{http_code}' https://impd.townin.net/kang-seung-sig",
+              "status": "skipped",
+              "why": "검사 명령 아님: curl -s -o /dev/null -w %{http_code} htt"
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json"
+          ]
+        }
       }
     },
     {
       "type": "FEATURE",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "parent": "ISS-460",
       "created_at": "2026-11-19T15:00:00",
-      "completed_at": null,
+      "completed_at": "2026-11-24T21:35:02.952502",
       "assign_to": "codex",
       "id": "ISS-474",
       "title": "[네이버 인물정보] 승인한 초안을 ego로 수정 신청 화면에 입력 → 대표님 확인 후 제출",
@@ -1346,9 +1505,27 @@
           }
         ],
         "approved_at": "2026-11-24T10:10:52.796Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "네이버 수정신청 화면(2026-11-24 실측: 수정 대상 선택→인물정보 입력 5탭→신청 완료)에 승인된 초안 중 자동 입력이 확실한 항목(영문명·사이트 추가)만 ego가 넣고, 나머지(직업·소속·경력·학력·수상·자격증, 삭제·수정)는 탭·값 순서표로 보여 준다. 최종 '신청'은 대표님이 ego 화면에서 직접 누른다 — 앱은 제출 버튼을 누르지 않는다.",
+          "risk": "중간(네이버 화면 구조 변경 시 입력 실패 — 실패하면 아무것도 제출되지 않음)",
+          "effort": "M",
+          "by": "factory-runner",
+          "at": "2026-11-24T12:09:28Z"
+        },
+        "acceptance_criteria": [
+          "승인된(최신 초안과 일치하는) 목표 프로필에서 '네이버 수정 신청 입력'을 누르면 ego가 수정신청 화면을 열어 대상 인물을 고르고 영문명·추가할 사이트 주소를 입력한 뒤 작업 공간을 대표님께 넘긴다(handOff)",
+          "앱은 어떤 경우에도 네이버 '신청/제출' 버튼을 누르지 않는다 — 대표님이 ego 화면에서 확인 후 직접 제출한다",
+          "자동 입력하지 못한 항목(직업·소속·경력·학력·수상·자격증, 삭제·수정 항목)은 입력할 탭 이름과 값이 순서표로 화면에 보인다",
+          "입력 기록(작업 공간 번호·자동 입력한 항목·직접 입력할 항목·실패 사유)이 남고, 대표님이 '제출했음'/'취소'로 상태를 바꿀 수 있다. 승인 안 됐거나 초안이 바뀐(다시 승인 필요) 목표는 입력이 거절된다",
+          "관련 테스트와 전체 테스트가 통과한다(ego는 대역), 실계정에는 입력 없는 점검 모드만 실행한다"
+        ]
       },
-      "updated_at": "2026-11-24T10:10:52.796Z"
+      "updated_at": "2026-11-24T12:09:28Z",
+      "result": {
+        "raw": "{\"commit\":\"2f32259\",\"migration\":\"20261124240000_create_naver_people_submissions(main, 개발 DB 적용)\",\"files_created\":[\"app/models/naver_people_submission.rb\",\"app/services/naver_people/submission_preparer.rb\",\"app/services/ego_profile/naver_submission_filler.rb\",\"app/controllers/pd/naver_people_submissions_controller.rb\",\"app/views/pd/naver_people_targets/_submissions.html.erb\",\"lib/ego/naver_people_modify_fill.mjs\"],\"review\":{\"gemini\":\"7건 — 1~6 맞음(입력 중 초안 변경 재확인, preparing 취소 거절, 사이트 영역 미탐지 시 클릭 안 함, 점검이 대표님께 넘긴 공간을 닫는 문제 → 점검 전용 공간, 이름·직업 부분일치 → 정확히 일치, 예외 시 preparing 고착 → failed, 직업은 네이버 현재 값 우선), 7 틀림(영문명 빈 값은 삭제로 분류돼 자동 입력 대상 아님)\",\"opus\":\"실계정 점검에서 네이버 첫 화면 '수정신청' 링크 2개로 실패 발견 → /infomanagement 직접 이동\"},\"criteria_check\":[{\"criterion\":\"승인된 최신 초안에서 ego가 수정신청 화면을 열어 대상 인물 선택·영문명·사이트 입력 후 공간을 대표님께 넘김\",\"met\":true,\"how\":\"실측 화면(수정 대상 선택→인물정보 입력 기본정보) 기준 스크립트, 실계정 점검 모드로 2단계 진입·enName 칸·사이트 추가 버튼 확인. 실제 입력은 승인된 목표가 아직 없어(개발 DB naver_people_targets 0건) 대역 테스트로 확인\"},{\"criterion\":\"앱은 네이버 신청/제출 버튼을 누르지 않음\",\"met\":true,\"how\":\"스크립트 클릭 대상은 대상 li·1단계 '다음'·'사이트 추가'·'추가하기'·'취소'뿐, 금지 버튼 클릭 패턴 없음을 검사하는 테스트 통과(Gemini 도 확인)\"},{\"criterion\":\"자동 입력 못 한 항목의 탭별 순서표\",\"met\":true,\"how\":\"submission_preparer_test: ename·sites add 만 자동, 나머지·remove/change 는 탭(기본정보/소속·경력/학력·수상·자격증)과 값으로 manual_items\"},{\"criterion\":\"입력 기록과 제출했음·취소, 미승인·다시 승인 필요 거절\",\"met\":true,\"how\":\"컨트롤러·preparer 테스트(미승인·stale 거절, 같은 digest 재사용 시 filler 0회, 입력 중 초안 변경→failed, 예외→failed, preparing 취소 거절), 로컬 화면 1280·390 넘침 없음\"},{\"criterion\":\"테스트 통과, 실계정은 점검 모드만\",\"met\":true,\"how\":\"전체 303 runs 0 failures, rubocop 0, brakeman 경고 0, naver_fill_probe {ok:true, ename:true, site_add:true}\"}],\"proof\":[{\"cmd\":\"bin/rails test test/services/naver_people test/services/ego_profile test/controllers/pd/naver_people_submissions_controller_test.rb test/models/naver_people_submission_test.rb\",\"exit_code\":0,\"output\":\"57 runs, 294 assertions, 0 failures, 0 errors, 0 skips\"},{\"cmd\":\"bin/rails test\",\"exit_code\":0,\"output\":\"303 runs, 1978 assertions, 0 failures, 0 errors, 1 skips\"},{\"cmd\":\"bin/rails profile_accounts:naver_fill_probe\",\"exit_code\":0,\"output\":\"{\"ok\":true,\"probe\":{\"ename\":true,\"site_add\":true}}\"}],\"note\":\"실제 네이버 입력·제출은 하지 않았다. 대표님이 목표 프로필을 저장·승인한 뒤 '네이버 수정 신청 화면에 입력'을 누르면 ego 공간이 넘어오고, 대표님이 확인 후 직접 신청한다.\"}"
+      }
     },
     {
       "id": "ISS-475",
@@ -1505,7 +1682,7 @@
       "title": "[연동] 보험설계사 샘플 여정 12단계 로컬 통합 시험 + UX 점수표(95% 판정)",
       "priority": "P1",
       "type": "FEATURE",
-      "status": "READY",
+      "status": "BLOCKED",
       "created_at": "2026-11-19T15:40:00",
       "completed_at": null,
       "assign_to": "codex",
@@ -1520,9 +1697,26 @@
           }
         ],
         "approved_at": "2026-11-24T10:10:52.796Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "depends_on_external": "0017_SocialDoctors ISS-521 (Townin 매체 추가·발행 어댑터·성과 수집·브랜드 요약 API), imPD ISS-476",
+        "recommendation": {
+          "verdict": "보류 권장",
+          "reason": "12단계 통합 시험의 절반(SD→Townin 발행·성과·내 브랜드 성과)이 SD ISS-521 미완료로 실행 불가. 지금 돌리면 60칸 중 최대 약 30칸만 판정되어 95% 판정 자체가 성립하지 않는다. SD ISS-521 이 풀리면 바로 시험한다.",
+          "risk": "낮음",
+          "effort": "L",
+          "by": "factory-runner",
+          "at": "2026-11-24T12:06:43Z"
+        },
+        "ask_kind": "external_wait",
+        "ask_prompt": "SocialDoctors 쪽 'Townin 매체 추가·성과 요약'(SD ISS-521)이 끝나면 [회신 왔음]을 눌러 주세요. 그때 보험설계사 12단계 통합 시험과 점수표를 진행합니다.",
+        "acceptance_criteria": [
+          "나설계(가상) 샘플로 12단계를 로컬 세 서비스(imPD·SD·Townin)에서 끝까지 실행하고 단계별 완료 기준 통과 여부가 기록된다",
+          "12단계×화면 기준 5개=60칸 판정이 화면 캡처와 함께 docs/ecosystem-ux-scorecard.md 에 기록되고 통과율이 계산된다",
+          "95% 미만이면 미달 칸마다 개선 이슈가 생긴다"
+        ]
       },
-      "updated_at": "2026-11-24T10:10:52.796Z"
+      "updated_at": "2026-11-24T12:06:43Z",
+      "blocked_reason": "12단계 중 6·7(SD→Townin 발행)·10(SD 성과 수집)·11(imPD 내 브랜드 Townin 성과)은 SocialDoctors ISS-521(Townin 매체·발행 어댑터·브랜드 요약 API)이 있어야 시험할 수 있다. SD ISS-521 은 현재 AWAITING_USER, imPD ISS-476 도 같은 이유로 BLOCKED. 나머지 선행(imPD ISS-475, Townin ISS-722, SD ISS-522)은 DONE."
     },
     {
       "id": "ISS-478",
@@ -2628,7 +2822,7 @@
       "id": "ISS-493",
       "title": "[디자인] PD 휴대폰 메뉴 아래 '공개 사이트 보기'·'Admin' 링크에 아이콘·글자색을 위 메뉴 항목과 맞추기",
       "type": "DESIGN_FIX",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P3",
       "assign_to": "codex",
       "depth": 1,
@@ -2636,7 +2830,7 @@
       "parent_id": "ISS-488",
       "depends_on": [],
       "created_at": "2026-11-24T10:57:26Z",
-      "updated_at": "2026-11-24T10:57:28.006Z",
+      "updated_at": "2026-11-24T12:35:08Z",
       "description": "ISS-488 검토(docs/ui-snapshots/ISS-467/design-review-ISS-488.md) 경미 항목. 390px 메뉴를 열면 아래 두 링크만 아이콘 없이 진한 글자라 다른 목록처럼 보인다. app/views/layouts/pd.html.erb 의 .pd-mobile-links 링크를 위 nav 항목과 같은 클래스(text-gray-500, lni 아이콘 w-4 h-4)로 맞춘다.",
       "payload": {
         "files": [
@@ -2666,8 +2860,279 @@
         "approved_at": "2026-11-24T10:57:28.006Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
+      "result": {
+        "commit": "9921425",
+        "files_modified": [
+          "app/views/layouts/pd.html.erb",
+          "test/integration/pd_layout_mobile_menu_test.rb"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "390px 메뉴에서 공개 사이트 보기·Admin 이 위 항목처럼 아이콘+같은 글자색",
+            "met": true,
+            "how": "로컬 3008 실측 390px: 두 링크 lni 아이콘 있음, 아이콘 가로 위치 위 nav 아이콘과 같음, 글자색 rgb(107,114,128)=text-gray-500(비활성 nav 와 동일), 가로 넘침 없음"
+          },
+          {
+            "criterion": "1280px 화면은 바뀌지 않음",
+            "met": true,
+            "how": "1280px 에서 .pd-mobile-links display none 유지, 데스크톱 헤더 링크 미변경(diff 는 .pd-mobile-links 안만)"
+          },
+          {
+            "criterion": "pd_layout_mobile_menu_test 통과",
+            "met": true,
+            "how": "lni-globe-1·lni-shield-2·text-gray-500 단언 추가, 통과"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/integration/pd_layout_mobile_menu_test.rb",
+            "exit_code": 0,
+            "output": "1 runs, 25 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "completed_at": "2026-11-24T21:36:28.013071"
+    },
+    {
+      "id": "ISS-494",
+      "title": "[Plan:디자인리뷰] ISS-408 시각적 완성도 검증",
+      "type": "DESIGN_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "design-critic",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": "ISS-408",
+      "depends_on": [],
+      "created_at": "2026-11-24T21:24:54.982488",
+      "payload": {
+        "files": [],
+        "source_issue": "ISS-408",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T12:24:56.946Z",
+            "by": "auto",
+            "reason": "「[Plan:디자인리뷰] ISS-408 시각적 완성도 검증」(DESIGN_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T12:24:56.946Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "반려 권장",
+          "reason": "ISS-408 은 코드 변경 없이 '이미 해소됨'으로 닫혔다(회원 공개 페이지 개편 187b0da). 1280·390 실측으로 1열 히어로·넘침 없음을 확인했고 검증할 새 변경이 없다.",
+          "risk": "낮음",
+          "effort": "작음",
+          "by": "factory-runner",
+          "at": "2026-11-24T12:36:54Z"
+        }
+      },
       "result": null,
-      "spawn_rules": []
+      "spawn_rules": [],
+      "updated_at": "2026-11-24T12:36:54Z"
+    },
+    {
+      "id": "ISS-495",
+      "title": "[Plan:테스트] ISS-493 변경사항 검증",
+      "type": "RUN_TESTS",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "test-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-493",
+      "depends_on": [],
+      "created_at": "2026-11-24T21:36:28.013071",
+      "payload": {
+        "files": [
+          "app/views/layouts/pd.html.erb"
+        ],
+        "source_issue": "ISS-493",
+        "scope": "changed",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T12:36:31.015Z",
+            "by": "auto",
+            "reason": "「[Plan:테스트] ISS-493 변경사항 검증」(RUN_TESTS, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T12:36:31.015Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "반려 권장",
+          "reason": "ISS-493 은 레이아웃 한 파일의 링크 클래스·아이콘 변경이며 pd_layout_mobile_menu_test 에 단언을 추가해 통과, 전체 303 runs 0 failures 로 이미 검증됨.",
+          "risk": "낮음",
+          "effort": "작음",
+          "by": "factory-runner",
+          "at": "2026-11-24T12:36:54Z"
+        }
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-24T12:36:54Z"
+    },
+    {
+      "id": "ISS-496",
+      "title": "[Plan:도메인분석] ISS-493 비즈니스 규칙/시나리오 도출",
+      "type": "DOMAIN_ANALYZE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "domain-analyst",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-493",
+      "depends_on": [],
+      "created_at": "2026-11-24T21:36:28.013071",
+      "payload": {
+        "files": [
+          "app/views/layouts/pd.html.erb"
+        ],
+        "source_issue": "ISS-493",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T12:36:31.015Z",
+            "by": "auto",
+            "reason": "「[Plan:도메인분석] ISS-493 비즈니스 규칙/시나리오 도출」(DOMAIN_ANALYZE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T12:36:31.015Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "반려 권장",
+          "reason": "휴대폰 메뉴 링크 아이콘·글자색 정리라 새 비즈니스 규칙·시나리오가 없다.",
+          "risk": "낮음",
+          "effort": "작음",
+          "by": "factory-runner",
+          "at": "2026-11-24T12:36:54Z"
+        }
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-24T12:36:54Z"
+    },
+    {
+      "id": "ISS-497",
+      "title": "[Plan:UX리뷰] ISS-493 UI 변경 검증",
+      "type": "UI_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "ux-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-493",
+      "depends_on": [],
+      "created_at": "2026-11-24T21:36:28.013071",
+      "payload": {
+        "files": [
+          "app/views/layouts/pd.html.erb"
+        ],
+        "source_issue": "ISS-493",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T12:36:31.015Z",
+            "by": "auto",
+            "reason": "「[Plan:UX리뷰] ISS-493 UI 변경 검증」(UI_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T12:36:31.015Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "반려 권장",
+          "reason": "390px 실측으로 아이콘 위치·글자색이 위 메뉴와 같고 1280px 은 변화 없음을 이미 확인(ISS-493 결과).",
+          "risk": "낮음",
+          "effort": "작음",
+          "by": "factory-runner",
+          "at": "2026-11-24T12:36:54Z"
+        }
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-24T12:36:54Z"
+    },
+    {
+      "id": "ISS-498",
+      "title": "[Plan:브랜드검증] ISS-493 아젠다 표현 + Action Clarity",
+      "type": "BRAND_GUARD",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "brand-guardian",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-493",
+      "depends_on": [],
+      "created_at": "2026-11-24T21:36:28.013071",
+      "payload": {
+        "files": [
+          "app/views/layouts/pd.html.erb"
+        ],
+        "source_issue": "ISS-493",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T12:36:31.015Z",
+            "by": "auto",
+            "reason": "「[Plan:브랜드검증] ISS-493 아젠다 표현 + Action Clarity」(BRAND_GUARD, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T12:36:31.015Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "반려 권장",
+          "reason": "브랜드 표현과 무관한 보조 링크 모양 통일. 기존 메뉴 항목과 같은 클래스를 써서 새 표현이 없다.",
+          "risk": "낮음",
+          "effort": "작음",
+          "by": "factory-runner",
+          "at": "2026-11-24T12:36:54Z"
+        }
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-24T12:36:54Z"
+    },
+    {
+      "id": "ISS-499",
+      "title": "[Plan:브라우저QA] ISS-493 콘솔 에러 + 스크린샷 검증",
+      "type": "BROWSER_QA",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "agent-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-493",
+      "depends_on": [],
+      "created_at": "2026-11-24T21:36:28.013071",
+      "payload": {
+        "files": [
+          "app/views/layouts/pd.html.erb"
+        ],
+        "source_issue": "ISS-493",
+        "action": "run_browse_qa",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-24T12:36:31.015Z",
+            "by": "auto",
+            "reason": "「[Plan:브라우저QA] ISS-493 콘솔 에러 + 스크린샷 검증」(BROWSER_QA, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-24T12:36:31.015Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "반려 권장",
+          "reason": "로컬 3008 에서 390·1280 실측(가로 넘침 없음) 완료. 템플릿 링크 2개 변경이라 콘솔 오류 위험이 없다.",
+          "risk": "낮음",
+          "effort": "작음",
+          "by": "factory-runner",
+          "at": "2026-11-24T12:36:54Z"
+        }
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-24T12:36:54Z"
     }
   ],
   "hooks": {
@@ -2781,6 +3246,30 @@
         "issue_type": "FEATURE",
         "plan_created": 0,
         "timestamp": "2026-11-24T20:58:02.217999"
+      },
+      {
+        "issue_id": "ISS-465",
+        "issue_type": "FEATURE",
+        "plan_created": 0,
+        "timestamp": "2026-11-24T21:24:01.602086"
+      },
+      {
+        "issue_id": "ISS-408",
+        "issue_type": "UX_FIX",
+        "plan_created": 1,
+        "timestamp": "2026-11-24T21:24:54.982488"
+      },
+      {
+        "issue_id": "ISS-474",
+        "issue_type": "FEATURE",
+        "plan_created": 0,
+        "timestamp": "2026-11-24T21:35:02.952502"
+      },
+      {
+        "issue_id": "ISS-493",
+        "issue_type": "DESIGN_FIX",
+        "plan_created": 5,
+        "timestamp": "2026-11-24T21:36:28.013071"
       }
     ],
     "on_fail": [],
@@ -5019,14 +5508,214 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 117,
+        "timestamp": "2026-11-24T20:59:49.933354",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3056시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 29,
+          "in_progress": 0,
+          "ready": 6,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 118,
+        "timestamp": "2026-11-24T20:59:59.823879",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3056시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 29,
+          "in_progress": 0,
+          "ready": 6,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 119,
+        "timestamp": "2026-11-24T21:00:03.040848",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3056시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 127시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 29,
+          "in_progress": 0,
+          "ready": 6,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 120,
+        "timestamp": "2026-11-24T21:00:05.258035",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3056시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 127시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 29,
+          "in_progress": 0,
+          "ready": 6,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 121,
+        "timestamp": "2026-11-24T21:00:06.738308",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3056시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 127시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 29,
+          "in_progress": 0,
+          "ready": 6,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 122,
+        "timestamp": "2026-11-24T21:00:07.894394",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3056시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 127시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 29,
+          "in_progress": 0,
+          "ready": 6,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 123,
+        "timestamp": "2026-11-24T21:00:08.928012",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3056시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 127시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 29,
+          "in_progress": 0,
+          "ready": 6,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 124,
+        "timestamp": "2026-11-24T21:00:09.921930",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3056시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 127시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 29,
+          "in_progress": 0,
+          "ready": 6,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 125,
+        "timestamp": "2026-11-24T21:00:10.674337",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3056시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 127시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 29,
+          "in_progress": 0,
+          "ready": 6,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 126,
+        "timestamp": "2026-11-24T21:00:11.467528",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-408 (UX_FIX) — 3056시간",
+          "🟡 장기 대기: ISS-465 (FEATURE) — 127시간",
+          "🟡 장기 대기: ISS-474 (FEATURE) — 126시간",
+          "🟡 장기 대기: ISS-477 (FEATURE) — 125시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 39,
+          "done": 29,
+          "in_progress": 0,
+          "ready": 6,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
   "stats": {
-    "total_issues": 493,
-    "completed": 18,
+    "total_issues": 499,
+    "completed": 22,
     "failed": 0,
-    "evolved": 116
+    "evolved": 126
   },
   "pending_opportunity_signals": [
     {
