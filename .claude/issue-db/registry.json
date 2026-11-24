@@ -6423,6 +6423,60 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 139,
+        "timestamp": "2026-11-24T21:50:12.691621",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (brand-guardian, ux-harness, domain-analyst, agent-harness, test-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 140,
+        "timestamp": "2026-11-24T21:50:15.270612",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (domain-analyst, ux-harness, test-harness, brand-guardian, agent-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 141,
+        "timestamp": "2026-11-24T21:50:17.018614",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (brand-guardian, ux-harness, domain-analyst, test-harness, agent-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
@@ -6430,7 +6484,7 @@
     "total_issues": 501,
     "completed": 27,
     "failed": 0,
-    "evolved": 138
+    "evolved": 141
   },
   "pending_opportunity_signals": [
     {
