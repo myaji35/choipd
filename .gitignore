@@ -51,3 +51,5 @@ ignore .github
 ._*
 .DS_Store
 !.env.example
+# 공장 실행기 이슈 DB 잠금 파일(일시 파일)
+.claude/issue-db/registry.json.lock

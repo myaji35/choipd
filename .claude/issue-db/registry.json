@@ -862,14 +862,6 @@
           "관련 테스트와 전체 테스트가 통과한다(ego는 대역), 실계정에는 입력·게시 없는 점검 모드만 실행한다"
         ],
         "recheck_reopens": 1,
-        "recheck_fail": {
-          "at": "2026-11-24T12:37:55Z",
-          "sha": "943647d",
-          "problems": [
-            "완료 기준 확인(criteria_check) 없음",
-            "실행 증거(proof) 없음"
-          ]
-        },
         "next_prompt_at": "2026-11-24T12:38:00.366970Z",
         "next_prompt_proposals": [
           {
@@ -938,7 +930,32 @@
             "exit_code": 0,
             "output": "303 runs, 1986 assertions, 0 failures, 0 errors, 1 skips"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-24T12:50:51Z",
+          "sha": "09f9d4c",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rails test test/controllers/pd/profile_account_linkedin_posts_controller_test.rb test/controllers/pd/profile_account_newsletter_drafts_controller_test.rb test/models/sns_scheduled_post_test.rb tes",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "bin/rails test",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json"
+          ]
+        }
       }
     },
     {
@@ -1621,14 +1638,6 @@
           "관련 테스트와 전체 테스트가 통과한다(ego는 대역), 실계정에는 입력 없는 점검 모드만 실행한다"
         ],
         "recheck_reopens": 1,
-        "recheck_fail": {
-          "at": "2026-11-24T12:37:55Z",
-          "sha": "943647d",
-          "problems": [
-            "완료 기준 확인(criteria_check) 없음",
-            "실행 증거(proof) 없음"
-          ]
-        },
         "next_prompt_at": "2026-11-24T12:38:11.360973Z",
         "next_prompt_proposals": [
           {
@@ -1702,7 +1711,39 @@
             "exit_code": 0,
             "output": "50: page.click(selector) [사이트 버튼 단일 후보] / 73: li[data-impd-person] / 75: role:button name=다음 — 제출·신청 클릭 없음"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-24T12:50:51Z",
+          "sha": "09f9d4c",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rails test test/services/naver_people/submission_preparer_test.rb test/services/ego_profile/naver_submission_filler_test.rb test/models/naver_people_submission_test.rb test/controllers/pd/naver_pe",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "bin/rails test",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "grep -nE 'page.click' lib/ego/naver_people_modify_fill.mjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "50:  await page.click(selector);\n73:  await page.click(\"li[data-impd-person]\");\n75:  await page.click('loc=role:button[name=\"다음\"]');"
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json"
+          ]
+        }
       }
     },
     {
@@ -3610,7 +3651,42 @@
             "exit_code": 0,
             "output": "No vulnerabilities found"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-24T12:50:51Z",
+          "sha": "09f9d4c",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/brakeman --no-pager",
+              "status": "skipped",
+              "why": "검사 명령 아님: bin/brakeman --no-pager"
+            },
+            {
+              "cmd": "bin/rails test",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "bin/rubocop",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": ".....................................................................................................................................................................................................................................................................................................................................................................\n\n428 files inspected, no offenses detected"
+            },
+            {
+              "cmd": "bin/bundler-audit",
+              "status": "skipped",
+              "why": "검사 명령 아님: bin/bundler-audit"
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json"
+          ]
+        }
       }
     }
   ],
@@ -6477,6 +6553,222 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 142,
+        "timestamp": "2026-11-24T21:50:26.922005",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (test-harness, domain-analyst, agent-harness, brand-guardian, ux-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 143,
+        "timestamp": "2026-11-24T21:50:33.853270",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (domain-analyst, ux-harness, test-harness, brand-guardian, agent-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 144,
+        "timestamp": "2026-11-24T21:50:35.836889",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (test-harness, brand-guardian, ux-harness, agent-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 145,
+        "timestamp": "2026-11-24T21:50:40.236355",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (domain-analyst, brand-guardian, agent-harness, ux-harness, test-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 146,
+        "timestamp": "2026-11-24T21:50:41.964970",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (agent-harness, domain-analyst, brand-guardian, test-harness, ux-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 147,
+        "timestamp": "2026-11-24T21:50:44.207110",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (brand-guardian, ux-harness, test-harness, domain-analyst, agent-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 148,
+        "timestamp": "2026-11-24T21:50:45.075554",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (agent-harness, brand-guardian, domain-analyst, ux-harness, test-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 149,
+        "timestamp": "2026-11-24T21:50:46.064328",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (ux-harness, test-harness, agent-harness, brand-guardian, domain-analyst)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 150,
+        "timestamp": "2026-11-24T21:50:47.227195",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (domain-analyst, brand-guardian, ux-harness, test-harness, agent-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 151,
+        "timestamp": "2026-11-24T21:50:48.201585",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (domain-analyst, brand-guardian, agent-harness, test-harness, ux-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 152,
+        "timestamp": "2026-11-24T21:50:49.480686",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (brand-guardian, ux-harness, domain-analyst, agent-harness, test-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 153,
+        "timestamp": "2026-11-24T21:50:50.673542",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (test-harness, ux-harness, agent-harness, domain-analyst, brand-guardian)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 2시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 47,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
@@ -6484,7 +6776,7 @@
     "total_issues": 501,
     "completed": 27,
     "failed": 0,
-    "evolved": 141
+    "evolved": 153
   },
   "pending_opportunity_signals": [
     {
