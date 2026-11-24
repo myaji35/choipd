@@ -34,6 +34,17 @@
     </section>
   <% end %>
   <% if @account.platform == "linkedin" && @latest_snapshot %>
+    <% profile_snapshots = @snapshots.lazy.filter_map do |snapshot|
+         pages = snapshot.data.is_a?(Hash) ? snapshot.data["pages"] : nil
+         next unless pages.is_a?(Hash) && pages.values_at("profile", "experience", "education", "skills", "certifications").any? { |page|
+           page.is_a?(Hash) && !page.key?("error") && page["text"].is_a?(String)
+         }
+
+         [snapshot, Linkedin::ProfileParser.new(pages).to_h]
+       end.first(10) %>
+    <% if profile_snapshots.any? %>
+      <%= render "linkedin_profile", profile_snapshots: profile_snapshots, naver_snapshot: @naver_snapshot %>
+    <% end %>
     <%= render "linkedin_activity", monitor: Linkedin::Monitor.new(@snapshots) %>
   <% end %>
   <h2 class="font-semibold text-navy">최근 사본</h2>

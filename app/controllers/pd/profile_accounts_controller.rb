@@ -9,6 +9,11 @@ class Pd::ProfileAccountsController < Pd::BaseController
   def show
     @snapshots = @account.profile_snapshots.recent.limit(@account.platform == "linkedin" ? 60 : 20).to_a
     @latest_snapshot = @snapshots.first
+    if @account.platform == "linkedin" && @latest_snapshot
+      accounts = ProfileAccount.active.for_platform("naver_people").where(tenant_id: @account.tenant_id)
+      accounts = accounts.where(member_id: @account.member_id) if @account.member_id
+      @naver_snapshot = ProfileSnapshot.where(profile_account: accounts).recent.first
+    end
   end
 
   def new
