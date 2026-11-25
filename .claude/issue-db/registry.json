@@ -11843,6 +11843,57 @@
       "spawn_rules": [],
       "updated_at": "2026-11-25T04:09:30Z",
       "origin": "factory-observation"
+    },
+    {
+      "id": "ISS-592",
+      "title": "[린트] 디자인 루프 11회차 테스트 2개 파일 RuboCop 9건(배열 대괄호 띄어쓰기 8, 작은따옴표 1)",
+      "type": "STYLE_FIX",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "agent-harness",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": null,
+      "depends_on": [],
+      "created_at": "2026-11-25T04:10:03Z",
+      "updated_at": "2026-11-25T04:10:06.679Z",
+      "origin": "factory-ship",
+      "payload": {
+        "origin": "factory-ship",
+        "files": [
+          "test/integration/member_admin_unsaved_guard_test.rb",
+          "test/integration/member_admin_editor_flow_test.rb"
+        ],
+        "evidence": [
+          "bin/rubocop: 463 files inspected, 9 offenses — member_admin_unsaved_guard_test.rb 38~41행 SpaceInsideArrayLiteralBrackets 8건, member_admin_editor_flow_test.rb 58행 StringLiterals 1건",
+          "디자인 루프 11회차 커밋 0d24999 에서 들어옴(ISS-588 수정 8936a06 이후)"
+        ],
+        "acceptance_criteria": [
+          "bin/rubocop 전체가 offenses 0건이다",
+          "두 테스트 파일이 그대로 통과한다",
+          "검사 내용(단언 값)은 바뀌지 않고 서식만 바뀐다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "회차 끝 전체 린트에서 발견. 다른 대화 세션(회원 디자인 루프)이 같은 파일을 지금도 고치는 중(LOG.md 미커밋)이라 이번 회차에서 손대지 않고 카드로 남김. 서식만 고치는 수준 — 다음 회차 worktree 에서 처리 후 cherry-pick",
+          "risk": "T0 — 테스트 코드 서식만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:10:03Z"
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T04:10:06.679Z",
+            "by": "auto",
+            "reason": "회차 끝 전체 린트에서 발견. 다른 대화 세션(회원 디자인 루프)이 같은 파일을 지금도 고치는 중(LOG.md 미커밋)이라 이번 회차에서 손대지 않고 카드로 남김. 서식만 고치는 수준 — 다음 회차 worktree 에서 처리 후 cherry-pick"
+          }
+        ],
+        "approved_at": "2026-11-25T04:10:06.679Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": []
     }
   ],
   "hooks": {
@@ -16648,7 +16699,7 @@
     ]
   },
   "stats": {
-    "total_issues": 591,
+    "total_issues": 592,
     "completed": 93,
     "failed": 0,
     "evolved": 223
