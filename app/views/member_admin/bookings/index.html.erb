@@ -1,19 +1,18 @@
-<% content_for :title, "예약 링크 관리 — #{@member.name}" %>
+<% content_for :title, "예약 링크 — #{@member.name}" %>
 
 <div class="impd-wrap" style="max-width: 1120px; margin: 0 auto; padding: 40px;">
   <header style="margin-bottom: 32px;">
-    <p class="impd-label-muted">BOOKINGS · /<%= @member.slug %></p>
-    <h1 class="impd-display" style="font-size: 44px; margin-top: 12px;">예약 링크 관리</h1>
+    <p class="impd-label-muted">고객 › 예약 링크</p>
+    <h1 class="impd-display" style="font-size: 44px; margin-top: 12px;">예약 링크</h1>
     <p style="margin-top: 12px; color: var(--impd-ink2); font-size: 14px; line-height: 1.7;">
-      여기 등록한 예약 링크가 공개 페이지의 '예약하기' 버튼으로 노출됩니다. (네이버 예약, 캘린들리, 카카오 예약 등)
+      이미 쓰는 예약 주소(네이버 예약, 카카오 예약 등)를 적어 두면 내 페이지에 '예약하기' 버튼이 생겨요.
     </p>
   </header>
 
   <div class="bookings-layout" style="display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 32px; align-items: start;">
     <section>
       <div class="impd-section-header">
-        <span class="impd-label">§01</span>
-        <h2 class="impd-display" style="font-size: 24px; flex: 1;">등록된 예약 링크</h2>
+        <h2 class="impd-display" style="font-size: 24px; flex: 1;">내 예약 링크</h2>
         <span class="impd-label-muted"><%= @bookings.size %>개</span>
       </div>
 
@@ -27,15 +26,15 @@
                   <% if http_url(booking.external_url).present? %>
                   <%= link_to booking.external_url, http_url(booking.external_url), target: "_blank", rel: "noopener", style: "display: block; margin-top: 8px; color: var(--impd-accent); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere;" %>
                   <% else %>
-                    <span><%= booking.external_url %></span>
+                    <span style="display: block; margin-top: 8px; font-size: 13px; color: var(--impd-muted); overflow-wrap: anywhere;"><%= booking.external_url %></span>
                   <% end %>
                   <% if booking.description.present? %>
                     <p style="margin-top: 8px; color: var(--impd-ink2); font-size: 14px; line-height: 1.6;"><%= booking.description %></p>
                   <% end %>
                 </div>
                 <%= button_to "삭제", slug_admin_booking_path(slug: @member.slug, id: booking), method: :delete,
-                      form: { data: { turbo_confirm: "이 예약 링크를 삭제하시겠습니까?" } },
-                      class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 12px; font-size: 12px; color: var(--impd-accent-2); border-color: var(--impd-accent-2);" %>
+                      form: { style: "flex-shrink: 0;", data: { turbo_confirm: "이 예약 링크를 지울까요? 지우면 되돌릴 수 없어요." } },
+                      class: "impd-btn impd-btn-secondary", style: "height: 44px; white-space: nowrap; flex-shrink: 0; padding: 0 12px; font-size: 12px; color: var(--impd-accent-2); border-color: var(--impd-accent-2);" %>
               </div>
 
               <details style="margin-top: 16px; border-top: 1px solid var(--impd-rule); padding-top: 14px;">
@@ -49,15 +48,14 @@
         </div>
       <% else %>
         <div class="impd-card" style="padding: 40px 24px; text-align: center;">
-          <p style="font-size: 14px; color: var(--impd-ink2); line-height: 1.7;">아직 등록한 예약 링크가 없습니다. 첫 링크를 추가하면 공개 페이지에 바로 노출됩니다.</p>
+          <p style="font-size: 14px; color: var(--impd-ink2); line-height: 1.7;">아직 예약 링크가 없어요. 쓰는 예약 주소가 있으면 하나 적어 보세요.</p>
         </div>
       <% end %>
     </section>
 
     <section class="impd-card" style="position: sticky; top: 88px;">
       <div class="impd-section-header" style="margin-bottom: 20px;">
-        <span class="impd-label">§02</span>
-        <h2 class="impd-display" style="font-size: 24px;">신규 등록</h2>
+        <h2 class="impd-display" style="font-size: 24px;">새 예약 링크 추가</h2>
       </div>
       <%= form_with model: MemberBooking.new, url: slug_admin_bookings_path(slug: @member.slug), class: "booking-form" do |form| %>
         <%= render "booking_fields", form: form, submit_label: "예약 링크 저장" %>

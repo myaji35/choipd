@@ -154,7 +154,7 @@
               <% @skills.each do |ms| %>
                 <span style="display: inline-flex; align-items: center; gap: 3px; padding: 5px 10px; background: <%= ms.weight >= 60 ? 'var(--impd-ink)' : 'var(--impd-paper)' %>; color: <%= ms.weight >= 60 ? 'var(--impd-paper)' : 'var(--impd-ink)' %>; border: 1px solid var(--impd-ink); font-size: 12px;">
                   <%= ms.skill.canonical_name %>
-                  <% if ms.weight >= 60 %><span style="font-family: var(--impd-font-mono); font-size: 9px; opacity: 0.7;">· <%= ms.weight %></span><% end %>
+                  <% if ms.weight >= 60 %><span style="font-size: 12px; opacity: 0.7;">· <%= ms.weight %></span><% end %>
                 </span>
               <% end %>
             </div>
@@ -182,15 +182,15 @@
     </div>
 
   <% elsif @step == 3 %>
-    <!-- ── Step 3: 스타일 선택 (5개 프리셋) ───────────── -->
+    <!-- ── Step 3: 스타일 선택 (5개 스타일) ───────────── -->
     <div class="impd-section-header">
       <span class="impd-label">스타일</span>
       <h1 class="impd-display" style="font-size: 36px; flex: 1; margin: 0;">스타일 선택</h1>
-      <span class="impd-label-muted">현재: <%= @member.theme_preset.presence&.upcase || "미설정" %></span>
+      <span class="impd-label-muted"><%= (ThemePreset.find(@member.theme_preset)&.dig(:name)).then { |n| n ? "지금: #{n}" : "아직 고르지 않았어요" } %></span>
     </div>
 
-    <p style="font-family: var(--impd-font-serif); font-style: italic; font-size: 16px; color: var(--impd-ink2); margin-bottom: 24px; max-width: 60ch;">
-      페이지의 분위기를 바꾸는 5가지 프리셋. 언제든 다시 고칠 수 있습니다.
+    <p style="font-size: 15px; color: var(--impd-ink2); margin-bottom: 24px; max-width: 60ch;">
+      내 페이지의 색과 분위기를 골라 주세요. 나중에 언제든 바꿀 수 있어요.
     </p>
 
     <%= form_with url: slug_admin_editor_update_style_path(slug: @member.slug), method: :patch, local: true, data: { turbo: false } do |f| %>
@@ -206,12 +206,9 @@
                 <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 28px; letter-spacing: -0.5px; line-height: 1; margin-top: 8px;">
                   <%= p[:name] %>
                 </div>
-                <div style="font-family: var(--impd-font-serif); font-style: italic; font-size: 16px; color: <%= p[:accent] %>; margin-top: 2px;">
-                  <%= LayoutPreset.find(@member.layout_preset)&.dig(:name) || "페이지 구성" %>
-                </div>
               </div>
               <div style="height: 36px; margin: 12px 0; border-top: 3px solid <%= p[:accent] %>; border-bottom: 1px solid <%= p[:ink] %>; opacity: .6;"></div>
-              <div style="font-size: 11px; opacity: 0.75; line-height: 1.5; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+              <div style="font-size: 13px; opacity: 0.75; line-height: 1.5; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
                 <span><%= p[:desc] %></span>
                 <span style="display: inline-flex; flex-shrink: 0; gap: 4px;" aria-label="강조색과 배경색">
                   <span style="width: 14px; height: 14px; border-radius: 50%; background: <%= p[:accent] %>; border: 1px solid rgba(0,0,0,0.16);"></span>
@@ -228,14 +225,14 @@
       </style>
 
       <button type="submit" class="impd-btn impd-btn-primary" style="margin-top: 28px; height: 52px; padding: 0 28px; font-size: 15px;">
-        스타일 적용하고 발행 →
+        이 스타일로 저장하고 다음 →
       </button>
     <% end %>
 
     <div class="impd-section-header" style="margin-top: 48px;">
-      <span class="impd-label">레이아웃</span>
-      <span class="impd-display" style="font-size: 28px; flex: 1;">페이지 구성 선택</span>
-      <span class="impd-label-muted">현재: <%= @member.layout_preset.upcase %></span>
+      <span class="impd-label">페이지 구성</span>
+      <span class="impd-display" style="font-size: 28px; flex: 1;">내용을 어떻게 늘어놓을까요</span>
+      <span class="impd-label-muted">지금: <%= LayoutPreset.find(@member.layout_preset)&.dig(:name) || "에디토리얼" %></span>
     </div>
 
     <%= form_with url: slug_admin_editor_update_layout_path(slug: @member.slug), method: :patch, local: true, data: { turbo: false } do |f| %>
@@ -254,7 +251,7 @@
               </div>
               <% preview_theme = ThemePreset.find(@member.theme_preset) || @presets.first %>
               <div style="background: <%= preview_theme[:paper] %>; color: <%= preview_theme[:ink] %>; border-top: 6px solid <%= preview_theme[:accent] %>; padding: 12px; margin: 12px 0; min-height: 60px;"><strong><%= p[:name] %></strong><div style="border-top: 1px solid; margin-top: 8px; opacity: .5;"></div></div>
-              <div style="font-size: 11px; opacity: 0.75; line-height: 1.5;">
+              <div style="font-size: 13px; opacity: 0.75; line-height: 1.5;">
                 <%= p[:desc] %>
               </div>
             </div>
@@ -267,17 +264,17 @@
       </style>
 
       <button type="submit" class="impd-btn impd-btn-primary" style="margin-top: 20px; height: 46px; padding: 0 24px; font-size: 14px;">
-        레이아웃 적용
+        이 구성으로 저장
       </button>
     <% end %>
 
   <% else %>
-    <!-- ── Step 4: 발행 체크리스트 + 공개 ─────────────── -->
+    <!-- ── Step 4: 공개 준비 항목 ─────────────── -->
     <div class="impd-section-header">
       <span class="impd-label">공개</span>
-      <h1 class="impd-display" style="font-size: 36px; flex: 1; margin: 0;">발행 — 공개 페이지 활성화</h1>
+      <h1 class="impd-display" style="font-size: 36px; flex: 1; margin: 0;">내 페이지 공개하기</h1>
       <% if @member.published_at %>
-        <span class="impd-label-muted" style="color: var(--impd-accent);">● 발행됨 · <%= @member.published_at.strftime("%Y.%m.%d") %></span>
+        <span class="impd-label-muted" style="color: var(--impd-accent);">● 공개 중 · <%= @member.published_at.strftime("%Y.%m.%d") %></span>
       <% end %>
     </div>
 
@@ -289,7 +286,7 @@
 
         <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px;">
           <span class="impd-display" style="font-size: 36px; letter-spacing: -1px;"><%= done_count %><span style="color: var(--impd-muted); font-weight: 400;">/<%= @checklist.size %></span></span>
-          <span class="impd-label-muted">완료 <%= pct %>%</span>
+          <span class="impd-label-muted">준비 <%= pct %>%</span>
         </div>
         <div style="height: 6px; background: var(--impd-card); border: 1px solid var(--impd-ink); margin-bottom: 18px;">
           <div style="height: 100%; width: <%= pct %>%; background: var(--impd-accent); transition: width .3s;"></div>
@@ -302,52 +299,50 @@
               <span style="flex: 1;"><%= c[:label] %></span>
               <% unless c[:done] %>
                 <a href="?step=<%= %w[bio profession region email phone].include?(c[:key]) ? 2 : (c[:key] == 'theme' ? 3 : 1) %>"
-                   style="font-family: var(--impd-font-sans); font-size: 13px; color: var(--impd-accent); text-decoration: none; border-bottom: 1px solid currentColor;">완성 →</a>
+                   style="font-family: var(--impd-font-sans); font-size: 13px; color: var(--impd-accent); display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline;">하러 가기 →</a>
               <% end %>
             </li>
           <% end %>
         </ul>
       </div>
 
-      <%# 우: 발행 카드 %>
+      <%# 우: 공개 카드 %>
       <div>
         <div style="background: var(--impd-ink); color: var(--impd-paper); padding: 28px; margin-bottom: 14px; position: relative;">
           <div class="impd-stripe" style="position: absolute; inset: 0; opacity: 0.15;"></div>
           <div style="position: relative;">
-            <div class="impd-label" style="color: var(--impd-paper);">공개 URL</div>
+            <div class="impd-label" style="color: var(--impd-paper);">내 페이지 주소</div>
             <div class="impd-display" style="font-size: 28px; margin-top: 10px; letter-spacing: -0.5px; word-break: break-all;">
               impd.townin.net/<%= @member.slug %>
             </div>
             <div style="margin-top: 14px; font-size: 13px; color: rgba(239,236,228,.7); line-height: 1.55;">
-              발행 후 누구나 이 주소로 당신의 페이지를 볼 수 있습니다.
-              OG 메타 자동 적용되어 카톡/SNS 공유 시 명함 이미지가 자동 노출됩니다.
+              공개하면 누구나 이 주소로 내 페이지를 볼 수 있어요. 카카오톡·문자로 주소를 보내면 내 명함 그림이 함께 보여요.
             </div>
           </div>
         </div>
 
-        <%# 발행 버튼 (이미 발행된 상태면 재발행) %>
+        <% if done_count < 4 %>
+          <p style="margin-bottom: 12px; font-size: 14px; color: var(--impd-ink2); line-height: 1.55;">
+            왼쪽 준비 항목을 4개 이상 마치면 공개할 수 있어요. 지금 <%= done_count %>개 마쳤어요.
+          </p>
+        <% end %>
+
         <%= form_with url: slug_admin_editor_publish_path(slug: @member.slug), method: :patch, local: true, data: { turbo: false } do %>
           <button type="submit" class="impd-btn impd-btn-primary"
                   style="width: 100%; height: 56px; font-size: 16px; justify-content: center;"
                   <%= "disabled" if done_count < 4 %>>
             <% if @member.published_at %>
-              ↻ 다시 발행하기
+              바뀐 내용 다시 공개하기
             <% else %>
-              <%= lni_icon "check" %> 지금 발행하기 →
+              <%= lni_icon "check" %> 지금 공개하기 →
             <% end %>
           </button>
-        <% end %>
-
-        <% if done_count < 4 %>
-          <p style="margin-top: 12px; font-size: 13px; color: var(--impd-muted); line-height: 1.55;">
-            최소 4개 항목 완료 시 발행 가능합니다. 체크리스트를 확인해 주세요.
-          </p>
         <% end %>
 
         <% if @member.published_at %>
           <a href="/<%= @member.slug %>" target="_blank" class="impd-btn impd-btn-secondary"
              style="width: 100%; height: 44px; margin-top: 10px; font-size: 13px; justify-content: center;">
-            공개 페이지 열기 →
+            내 페이지 보기 →
           </a>
         <% end %>
       </div>
@@ -389,7 +384,6 @@
   }
   .editor-page select:focus, .editor-fields :is(input, textarea):focus { border-color: var(--impd-accent); }
   .editor-fields textarea { resize: vertical; }
-  .editor-fields :is(input[type="tel"], input[type="url"]) { font-family: var(--impd-font-mono); }
   @media (max-width: 768px) { .editor-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 24px !important; } .editor-page > div:first-of-type a { padding: 12px 4px !important; min-width: 0; } .editor-page > div:first-of-type a p { font-size: 13px !important; overflow-wrap: anywhere; } .editor-page .impd-section-header { flex-wrap: wrap; } }
   .editor-page button, .editor-page select, .editor-page .impd-btn { min-height: 44px; }
   .theme-radio:focus-visible + .theme-card, .layout-radio:focus-visible + .layout-card { outline: 3px solid var(--impd-accent); }

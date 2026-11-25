@@ -49,7 +49,7 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
     preset = ThemePreset.find(key)
     if preset
       @member.update!(theme_preset: key)
-      redirect_to action: :show, params: { slug: @member.slug, step: 4 }, notice: "스타일 '#{preset[:name]}' 적용됨"
+      redirect_to action: :show, params: { slug: @member.slug, step: 4 }, notice: "'#{preset[:name]}' 스타일로 저장했어요. 이제 공개만 하면 돼요."
     else
       redirect_to action: :show, params: { slug: @member.slug, step: 3 }, alert: "유효한 스타일을 선택해 주세요"
     end
@@ -60,7 +60,7 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
     preset = LayoutPreset.find(key)
     if preset
       @member.update!(layout_preset: key)
-      redirect_to action: :show, params: { slug: @member.slug, step: 3 }, notice: "레이아웃 '#{preset[:name]}' 적용됨"
+      redirect_to action: :show, params: { slug: @member.slug, step: 3 }, notice: "'#{preset[:name]}' 구성으로 저장했어요."
     else
       redirect_to action: :show, params: { slug: @member.slug, step: 3 }, alert: "유효한 레이아웃을 선택해 주세요"
     end
@@ -68,22 +68,22 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
 
   def publish
     @member.update!(published_at: Time.current)
-    redirect_to "/#{@member.slug}", notice: "페이지가 발행되었습니다 🎉"
+    redirect_to "/#{@member.slug}", notice: "내 페이지를 공개했어요."
   end
 
   private
 
   def build_checklist
     [
-      { key: "bio",        label: "자기소개 작성", done: @member.bio.to_s.length >= 20 },
-      { key: "profession", label: "직업 설정",      done: @member.profession.present? && @member.profession != "custom" },
-      { key: "region",     label: "지역 설정",      done: @member.region.present? },
-      { key: "email",      label: "이메일",          done: @member.email.present? },
-      { key: "phone",      label: "전화 연락처",    done: @member.phone.present? },
-      { key: "photo",      label: "사진 1장 이상",  done: @photos_count.to_i > 0 },
-      { key: "doc",        label: "이력 문서 1건",  done: @doc_count.to_i > 0 },
-      { key: "skill",      label: "달란트 3개+",    done: @skills.size >= 3 },
-      { key: "theme",      label: "스타일 선택",    done: @member.theme_preset.present? }
+      { key: "bio",        label: "자기소개 쓰기", done: @member.bio.to_s.length >= 20 },
+      { key: "profession", label: "직업 정하기",      done: @member.profession.present? && @member.profession != "custom" },
+      { key: "region",     label: "지역 정하기",      done: @member.region.present? },
+      { key: "email",      label: "이메일 적기",          done: @member.email.present? },
+      { key: "phone",      label: "전화번호 적기",    done: @member.phone.present? },
+      { key: "photo",      label: "사진 1장 이상 올리기",  done: @photos_count.to_i > 0 },
+      { key: "doc",        label: "이력·경력 문서 1개 올리기",  done: @doc_count.to_i > 0 },
+      { key: "skill",      label: "자료에서 찾은 강점 3개 이상",    done: @skills.size >= 3 },
+      { key: "theme",      label: "스타일 고르기",    done: @member.theme_preset.present? }
     ]
   end
 end

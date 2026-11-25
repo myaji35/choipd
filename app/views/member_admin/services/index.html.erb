@@ -1,20 +1,19 @@
-<% content_for :title, "서비스 / 가격 관리 — #{@member.name}" %>
+<% content_for :title, "서비스·가격 — #{@member.name}" %>
 
 <div class="impd-wrap" style="max-width: 1120px; margin: 0 auto; padding: 40px;">
   <%= render "member_admin/shared/checklist_arrival" %>
   <header style="margin-bottom: 32px;">
-    <p class="impd-label-muted">SERVICES · /<%= @member.slug %></p>
-    <h1 class="impd-display" style="font-size: 44px; margin-top: 12px;">서비스 / 가격 관리</h1>
+    <p class="impd-label-muted">내 페이지 › 서비스</p>
+    <h1 class="impd-display" style="font-size: 44px; margin-top: 12px;">서비스·가격</h1>
     <p style="margin-top: 12px; color: var(--impd-ink2); font-size: 14px; line-height: 1.7;">
-      공개 페이지(/<%= @member.slug %>)의 '서비스/수업' 섹션에 표시됩니다.
+      내 페이지의 '서비스' 칸에 보여요. 고객이 무엇을 얼마에 받을 수 있는지 적어 주세요.
     </p>
   </header>
 
   <div class="services-layout" style="display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 32px; align-items: start;">
     <section>
       <div class="impd-section-header">
-        <span class="impd-label">§01</span>
-        <h2 class="impd-display" style="font-size: 24px; flex: 1;">등록된 서비스</h2>
+        <h2 class="impd-display" style="font-size: 24px; flex: 1;">내 서비스</h2>
         <span class="impd-label-muted"><%= @services.size %>개</span>
       </div>
 
@@ -27,7 +26,7 @@
                   <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
                     <h3 style="font-size: 17px; line-height: 1.45;"><%= service.title %></h3>
                     <span style="border: 1px solid <%= service.is_active.to_i == 1 ? 'var(--impd-accent)' : 'var(--impd-rule)' %>; color: <%= service.is_active.to_i == 1 ? 'var(--impd-accent)' : 'var(--impd-muted)' %>; padding: 3px 7px; font-size: 12px; font-weight: 600;">
-                      <%= service.is_active.to_i == 1 ? "활성" : "비활성" %>
+                      <%= service.is_active.to_i == 1 ? "보이는 중" : "숨김" %>
                     </span>
                   </div>
                   <p style="margin-top: 8px; color: var(--impd-ink2); font-size: 14px;">
@@ -35,8 +34,8 @@
                   </p>
                 </div>
                 <%= button_to "삭제", slug_admin_service_path(slug: @member.slug, id: service), method: :delete,
-                      form: { data: { turbo_confirm: "이 서비스를 삭제하시겠습니까?" } },
-                      class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 12px; font-size: 12px; color: var(--impd-accent-2); border-color: var(--impd-accent-2);" %>
+                      form: { style: "flex-shrink: 0;", data: { turbo_confirm: "이 서비스를 지울까요? 지우면 되돌릴 수 없어요." } },
+                      class: "impd-btn impd-btn-secondary", style: "height: 44px; white-space: nowrap; flex-shrink: 0; padding: 0 12px; font-size: 12px; color: var(--impd-accent-2); border-color: var(--impd-accent-2);" %>
               </div>
 
               <details style="margin-top: 16px; border-top: 1px solid var(--impd-rule); padding-top: 14px;">
@@ -50,15 +49,14 @@
         </div>
       <% else %>
         <div class="impd-card" style="padding: 40px 24px; text-align: center;">
-          <p style="font-size: 14px; color: var(--impd-ink2); line-height: 1.7;">아직 등록한 서비스가 없어요. 첫 서비스를 추가하면 공개 페이지에 바로 노출됩니다.</p>
+          <p style="font-size: 14px; color: var(--impd-ink2); line-height: 1.7;">아직 서비스가 없어요. 오른쪽(휴대폰은 아래) '새 서비스 추가'에 적으면 내 페이지에 바로 보여요.</p>
         </div>
       <% end %>
     </section>
 
     <section id="new-service" class="impd-card checklist-target" style="position: sticky; top: 88px;">
       <div class="impd-section-header" style="margin-bottom: 20px;">
-        <span class="impd-label">§02</span>
-        <h2 class="impd-display" style="font-size: 24px;">신규 등록</h2>
+        <h2 class="impd-display" style="font-size: 24px;">새 서비스 추가</h2>
       </div>
       <%= form_with model: MemberService.new, url: slug_admin_services_path(slug: @member.slug) do |form| %>
         <%= render "service_fields", form: form, submit_label: "서비스 저장" %>
