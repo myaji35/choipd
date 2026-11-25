@@ -40,7 +40,20 @@ class MemberAdminDashboardUxTest < ActionDispatch::IntegrationTest
       assert_not_includes response.body, text
     end
     assert_select ".dashboard-stats a[href=?]", slug_admin_inquiries_path(slug: slug), text: "0"
-    assert_select ".dashboard-stats a[href=?]", slug_admin_services_path(slug: slug), text: "0"
+    assert_select ".dashboard-stats .dashboard-stat", count: 4
+  end
+
+  test "숫자와 최근 문의를 프로필 관리보다 먼저 보여 준다" do
+    member = create_overview_member
+
+    get slug_admin_dashboard_path(slug: member.slug)
+
+    assert_response :ok
+    stats = response.body.index('class="dashboard-stats"')
+    inquiries = response.body.index('id="recent-inquiries-title"')
+    profiles = response.body.index('id="profile-accounts-status"')
+    assert_operator stats, :<, inquiries
+    assert_operator inquiries, :<, profiles
   end
 
   test "내 페이지 한눈에에서 주소와 빈 항목 안내를 보여 준다" do
@@ -74,7 +87,7 @@ class MemberAdminDashboardUxTest < ActionDispatch::IntegrationTest
     get slug_admin_dashboard_path(slug: slug)
 
     assert_response :ok
-    assert_select ".dashboard-overview" do
+    assert_select ".dashboard-overview-list" do
       {
         slug_admin_services_path(slug: slug) => "2개",
         slug_admin_faqs_path(slug: slug) => "1개",

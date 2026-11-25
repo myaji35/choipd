@@ -144,6 +144,102 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_equal "내 정보를 저장했어요. 이제 스타일을 골라 주세요.", flash[:notice]
   end
 
+  test "공개한 뒤 4단계에서 주소를 공유할 수 있다" do
+    @member.update!(bio: "가" * 30, profession: "educator")
+
+    patch slug_admin_editor_publish_path(slug: @member.slug)
+
+    assert_redirected_to slug_admin_editor_path(slug: @member.slug, step: 4, published: 1)
+    assert_not_nil @member.reload.published_at
+    follow_redirect!
+    assert_select "#publish-done[role=status] strong", text: "공개했어요."
+    assert_select "#publish-next-actions" do
+      assert_select "button[type=button][data-page-path=?]", "/#{@member.slug}", text: "주소 복사"
+      assert_select "a[href=?][target=_blank]", "/#{@member.slug}", text: "내 페이지 보기"
+    end
+  end
+
+  test "공개한 회원에게 다시 공개하는 버튼 대신 상태를 보여 준다" do
+    @member.update!(published_at: Time.utc(2026, 11, 24, 18), theme_preset: nil)
+
+    get slug_admin_editor_path(slug: @member.slug, step: 4)
+
+    assert_select "h1", text: "내 페이지가 공개돼 있어요"
+    assert_select ".impd-label-muted", text: "● 공개 중 · 2026.11.25부터"
+    assert_select "a[href='?step=3']", text: /스타일.*\(마침\)/
+    assert_select "form[action=?]", slug_admin_editor_publish_path(slug: @member.slug), count: 0
+    assert_not_includes response.body, "다시 공개하기"
+    assert_includes response.body, "다시 공개할 필요는 없어요"
+    assert_select "#publish-done", count: 0
+  end
+
+  test "아직 공개하지 않았으면 주소에 표시를 붙여도 완료 안내를 숨긴다" do
+    get slug_admin_editor_path(slug: @member.slug, step: 4, published: 1)
+
+    assert_select "#publish-done", count: 0
+    assert_select "button[type=submit]", text: "지금 공개하기"
+  end
+
+  test "스타일 저장 전에는 기본 스타일을 안내하고 저장 후에는 마침을 표시한다" do
+    @member.update!(theme_preset: nil)
+    path = slug_admin_editor_path(slug: @member.slug, step: 4)
+
+    get path
+    assert_select "a[href='?step=3'] p", text: "기본 스타일 사용 중"
+
+    @member.update!(theme_preset: "warm")
+    get path
+    assert_select "a[href='?step=3']", text: /스타일.*\(마침\)/
+    assert_not_includes response.body, "기본 스타일 사용 중"
+  end
+
+  test "이메일 저장 실패 후 입력값을 유지하고 수정한 정보는 다시 저장할 수 있다" do
+    original_bio, original_email = @member.bio, @member.email
+    path = slug_admin_editor_update_info_path(slug: @member.slug)
+    info = {
+      email: "abc", bio: ("새로 쓴 자기소개입니다. " * 4).strip, career_note: "새로 쓴 경력",
+      profession: "custom", custom_profession: "스마트폰 강사", region: "서울",
+      kakao_channel: "https://pf.kakao.com/example"
+    }
+
+    patch path, params: { member: info }
+
+    assert_response :unprocessable_entity
+    assert_select "#info-errors[role=alert] strong", text: /쓴 내용은 그대로 남아 있어요/
+    assert_select "textarea#member_bio", text: info[:bio].strip
+    assert_select "textarea#member_career_note", text: info[:career_note]
+    assert_select "input#member_email[value=abc][aria-invalid=true][aria-describedby=member_email_error]"
+    assert_select "#member_email_error", text: /이메일 주소 모양이 맞지 않아요/
+    assert_select "select#member_profession option[value=custom][selected]"
+    assert_select "input#member_custom_profession[value=?]", info[:custom_profession]
+    assert_select "input#member_kakao_channel[value=?]", info[:kakao_channel]
+    assert_select "a[aria-current=step]", text: /정보 확인/
+    assert_select "a[aria-current=step] span", text: "(마침)", count: 0
+    assert_select "a[href=?]", slug_admin_editor_path(slug: @member.slug, step: 3), text: /스타일/
+    @member.reload
+    assert_equal [original_bio, original_email], [@member.bio, @member.email]
+
+    patch path, params: { member: info.merge(email: original_email) }
+
+    assert_redirected_to slug_admin_editor_path(slug: @member.slug, step: 3)
+    assert_equal info[:bio], @member.reload.bio
+  end
+
+  test "비었거나 다른 회원이 쓰는 이메일에는 알맞은 문구를 표시한다" do
+    other = Member.create!(name: "다른 회원", slug: "other-#{@member.slug}", email: "other-#{@member.email}",
+      password: "password1234", password_confirmation: "password1234")
+    {
+      "" => "이메일을 적어 주세요. 고객 문의가 이 주소로 와요.",
+      other.email => "이미 다른 회원이 쓰는 이메일이에요. 다른 주소를 적어 주세요."
+    }.each do |email, message|
+      patch slug_admin_editor_update_info_path(slug: @member.slug), params: { member: { email: email } }
+
+      assert_response :unprocessable_entity
+      assert_select "#info-errors li", text: message, count: 1
+      assert_select "#member_email_error", text: message
+    end
+  end
+
   test "올릴 수 없는 문서는 글 파일로 저장하는 방법을 안내한다" do
     post slug_admin_documents_path(slug: @member.slug, format: :json), params: { filename: "a.pdf", content: "x" }
 

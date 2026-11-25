@@ -5,20 +5,21 @@
   <!-- 4단계 progress rail — 모두 클릭 가능. 각 단계별 완료 상태 표시. -->
   <%
     step1_done = @photos_count.to_i > 0 || @doc_count.to_i > 0
-    step3_done = @member.theme_preset.present?
+    step3_done = @member.theme_preset.present? || @member.published_at.present?
     step4_done = @member.published_at.present?
 
+    editor_path = slug_admin_editor_path(slug: @member.slug) if @info_draft
     steps = [
       [1, "자료 올리기", "", step1_done],
       [2, "정보 확인", "", @can_publish],
-      [3, "스타일", "", step3_done],
+      [3, "스타일", step3_done ? "" : "기본 스타일 사용 중", step3_done],
       [4, "공개", "", step4_done],
     ]
   %>
   <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--impd-ink); margin-bottom: 48px;">
     <% steps.each_with_index do |(n, label, desc, done), i| %>
       <% current = @step == n %>
-      <a href="?step=<%= n %>" <%= 'aria-current="step"'.html_safe if current %>
+      <a href="<%= editor_path %>?step=<%= n %>" <%= 'aria-current="step"'.html_safe if current %>
          style="display: block; padding: 16px 20px; text-decoration: none; <%= 'border-left: 1px solid var(--impd-rule);' if i > 0 %> position: relative; background: <%= current ? 'var(--impd-card)' : 'transparent' %>; transition: background .15s;"
          onmouseover="if(!<%= current %>)this.style.background='var(--impd-card)';"
          onmouseout="if(!<%= current %>)this.style.background='transparent';">
@@ -34,7 +35,9 @@
           <% end %>
         </div>
         <p style="font-family: var(--impd-font-display); font-weight: 800; font-size: 20px; margin-top: 6px; color: var(--impd-ink);"><%= label %><% if done && !current %> <span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">(마침)</span><% end %></p>
-        <p style="font-size: 12px; color: var(--impd-muted); margin-top: 4px;"><%= desc %></p>
+        <% if desc.present? %>
+          <p style="font-size: 12px; color: var(--impd-muted); margin-top: 4px;"><%= desc %></p>
+        <% end %>
       </a>
     <% end %>
   </div>
@@ -78,12 +81,36 @@
         <h2 id="basic-info-heading" class="impd-label">기본 정보</h2>
         <%= render "member_admin/editor/profile_photo" %>
         <%= form_with url: slug_admin_editor_update_info_path(slug: @member.slug), method: :patch, local: true, class: "editor-fields", data: { turbo: false } do %>
+          <%
+            info = @info_draft || @member
+            errors = @info_errors || {}
+            field_errors = ->(field, description = nil) do
+              error_id = "member_#{field}_error" if errors.key?(field)
+              tag.attributes(aria: { invalid: ("true" if error_id), describedby: [description, error_id].compact.join(" ").presence })
+            end
+            error_message = ->(field) do
+              if errors.key?(field)
+                tag.p(errors[field], id: "member_#{field}_error", style: "color:#b42318; font-size:14px; margin-top:6px;")
+              end
+            end
+          %>
+          <% if @info_errors %>
+            <div id="info-errors" role="alert" style="border-left: 3px solid #b42318; background: #fff; padding: 14px 16px; margin-top: 16px;">
+              <strong>저장하지 못했어요. 쓴 내용은 그대로 남아 있어요.</strong>
+              <ul>
+                <% errors.each_value do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
           <div id="bio" class="checklist-target" style="margin-top: 16px;">
             <label for="member_bio" class="impd-label-muted">자기소개</label>
             <textarea id="member_bio" name="member[bio]" rows="6" maxlength="200"
-                      aria-describedby="member_bio_count" data-editor-info-target="bio" data-action="input->editor-info#updateBioCount"
-                      placeholder="한 줄로 표현할 수 있나요? (예: 스마트폰 하나로 유튜브 채널 만드는 법을 가르치는 강사)"><%= @member.bio %></textarea>
-            <% bio_count = @member.bio.to_s.length %>
+                      <%= field_errors.call(:bio, "member_bio_count") %> data-editor-info-target="bio" data-action="input->editor-info#updateBioCount"
+                      placeholder="한 줄로 표현할 수 있나요? (예: 스마트폰 하나로 유튜브 채널 만드는 법을 가르치는 강사)"><%= info.bio %></textarea>
+            <%= error_message.call(:bio) %>
+            <% bio_count = info.bio.to_s.length %>
             <% bio_hint = if bio_count < 20
               "20자를 넘기면 내 페이지를 공개할 수 있어요."
             elsif bio_count < 50
@@ -96,51 +123,61 @@
 
           <div id="profession-region" class="checklist-target editor-pair" style="margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
             <div>
-              <% preset_profession = Member::PROFESSIONS.include?(@member.profession) ? @member.profession : "custom" %>
+              <% submitted_profession = params.dig(:member, :profession) if @info_draft %>
+              <% preset_profession = submitted_profession || (Member::PROFESSIONS.include?(info.profession) ? info.profession : "custom") %>
+              <% custom_profession = params.dig(:member, :custom_profession) if @info_draft %>
+              <% custom_profession ||= info.profession unless Member::PROFESSIONS.include?(info.profession) %>
               <label for="member_profession" class="impd-label-muted">직업</label>
-              <select id="member_profession" name="member[profession]" data-editor-info-target="profession" data-action="change->editor-info#toggleProfession">
+              <select id="member_profession" name="member[profession]" data-editor-info-target="profession" data-action="change->editor-info#toggleProfession" <%= field_errors.call(:profession) %>>
                 <% [["직접 입력", "custom"], ["보험 설계사", "insurance_agent"], ["공인중개사", "realtor"], ["강사", "educator"], ["작가", "author"], ["자영업자", "shopowner"], ["프리랜서", "freelancer"]].each do |label, value| %>
                   <option value="<%= value %>" <%= "selected" if preset_profession == value %>><%= label %></option>
                 <% end %>
               </select>
+              <%= error_message.call(:profession) %>
               <div data-editor-info-target="customProfession" style="margin-top: 12px;" <%= "hidden" if preset_profession != "custom" %>>
                 <label for="member_custom_profession" class="impd-label-muted">직업 직접 입력</label>
-                <input type="text" id="member_custom_profession" name="member[custom_profession]"
-                       value="<%= @member.profession unless Member::PROFESSIONS.include?(@member.profession) %>" placeholder="예: 스마트폰 강사">
+                <input type="text" id="member_custom_profession" name="member[custom_profession]" <%= field_errors.call(:custom_profession) %>
+                       value="<%= custom_profession %>" placeholder="예: 스마트폰 강사">
+                <%= error_message.call(:custom_profession) %>
               </div>
             </div>
             <div>
               <label for="member_region" class="impd-label-muted">지역</label>
-              <input type="text" id="member_region" name="member[region]" value="<%= @member.region %>" placeholder="예: 서울 · 성북">
+              <input type="text" id="member_region" name="member[region]" value="<%= info.region %>" placeholder="예: 서울 · 성북" <%= field_errors.call(:region) %>>
+              <%= error_message.call(:region) %>
             </div>
           </div>
 
           <div class="editor-pair" style="margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
             <div>
               <label for="member_email" class="impd-label-muted">이메일</label>
-              <input type="email" autocomplete="email" id="member_email" name="member[email]" value="<%= @member.email %>">
+              <input type="text" inputmode="email" autocomplete="email" id="member_email" name="member[email]" value="<%= info.email %>" <%= field_errors.call(:email) %>>
+              <%= error_message.call(:email) %>
             </div>
             <div>
               <label for="member_phone" class="impd-label-muted">전화번호</label>
-              <input type="tel" inputmode="tel" autocomplete="tel" id="member_phone" name="member[phone]" value="<%= @member.phone %>" placeholder="010-0000-0000">
+              <input type="tel" inputmode="tel" autocomplete="tel" id="member_phone" name="member[phone]" value="<%= info.phone %>" placeholder="010-0000-0000" <%= field_errors.call(:phone) %>>
+              <%= error_message.call(:phone) %>
             </div>
           </div>
 
           <div style="margin-top: 14px;">
             <label for="member_kakao_channel" class="impd-label-muted">카카오톡 채널 주소 <span style="font-weight: 400; color: var(--impd-muted);">(선택)</span></label>
-            <input type="url" id="member_kakao_channel" name="member[kakao_channel]" value="<%= @member.social["kakao_channel"] %>" placeholder="https://pf.kakao.com/...">
+            <input type="url" id="member_kakao_channel" name="member[kakao_channel]" value="<%= (@info_draft && params.dig(:member, :kakao_channel)) || info.social["kakao_channel"] %>" placeholder="https://pf.kakao.com/..." <%= field_errors.call(:kakao_channel) %>>
+            <%= error_message.call(:kakao_channel) %>
           </div>
 
           <div style="margin-top: 14px;">
             <label for="member_career_note" class="impd-label-muted">경력·이력 <span style="font-weight: 400; color: var(--impd-muted);">(선택)</span></label>
             <div id="member_career_note_hint" class="impd-label-muted" style="margin-top: 6px;">학력·경력·수상·자격 등을 자유롭게 쓰세요. 정해진 형식은 없습니다.</div>
-            <textarea id="member_career_note" name="member[career_note]" rows="6" aria-describedby="member_career_note_hint"
+            <textarea id="member_career_note" name="member[career_note]" rows="6" <%= field_errors.call(:career_note, "member_career_note_hint") %>
                       placeholder="예시)
 1970년생
 학력 - OO대 신문방송학과 졸업 (1995)
 경력 - KBS PD (1996~2015), 한국환경저널 발행인 (2016~)
 수상 - 방송대상 (2010)
-자격 - 사회복지사 2급"><%= @member.career_note %></textarea>
+자격 - 사회복지사 2급"><%= info.career_note %></textarea>
+            <%= error_message.call(:career_note) %>
           </div>
 
           <button type="submit" class="impd-btn impd-btn-accent" style="margin-top: 20px; height: 52px; padding: 0 28px; font-size: 15px; width: 100%; justify-content: center;">
@@ -169,12 +206,12 @@
             <p style="font-size: 13px; color: var(--impd-muted); margin: 12px 0;">
               이력서나 경력을 적은 글을 올리면, 그 안에서 강점을 찾아 여기에 보여 드려요.
             </p>
-            <a href="?step=1&amp;tab=docs#docs" class="impd-btn impd-btn-secondary" style="margin-top: 6px;">← 문서 올리러 가기</a>
+            <a href="<%= editor_path %>?step=1&amp;tab=docs#docs" class="impd-btn impd-btn-secondary" style="margin-top: 6px;">← 문서 올리러 가기</a>
           <% else %>
             <p style="font-size: 13px; color: var(--impd-muted); margin: 12px 0;">
               올린 문서 <%= @doc_count %>개에서는 아직 강점을 찾지 못했어요. 자격·수상·전문 분야가 적힌 글을 더 올리면 찾기 쉬워요. 없어도 페이지는 공개할 수 있어요.
             </p>
-            <a href="?step=1&amp;tab=docs#docs" class="impd-btn impd-btn-secondary" style="margin-top: 6px;">문서 더 올리기</a>
+            <a href="<%= editor_path %>?step=1&amp;tab=docs#docs" class="impd-btn impd-btn-secondary" style="margin-top: 6px;">문서 더 올리기</a>
           <% end %>
         </div>
 
@@ -270,9 +307,9 @@
     <!-- ── Step 4: 공개 준비 항목 ─────────────── -->
     <div class="impd-section-header">
       <span class="impd-label">공개</span>
-      <h1 class="impd-display" style="font-size: 36px; flex: 1; margin: 0;">내 페이지 공개하기</h1>
+      <h1 class="impd-display" style="font-size: 36px; flex: 1; margin: 0;"><%= step4_done ? "내 페이지가 공개돼 있어요" : "내 페이지 공개하기" %></h1>
       <% if @member.published_at %>
-        <span class="impd-label-muted" style="color: var(--impd-accent);">● 공개 중 · <%= @member.published_at.strftime("%Y.%m.%d") %></span>
+        <span class="impd-label-muted" style="color: var(--impd-accent);">● 공개 중 · <%= @member.published_at.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d") %>부터</span>
       <% end %>
     </div>
 
@@ -305,7 +342,7 @@
           <% end %>
         </ul>
         <p class="impd-label-muted" style="margin-top: 14px;">
-          스타일: <%= ThemePreset.find(@member.theme_preset)&.dig(:name) || "잡지형 (기본)" %> · <a href="?step=3" style="color: var(--impd-accent); text-decoration: underline; display: inline-flex; align-items: center; min-height: 44px;">바꾸기</a>
+          스타일: <%= ThemePreset.find(@member.theme_preset)&.dig(:name) || "잡지형 (기본)" %> · <a href="<%= editor_path %>?step=3" style="color: var(--impd-accent); text-decoration: underline; display: inline-flex; align-items: center; min-height: 44px;">바꾸기</a>
         </p>
       </div>
 
@@ -319,36 +356,46 @@
               impd.townin.net/<%= @member.slug %>
             </div>
             <div style="margin-top: 14px; font-size: 13px; color: rgba(239,236,228,.7); line-height: 1.55;">
-              공개하면 누구나 이 주소로 내 페이지를 볼 수 있어요. 카카오톡·문자로 주소를 보내면 내 명함 그림이 함께 보여요.
+              <%= step4_done ? "지금" : "공개하면" %> 누구나 이 주소로 내 페이지를 볼 수 있어요. 카카오톡·문자로 주소를 보내면 내 명함 그림이 함께 보여요.
             </div>
           </div>
         </div>
 
-        <% if !@can_publish %>
-          <p style="margin-bottom: 12px; font-size: 14px; color: var(--impd-ink2); line-height: 1.55;">
-            공개하려면 아직 필요해요: <strong><%= @publish_missing.join(" · ") %></strong>
-          </p>
-          <a href="<%= slug_admin_editor_path(slug: @member.slug, step: 2, anchor: @publish_missing.include?("자기소개 20자 이상") ? "bio" : "profession-region") %>"
-             class="impd-btn impd-btn-secondary" style="width: 100%; height: 48px; margin-bottom: 12px; justify-content: center;">내 정보 적으러 가기 →</a>
-        <% end %>
+        <% if step4_done %>
+          <% if params[:published] == "1" %>
+            <div id="publish-done" role="status" style="border-left: 3px solid var(--impd-accent); background: #fff; padding: 16px; margin-bottom: 14px;">
+              <strong>공개했어요.</strong>
+              <p>이제 주소를 복사해 카카오톡이나 문자로 고객에게 보내 보세요. 명함에 QR 그림을 넣어도 좋아요.</p>
+            </div>
+          <% end %>
+          <div id="publish-next-actions">
+            <% page_path = public_profile_path(slug: @member.slug) %>
+            <button type="button" class="impd-btn impd-btn-primary" data-page-path="<%= page_path %>"
+                    onclick="navigator.clipboard.writeText(window.location.origin + this.dataset.pagePath).then(() => { this.textContent = '복사했어요' })">주소 복사</button>
+            <%= link_to "내 페이지 보기", page_path, target: "_blank", rel: "noopener", class: "impd-btn impd-btn-secondary" %>
+          </div>
+          <p class="impd-label-muted" style="font-size: 14px; margin-top: 12px;">고친 내용은 저장하면 바로 내 페이지에 반영돼요. 다시 공개할 필요는 없어요.</p>
+          <div class="editor-publish-links">
+            <%= link_to "QR 그림 저장", member_qr_path(slug: @member.slug, format: :svg), download: "#{@member.slug}-qr.svg" %>
+            <span aria-hidden="true">·</span>
+            <%= link_to "대시보드로 가기", slug_admin_dashboard_path(slug: @member.slug) %>
+          </div>
+        <% else %>
+          <% if !@can_publish %>
+            <p style="margin-bottom: 12px; font-size: 14px; color: var(--impd-ink2); line-height: 1.55;">
+              공개하려면 아직 필요해요: <strong><%= @publish_missing.join(" · ") %></strong>
+            </p>
+            <a href="<%= slug_admin_editor_path(slug: @member.slug, step: 2, anchor: @publish_missing.include?("자기소개 20자 이상") ? "bio" : "profession-region") %>"
+               class="impd-btn impd-btn-secondary" style="width: 100%; height: 48px; margin-bottom: 12px; justify-content: center;">내 정보 적으러 가기 →</a>
+          <% end %>
 
-        <%= form_with url: slug_admin_editor_publish_path(slug: @member.slug), method: :patch, local: true, data: { turbo: false } do %>
-          <button type="submit" class="impd-btn impd-btn-primary"
-                  style="width: 100%; height: 56px; font-size: 16px; justify-content: center;"
-                  <%= "disabled" if !@can_publish %>>
-            <% if @member.published_at %>
-              바뀐 내용 다시 공개하기
-            <% else %>
+          <%= form_with url: slug_admin_editor_publish_path(slug: @member.slug), method: :patch, local: true, data: { turbo: false } do %>
+            <button type="submit" class="impd-btn impd-btn-primary"
+                    style="width: 100%; height: 56px; font-size: 16px; justify-content: center;"
+                    <%= "disabled" if !@can_publish %>>
               지금 공개하기
-            <% end %>
-          </button>
-        <% end %>
-
-        <% if @member.published_at %>
-          <a href="/<%= @member.slug %>" target="_blank" class="impd-btn impd-btn-secondary"
-             style="width: 100%; height: 44px; margin-top: 10px; font-size: 13px; justify-content: center;">
-            내 페이지 보기 →
-          </a>
+            </button>
+          <% end %>
         <% end %>
       </div>
     </div>
@@ -356,13 +403,13 @@
 
   <!-- 단계 네비 -->
   <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--impd-rule);">
-    <% if @step > 1 %><a href="?step=<%= @step - 1 %>" class="impd-btn impd-btn-secondary">← 이전</a><% else %>
+    <% if @step > 1 %><a href="<%= editor_path %>?step=<%= @step - 1 %>" class="impd-btn impd-btn-secondary">← 이전</a><% else %>
       <span class="impd-label-muted" style="align-self: center;">올린 파일은 바로 저장돼요. 다 올렸으면 다음으로 가세요.</span>
     <% end %>
     <% if @step == 1 %>
-      <a href="?step=2" class="impd-btn impd-btn-primary">다음 →</a>
+      <a href="<%= editor_path %>?step=2" class="impd-btn impd-btn-primary">다음 →</a>
     <% elsif @step < 4 %>
-      <a href="?step=<%= @step + 1 %>" class="editor-skip-link" style="color: var(--impd-muted); font-size: 13px; text-decoration: underline; min-height: 44px; display: inline-flex; align-items: center;">저장하지 않고 다음 단계 보기 →</a>
+      <a href="<%= editor_path %>?step=<%= @step + 1 %>" class="editor-skip-link" style="color: var(--impd-muted); font-size: 13px; text-decoration: underline; min-height: 44px; display: inline-flex; align-items: center;">저장하지 않고 다음 단계 보기 →</a>
     <% end %>
   </div>
 </div>
@@ -428,6 +475,12 @@
     outline-offset: 1px;
   }
   .editor-fields textarea { resize: vertical; }
+  .editor-fields [aria-invalid="true"] { border-color: #b42318; }
+  #publish-next-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  #publish-next-actions .impd-btn { height: 52px; justify-content: center; }
+  .editor-publish-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; }
+  .editor-publish-links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--impd-accent); text-decoration: underline; }
+  @media (max-width: 480px) { #publish-next-actions { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 768px) { .editor-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 24px !important; } .editor-page > div:first-of-type a { padding: 12px 4px !important; min-width: 0; } .editor-page > div:first-of-type a p { font-size: 13px !important; overflow-wrap: anywhere; } .editor-page .impd-section-header { flex-wrap: wrap; } }
   @media (max-width: 480px) { .editor-pair { grid-template-columns: minmax(0, 1fr) !important; } }
   .theme-card, .layout-card { position: relative; }

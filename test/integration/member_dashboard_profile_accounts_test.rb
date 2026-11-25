@@ -53,15 +53,16 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
       assert_select "article > p", text: "운영팀이 준비하고 있어요. 끝나면 여기에 표시돼요."
       assert_select "p", text: "맡긴 계정: 아직 등록 안 됨"
       assert_select "ol li", text: /✓ 계정 맡기기/
-      assert_select "ol li", text: /○ 로그인 확인/
+      assert_select "span", text: "준비 중"
+      assert_select "ol li", text: /○ 계정 확인/
       assert_select "ol li", text: "✓ 내용 손보기"
       assert_select "p", text: "네이버에 고쳐 달라고 한 날: #{submission.created_at.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M")} (제출함)"
     end
     assert_select "#profile-accounts-status article:last-child" do
       assert_select "h3", text: linkedin.display_name
       assert_select "p", text: "맡긴 계정: ka***@example.com"
-      assert_select "ol li", text: /✓/, count: 3
-      assert_select "span", text: "로그인됨"
+      assert_select "ol", count: 0
+      assert_select "span", text: "관리 중"
       assert_select "details:not([open])" do
         assert_select "summary", text: "자세히 보기"
         assert_select "p", text: "운영팀이 마지막으로 확인: 2일 전"
@@ -73,6 +74,8 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
       assert_select "a[href=?][target='_blank'][rel='noopener']", linkedin.profile_url, text: "프로필 열기 ↗"
     end
     assert_not_includes response.body, "kangss@example.com"
+    assert_not_includes response.body, "로그인됨"
+    assert_not_includes response.body, "로그인 확인"
     assert_select "a", text: "관리 화면에서 열기", count: 0
     assert_select "a[href^='/pd/']", count: 0
   end
@@ -99,7 +102,7 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
       account.profile_snapshots.create!(captured_at: Time.current, data: data)
       visit_dashboard
 
-      assert_select "#profile-accounts-status span", text: "오류"
+      assert_select "#profile-accounts-status span", text: "확인 중"
       assert_select "#profile-accounts-status p", text: "로그인에 문제가 있어 운영팀이 확인하고 있어요. 따로 하실 일은 없어요."
       assert_select "#profile-accounts-status progress", count: 0
       assert_select "#profile-accounts-status a", text: "프로필 열기 ↗", count: 0
