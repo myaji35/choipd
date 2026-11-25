@@ -4153,7 +4153,7 @@
       "priority": "P2",
       "assign_to": "agent-harness",
       "created_at": "2026-11-25T09:10:32.423069+09:00",
-      "updated_at": "2026-11-25T04:53:38Z",
+      "updated_at": "2026-11-25T05:38:58Z",
       "payload": {
         "origin": "chat-delegate",
         "delegated": {
@@ -4188,11 +4188,11 @@
         "branch": "factory/ISS-504",
         "recommendation": {
           "verdict": "승인 권장",
-          "reason": "재검증 실패는 다른 세션 미커밋 변경·임시 서버 부재 탓. 깨끗한 HEAD 에서 같은 명령 전부 통과",
+          "reason": "실행기 재검증 실패로 되돌림 — 다시 돌린 결과가 다름: `PARALLEL_WORKERS=1 bin/rails test test/integration/member_sc` 기록 0 → 실제 1",
           "risk": "낮음",
-          "effort": "XS",
-          "by": "factory-runner",
-          "at": "2026-11-25T05:05:06Z"
+          "effort": "작음",
+          "by": "factory-recheck",
+          "at": "2026-11-25T05:13:31Z"
         },
         "deploy_gate_items": [
           "회원 AI 키 보관·교체·삭제 정책 승인, 운영 AR_ENCRYPTION_* 키 주입 확인(현재 키 용도는 연결 시험뿐)",
@@ -4271,6 +4271,11 @@
             "at": "2026-11-25T09:43:21+09:00",
             "by": "factory-runner",
             "note": "대표님 설계 변경 반영 재작업 착수. 구글 민감 권한 검수 항목은 사라지고, AI 키 보관(시크릿) 때문에 gate=deploy 유지."
+          },
+          {
+            "at": "2026-11-25T05:39:28Z",
+            "by": "factory-runner",
+            "note": "ISS-611(87ea08d): 운영(eager_load)에서 Active Record 암호화 키가 실제로 비어 있던 결함 수정. 배포 전 확인 항목 'AR_ENCRYPTION_* 키 주입'은 그대로 유지 — 주입하지 않으면 secret_key_base 파생값이 쓰인다."
           }
         ],
         "test_users": {
@@ -4317,14 +4322,13 @@
           "by": "대표님(헤르메스)",
           "at": "2026-11-25T02:46:49.447Z"
         },
-        "recheck_reopens": 1,
+        "recheck_reopens": 2,
         "recheck_fail": {
-          "at": "2026-11-25T04:53:38Z",
-          "sha": "091a09e",
+          "at": "2026-11-25T05:13:31Z",
+          "sha": "6e9e361",
           "problems": [
             "다시 돌린 결과가 다름: `PARALLEL_WORKERS=1 bin/rails test test/integration/member_sc` 기록 0 → 실제 1",
-            "다시 돌린 결과가 다름: `bin/rails test` 기록 0 → 실제 1",
-            "다시 돌린 결과가 다름: `bin/rubocop` 기록 0 → 실제 1"
+            "다시 돌린 결과가 다름: `bin/rails test` 기록 0 → 실제 1"
           ]
         },
         "next_prompt_at": "2026-11-25T04:56:34.706832Z",
@@ -4352,9 +4356,12 @@
           "at": "2026-11-25T04:56:34.706832Z"
         },
         "recheck_resolution": {
-          "at": "2026-11-25T05:05:06Z",
+          "at": "2026-11-25T05:38:58Z",
           "by": "factory-runner",
-          "cause": "재검증 실패는 환경 원인: (1) 재검증이 다른 대화 세션(회원 디자인 루프)의 미커밋 변경 15파일이 남은 main 작업 트리에서 돌았다 — rubocop 위반은 그 세션의 미커밋 brands_controller.rb·member_dashboard_channels_test.rb 에서 나옴, (2) chopd_mobile_menu_check 는 기록 당시 임시 3099 서버를 썼는데 재검증 때는 꺼져 있었다(ERR_CONNECTION_REFUSED). 같은 커밋 cca5cb7 을 깨끗한 worktree 로 열어 다시 돌리니 모두 통과."
+          "cause": "앞선 '환경 원인' 판정은 틀렸다. 재검증기는 CI=1 로 돌고 test.rb 는 CI 가 있으면 eager_load=true — 이때 config/initializers/active_record_encryption.rb 의 after_initialize 키 주입이 적용되지 않아 스캔 정리(ISS-504) 테스트 4건이 Missing primary_key 에러로 실패했다(전체 bin/rails test exit 1). 재검증 출력은 stderr 경고만 400자 남아 원인이 가려졌다. ISS-611(87ea08d)로 고친 뒤 같은 조건(CI=1·rbenv shims)으로 main 에서 재실행 통과.",
+          "fixed_by": "ISS-611",
+          "fixed_sha": "87ea08d",
+          "corrects": "2026-11-25T05:05:06Z 환경 원인 판정"
         }
       },
       "history": [
@@ -4366,7 +4373,7 @@
       ],
       "result": {
         "resolution": "verified_rerun",
-        "skip_derivatives": "재검증 환경 실패 해소 — 코드 변경 없음",
+        "skip_derivatives": "재검증 실패 원인(ISS-611 암호화 키 eager_load) 해소 — 이 카드 코드 변경 없음",
         "files_changed": [
           "app/services/scan_organizer/*",
           "app/controllers/member_admin/scan_organizers_controller.rb",
@@ -4394,27 +4401,27 @@
             "how": "병합 후 main 전체 496 runs 0 failures, rubocop 483 files 0 offenses"
           }
         ],
-        "recheck_cause": "재검증 실패는 환경 원인: (1) 재검증이 다른 대화 세션(회원 디자인 루프)의 미커밋 변경 15파일이 남은 main 작업 트리에서 돌았다 — rubocop 위반은 그 세션의 미커밋 brands_controller.rb·member_dashboard_channels_test.rb 에서 나옴, (2) chopd_mobile_menu_check 는 기록 당시 임시 3099 서버를 썼는데 재검증 때는 꺼져 있었다(ERR_CONNECTION_REFUSED). 같은 커밋 cca5cb7 을 깨끗한 worktree 로 열어 다시 돌리니 모두 통과.",
-        "verified_sha": "cca5cb7",
         "proof": [
           {
             "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/member_scan_organizer_test.rb test/models/scan_organizer_setting_test.rb test/services/scan_organizer test/integration/brand_profile_process_test.rb",
             "exit_code": 0,
-            "output": "관련 6파일 묶음 37 runs, 389 assertions, 0 failures, 0 errors, 0 skips"
+            "output": "22 runs, 225 assertions, 0 failures, 0 errors, 0 skips (CI=1)"
+          },
+          {
+            "cmd": "CI=1 bin/rails test",
+            "exit_code": 0,
+            "output": "561 runs, 4849 assertions, 0 failures, 0 errors, 1 skips (main 87ea08d, 재검증과 같은 CI=1·rbenv shims)"
           },
           {
             "cmd": "bin/rubocop",
             "exit_code": 0,
-            "output": "493 files inspected, no offenses detected (깨끗한 worktree, cca5cb7)"
-          },
-          {
-            "cmd": "bin/rails test",
-            "exit_code": 0,
-            "output": "522 runs, 4604 assertions, 0 failures, 0 errors, 1 skips (깨끗한 worktree, cca5cb7)"
+            "output": "495 files inspected, no offenses detected"
           }
-        ]
+        ],
+        "recheck_cause": "앞선 '환경 원인' 판정은 틀렸다. 재검증기는 CI=1 로 돌고 test.rb 는 CI 가 있으면 eager_load=true — 이때 config/initializers/active_record_encryption.rb 의 after_initialize 키 주입이 적용되지 않아 스캔 정리(ISS-504) 테스트 4건이 Missing primary_key 에러로 실패했다(전체 bin/rails test exit 1). 재검증 출력은 stderr 경고만 400자 남아 원인이 가려졌다. ISS-611(87ea08d)로 고친 뒤 같은 조건(CI=1·rbenv shims)으로 main 에서 재실행 통과.",
+        "verified_sha": "87ea08d"
       },
-      "completed_at": "2026-11-25T14:05:06.636273"
+      "completed_at": "2026-11-25T14:38:58.394291"
     },
     {
       "id": "ISS-509",
@@ -12434,18 +12441,18 @@
         "priority_reason": "엔진 기본 P0 이나 표시 아이콘 교체라 사용자 막힘 없음 → P2",
         "recommendation": {
           "verdict": "승인 권장",
-          "reason": "재검증 실패는 다른 세션 미커밋 변경·임시 서버 부재 탓. 깨끗한 HEAD 에서 같은 명령 전부 통과",
+          "reason": "실행기 재검증 실패로 되돌림 — 다시 돌린 결과가 다름: `bin/rails test` 기록 0 → 실제 1",
           "risk": "낮음",
-          "effort": "XS",
-          "by": "factory-runner",
-          "at": "2026-11-25T05:05:06Z"
+          "effort": "작음",
+          "by": "factory-recheck",
+          "at": "2026-11-25T05:13:31Z"
         },
-        "recheck_reopens": 1,
+        "recheck_reopens": 2,
         "recheck_fail": {
-          "at": "2026-11-25T04:53:38Z",
-          "sha": "091a09e",
+          "at": "2026-11-25T05:13:31Z",
+          "sha": "6e9e361",
           "problems": [
-            "다시 돌린 결과가 다름: `BASE_URL=http://127.0.0.1:3099 node script/qa/chopd_mobile_m` 기록 0 → 실제 1"
+            "다시 돌린 결과가 다름: `bin/rails test` 기록 0 → 실제 1"
           ]
         },
         "next_prompt_at": "2026-11-25T04:56:47.584858Z",
@@ -12473,14 +12480,17 @@
           "at": "2026-11-25T04:56:47.584858Z"
         },
         "recheck_resolution": {
-          "at": "2026-11-25T05:05:06Z",
+          "at": "2026-11-25T05:38:58Z",
           "by": "factory-runner",
-          "cause": "재검증 실패는 환경 원인: (1) 재검증이 다른 대화 세션(회원 디자인 루프)의 미커밋 변경 15파일이 남은 main 작업 트리에서 돌았다 — rubocop 위반은 그 세션의 미커밋 brands_controller.rb·member_dashboard_channels_test.rb 에서 나옴, (2) chopd_mobile_menu_check 는 기록 당시 임시 3099 서버를 썼는데 재검증 때는 꺼져 있었다(ERR_CONNECTION_REFUSED). 같은 커밋 cca5cb7 을 깨끗한 worktree 로 열어 다시 돌리니 모두 통과."
+          "cause": "앞선 '환경 원인' 판정은 틀렸다. 재검증기는 CI=1 로 돌고 test.rb 는 CI 가 있으면 eager_load=true — 이때 config/initializers/active_record_encryption.rb 의 after_initialize 키 주입이 적용되지 않아 스캔 정리(ISS-504) 테스트 4건이 Missing primary_key 에러로 실패했다(전체 bin/rails test exit 1). 재검증 출력은 stderr 경고만 400자 남아 원인이 가려졌다. ISS-611(87ea08d)로 고친 뒤 같은 조건(CI=1·rbenv shims)으로 main 에서 재실행 통과.",
+          "fixed_by": "ISS-611",
+          "fixed_sha": "87ea08d",
+          "corrects": "2026-11-25T05:05:06Z 환경 원인 판정"
         }
       },
       "result": {
         "resolution": "verified_rerun",
-        "skip_derivatives": "재검증 환경 실패 해소 — 코드 변경 없음",
+        "skip_derivatives": "재검증 실패 원인(ISS-611 암호화 키 eager_load) 해소 — 이 카드 코드 변경 없음",
         "files_changed": [
           "app/views/layouts/_chopd_header.html.erb",
           "test/integration/chopd_header_icons_test.rb"
@@ -12507,18 +12517,16 @@
             "how": "test/integration/chopd_header_icons_test.rb"
           }
         ],
-        "recheck_cause": "재검증 실패는 환경 원인: (1) 재검증이 다른 대화 세션(회원 디자인 루프)의 미커밋 변경 15파일이 남은 main 작업 트리에서 돌았다 — rubocop 위반은 그 세션의 미커밋 brands_controller.rb·member_dashboard_channels_test.rb 에서 나옴, (2) chopd_mobile_menu_check 는 기록 당시 임시 3099 서버를 썼는데 재검증 때는 꺼져 있었다(ERR_CONNECTION_REFUSED). 같은 커밋 cca5cb7 을 깨끗한 worktree 로 열어 다시 돌리니 모두 통과.",
-        "verified_sha": "cca5cb7",
         "proof": [
           {
             "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_header_icons_test.rb test/integration/chopd_header_links_test.rb test/integration/chopd_header_member_session_test.rb",
             "exit_code": 0,
-            "output": "재검증에서도 same(통과)"
+            "output": "6 runs, 70 assertions, 0 failures, 0 errors, 0 skips (CI=1)"
           },
           {
             "cmd": "node script/qa/chopd_mobile_menu_check.cjs",
             "exit_code": 0,
-            "output": "상주 개발 서버 3008 기준 연속 3회 SUMMARY pass=true (임시 3099 의존 제거)"
+            "output": "상주 3008 서버 연속 3회 SUMMARY pass=true"
           },
           {
             "cmd": "ROUTES=/education,/media/greeting WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
@@ -12526,22 +12534,24 @@
             "output": "SUMMARY pass=true"
           },
           {
-            "cmd": "bin/rubocop",
+            "cmd": "CI=1 bin/rails test",
             "exit_code": 0,
-            "output": "493 files inspected, no offenses detected (깨끗한 worktree, cca5cb7)"
+            "output": "561 runs, 4849 assertions, 0 failures, 0 errors, 1 skips (main 87ea08d, 재검증과 같은 CI=1·rbenv shims)"
           },
           {
-            "cmd": "bin/rails test",
+            "cmd": "bin/rubocop",
             "exit_code": 0,
-            "output": "522 runs, 4604 assertions, 0 failures, 0 errors, 1 skips (깨끗한 worktree, cca5cb7)"
+            "output": "495 files inspected, no offenses detected"
           }
-        ]
+        ],
+        "recheck_cause": "앞선 '환경 원인' 판정은 틀렸다. 재검증기는 CI=1 로 돌고 test.rb 는 CI 가 있으면 eager_load=true — 이때 config/initializers/active_record_encryption.rb 의 after_initialize 키 주입이 적용되지 않아 스캔 정리(ISS-504) 테스트 4건이 Missing primary_key 에러로 실패했다(전체 bin/rails test exit 1). 재검증 출력은 stderr 경고만 400자 남아 원인이 가려졌다. ISS-611(87ea08d)로 고친 뒤 같은 조건(CI=1·rbenv shims)으로 main 에서 재실행 통과.",
+        "verified_sha": "87ea08d"
       },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T04:53:38Z",
+      "updated_at": "2026-11-25T05:38:58Z",
       "origin": "factory-observation",
       "started_at": "2026-11-25T04:44:15.889028Z",
-      "completed_at": "2026-11-25T14:05:06.707168"
+      "completed_at": "2026-11-25T14:38:58.448840"
     },
     {
       "id": "ISS-592",
@@ -14105,7 +14115,7 @@
       "parent_id": null,
       "depends_on": [],
       "created_at": "2026-11-25T04:52:06Z",
-      "updated_at": "2026-11-25T05:03:27Z",
+      "updated_at": "2026-11-25T05:38:58Z",
       "description": "공장 회차 끝 bin/rubocop 이 34 offenses(Layout/SpaceInsideArrayLiteralBrackets, 자동 수정 가능)를 보고. 모두 다른 대화 세션의 디자인 루프 15회차 커밋 b8230f3 파일. 그 세션이 같은 시각 작업 중이라 이번 회차에서는 손대지 않음. ISS-600 과 같은 유형.",
       "payload": {
         "origin": "factory-ship",
@@ -14126,11 +14136,11 @@
         ],
         "recommendation": {
           "verdict": "승인 권장",
-          "reason": "재검증 실패는 다른 세션 미커밋 변경·임시 서버 부재 탓. 깨끗한 HEAD 에서 같은 명령 전부 통과",
+          "reason": "실행기 재검증 실패로 되돌림 — 다시 돌린 결과가 다름: `bin/rails test` 기록 0 → 실제 1",
           "risk": "낮음",
-          "effort": "XS",
-          "by": "factory-runner",
-          "at": "2026-11-25T05:05:06Z"
+          "effort": "작음",
+          "by": "factory-recheck",
+          "at": "2026-11-25T05:13:31Z"
         },
         "decisions": [
           {
@@ -14142,13 +14152,12 @@
         ],
         "approved_at": "2026-11-25T04:52:06.213Z",
         "approved_by": "자동 승인(추천: 승인 권장)",
-        "recheck_reopens": 1,
+        "recheck_reopens": 2,
         "recheck_fail": {
-          "at": "2026-11-25T05:03:27Z",
-          "sha": "cca5cb7",
+          "at": "2026-11-25T05:13:31Z",
+          "sha": "6e9e361",
           "problems": [
-            "다시 돌린 결과가 다름: `bin/rubocop` 기록 0 → 실제 1",
-            "다시 돌린 결과가 다름: `PARALLEL_WORKERS=1 bin/rails test test/controllers/member_ad` 기록 0 → 실제 1"
+            "다시 돌린 결과가 다름: `bin/rails test` 기록 0 → 실제 1"
           ]
         },
         "next_prompt_at": "2026-11-25T05:03:30.659664Z",
@@ -14176,14 +14185,17 @@
           "at": "2026-11-25T05:03:30.659664Z"
         },
         "recheck_resolution": {
-          "at": "2026-11-25T05:05:06Z",
+          "at": "2026-11-25T05:38:58Z",
           "by": "factory-runner",
-          "cause": "재검증 실패는 환경 원인: (1) 재검증이 다른 대화 세션(회원 디자인 루프)의 미커밋 변경 15파일이 남은 main 작업 트리에서 돌았다 — rubocop 위반은 그 세션의 미커밋 brands_controller.rb·member_dashboard_channels_test.rb 에서 나옴, (2) chopd_mobile_menu_check 는 기록 당시 임시 3099 서버를 썼는데 재검증 때는 꺼져 있었다(ERR_CONNECTION_REFUSED). 같은 커밋 cca5cb7 을 깨끗한 worktree 로 열어 다시 돌리니 모두 통과."
+          "cause": "앞선 '환경 원인' 판정은 틀렸다. 재검증기는 CI=1 로 돌고 test.rb 는 CI 가 있으면 eager_load=true — 이때 config/initializers/active_record_encryption.rb 의 after_initialize 키 주입이 적용되지 않아 스캔 정리(ISS-504) 테스트 4건이 Missing primary_key 에러로 실패했다(전체 bin/rails test exit 1). 재검증 출력은 stderr 경고만 400자 남아 원인이 가려졌다. ISS-611(87ea08d)로 고친 뒤 같은 조건(CI=1·rbenv shims)으로 main 에서 재실행 통과.",
+          "fixed_by": "ISS-611",
+          "fixed_sha": "87ea08d",
+          "corrects": "2026-11-25T05:05:06Z 환경 원인 판정"
         }
       },
       "result": {
         "resolution": "verified_rerun",
-        "skip_derivatives": "재검증 환경 실패 해소 — 코드 변경 없음",
+        "skip_derivatives": "재검증 실패 원인(ISS-611 암호화 키 eager_load) 해소 — 이 카드 코드 변경 없음",
         "files_changed": [
           "app/controllers/concerns/member_admin/channel_overview.rb",
           "app/helpers/member_admin/channels_helper.rb",
@@ -14208,28 +14220,28 @@
             "how": "worktree /Volumes/GH_APFS/choi-pd-iss606 에서 커밋 후 main 으로 cherry-pick, worktree 제거"
           }
         ],
-        "recheck_cause": "재검증 실패는 환경 원인: (1) 재검증이 다른 대화 세션(회원 디자인 루프)의 미커밋 변경 15파일이 남은 main 작업 트리에서 돌았다 — rubocop 위반은 그 세션의 미커밋 brands_controller.rb·member_dashboard_channels_test.rb 에서 나옴, (2) chopd_mobile_menu_check 는 기록 당시 임시 3099 서버를 썼는데 재검증 때는 꺼져 있었다(ERR_CONNECTION_REFUSED). 같은 커밋 cca5cb7 을 깨끗한 worktree 로 열어 다시 돌리니 모두 통과.",
-        "verified_sha": "cca5cb7",
         "proof": [
           {
             "cmd": "PARALLEL_WORKERS=1 bin/rails test test/controllers/member_admin/channels_controller_test.rb test/integration/member_dashboard_channels_test.rb",
             "exit_code": 0,
-            "output": "관련 6파일 묶음 37 runs, 389 assertions, 0 failures, 0 errors, 0 skips"
+            "output": "21 runs, 203 assertions, 0 failures, 0 errors, 0 skips (CI=1)"
+          },
+          {
+            "cmd": "CI=1 bin/rails test",
+            "exit_code": 0,
+            "output": "561 runs, 4849 assertions, 0 failures, 0 errors, 1 skips (main 87ea08d, 재검증과 같은 CI=1·rbenv shims)"
           },
           {
             "cmd": "bin/rubocop",
             "exit_code": 0,
-            "output": "493 files inspected, no offenses detected (깨끗한 worktree, cca5cb7)"
-          },
-          {
-            "cmd": "bin/rails test",
-            "exit_code": 0,
-            "output": "522 runs, 4604 assertions, 0 failures, 0 errors, 1 skips (깨끗한 worktree, cca5cb7)"
+            "output": "495 files inspected, no offenses detected"
           }
-        ]
+        ],
+        "recheck_cause": "앞선 '환경 원인' 판정은 틀렸다. 재검증기는 CI=1 로 돌고 test.rb 는 CI 가 있으면 eager_load=true — 이때 config/initializers/active_record_encryption.rb 의 after_initialize 키 주입이 적용되지 않아 스캔 정리(ISS-504) 테스트 4건이 Missing primary_key 에러로 실패했다(전체 bin/rails test exit 1). 재검증 출력은 stderr 경고만 400자 남아 원인이 가려졌다. ISS-611(87ea08d)로 고친 뒤 같은 조건(CI=1·rbenv shims)으로 main 에서 재실행 통과.",
+        "verified_sha": "87ea08d"
       },
       "spawn_rules": [],
-      "completed_at": "2026-11-25T14:05:06.558364"
+      "completed_at": "2026-11-25T14:38:58.501951"
     },
     {
       "id": "ISS-607",
@@ -14553,7 +14565,47 @@
             "exit_code": 0,
             "output": "1 file inspected, no offenses detected"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T05:13:31Z",
+          "sha": "6e9e361",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_greeting_readability_test.rb test/integration/chopd_header_links_test.rb test/integration/chopd_header_icons_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "node script/qa/greeting_readability_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "headerBottom\": 81.5,\n      \"noHeaderOverlap\": true\n    },\n    {\n      \"width\": 390,\n      \"minContrast\": 5.8,\n      \"contrastItems\": [],\n      \"breadcrumbTop\": 88,\n      \"headerBottom\": 80,\n      \"noHeaderOverlap\": true\n    },\n    {\n      \"width\": 320,\n      \"minContrast\": 5.8,\n      \"contrastItems\": [],\n      \"breadcrumbTop\": 88,\n      \"headerBottom\": 80,\n      \"noHeaderOverlap\": true\n    }\n  ]\n}"
+            },
+            {
+              "cmd": "ROUTES=/media/greeting WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "\"width\":320,\"file\":\"tmp/qa/layout/media-greeting-320.png\",\"bytes\":117055,\"scrollWidth\":320,\"clientWidth\":320,\"hScroll\":false,\"checked\":1,\"clipped\":0,\"clippedItems\":[],\"footerWrapped\":0,\"footerWrappedItems\":[],\"pillWrapped\":0,\"pillWrappedItems\":[],\"pillMinHeight\":null,\"pillShort\":0,\"pillShortItems\":[],\"consoleErrors\":0,\"consoleErrorItems\":[],\"badResponses\":0,\"badResponseItems\":[]}\nSUMMARY pass=true"
+            },
+            {
+              "cmd": "bin/rubocop test/integration/chopd_greeting_readability_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "Inspecting 1 file\n.\n\n1 file inspected, no offenses detected"
+            }
+          ],
+          "dirty": [
+            "ocs/design-loop/member-1125/LOG.md",
+            "script/qa/member_loop_shots.cjs"
+          ]
+        }
       },
       "spawn_rules": [],
       "updated_at": "2026-11-25T05:05:32Z",
@@ -14641,10 +14693,293 @@
             "exit_code": 0,
             "output": "29 runs, 309 assertions, 0 failures, 0 errors, 0 skips"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T05:13:31Z",
+          "sha": "6e9e361",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rubocop",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": ".....................................................................................................................................................................................................................................................................................................................................................................\n\n493 files inspected, no offenses detected"
+            },
+            {
+              "cmd": "PARALLEL_WORKERS=1 bin/rails test test/controllers/member_admin/brands_controller_test.rb test/controllers/member_admin/channels_controller_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            }
+          ],
+          "dirty": [
+            "ocs/design-loop/member-1125/LOG.md",
+            "script/qa/member_loop_shots.cjs"
+          ]
+        }
       },
       "spawn_rules": [],
       "completed_at": "2026-11-25T14:13:16.653166"
+    },
+    {
+      "id": "ISS-611",
+      "title": "[버그] eager_load(CI·운영)에서 Active Record 암호화 키가 적용되지 않아 스캔 정리 AI 키 저장이 실패",
+      "type": "FIX_BUG",
+      "priority": "P0",
+      "status": "DONE",
+      "assign_to": "agent-harness",
+      "origin": "factory-ship",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": "ISS-504",
+      "depends_on": [],
+      "created_at": "2026-11-25T05:18:57Z",
+      "updated_at": "2026-11-25T05:18:57Z",
+      "description": "실행기 재검증(CI=1)에서 bin/rails test 가 4 errors: ActiveRecord::Encryption::Errors::Configuration Missing primary_key (member_scan_organizer_test 3건, scan_organizer_setting_test 1건). config/initializers/active_record_encryption.rb 가 키를 after_initialize 에서 앱 설정에 넣지만, eager_load=true 면 Rails 의 on_load(:active_record_encryption) 훅이 그 전에 빈 키로 ActiveRecord::Encryption.configure 를 끝낸다. 운영(production.rb eager_load=true)도 같은 조건이라 SNS 토큰·회원 AI 키 암호화 저장이 실패하는 잠복 결함.",
+      "payload": {
+        "origin": "factory-ship",
+        "files": [
+          "config/initializers/active_record_encryption.rb",
+          "test/initializers/active_record_encryption_test.rb"
+        ],
+        "evidence": [
+          "CI=1 bin/rails test (깨끗한 worktree 6e9e361) → 540 runs, 0 failures, 4 errors",
+          "CI 없이 bin/rails test → 540 runs 0 failures (eager_load 꺼짐이라 통과)",
+          "activerecord-8.1.4.1 railtie.rb:361 active_record_encryption.configuration 훅"
+        ],
+        "acceptance_criteria": [
+          "CI=1(eager_load 켜짐)에서 bin/rails test 전체가 에러 0건으로 통과한다",
+          "CI 없이 돌려도 전체 테스트가 그대로 통과한다",
+          "credentials 에 키가 있으면 그 값을 덮어쓰지 않고, 없을 때만 환경변수→secret_key_base 파생값으로 채운다",
+          "eager_load 상태에서도 암호화 키가 채워지는지 확인하는 테스트가 있다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "재검증 되돌림 3건(ISS-504·591·606)의 진짜 원인. 기존 설계(운영은 환경변수, 없으면 secret_key_base 파생) 그대로 적용 시점만 바로잡는 버그 수정이라 방향 변경 없음. 운영에도 같은 결함이 잠복해 있어 P0.",
+          "risk": "낮음 — 설정 파일 1개, credentials 값 우선 보존",
+          "effort": "작음",
+          "by": "factory-runner",
+          "at": "2026-11-25T05:18:57Z"
+        }
+      },
+      "completed_at": "2026-11-25T14:38:39.648100",
+      "result": {
+        "files_changed": [
+          "config/initializers/active_record_encryption.rb",
+          "test/initializers/active_record_encryption_test.rb"
+        ],
+        "commit": "87ea08d",
+        "root_cause": "after_initialize 에서 앱 설정에 키를 넣었지만 eager_load=true 면 Rails railtie 의 on_load(:active_record_encryption) 가 먼저 빈 키로 configure 를 끝냄. 운영(eager_load=true)도 수정 전 has_primary_key? false 실측.",
+        "criteria_check": [
+          {
+            "criterion": "CI=1(eager_load 켜짐)에서 bin/rails test 전체가 에러 0건으로 통과",
+            "met": true,
+            "how": "main 87ea08d 에서 CI=1 FACTORY_RECHECK=1 shims 경로로 bin/rails test → 561 runs 0 failures 0 errors (수정 전 6e9e361 은 4 errors)"
+          },
+          {
+            "criterion": "CI 없이 돌려도 전체 테스트 통과",
+            "met": true,
+            "how": "worktree factory/ISS-611 에서 bin/rails test → 543 runs 0 failures 0 errors"
+          },
+          {
+            "criterion": "credentials 키가 있으면 덮어쓰지 않고 없을 때만 환경변수→파생값",
+            "met": true,
+            "how": "has_<key>? 가 참이면 next — railtie configure(credentials·앱 설정) 뒤에 실행되는 on_load 블록. 파생 공식·접두 문자열 diff 로 불변 확인"
+          },
+          {
+            "criterion": "eager_load 에서도 키가 채워지는지 확인하는 테스트",
+            "met": true,
+            "how": "test/initializers/active_record_encryption_test.rb — 수정 전 코드에 넣으면 CI=1 에서 2 errors, 수정 후 3 runs 0 failures 0 skips. 운영 runner(RAILS_ENV=production, 임시 SECRET_KEY_BASE)에서 수정 전 false → 수정 후 키 채워짐·암복호 왕복 확인"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "CI=1 bin/rails test",
+            "exit_code": 0,
+            "output": "561 runs, 4849 assertions, 0 failures, 0 errors, 1 skips"
+          },
+          {
+            "cmd": "CI=1 PARALLEL_WORKERS=1 bin/rails test test/initializers/active_record_encryption_test.rb test/models/scan_organizer_setting_test.rb test/integration/member_scan_organizer_test.rb",
+            "exit_code": 0,
+            "output": "0 failures, 0 errors"
+          },
+          {
+            "cmd": "bin/rubocop",
+            "exit_code": 0,
+            "output": "495 files inspected, no offenses detected"
+          }
+        ],
+        "review": {
+          "gemini": "hydrogen-high 1건(credentials 로 키 주입된 환경에서 파생값 테스트가 skip 안 됨) → 맞음, Codex 재위임 반영. neon-high 는 5분·10분 두 번 시간 초과로 결과 없음",
+          "opus": "credentials 우선 보존, 파생 공식 불변, 운영 eager_load 실측"
+        }
+      }
+    },
+    {
+      "id": "ISS-612",
+      "title": "[Plan:테스트] ISS-611 변경사항 검증",
+      "type": "RUN_TESTS",
+      "status": "DONE",
+      "priority": "P1",
+      "assign_to": "test-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-611",
+      "depends_on": [],
+      "created_at": "2026-11-25T14:38:39.648100",
+      "payload": {
+        "files": [
+          "config/initializers/active_record_encryption.rb",
+          "test/initializers/active_record_encryption_test.rb"
+        ],
+        "source_issue": "ISS-611",
+        "scope": "changed",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T05:38:40.499Z",
+            "by": "auto",
+            "reason": "「[Plan:테스트] ISS-611 변경사항 검증」(RUN_TESTS, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T05:38:40.499Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-611 암호화 초기화 수정의 회귀 확인. 암호화를 쓰는 두 모델(SnsAccount 토큰·ScanOrganizerSetting AI 키) 관련 테스트를 eager_load 켜짐·꺼짐 두 모드로 돌리면 충분",
+          "risk": "낮음",
+          "effort": "작음",
+          "by": "factory-runner",
+          "at": "2026-11-25T05:39:28Z"
+        },
+        "acceptance_criteria": [
+          "암호화 초기화 테스트와 암호화 사용 모델(SNS 계정 경유 채널·스캔 정리) 관련 테스트가 CI=1 에서 통과",
+          "같은 묶음이 CI 없이도 통과"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "total": 31,
+        "failed_count": 0,
+        "criteria_check": [
+          {
+            "criterion": "CI=1 에서 암호화 관련 테스트 통과",
+            "met": true,
+            "how": "31 runs 0 failures 0 errors"
+          },
+          {
+            "criterion": "CI 없이도 통과",
+            "met": true,
+            "how": "같은 묶음 31 runs 0 failures"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "CI=1 PARALLEL_WORKERS=1 bin/rails test test/initializers/active_record_encryption_test.rb test/models/scan_organizer_setting_test.rb test/integration/member_scan_organizer_test.rb test/models/sns_scheduled_post_test.rb test/models/brand_channel_test.rb test/controllers/member_admin/brand_channels_controller_test.rb",
+            "exit_code": 0,
+            "output": "31 runs, 242 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/initializers/active_record_encryption_test.rb test/models/scan_organizer_setting_test.rb test/integration/member_scan_organizer_test.rb test/models/sns_scheduled_post_test.rb test/models/brand_channel_test.rb test/controllers/member_admin/brand_channels_controller_test.rb",
+            "exit_code": 0,
+            "output": "31 runs, 242 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "CI=1 bin/rails test",
+            "exit_code": 0,
+            "output": "561 runs, 4849 assertions, 0 failures, 0 errors, 1 skips"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T05:39:28Z",
+      "completed_at": "2026-11-25T14:39:28.367287"
+    },
+    {
+      "id": "ISS-613",
+      "title": "[Plan:도메인분석] ISS-611 비즈니스 규칙/시나리오 도출",
+      "type": "DOMAIN_ANALYZE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "domain-analyst",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-611",
+      "depends_on": [],
+      "created_at": "2026-11-25T14:38:39.648100",
+      "payload": {
+        "files": [
+          "config/initializers/active_record_encryption.rb",
+          "test/initializers/active_record_encryption_test.rb"
+        ],
+        "source_issue": "ISS-611",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T05:38:40.500Z",
+            "by": "auto",
+            "reason": "「[Plan:도메인분석] ISS-611 비즈니스 규칙/시나리오 도출」(DOMAIN_ANALYZE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T05:38:40.500Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "설정 파일 1개(암호화 키 적용 시점) 수정이라 새 업무 규칙은 없음. '운영은 환경변수 키, 없으면 secret_key_base 파생, credentials 우선' 규칙만 기록하고 짧게 마감 권장",
+          "risk": "낮음",
+          "effort": "작음",
+          "by": "factory-runner",
+          "at": "2026-11-25T05:39:38Z"
+        }
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T05:38:40.500Z"
+    },
+    {
+      "id": "ISS-614",
+      "title": "[Plan:품질평가] ISS-612 품질 점수 산출",
+      "type": "SCORE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "eval-harness",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-612",
+      "depends_on": [],
+      "created_at": "2026-11-25T14:39:28.367287",
+      "payload": {
+        "test_result": {
+          "passed": true,
+          "total": 31,
+          "coverage": null
+        },
+        "source_issue": "ISS-612",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T05:39:28.501Z",
+            "by": "auto",
+            "reason": "「[Plan:품질평가] ISS-612 품질 점수 산출」(SCORE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T05:39:28.501Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-612 테스트 통과 후 자동 점수 산출. 전체 561건 통과·린트 0건 근거로 바로 처리 가능",
+          "risk": "낮음",
+          "effort": "작음",
+          "by": "factory-runner",
+          "at": "2026-11-25T05:39:38Z"
+        }
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T05:39:28.501Z"
     }
   ],
   "hooks": {
@@ -15394,6 +15729,36 @@
         "issue_type": "STYLE_FIX",
         "plan_created": 0,
         "timestamp": "2026-11-25T14:13:16.653166"
+      },
+      {
+        "issue_id": "ISS-611",
+        "issue_type": "FIX_BUG",
+        "plan_created": 2,
+        "timestamp": "2026-11-25T14:38:39.648100"
+      },
+      {
+        "issue_id": "ISS-504",
+        "issue_type": "FEATURE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T14:38:58.394291"
+      },
+      {
+        "issue_id": "ISS-591",
+        "issue_type": "DESIGN_FIX",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T14:38:58.448840"
+      },
+      {
+        "issue_id": "ISS-606",
+        "issue_type": "STYLE_FIX",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T14:38:58.501951"
+      },
+      {
+        "issue_id": "ISS-612",
+        "issue_type": "RUN_TESTS",
+        "plan_created": 1,
+        "timestamp": "2026-11-25T14:39:28.367287"
       }
     ],
     "on_fail": [],
@@ -19642,8 +20007,8 @@
     ]
   },
   "stats": {
-    "total_issues": 609,
-    "completed": 124,
+    "total_issues": 612,
+    "completed": 129,
     "failed": 0,
     "evolved": 223
   },
@@ -19740,6 +20105,15 @@
       "result": {
         "passed": true,
         "total": 516,
+        "coverage": null
+      }
+    },
+    {
+      "source_issue": "ISS-612",
+      "source_type": "RUN_TESTS",
+      "result": {
+        "passed": true,
+        "total": 31,
         "coverage": null
       }
     }
