@@ -8691,7 +8691,22 @@
             "output": "5 runs, 0 failures, 0 errors, 0 skips"
           }
         ],
-        "lint_fix_commit": "c9cdf49"
+        "lint_fix_commit": "c9cdf49",
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T03:35:28Z",
+          "sha": "e9b42b3",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rails test test/integration/education_filter_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            }
+          ]
+        }
       },
       "spawn_rules": [],
       "started_at": "2026-11-25T03:23:19Z",
@@ -9198,7 +9213,29 @@
             "exit_code": 0,
             "output": "educationClosed display none expanded false, consoleErrors 0 / SUMMARY pass=true"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T03:35:28Z",
+          "sha": "e9b42b3",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rails test test/integration/chopd_header_links_test.rb test/integration/education_filter_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "node script/qa/chopd_mobile_menu_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "{\"viewport\":{\"width\":390,\"height\":844},\"consoleErrorItems\":[],\"pageErrorItems\":[],\"educationOpen\":{\"display\":\"flex\",\"expanded\":\"true\"},\"educationClosed\":{\"display\":\"none\",\"expanded\":\"false\"},\"worksSameDocument\":true,\"worksOpen\":{\"display\":\"flex\",\"expanded\":\"true\"},\"consoleErrors\":0,\"pageErrors\":0}\nSUMMARY pass=true"
+            }
+          ]
+        }
       },
       "spawn_rules": [],
       "started_at": "2026-11-25T03:23:19Z",
@@ -10045,7 +10082,7 @@
       "id": "ISS-569",
       "title": "[Plan:품질평가] ISS-558 품질 점수 산출",
       "type": "SCORE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "eval-harness",
       "depth": 3,
@@ -10069,17 +10106,68 @@
           }
         ],
         "approved_at": "2026-11-25T03:21:16.541Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "acceptance_criteria": [
+          "ISS-558(바닥글 변경) 검증 근거(테스트·대비 점검)를 다시 돌려 통과를 확인한다",
+          "품질 점수와 영역별 점수, 근거 명령을 남긴다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "직전 수정의 검증 단계 — 읽기 위주 검사라 다른 세션 편집 파일(문의함)과 겹치지 않음",
+          "risk": "T0 — 코드 변경 없음(결함 발견 시 별도 카드)",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:36:26Z"
+        }
       },
-      "result": null,
+      "result": {
+        "score": 86,
+        "prev_score": 86,
+        "breakdown": {
+          "quality": 90,
+          "coverage": 84,
+          "performance": 85,
+          "docs": 85
+        },
+        "criteria_check": [
+          {
+            "criterion": "ISS-558(바닥글 ISS-532 변경) 검증 근거(테스트·대비 점검)를 다시 돌려 통과를 확인한다",
+            "met": true,
+            "how": "/works,/education 바닥글: 통합 테스트 18 runs 0 failures, footer_readability_check 6화면 최소대비 5.30 pass, layout_check /education·/works 1280·390·320 가로스크롤·잘림·콘솔오류 0"
+          },
+          {
+            "criterion": "품질 점수와 영역별 점수, 근거 명령을 남긴다",
+            "met": true,
+            "how": "breakdown·proof 기록. 감점: 대비·위계 검사가 인라인 스타일 정적 파싱이라 클래스 기반 변경엔 브라우저 점검 의존(coverage), 문서화 보통"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_header_links_test.rb test/integration/education_filter_test.rb test/integration/public_pages_test.rb test/integration/chopd_footer_hierarchy_test.rb",
+            "exit_code": 0,
+            "output": "18 runs, 324 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "node script/qa/footer_readability_check.cjs",
+            "exit_code": 0,
+            "output": "minContrast 5.30 (6 results) SUMMARY pass=true"
+          },
+          {
+            "cmd": "ROUTES=/education,/works WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "hScroll false, clipped 0, consoleErrors 0 ... SUMMARY pass=true"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:21:16.541Z"
+      "updated_at": "2026-11-25T03:36:26Z",
+      "completed_at": "2026-11-25T12:44:16.275721"
     },
     {
       "id": "ISS-570",
       "title": "[Plan:품질평가] ISS-563 품질 점수 산출",
       "type": "SCORE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "eval-harness",
       "depth": 3,
@@ -10103,11 +10191,62 @@
           }
         ],
         "approved_at": "2026-11-25T03:21:16.541Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "acceptance_criteria": [
+          "ISS-563(교육·레이아웃·바닥글 변경) 검증 근거를 다시 돌려 통과를 확인한다",
+          "품질 점수와 영역별 점수, 근거 명령을 남긴다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "직전 수정의 검증 단계 — 읽기 위주 검사라 다른 세션 편집 파일(문의함)과 겹치지 않음",
+          "risk": "T0 — 코드 변경 없음(결함 발견 시 별도 카드)",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:36:26Z"
+        }
       },
-      "result": null,
+      "result": {
+        "score": 87,
+        "prev_score": 86,
+        "breakdown": {
+          "quality": 90,
+          "coverage": 86,
+          "performance": 85,
+          "docs": 85
+        },
+        "criteria_check": [
+          {
+            "criterion": "ISS-563(교육·레이아웃·바닥글 ISS-551 변경) 검증 근거(테스트·대비 점검)를 다시 돌려 통과를 확인한다",
+            "met": true,
+            "how": "/education 레이아웃·바닥글: 통합 테스트 18 runs 0 failures, footer_readability_check 6화면 최소대비 5.30 pass, layout_check /education·/works 1280·390·320 가로스크롤·잘림·콘솔오류 0"
+          },
+          {
+            "criterion": "품질 점수와 영역별 점수, 근거 명령을 남긴다",
+            "met": true,
+            "how": "breakdown·proof 기록. 감점: 대비·위계 검사가 인라인 스타일 정적 파싱이라 클래스 기반 변경엔 브라우저 점검 의존(coverage), 문서화 보통"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_header_links_test.rb test/integration/education_filter_test.rb test/integration/public_pages_test.rb test/integration/chopd_footer_hierarchy_test.rb",
+            "exit_code": 0,
+            "output": "18 runs, 324 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "node script/qa/footer_readability_check.cjs",
+            "exit_code": 0,
+            "output": "minContrast 5.30 (6 results) SUMMARY pass=true"
+          },
+          {
+            "cmd": "ROUTES=/education,/works WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "hScroll false, clipped 0, consoleErrors 0 ... SUMMARY pass=true"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:21:16.541Z"
+      "updated_at": "2026-11-25T03:36:26Z",
+      "completed_at": "2026-11-25T12:44:16.383506"
     },
     {
       "id": "ISS-571",
@@ -10164,7 +10303,7 @@
       "id": "ISS-572",
       "title": "[Plan:테스트] ISS-557 변경사항 검증",
       "type": "RUN_TESTS",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "test-harness",
       "depth": 2,
@@ -10187,11 +10326,61 @@
           }
         ],
         "approved_at": "2026-11-25T03:25:28.924Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "acceptance_criteria": [
+          "헤더 '소개' 링크가 실제 있는 화면(/media/greeting)으로 이어지는 테스트가 통과한다",
+          "390px 모바일 메뉴에서 '소개'를 누르면 메뉴가 닫히고 이동한다(브라우저 점검 통과)",
+          "관련 공개 화면 통합 테스트가 0 실패다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "직전 수정의 검증 단계 — 읽기 위주 검사라 다른 세션 편집 파일(문의함)과 겹치지 않음",
+          "risk": "T0 — 코드 변경 없음(결함 발견 시 별도 카드)",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:36:26Z"
+        }
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "total": 18,
+        "failed_count": 0,
+        "coverage": null,
+        "commit": "fb5f6b7",
+        "criteria_check": [
+          {
+            "criterion": "헤더 '소개' 링크가 실제 있는 화면(/media/greeting)으로 이어지는 테스트가 통과한다",
+            "met": true,
+            "how": "chopd_header_links_test 가 데스크톱·모바일 '소개' href == media_greeting_path 확인, 18 runs 0 failures"
+          },
+          {
+            "criterion": "390px 모바일 메뉴에서 '소개'를 누르면 메뉴가 닫히고 이동한다",
+            "met": true,
+            "how": "chopd_mobile_menu_check.cjs 에 단계 추가(fb5f6b7) — introNav finalPath /media/greeting, menuDisplay none, expanded false, Turbo 같은 문서 전환, 3회 연속 pass"
+          },
+          {
+            "criterion": "관련 공개 화면 통합 테스트가 0 실패다",
+            "met": true,
+            "how": "헤더·교육·공개화면·바닥글 통합 테스트 18 runs 0 failures"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_header_links_test.rb test/integration/education_filter_test.rb test/integration/public_pages_test.rb test/integration/chopd_footer_hierarchy_test.rb",
+            "exit_code": 0,
+            "output": "18 runs, 324 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "node script/qa/chopd_mobile_menu_check.cjs",
+            "exit_code": 0,
+            "output": "\"introNav\":{\"finalPath\":\"/media/greeting\",\"menuDisplay\":\"none\",\"expanded\":\"false\",\"sameDocument\":true} SUMMARY pass=true"
+          }
+        ],
+        "review": "Gemini hydrogen-high 독립 검수 6건 중 2건(전환 직후 너무 일찍 읽음, 빈 상태 렌더 미확인) 반영, 1건 실행으로 틀림 판정, 3건 정적검사 한계로 미반영"
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:25:28.924Z"
+      "updated_at": "2026-11-25T03:36:26Z",
+      "completed_at": "2026-11-25T12:43:58.273523"
     },
     {
       "id": "ISS-573",
@@ -10326,7 +10515,7 @@
       "id": "ISS-577",
       "title": "[Plan:테스트] ISS-552 변경사항 검증",
       "type": "RUN_TESTS",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "test-harness",
       "depth": 2,
@@ -10349,11 +10538,60 @@
           }
         ],
         "approved_at": "2026-11-25T03:27:32.237Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "acceptance_criteria": [
+          "교육 화면 빈 목록 안내 글자 대비가 4.5:1 이상임을 테스트·점검으로 확인한다",
+          "빈 목록일 때 강좌 문의 버튼이 보이고 문의 화면으로 이어진다",
+          "교육 필터 통합 테스트가 0 실패다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "직전 수정의 검증 단계 — 읽기 위주 검사라 다른 세션 편집 파일(문의함)과 겹치지 않음",
+          "risk": "T0 — 코드 변경 없음(결함 발견 시 별도 카드)",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:36:26Z"
+        }
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "total": 6,
+        "failed_count": 0,
+        "coverage": null,
+        "commit": "5a8844e",
+        "criteria_check": [
+          {
+            "criterion": "교육 화면 빈 목록 안내 글자 대비가 4.5:1 이상임을 테스트·점검으로 확인한다",
+            "met": true,
+            "how": "education_filter_test 에 대비 계산 테스트 추가(5a8844e) — .empty-state rgba(255,255,255,.72) on #0a0e1a 통과; 알파 .3 으로 변조 시 2.6381:1 로 실패해 검출력 확인"
+          },
+          {
+            "criterion": "빈 목록일 때 강좌 문의 버튼이 보이고 문의 화면으로 이어진다",
+            "met": true,
+            "how": "기존 테스트가 .empty-state 안 '원하는 강좌 문의하기' href new_inquiry_path(type: b2b) 확인, 강좌 있으면 숨김도 확인"
+          },
+          {
+            "criterion": "교육 필터 통합 테스트가 0 실패다",
+            "met": true,
+            "how": "education_filter_test 6 runs 0 failures"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "6 runs, 41 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "bin/rubocop test/integration/education_filter_test.rb test/integration/chopd_footer_hierarchy_test.rb",
+            "exit_code": 0,
+            "output": "2 files inspected, no offenses detected"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:27:32.237Z"
+      "updated_at": "2026-11-25T03:36:26Z",
+      "completed_at": "2026-11-25T12:44:05.955059"
     },
     {
       "id": "ISS-578",
@@ -10488,7 +10726,7 @@
       "id": "ISS-582",
       "title": "[Plan:비즈니스검증] chopd-footer-readability 규칙 5개 정적 검증",
       "type": "BIZ_VALIDATE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "biz-validator",
       "depth": 3,
@@ -10555,11 +10793,92 @@
           }
         ],
         "approved_at": "2026-11-25T03:33:59.745Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "acceptance_criteria": [
+          "바닥글 규칙 R1~R5 각각에 대해 코드·테스트·점검 스크립트 근거로 충족 여부를 판정한다",
+          "충족 못 한 규칙이 있으면 수정 카드로 남긴다",
+          "규칙별 판정을 다시 돌릴 수 있는 검사 명령이 1개 이상 있다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "직전 수정의 검증 단계 — 읽기 위주 검사라 다른 세션 편집 파일(문의함)과 겹치지 않음",
+          "risk": "T0 — 코드 변경 없음(결함 발견 시 별도 카드)",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:36:26Z"
+        }
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "coverage": 100,
+        "critical_gaps": 0,
+        "major_gaps": 0,
+        "commit": "85d6161",
+        "rules": [
+          {
+            "id": "R1",
+            "met": true,
+            "how": "footer_readability_check 6화면(/education·/works × 1280·390·320) 최소 대비 5.30:1"
+          },
+          {
+            "id": "R2",
+            "met": true,
+            "how": "chopd_footer_hierarchy_test(85d6161): 목록 링크 알파 .7 > 소제목 .55·하단 .55·저작권 .5, 강조색 링크는 'B2B/B2G 문의하기'(#ff7850) 1개뿐. 링크를 .5 로 변조하면 실패 확인"
+          },
+          {
+            "id": "R3",
+            "met": true,
+            "how": "footer_readability_check wordBreakItems 0 (6화면)"
+          },
+          {
+            "id": "R4",
+            "met": true,
+            "how": "footer_readability_check overflow null, layout_check hScroll false (320 포함)"
+          },
+          {
+            "id": "R5",
+            "met": true,
+            "how": "public_pages_test 'chopd footer keeps inquiry entry' + footer_inquiry_flow 390 linkVisible true → /inquiries/new 200, 콘솔오류 0"
+          }
+        ],
+        "criteria_check": [
+          {
+            "criterion": "바닥글 규칙 R1~R5 각각에 대해 코드·테스트·점검 스크립트 근거로 충족 여부를 판정한다",
+            "met": true,
+            "how": "rules 배열에 규칙별 근거 기록, 5/5 충족"
+          },
+          {
+            "criterion": "충족 못 한 규칙이 있으면 수정 카드로 남긴다",
+            "met": true,
+            "how": "미충족 0건 — 수정 카드 불필요"
+          },
+          {
+            "criterion": "규칙별 판정을 다시 돌릴 수 있는 검사 명령이 1개 이상 있다",
+            "met": true,
+            "how": "proof 의 rails test·node 점검 3종"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_footer_hierarchy_test.rb test/integration/public_pages_test.rb",
+            "exit_code": 0,
+            "output": "0 failures, 0 errors"
+          },
+          {
+            "cmd": "node script/qa/footer_readability_check.cjs",
+            "exit_code": 0,
+            "output": "minContrast 5.30, wordBreakItems [], overflow null SUMMARY pass=true"
+          },
+          {
+            "cmd": "node script/qa/footer_inquiry_flow.cjs",
+            "exit_code": 0,
+            "output": "linkVisible true, finalPath /inquiries/new, status 200, consoleErrors 0 SUMMARY pass=true"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:33:59.745Z"
+      "updated_at": "2026-11-25T03:36:26Z",
+      "completed_at": "2026-11-25T12:44:27.914787"
     },
     {
       "id": "ISS-583",
@@ -10642,6 +10961,137 @@
       "result": null,
       "spawn_rules": [],
       "updated_at": "2026-11-25T03:33:59.745Z"
+    },
+    {
+      "id": "ISS-585",
+      "title": "[Plan:품질평가] ISS-572 품질 점수 산출",
+      "type": "SCORE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "eval-harness",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-572",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:43:58.273523",
+      "payload": {
+        "test_result": {
+          "passed": true,
+          "total": 18,
+          "coverage": null
+        },
+        "source_issue": "ISS-572",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:43:59.109Z",
+            "by": "auto",
+            "reason": "「[Plan:품질평가] ISS-572 품질 점수 산출」(SCORE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:43:59.109Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:43:59.109Z"
+    },
+    {
+      "id": "ISS-586",
+      "title": "[Plan:품질평가] ISS-577 품질 점수 산출",
+      "type": "SCORE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "eval-harness",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-577",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:44:05.955059",
+      "payload": {
+        "test_result": {
+          "passed": true,
+          "total": 6,
+          "coverage": null
+        },
+        "source_issue": "ISS-577",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:44:29.078Z",
+            "by": "auto",
+            "reason": "「[Plan:품질평가] ISS-577 품질 점수 산출」(SCORE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:44:29.078Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:44:29.078Z"
+    },
+    {
+      "id": "ISS-587",
+      "title": "[린트] 회원 대시보드 UX 테스트 122행 배열 대괄호 안 띄어쓰기 2건(RuboCop) — 디자인 루프 8회차 커밋 4eaf265",
+      "type": "STYLE_FIX",
+      "status": "DONE",
+      "priority": "P1",
+      "origin": "factory-ship",
+      "assign_to": "agent-harness",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": null,
+      "depends_on": [],
+      "created_at": "2026-11-25T03:45:07Z",
+      "updated_at": "2026-11-25T03:45:07Z",
+      "payload": {
+        "origin": "factory-ship",
+        "files": [
+          "test/integration/member_admin_dashboard_ux_test.rb"
+        ],
+        "acceptance_criteria": [
+          "bin/rubocop 전체 0건",
+          "member_admin_dashboard_ux_test 통과(동작 변경 없음)"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "회차 끝 전체 린트에서 발견, 출고를 막는 형식 위반 2건. 공백만 고치는 수정",
+          "risk": "T0 — 테스트 파일 공백만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:45:07Z"
+        }
+      },
+      "completed_at": "2026-11-25T12:45:42.135532",
+      "result": {
+        "lint_errors": 0,
+        "type_errors": 0,
+        "commit": "67b76c5",
+        "criteria_check": [
+          {
+            "criterion": "bin/rubocop 전체 0건",
+            "met": true,
+            "how": "462 files inspected, no offenses detected"
+          },
+          {
+            "criterion": "member_admin_dashboard_ux_test 통과(동작 변경 없음)",
+            "met": true,
+            "how": "9 runs 0 failures, 공백만 변경"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rubocop",
+            "exit_code": 0,
+            "output": "462 files inspected, no offenses detected"
+          },
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/member_admin_dashboard_ux_test.rb",
+            "exit_code": 0,
+            "output": "9 runs, 124 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      }
     }
   ],
   "hooks": {
@@ -11109,6 +11559,42 @@
         "issue_type": "BRAND_GUARD",
         "plan_created": 0,
         "timestamp": "2026-11-25T12:33:57.779451"
+      },
+      {
+        "issue_id": "ISS-572",
+        "issue_type": "RUN_TESTS",
+        "plan_created": 1,
+        "timestamp": "2026-11-25T12:43:58.273523"
+      },
+      {
+        "issue_id": "ISS-577",
+        "issue_type": "RUN_TESTS",
+        "plan_created": 1,
+        "timestamp": "2026-11-25T12:44:05.955059"
+      },
+      {
+        "issue_id": "ISS-569",
+        "issue_type": "SCORE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T12:44:16.275721"
+      },
+      {
+        "issue_id": "ISS-570",
+        "issue_type": "SCORE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T12:44:16.383506"
+      },
+      {
+        "issue_id": "ISS-582",
+        "issue_type": "BIZ_VALIDATE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T12:44:27.914787"
+      },
+      {
+        "issue_id": "ISS-587",
+        "issue_type": "STYLE_FIX",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T12:45:42.135532"
       }
     ],
     "on_fail": [],
@@ -15351,8 +15837,8 @@
     ]
   },
   "stats": {
-    "total_issues": 581,
-    "completed": 77,
+    "total_issues": 583,
+    "completed": 83,
     "failed": 0,
     "evolved": 223
   },
@@ -15422,6 +15908,24 @@
       "result": {
         "passed": true,
         "total": 5,
+        "coverage": null
+      }
+    },
+    {
+      "source_issue": "ISS-572",
+      "source_type": "RUN_TESTS",
+      "result": {
+        "passed": true,
+        "total": 18,
+        "coverage": null
+      }
+    },
+    {
+      "source_issue": "ISS-577",
+      "source_type": "RUN_TESTS",
+      "result": {
+        "passed": true,
+        "total": 6,
         "coverage": null
       }
     }
