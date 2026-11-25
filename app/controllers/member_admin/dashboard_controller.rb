@@ -11,6 +11,11 @@ class MemberAdmin::DashboardController < MemberAdmin::BaseController
     @inquiries_count = @member.member_inquiries.count
     @unread_inquiries = @member.member_inquiries.unread.count
     @services_count = @member.member_services.count
+    @faqs_count = @member.member_faqs.count
+    @visible_posts_count = @member.member_posts.published.count
+    @posts_count = @member.member_posts.count
+    @pending_reviews_count = @member.member_reviews.where(status: "new").count
+    @bookings_count = @member.member_bookings.count
     @link_clicks = ShortLink.where(member_id: @member.id).sum(:click_count)
     sns_accounts = @member.sns_accounts.includes(:sns_follower_snapshots)
     follower_counts = sns_accounts.filter_map(&:follower_count)

@@ -1,31 +1,31 @@
-<div class="service-field">
+<div class="impd-field">
   <%= form.label :title, "서비스 이름 (필수)" %>
-  <%= form.text_field :title, required: true, placeholder: "예: 1:1 보장 분석 상담", class: "service-input" %>
+  <%= form.text_field :title, required: true, placeholder: "예: 1:1 보장 분석 상담", class: "impd-input" %>
 </div>
-<div class="service-field">
+<div class="impd-field">
   <%= form.label :description, "설명 (선택)" %>
-  <%= form.text_area :description, rows: 4, placeholder: "어떤 분께, 무엇을 해 드리는지 2~3줄로 적어 주세요.", class: "service-input", style: "resize: vertical;" %>
+  <%= form.text_area :description, rows: 4, placeholder: "어떤 분께, 무엇을 해 드리는지 2~3줄로 적어 주세요.", class: "impd-input" %>
 </div>
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-  <div class="service-field">
+<div class="impd-field-row">
+  <div class="impd-field">
     <%= form.label :price, "가격 (선택)" %>
-    <%= form.text_field :price, placeholder: "예: 50,000원, 무료", class: "service-input" %>
+    <%= form.text_field :price, placeholder: "예: 50,000원, 무료", class: "impd-input" %>
   </div>
-  <div class="service-field">
+  <div class="impd-field">
     <%= form.label :price_label, "가격 단위 (선택)" %>
-    <%= form.text_field :price_label, placeholder: "예: 1회, 한 달", class: "service-input" %>
+    <%= form.text_field :price_label, placeholder: "예: 1회, 한 달", class: "impd-input" %>
   </div>
 </div>
-<div class="service-field">
+<div class="impd-field">
   <%= form.label :cta_label, "신청 버튼에 쓸 말 (선택)" %>
-  <%= form.text_field :cta_label, placeholder: "예: 상담 신청", class: "service-input" %>
+  <%= form.text_field :cta_label, placeholder: "예: 상담 신청", class: "impd-input" %>
 </div>
-<div class="service-field">
+<div class="impd-field">
   <%= form.label :cta_url, "신청 받을 주소 (선택)" %>
-  <%= form.url_field :cta_url, placeholder: "예: https://open.kakao.com/...", class: "service-input" %>
+  <%= form.url_field :cta_url, placeholder: "예: https://open.kakao.com/...", class: "impd-input" %>
 </div>
-<div class="service-field" style="display: flex; align-items: center; gap: 9px;">
-  <%= form.check_box :is_active, style: "width: 16px; height: 16px; accent-color: var(--impd-accent);" %>
-  <%= form.label :is_active, "내 페이지에 보이기", style: "margin: 0; color: var(--impd-ink2);" %>
-</div>
+<label class="impd-check">
+  <%= form.check_box :is_active %>
+  내 페이지에 보이기
+</label>
 <%= form.submit submit_label, class: "impd-btn impd-btn-primary", style: "width: 100%; justify-content: center; margin-top: 20px;" %>

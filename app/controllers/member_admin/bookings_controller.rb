@@ -9,7 +9,7 @@ class MemberAdmin::BookingsController < MemberAdmin::BaseController
     booking = @member.member_bookings.new(booking_params)
 
     if booking.save
-      redirect_to slug_admin_bookings_path(slug: @member.slug), notice: "예약 링크를 등록했습니다."
+      redirect_to slug_admin_bookings_path(slug: @member.slug), notice: "예약 링크를 저장했어요. 내 페이지에 '예약하기' 버튼이 생겨요."
     else
       @bookings = @member.member_bookings.recent
       flash.now[:alert] = booking.errors.full_messages.join(", ")
@@ -19,7 +19,7 @@ class MemberAdmin::BookingsController < MemberAdmin::BaseController
 
   def update
     if @booking.update(booking_params)
-      redirect_to slug_admin_bookings_path(slug: @member.slug), notice: "예약 링크를 수정했습니다."
+      redirect_to slug_admin_bookings_path(slug: @member.slug), notice: "예약 링크를 고쳤어요."
     else
       @bookings = @member.member_bookings.recent
       flash.now[:alert] = @booking.errors.full_messages.join(", ")
@@ -29,7 +29,7 @@ class MemberAdmin::BookingsController < MemberAdmin::BaseController
 
   def destroy
     @booking.destroy!
-    redirect_to slug_admin_bookings_path(slug: @member.slug), notice: "예약 링크를 삭제했습니다."
+    redirect_to slug_admin_bookings_path(slug: @member.slug), notice: "예약 링크를 지웠어요."
   end
 
   private

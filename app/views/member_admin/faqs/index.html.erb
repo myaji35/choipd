@@ -7,9 +7,12 @@
     <p style="margin-top: 12px; color: var(--impd-ink2); font-size: 14px; line-height: 1.7; word-break: keep-all;">
       고객이 자주 묻는 것과 답을 미리 적어 두면, 내 페이지에 보이고 검색에도 더 잘 나와요. 3~5개면 충분해요.
     </p>
+    <% if @faqs.any? %>
+      <a href="#new-faq" class="impd-btn impd-btn-accent impd-jump-new">+ 새 질문 추가</a>
+    <% end %>
   </header>
 
-  <div class="faqs-layout" style="display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 32px; align-items: start;">
+  <div class="faqs-layout<%= ' is-empty' if @faqs.empty? %>" style="display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 32px; align-items: start;">
     <section>
       <div class="impd-section-header">
         <h2 class="impd-display" style="font-size: 24px; flex: 1;">내 질문·답변</h2>
@@ -51,7 +54,7 @@
       <% end %>
     </section>
 
-    <section class="impd-card" style="position: sticky; top: 88px;">
+    <section id="new-faq" class="impd-card" style="position: sticky; top: 88px; scroll-margin-top: 16px;">
       <div class="impd-section-header" style="margin-bottom: 20px;">
         <h2 class="impd-display" style="font-size: 24px;">새 질문 추가</h2>
       </div>
@@ -63,11 +66,8 @@
 </div>
 
 <style>
-  .faq-field { margin-top: 15px; }
-  .faq-field:first-child { margin-top: 0; }
-  .faq-field label { display: block; margin-bottom: 6px; color: var(--impd-muted); font-size: 13px; font-weight: 600; }
-  .faq-input { width: 100%; border: 1px solid var(--impd-rule); background: var(--impd-card); padding: 10px 12px; color: var(--impd-ink); font-family: var(--impd-font-sans); font-size: 14px; line-height: 1.6; }
   @media (max-width: 820px) {
+    .faqs-layout.is-empty > section:last-child { order: -1; }
     .impd-wrap { padding: 28px 20px !important; }
     .faqs-layout { grid-template-columns: 1fr !important; }
     .faqs-layout > section:last-child { position: static !important; }

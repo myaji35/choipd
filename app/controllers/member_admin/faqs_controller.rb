@@ -9,7 +9,7 @@ class MemberAdmin::FaqsController < MemberAdmin::BaseController
     faq = @member.member_faqs.new(faq_params)
 
     if faq.save
-      redirect_to slug_admin_faqs_path(slug: @member.slug), notice: "FAQ를 등록했습니다."
+      redirect_to slug_admin_faqs_path(slug: @member.slug), notice: "질문을 저장했어요. 내 페이지에서 볼 수 있어요."
     else
       @faqs = @member.member_faqs.sorted
       flash.now[:alert] = faq.errors.full_messages.join(", ")
@@ -19,7 +19,7 @@ class MemberAdmin::FaqsController < MemberAdmin::BaseController
 
   def update
     if @faq.update(faq_params)
-      redirect_to slug_admin_faqs_path(slug: @member.slug), notice: "FAQ를 수정했습니다."
+      redirect_to slug_admin_faqs_path(slug: @member.slug), notice: "질문을 고쳤어요."
     else
       @faqs = @member.member_faqs.sorted
       flash.now[:alert] = @faq.errors.full_messages.join(", ")
@@ -29,7 +29,7 @@ class MemberAdmin::FaqsController < MemberAdmin::BaseController
 
   def destroy
     @faq.destroy!
-    redirect_to slug_admin_faqs_path(slug: @member.slug), notice: "FAQ를 삭제했습니다."
+    redirect_to slug_admin_faqs_path(slug: @member.slug), notice: "질문을 지웠어요."
   end
 
   private

@@ -50,6 +50,24 @@
       .impd-btn-accent { background: var(--impd-accent); color: white; }
       .impd-btn-secondary { background: transparent; color: var(--impd-ink); border: 1px solid var(--impd-ink); }
       .impd-card { background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 24px; }
+      .impd-field { margin-top: 16px; }
+      .impd-field:first-child { margin-top: 0; }
+      .impd-field > label, .impd-field-label { display: block; margin-bottom: 6px; color: var(--impd-ink2); font-size: 14px; font-weight: 600; }
+      .impd-input { display: block; width: 100%; min-height: 48px; border: 1px solid var(--impd-rule); border-radius: 0; background: #fff; padding: 11px 12px; color: var(--impd-ink); font-family: var(--impd-font-sans); font-size: 16px; line-height: 1.5; }
+      textarea.impd-input { resize: vertical; }
+      .impd-input::placeholder { color: var(--impd-muted); opacity: .75; }
+      .impd-input:focus { outline: 2px solid var(--impd-accent); outline-offset: 1px; border-color: var(--impd-accent); }
+      .impd-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; align-items: start; }
+      .impd-field-row > .impd-field { min-width: 0; margin-top: 0; }
+      .impd-field-help { margin-top: 6px; font-size: 13px; color: var(--impd-muted); line-height: 1.5; }
+      .impd-check { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 8px; font-size: 14px; color: var(--impd-ink2); cursor: pointer; }
+      .impd-check input[type="checkbox"] { width: 20px; height: 20px; flex-shrink: 0; accent-color: var(--impd-accent); }
+      .impd-jump-new { display: none; }
+      @media (max-width: 820px) {
+        .impd-jump-new { display: flex; width: 100%; justify-content: center; margin-top: 16px; height: 48px; }
+      }
+      html { scroll-behavior: smooth; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
     </style>
     <%= render "shared/feedback_styles" %>
     <%= csrf_meta_tags %>

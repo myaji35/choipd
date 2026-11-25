@@ -32,4 +32,18 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_includes response.body, "보냈어요. 보통 24시간 안에 답장이 와요."
   end
+
+  test "긴 서비스 이름 위에 신청 상태를 표시하고 가격에는 본문 글꼴을 쓴다" do
+    title = "보험설계사 AI 영업 도구 도입 안내"
+    @member.member_services.create!(title: title, price_label: "무료", is_active: 1)
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_response :ok
+    assert_select "#classes span.impd-label-muted + h3", text: title
+    assert_select "#classes span.impd-label-muted", text: "신청 가능"
+    assert_select "#classes p[style*='var(--impd-font-sans)']", text: "무료"
+    assert_not_includes css_select("#classes").to_s, "position: absolute"
+    assert_not_includes css_select("#classes").to_s, "impd-font-mono"
+  end
 end
