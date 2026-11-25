@@ -13,7 +13,8 @@ const routes = process.env.ROUTES === undefined
       name: routePath.replace(/^\/+|\/+$/g, '').replace(/\//g, '-') || 'home',
       path: routePath,
     }));
-const viewports = [{ width: 1280, height: 900 }, { width: 390, height: 844 }];
+const widthItems = (process.env.WIDTHS ?? '1280,390').split(',').map(value => value.trim());
+const widths = widthItems.map(Number);
 
 async function main() {
   if (routes.length === 0) {
@@ -22,6 +23,14 @@ async function main() {
     process.exitCode = 2;
     return;
   }
+
+  if (widthItems.some((value, index) => !/^\d+$/.test(value) || !Number.isSafeInteger(widths[index]) || widths[index] <= 0)) {
+    console.error('WIDTHS 에 쉼표로 구분한 양의 정수 폭을 지정해야 합니다');
+    console.log('SUMMARY pass=false');
+    process.exitCode = 2;
+    return;
+  }
+  const viewports = widths.map(width => ({ width, height: width >= 1024 ? 900 : 844 }));
 
   const { chromium } = require(require.resolve('playwright', { paths: [__dirname] }));
   fs.mkdirSync(outDir, { recursive: true });
@@ -89,9 +98,16 @@ async function main() {
             }
           }
           const pillWrappedItems = [];
+          const pillShortItems = [];
+          let pillMinHeight = null;
           for (const el of document.querySelectorAll('.filter-pill')) {
             const { visibility, display } = getComputedStyle(el);
             if (visibility === 'hidden' || display === 'none' || !el.getClientRects().length) continue;
+            const { width, height } = el.getBoundingClientRect();
+            if (width > 0 && height > 0) {
+              pillMinHeight = pillMinHeight === null ? height : Math.min(pillMinHeight, height);
+              if (height < 32) pillShortItems.push({ text: el.innerText, height });
+            }
             const range = document.createRange();
             range.selectNodeContents(el);
             const lineTops = new Set();
@@ -107,6 +123,8 @@ async function main() {
             scrollWidth, clientWidth, hScroll: scrollWidth > clientWidth, checked, clipped: clippedItems.length, clippedItems,
             footerWrapped: footerWrappedItems.length, footerWrappedItems,
             pillWrapped: pillWrappedItems.length, pillWrappedItems,
+            pillMinHeight: pillMinHeight === null ? null : Math.round(pillMinHeight * 10) / 10,
+            pillShort: pillShortItems.length, pillShortItems,
           };
         });
         const consoleErrors = consoleErrorItems.length;
@@ -116,7 +134,7 @@ async function main() {
           consoleErrors, consoleErrorItems, badResponses, badResponseItems,
         }));
         pass = pass && !result.hScroll && result.clipped === 0 && result.footerWrapped === 0
-          && result.pillWrapped === 0 && consoleErrors === 0 && badResponses === 0;
+          && result.pillWrapped === 0 && result.pillShort === 0 && consoleErrors === 0 && badResponses === 0;
         await page.close();
       }
     }
