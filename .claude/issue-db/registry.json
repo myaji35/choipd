@@ -10482,7 +10482,7 @@
       "id": "ISS-576",
       "title": "[Plan:브라우저QA] ISS-557 콘솔 에러 + 스크린샷 검증",
       "type": "BROWSER_QA",
-      "status": "READY",
+      "status": "IN_PROGRESS",
       "priority": "P1",
       "assign_to": "agent-harness",
       "depth": 2,
@@ -10505,11 +10505,24 @@
           }
         ],
         "approved_at": "2026-11-25T03:25:28.924Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "헤더 '소개'·모바일 메뉴 수정(ISS-557)이 실제 화면에서 콘솔 오류 없이 동작하는지 확인하는 검증 카드",
+          "risk": "T0 — 읽기 전용 검증, 데이터 영향 없음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:48:18Z"
+        },
+        "acceptance_criteria": [
+          "1280·390 주요 화면(/, /media/greeting)에서 콘솔 오류 0개·깨진 요청 0개",
+          "390 모바일 메뉴 '소개'를 누르면 /media/greeting 으로 이동하고 메뉴가 닫힌다",
+          "헤더가 가로 넘침 없이 표시된다(layout_check 통과)"
+        ]
       },
       "result": null,
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:25:28.924Z"
+      "updated_at": "2026-11-25T03:48:18Z"
     },
     {
       "id": "ISS-577",
@@ -10693,7 +10706,7 @@
       "id": "ISS-581",
       "title": "[Plan:브라우저QA] ISS-552 콘솔 에러 + 스크린샷 검증",
       "type": "BROWSER_QA",
-      "status": "READY",
+      "status": "IN_PROGRESS",
       "priority": "P1",
       "assign_to": "agent-harness",
       "depth": 2,
@@ -10716,11 +10729,24 @@
           }
         ],
         "approved_at": "2026-11-25T03:27:32.237Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "교육 빈 강좌 안내·문의 버튼 수정(ISS-552)이 실제 화면에서 오류 없이 보이는지 확인하는 검증 카드",
+          "risk": "T0 — 읽기 전용 검증, 데이터 영향 없음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:48:18Z"
+        },
+        "acceptance_criteria": [
+          "/education 1280·390·320 에서 콘솔 오류 0개·가로 넘침 없음",
+          "빈 강좌 안내 글자 대비 4.5:1 이상, 강좌 문의 버튼이 /inquiries/new 로 이어진다",
+          "관련 자동 테스트가 통과한다"
+        ]
       },
       "result": null,
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:27:32.237Z"
+      "updated_at": "2026-11-25T03:48:18Z"
     },
     {
       "id": "ISS-582",
@@ -10884,7 +10910,7 @@
       "id": "ISS-583",
       "title": "[Plan:시나리오실행] chopd-footer-readability 시나리오 3개 E2E 실행",
       "type": "SCENARIO_PLAY",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "scenario-player",
       "depth": 3,
@@ -10924,11 +10950,76 @@
           }
         ],
         "approved_at": "2026-11-25T03:33:59.745Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "방금 만든 바닥글 가독성 시나리오 3개를 실제 화면에서 돌려 확인하는 검증 카드. 기존 점검 스크립트로 바로 실행 가능",
+          "risk": "T0 — 읽기 전용 검증, 데이터 영향 없음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:48:18Z"
+        },
+        "acceptance_criteria": [
+          "390px /works 바닥글이 단어 단위로 줄바꿈되고 글자 대비가 4.5:1 이상이다",
+          "/education 바닥글 'B2B/B2G 문의하기'를 누르면 /inquiries/new 가 200으로 열리고 콘솔 오류가 0개다",
+          "320px /education 소개 문장에 '강좌로'가 한 단어로 남고 가로 스크롤이 없다"
+        ]
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "scenarios": [
+          {
+            "id": "S1",
+            "result": "PASS"
+          },
+          {
+            "id": "S2",
+            "result": "PASS"
+          },
+          {
+            "id": "S3",
+            "result": "PASS"
+          }
+        ],
+        "fail_count": 0,
+        "criteria_check": [
+          {
+            "criterion": "390px /works 바닥글이 단어 단위로 줄바꿈되고 글자 대비가 4.5:1 이상이다",
+            "met": true,
+            "how": "footer_readability_check: /works 390 minContrast 5.30, wordBreakItems 0, 가로 넘침 없음"
+          },
+          {
+            "criterion": "/education 바닥글 B2B/B2G 문의하기 → /inquiries/new 200, 콘솔 오류 0",
+            "met": true,
+            "how": "footer_inquiry_flow 390: finalPath /inquiries/new status 200 formFound true consoleErrors 0 badResponses 0"
+          },
+          {
+            "criterion": "320px /education 소개 문장 강좌로 유지, 가로 스크롤 없음",
+            "met": true,
+            "how": "playwright 320 측정: 강좌로 세 글자 같은 줄(broken false), scrollWidth 320 = clientWidth 320; footer_readability_check 320 overflow null"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "cd script/qa && node footer_readability_check.cjs",
+            "exit_code": 0,
+            "output": "/works 390 minContrast 5.30 wordBreakItems [] overflow null consoleErrors 0 … SUMMARY pass=true"
+          },
+          {
+            "cmd": "cd script/qa && START=/education WIDTH=390 node footer_inquiry_flow.cjs",
+            "exit_code": 0,
+            "output": "finalPath /inquiries/new status 200 formFound true consoleErrors 0 badResponses 0 SUMMARY pass=true"
+          },
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_footer_hierarchy_test.rb test/integration/chopd_header_links_test.rb test/integration/pd_layout_mobile_menu_test.rb test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "10 runs, 197 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:33:59.745Z"
+      "updated_at": "2026-11-25T03:48:18Z",
+      "completed_at": "2026-11-25T12:55:56.308665"
     },
     {
       "id": "ISS-584",
@@ -10966,7 +11057,7 @@
       "id": "ISS-585",
       "title": "[Plan:품질평가] ISS-572 품질 점수 산출",
       "type": "SCORE",
-      "status": "READY",
+      "status": "IN_PROGRESS",
       "priority": "P1",
       "assign_to": "eval-harness",
       "depth": 3,
@@ -10990,17 +11081,29 @@
           }
         ],
         "approved_at": "2026-11-25T03:43:59.109Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-572 모바일 메뉴 점검 테스트 추가에 대한 품질 점수 산출. 테스트·린트 결과로 바로 계산 가능",
+          "risk": "T0 — 읽기 전용 검증, 데이터 영향 없음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:48:18Z"
+        },
+        "acceptance_criteria": [
+          "관련 테스트와 RuboCop 결과를 직접 다시 돌려 점수 근거로 남긴다",
+          "품질·커버리지·성능·문서 4개 영역 점수와 총점을 남긴다"
+        ]
       },
       "result": null,
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:43:59.109Z"
+      "updated_at": "2026-11-25T03:48:18Z"
     },
     {
       "id": "ISS-586",
       "title": "[Plan:품질평가] ISS-577 품질 점수 산출",
       "type": "SCORE",
-      "status": "READY",
+      "status": "IN_PROGRESS",
       "priority": "P1",
       "assign_to": "eval-harness",
       "depth": 3,
@@ -11024,11 +11127,23 @@
           }
         ],
         "approved_at": "2026-11-25T03:44:29.078Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-577 빈 강좌 대비 검사 추가에 대한 품질 점수 산출. 테스트·린트 결과로 바로 계산 가능",
+          "risk": "T0 — 읽기 전용 검증, 데이터 영향 없음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:48:18Z"
+        },
+        "acceptance_criteria": [
+          "관련 테스트와 RuboCop 결과를 직접 다시 돌려 점수 근거로 남긴다",
+          "품질·커버리지·성능·문서 4개 영역 점수와 총점을 남긴다"
+        ]
       },
       "result": null,
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:44:29.078Z"
+      "updated_at": "2026-11-25T03:48:18Z"
     },
     {
       "id": "ISS-587",
@@ -11621,6 +11736,12 @@
         "issue_type": "STYLE_FIX",
         "plan_created": 0,
         "timestamp": "2026-11-25T12:45:42.135532"
+      },
+      {
+        "issue_id": "ISS-583",
+        "issue_type": "SCENARIO_PLAY",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T12:55:56.308665"
       }
     ],
     "on_fail": [],
@@ -15864,7 +15985,7 @@
   },
   "stats": {
     "total_issues": 583,
-    "completed": 83,
+    "completed": 84,
     "failed": 0,
     "evolved": 223
   },
