@@ -14321,7 +14321,7 @@
       "id": "ISS-608",
       "title": "[Plan:비즈니스검증] chopd 발행인 인사말(/media/greeting) 규칙 5개 정적 검증",
       "type": "BIZ_VALIDATE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "biz-validator",
       "depth": 3,
@@ -14361,17 +14361,82 @@
         "acceptance_criteria": [
           "규칙 5개마다 그것을 확인하는 테스트·점검 스크립트가 있는지 표로 남긴다",
           "덮지 못한 규칙이 있으면 테스트를 추가하거나 수정 카드를 만든다"
+        ],
+        "branch": "factory/ISS-608-609 (worktree, main 에 cherry-pick)"
+      },
+      "result": {
+        "commit": "03e5c3d",
+        "files_changed": [
+          "test/integration/chopd_greeting_readability_test.rb"
+        ],
+        "rule_coverage": [
+          {
+            "rule": "헤더 '소개' → /media/greeting",
+            "covered_by": "test/integration/chopd_header_links_test.rb (데스크톱·모바일 메뉴 소개 링크 href = media_greeting_path)",
+            "status": "덮임"
+          },
+          {
+            "rule": "비로그인 공개·읽기 전용",
+            "covered_by": "test/integration/chopd_greeting_readability_test.rb 'publisher greeting is public and read-only' (이번에 추가: 비로그인 200, main 안 form·input·textarea·select·submit·data-method 링크 0)",
+            "status": "빈칸 → 테스트 추가"
+          },
+          {
+            "rule": "이름·직함·인사말·서명 대비 4.5:1 이상",
+            "covered_by": "script/qa/greeting_readability_check.cjs (1280·390·320 최소 대비 10.9:1) + 통합 테스트(옅은 글자 클래스 0, 이름·인사·서명 문구 존재)",
+            "status": "덮임"
+          },
+          {
+            "rule": "이동 경로가 헤더와 겹치지 않음",
+            "covered_by": "script/qa/greeting_readability_check.cjs noHeaderOverlap (breadcrumbTop 112/88 > headerBottom 81.5/80)",
+            "status": "덮임"
+          },
+          {
+            "rule": "아이콘은 LineIcons 만",
+            "covered_by": "chopd_greeting_readability_test (main svg 0, lni-user-4) + chopd_header_icons_test (헤더 svg 0)",
+            "status": "덮임"
+          }
+        ],
+        "gaps_found": 1,
+        "gaps_fixed": 1,
+        "criteria_check": [
+          {
+            "criterion": "규칙 5개마다 확인하는 테스트·점검 스크립트를 표로 남긴다",
+            "met": true,
+            "how": "result.rule_coverage 5행"
+          },
+          {
+            "criterion": "덮지 못한 규칙이 있으면 테스트를 추가하거나 수정 카드를 만든다",
+            "met": true,
+            "how": "규칙 2(읽기 전용) 빈칸 → 통합 테스트 추가, 커밋 03e5c3d"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_greeting_readability_test.rb test/integration/chopd_header_links_test.rb",
+            "exit_code": 0,
+            "output": "3 runs, 35 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "node script/qa/greeting_readability_check.cjs",
+            "exit_code": 0,
+            "output": "\"pass\": true — 1280/390/320 minContrast 10.9, noHeaderOverlap true"
+          },
+          {
+            "cmd": "bin/rubocop test/integration/chopd_greeting_readability_test.rb",
+            "exit_code": 0,
+            "output": "1 file inspected, no offenses detected"
+          }
         ]
       },
-      "result": null,
       "spawn_rules": [],
-      "updated_at": "2026-11-25T05:01:09.596Z"
+      "updated_at": "2026-11-25T05:05:32Z",
+      "completed_at": "2026-11-25T14:06:35.761262"
     },
     {
       "id": "ISS-609",
       "title": "[Plan:UX수정] UX 이슈 3건 수정",
       "type": "UX_FIX",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "agent-harness",
       "depth": 3,
@@ -14416,11 +14481,83 @@
           "layout_check·greeting_readability_check(1280·390·320) 통과, 버튼 아이콘은 LineIcons",
           "버튼 존재·링크를 확인하는 테스트가 있다"
         ],
-        "priority_reason": "엔진 기본 P1 유지 — 첫 방문자 소개 화면의 다음 행동 부재"
+        "priority_reason": "엔진 기본 P1 유지 — 첫 방문자 소개 화면의 다음 행동 부재",
+        "branch": "factory/ISS-608-609 (worktree, main 에 cherry-pick)"
       },
-      "result": null,
+      "result": {
+        "commit": "fdfa9e5",
+        "files_changed": [
+          "app/views/chopd/media/greeting.html.erb",
+          "test/integration/chopd_greeting_readability_test.rb"
+        ],
+        "measurements": {
+          "1280": {
+            "crumb_left": 272,
+            "body_left": 272,
+            "h1_to_profile_gap": "약 100px → 48px",
+            "first_sentence_in_first_screen": true
+          },
+          "390": {
+            "buttons": "서명 아래 세로 2개 358×48"
+          },
+          "320": {
+            "buttons": "서명 아래 세로 2개 288×48"
+          },
+          "min_contrast": 5.8
+        },
+        "criteria_check": [
+          {
+            "criterion": "390·320 에서 서명 아래 '교육 과정 보기'(주)·'강좌 문의'(보조)가 보이고 교육 목록·문의 양식으로 이동",
+            "met": true,
+            "how": "playwright 측정: 390·320 버튼 2개 href /education, /inquiries/new, 높이 48. 스크린샷 확인(주황 채움 / 테두리만)"
+          },
+          {
+            "criterion": "1280 제목 영역 왼쪽 끝이 본문과 줄이 맞는다",
+            "met": true,
+            "how": "이동 경로·제목·본문 left 모두 272px (이전 제목 16px)"
+          },
+          {
+            "criterion": "1280 첫 화면에 인사말 첫 문장이 보인다",
+            "met": true,
+            "how": "첫 문장 하단 389px < 화면 844px, 제목~프로필 간격 48px"
+          },
+          {
+            "criterion": "layout_check·greeting_readability_check 통과, 버튼 아이콘 LineIcons",
+            "met": true,
+            "how": "둘 다 pass=true(최소 대비 5.8:1), 아이콘 ::before font-family Lineicons"
+          },
+          {
+            "criterion": "버튼 존재·링크 테스트",
+            "met": true,
+            "how": "chopd_greeting_readability_test 'publisher greeting ends with next-step links'"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_greeting_readability_test.rb test/integration/chopd_header_links_test.rb test/integration/chopd_header_icons_test.rb",
+            "exit_code": 0,
+            "output": "6 runs, 51 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "node script/qa/greeting_readability_check.cjs",
+            "exit_code": 0,
+            "output": "\"pass\": true (1280/390/320, minContrast 5.8, noHeaderOverlap true)"
+          },
+          {
+            "cmd": "ROUTES=/media/greeting WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "SUMMARY pass=true"
+          },
+          {
+            "cmd": "bin/rubocop test/integration/chopd_greeting_readability_test.rb",
+            "exit_code": 0,
+            "output": "1 file inspected, no offenses detected"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T05:02:33.626Z"
+      "updated_at": "2026-11-25T05:05:32Z",
+      "completed_at": "2026-11-25T14:10:54.525233"
     }
   ],
   "hooks": {
@@ -15152,6 +15289,18 @@
         "issue_type": "DESIGN_FIX",
         "plan_created": 0,
         "timestamp": "2026-11-25T14:05:06.707168"
+      },
+      {
+        "issue_id": "ISS-608",
+        "issue_type": "BIZ_VALIDATE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T14:06:35.761262"
+      },
+      {
+        "issue_id": "ISS-609",
+        "issue_type": "UX_FIX",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T14:10:54.525233"
       }
     ],
     "on_fail": [],
@@ -19401,7 +19550,7 @@
   },
   "stats": {
     "total_issues": 609,
-    "completed": 121,
+    "completed": 123,
     "failed": 0,
     "evolved": 223
   },
