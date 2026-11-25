@@ -5,7 +5,7 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
 
   setup do
     @pd = AdminUser.create!(email: "pd-members@example.test", password: "password123", role: "pd")
-    @member = Member.create!(name: "대행 등록 회원", email: "pd-member@example.test", slug: "pd-member")
+    @member = Member.create!(name: "대행 등록 회원", email: "pd-member@example.test", slug: "pd-member", status: "approved")
   end
 
   test "로그인이 필요하다" do
@@ -179,7 +179,10 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
       ].join("
 "), elements.first.text
     end
-    assert_select "#channels button[type=button]", text: "안내 복사"
+    assert_select "#channels [data-controller='clipboard-copy'] textarea#consent-request-text[data-clipboard-copy-target='source']"
+    assert_select "#channels button[type=button][data-action='clipboard-copy#copy']", text: "안내 복사"
+    assert_select "#channels [role=status][data-clipboard-copy-target='status']"
+    assert_select "#channels button[onclick]", count: 0
     assert_select "#accounts a[href=?]", slug_admin_dashboard_path(slug: @member.slug, anchor: "profile-accounts-status"), text: "회원 화면에서 보기"
     [waiting, consented].each do |channel|
       assert_select "#channels a[href=?]", slug_admin_channels_path(slug: @member.slug, anchor: "channel-#{channel.id}"), text: "회원 화면에서 보기"
@@ -190,6 +193,41 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     waiting.update!(delegation_consent_at: Time.current)
     get pd_member_path(@member)
     assert_select "#consent-request-text", count: 0
+  end
+
+  test "로그인할 수 없는 회원은 목록과 상세에서 상태를 알려 준다" do
+    pending = Member.create!(name: "승인 대기 회원", email: "pd-pending@example.test", slug: "pd-pending", status: "pending_approval")
+    pending.ensure_personal_brand!.brand_channels.create!(platform: "naver_blog")
+    Member.create!(name: "정지 회원", email: "pd-suspended@example.test", slug: "pd-suspended", status: "suspended")
+    Member.create!(name: "거부 회원", email: "pd-rejected@example.test", slug: "pd-rejected", status: "rejected")
+    Member.create!(name: "탈퇴 회원", email: "pd-withdrawn@example.test", slug: "pd-withdrawn", status: "approved", withdrawn_at: Time.current)
+    sign_in @pd
+
+    get pd_members_path
+    assert_response :ok
+    assert_select "li", text: /#{pending.name}/ do
+      assert_select "span", text: "승인 대기 · 로그인 불가"
+    end
+    assert_select "li", text: /#{@member.name}/ do
+      assert_select "span", text: /로그인 불가/, count: 0
+    end
+    %w[정지 거부 탈퇴].each do |status|
+      assert_select "span", text: "#{status} · 로그인 불가"
+    end
+
+    get pd_member_path(pending)
+    assert_response :ok
+    assert_select "header [role=note] h2", text: "이 회원은 지금 로그인할 수 없습니다 (승인 대기)"
+    assert_select "header [role=note] p", text: "승인·정지 해제는 운영자에게 요청해 주세요."
+    assert_select "#channels h3", text: "위탁 동의 대기 1개"
+    assert_select "#consent-request-text, #channels [data-controller='clipboard-copy']", count: 0
+    assert_select "#channels p", text: "회원이 로그인할 수 있게 된 뒤에 동의 안내를 보낼 수 있습니다."
+    assert_select "a[href^='/admin']", count: 0
+
+    sign_in AdminUser.create!(email: "pending-member-admin@example.test", password: "password123", role: "admin")
+    get pd_member_path(pending)
+    assert_response :ok
+    assert_select "a[href=?]", admin_member_path(pending), text: "운영자 회원 상세에서 상태 바꾸기"
   end
 
   test "이름이나 로그인 아이디가 맞는 미연결 계정만 바로 보여 준다" do

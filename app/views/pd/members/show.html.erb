@@ -19,6 +19,17 @@
       <%= link_to "회원 화면에서 확인", slug_admin_dashboard_path(slug: @member.slug), class: "inline-flex items-center bg-primary text-white px-4 py-2 rounded-lg text-sm", style: link_height %>
     <% end %>
   </div>
+  <% unless @member.can_sign_in? %>
+    <div class="mt-3 rounded-lg border border-gray-400 p-4 text-sm" role="note">
+      <h2 class="font-semibold text-navy">이 회원은 지금 로그인할 수 없습니다 (<%= member_login_status_label(@member) %>)</h2>
+      <p class="mt-2 text-gray-700">등록은 해 둘 수 있지만, 회원이 로그인해야 운영 위탁에 동의할 수 있습니다.</p>
+      <% if current_admin_user.admin? %>
+        <%= link_to "운영자 회원 상세에서 상태 바꾸기", admin_member_path(@member), class: row_link_class, style: link_height %>
+      <% else %>
+        <p class="mt-2 text-gray-700">승인·정지 해제는 운영자에게 요청해 주세요.</p>
+      <% end %>
+    </div>
+  <% end %>
 </header>
 
 <section id="accounts" class="mb-6 rounded-lg border border-gray-100 bg-white p-4 shadow-sm">
@@ -86,7 +97,12 @@
   <p class="mt-2 text-sm text-gray-600">등록하면 회원 대시보드 '내 채널 운영 현황'과 '내 채널'에 바로 보입니다.</p>
   <% waiting_channels = @channels_by_platform.values.flatten.reject(&:delegated?) %>
   <% if waiting_channels.any? %>
-    <% if @member.slug.present? %>
+    <% if !@member.can_sign_in? %>
+      <div class="mt-3 rounded-lg border border-gray-300 p-4 text-sm">
+        <h3 class="font-semibold text-navy">위탁 동의 대기 <%= waiting_channels.size %>개</h3>
+        <p class="mt-2 text-gray-600">회원이 로그인할 수 있게 된 뒤에 동의 안내를 보낼 수 있습니다.</p>
+      </div>
+    <% elsif @member.slug.present? %>
       <% waiting_labels = Pd::MembersController::CHANNEL_PLATFORMS.values_at(*waiting_channels.map(&:platform).uniq).join("·") %>
       <% consent_request = <<~TEXT
         #{@member.name}님, imPD 운영팀입니다.
@@ -96,14 +112,16 @@
         #{slug_admin_channels_url(slug: @member.slug)}
       TEXT
       %>
-      <div class="mt-3 rounded-lg border border-gray-300 p-4 text-sm">
+      <div class="mt-3 rounded-lg border border-gray-300 p-4 text-sm" data-controller="clipboard-copy">
         <h3 class="font-semibold text-navy">위탁 동의 대기 <%= waiting_channels.size %>개 — 회원에게 알려 주세요</h3>
         <p class="mt-2 text-gray-600">동의는 회원 본인만 할 수 있습니다. 아래 안내를 복사해 문자·카카오톡으로 보내 주세요.</p>
         <label for="consent-request-text" class="mt-3 block font-medium text-navy">회원에게 보낼 안내</label>
         <%= text_area_tag "consent-request-text", consent_request.chomp, readonly: true, rows: 5,
+            data: { clipboard_copy_target: "source" },
             class: "mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" %>
         <button type="button" class="mt-2 rounded-lg border border-gray-300 px-4 py-2 text-primary cursor-pointer" style="<%= link_height %>"
-                onclick="navigator.clipboard.writeText(document.getElementById('consent-request-text').value).then(() => { clearTimeout(this.copyTimer); this.textContent = '복사했습니다'; this.copyTimer = setTimeout(() => { this.textContent = '안내 복사' }, 2000) })">안내 복사</button>
+                data-action="clipboard-copy#copy" data-clipboard-copy-target="button">안내 복사</button>
+        <p class="mt-2 text-sm text-gray-700" role="status" aria-live="polite" data-clipboard-copy-target="status"></p>
       </div>
     <% else %>
       <p class="mt-2 text-sm text-gray-600">회원 주소(슬러그)가 없어 안내 주소를 만들 수 없습니다.</p>

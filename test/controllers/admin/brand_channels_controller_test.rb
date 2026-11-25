@@ -34,6 +34,7 @@ class Admin::BrandChannelsControllerTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_select ".bg-red-100.text-red-700", text: "로그인 필요"
+    assert_select "tr td", text: "동의 대기"
 
     get edit_admin_brand_brand_channel_path(@brand, channel)
     assert_response :success
@@ -47,6 +48,52 @@ class Admin::BrandChannelsControllerTest < ActionDispatch::IntegrationTest
 
     assert_difference("BrandChannel.count", -1) { delete admin_brand_brand_channel_path(@brand, channel) }
     assert_response :see_other
+  end
+
+  test "채널 폼은 기본 칸을 먼저 보여 주고 연결 설정은 접어 둔다" do
+    sign_in @admin
+
+    get new_admin_brand_brand_channel_path(@brand)
+    assert_response :success
+    assert_select "a[href=?]", admin_brand_path(@brand), text: /채널 목록/
+    assert_select "label", text: "계정 이름(핸들)"
+    assert_select "details:not([open]) input[name='brand_channel[credential_ref]']"
+    assert_select "details summary", text: /연결 설정/
+
+    post admin_brand_brand_channels_path(@brand), params: {
+      brand_channel: { platform: "naver_blog", connection_method: "" }
+    }
+    assert_redirected_to admin_brand_path(@brand)
+    channel = @brand.brand_channels.sole
+    assert_equal "ego_session", channel.connection_method
+
+    get edit_admin_brand_brand_channel_path(@brand, channel)
+    assert_response :success
+    assert_select "details[open] input[name='brand_channel[credential_ref]']"
+
+    post admin_brand_brand_channels_path(@brand), params: {
+      brand_channel: { platform: "other", credential_ref: "invalid label" }
+    }
+    assert_response :unprocessable_entity
+    assert_select "details[open] input[name='brand_channel[credential_ref]'][value='invalid label']"
+  end
+
+  test "회원 브랜드에서는 대행 등록 화면으로 가는 링크를 보여 준다" do
+    sign_in @admin
+    member = Member.create!(name: "브랜드 회원", email: "brand-member@example.test", slug: "brand-member")
+    brand = member.ensure_personal_brand!
+    link_text = "이 회원 계정·채널 대행 등록"
+
+    [admin_brand_path(brand), new_admin_brand_brand_channel_path(brand)].each do |path|
+      get path
+      assert_response :success
+      assert_select "a[href=?]", pd_member_path(member), text: link_text
+    end
+    [admin_brand_path(@brand), new_admin_brand_brand_channel_path(@brand)].each do |path|
+      get path
+      assert_response :success
+      assert_select "a", text: link_text, count: 0
+    end
   end
 
   test "rejects a channel under the wrong brand" do

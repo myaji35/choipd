@@ -1,6 +1,18 @@
 <% content_for :title, title %>
-<h1 class="text-2xl font-bold text-navy mb-4"><%= title %></h1>
-<p class="text-sm text-gray-500 mb-4"><%= @brand.name %></p>
+<% member = @brand.member %>
+<% control_height = "min-height: 44px;" %>
+
+<%= link_to "← #{@brand.name} 채널 목록", admin_brand_path(@brand), class: "inline-flex items-center text-sm text-primary", style: control_height %>
+<h1 class="text-2xl font-bold text-navy mb-2"><%= title %></h1>
+<div class="mb-4 flex flex-wrap items-center gap-x-3 text-sm">
+  <p class="break-words text-gray-500"><%= @brand.name %><%= " · 회원 #{member.name}" if member %></p>
+  <% if member %>
+    <%= link_to "이 회원 계정·채널 대행 등록", pd_member_path(member), class: "inline-flex items-center text-primary", style: control_height %>
+  <% end %>
+</div>
+<% if @brand_channel.new_record? && member %>
+  <p class="mb-4 text-sm text-gray-600">네이버 블로그·페이스북·인스타그램은 '이 회원 계정·채널 대행 등록'에서 4칸만 채워 등록할 수 있어요. 여기서는 그 밖의 채널이나 연결 설정까지 한 번에 넣을 때 씁니다.</p>
+<% end %>
 
 <%= form_with model: [:admin, @brand, @brand_channel], class: "bg-white rounded-lg border border-gray-200 p-4 space-y-4" do |f| %>
   <% if @brand_channel.errors.any? %>
@@ -11,63 +23,76 @@
     </ul>
   <% end %>
 
-  <% input_class = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
-  <div>
-    <%= f.label :platform, "채널 종류" %>
-    <%= f.select :platform, BrandChannel::PLATFORMS.invert.to_a, { include_blank: "선택해 주세요" }, class: input_class, required: true %>
+  <% label_class = "mb-1 block text-sm font-medium text-gray-700" %>
+  <% input_class = "block w-full min-w-0 max-w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+  <div class="grid gap-4 md:grid-cols-2">
+    <div>
+      <%= f.label :platform, "채널 종류", class: label_class %>
+      <%= f.select :platform, BrandChannel::PLATFORMS.invert.to_a, { include_blank: "선택해 주세요" }, class: input_class, style: control_height, required: true %>
+    </div>
+    <div>
+      <%= f.label :account_handle, "계정 이름(핸들)", class: label_class %>
+      <%= f.text_field :account_handle, class: input_class, style: control_height, aria: { describedby: "channel-handle-help" } %>
+      <p id="channel-handle-help" class="mt-1 text-xs text-gray-500">예: 블로그 아이디, 인스타그램 @ 뒤 이름</p>
+    </div>
+    <div>
+      <%= f.label :profile_url, "채널 주소", class: label_class %>
+      <%= f.url_field :profile_url, placeholder: "https://", class: input_class, style: control_height %>
+    </div>
+    <div>
+      <%= f.label :notes, "메모", class: label_class %>
+      <%= f.text_area :notes, rows: 3, class: input_class, style: control_height, aria: { describedby: "channel-notes-help" } %>
+      <p id="channel-notes-help" class="mt-1 text-xs text-gray-500">비밀번호는 여기에 적지 마세요.</p>
+    </div>
   </div>
-  <div>
-    <%= f.label :account_handle, "계정 핸들" %>
-    <%= f.text_field :account_handle, class: input_class %>
-  </div>
-  <div>
-    <%= f.label :profile_url, "채널 주소" %>
-    <%= f.url_field :profile_url, class: input_class %>
-  </div>
-  <div>
-    <%= f.label :connection_method, "연결 방식" %>
-    <%= f.select :connection_method, BrandChannel::CONNECTION_METHODS.invert.to_a,
-        { include_blank: @brand_channel.new_record? ? "채널별 기본값" : false }, class: input_class %>
-  </div>
-  <div>
-    <%= f.label :credential_ref, "보관 위치 이름표" %>
-    <%= f.text_field :credential_ref, maxlength: 64, pattern: "[A-Za-z0-9_.\\-]+", autocomplete: "off", class: input_class %>
-    <p class="text-xs text-gray-500 mt-1">키체인 항목의 이름만 입력해 주세요. 예시 impd-brand-<%= @brand.id %>-naver_blog</p>
-  </div>
-  <div>
-    <%= f.label :ego_server_name, "Ego 서버 이름" %>
-    <%= f.text_field :ego_server_name, maxlength: 64, pattern: "[A-Za-z0-9_.\\-]+", class: input_class %>
-  </div>
-  <div>
-    <%= f.label :sns_account_id, "연결할 SNS 계정 ID" %>
-    <%= f.number_field :sns_account_id, min: 1, class: input_class %>
-  </div>
-  <div>
-    <%= f.label :profile_account_id, "연결할 인물정보 계정 ID" %>
-    <%= f.number_field :profile_account_id, min: 1, class: input_class %>
-  </div>
-  <div>
-    <%= f.label :session_status, "연결 상태" %>
-    <%= f.select :session_status, BrandChannel::SESSION_STATUSES.invert.to_a, {}, class: input_class %>
-  </div>
-  <div>
-    <%= f.label :last_checked_at, "마지막 점검 시각" %>
-    <%= f.datetime_local_field :last_checked_at, class: input_class %>
-  </div>
-  <div>
-    <%= f.label :last_error, "마지막 오류" %>
-    <%= f.text_area :last_error, rows: 2, class: input_class %>
-  </div>
-  <div>
-    <%= f.label :posting_cadence, "게시 주기" %>
-    <%= f.text_field :posting_cadence, class: input_class %>
-  </div>
-  <div>
-    <%= f.label :notes, "메모" %>
-    <%= f.text_area :notes, rows: 3, class: input_class %>
-  </div>
+
+  <% connection_error_fields = %i[connection_method credential_ref ego_server_name sns_account_id sns_account profile_account_id profile_account session_status last_checked_at last_error posting_cadence] %>
+  <%= tag.details(open: @brand_channel.persisted? || connection_error_fields.any? { |field| @brand_channel.errors.include?(field) }) do %>
+    <summary class="cursor-pointer py-3 text-sm font-medium text-gray-700" style="<%= control_height %>">연결 설정 (점검·자동 게시용 — 비워 둬도 등록됩니다)</summary>
+    <div class="mt-2 space-y-4">
+      <div>
+        <%= f.label :connection_method, "연결 방식", class: label_class %>
+        <%= f.select :connection_method, BrandChannel::CONNECTION_METHODS.invert.to_a,
+            { include_blank: @brand_channel.new_record? ? "채널별 기본값" : false }, class: input_class, style: control_height %>
+      </div>
+      <div>
+        <%= f.label :credential_ref, "보관 위치 이름표", class: label_class %>
+        <%= f.text_field :credential_ref, maxlength: 64, pattern: "[A-Za-z0-9_.\\-]+", autocomplete: "off", class: input_class, style: control_height %>
+        <p class="text-xs text-gray-500 mt-1">키체인 항목의 이름만 입력해 주세요. 예시 impd-brand-<%= @brand.id %>-naver_blog</p>
+      </div>
+      <div>
+        <%= f.label :ego_server_name, "Ego 서버 이름", class: label_class %>
+        <%= f.text_field :ego_server_name, maxlength: 64, pattern: "[A-Za-z0-9_.\\-]+", class: input_class, style: control_height %>
+      </div>
+      <div>
+        <%= f.label :sns_account_id, "연결할 SNS 계정 ID", class: label_class %>
+        <%= f.number_field :sns_account_id, min: 1, class: input_class, style: control_height %>
+      </div>
+      <div>
+        <%= f.label :profile_account_id, "연결할 인물정보 계정 ID", class: label_class %>
+        <%= f.number_field :profile_account_id, min: 1, class: input_class, style: control_height %>
+      </div>
+      <div>
+        <%= f.label :session_status, "연결 상태", class: label_class %>
+        <%= f.select :session_status, BrandChannel::SESSION_STATUSES.invert.to_a, {}, class: input_class, style: control_height %>
+      </div>
+      <div>
+        <%= f.label :last_checked_at, "마지막 점검 시각", class: label_class %>
+        <%= f.datetime_local_field :last_checked_at, class: input_class, style: control_height %>
+      </div>
+      <div>
+        <%= f.label :last_error, "마지막 오류", class: label_class %>
+        <%= f.text_area :last_error, rows: 2, class: input_class, style: control_height %>
+      </div>
+      <div>
+        <%= f.label :posting_cadence, "게시 주기", class: label_class %>
+        <%= f.text_field :posting_cadence, class: input_class, style: control_height %>
+      </div>
+    </div>
+  <% end %>
+
   <div class="flex items-center gap-3">
-    <%= f.submit "저장", class: "bg-primary text-white px-4 py-2 rounded-lg cursor-pointer" %>
-    <%= link_to "취소", admin_brand_path(@brand), class: "text-sm text-primary" %>
+    <%= f.submit "저장", class: "bg-primary text-white px-4 py-2 rounded-lg cursor-pointer", style: control_height %>
+    <%= link_to "취소", admin_brand_path(@brand), class: "inline-flex items-center text-sm text-primary", style: control_height %>
   </div>
 <% end %>

@@ -51,7 +51,8 @@ class BrandProfileProcessTest < ActionDispatch::IntegrationTest
     assert_select "h2", text: "브랜드"
     assert_select "h2", text: "프로필 계정(네이버 인물정보·LinkedIn)"
     assert_select "a[href=?]", admin_brand_path(brand), text: brand.name
-    assert_select "a[href=?]", new_pd_profile_account_path(member_id: member.id), text: "계정 추가"
+    assert_select "a[href=?]", pd_member_path(member, anchor: "accounts"), text: "계정 등록·연결하기"
+    assert_select "a[href^='/pd/people_accounts/new']", count: 0
     assert_select "p", text: "연결된 프로필 계정이 없습니다."
     assert_select "form[method=post][action=?] button", create_personal_brand_admin_member_path(member), text: "개인 브랜드 만들기"
 

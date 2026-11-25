@@ -37,6 +37,9 @@
         <div class="min-w-0 max-w-full grow break-words">
           <strong class="text-navy"><%= member.name %></strong>
           <span class="text-gray-500">/<%= member.slug %></span>
+          <% unless member.can_sign_in? %>
+            <span class="inline-flex rounded border border-gray-400 px-2 py-0.5 text-xs text-gray-700"><%= member_login_status_label(member) %> · 로그인 불가</span>
+          <% end %>
         </div>
         <span class="text-gray-600">프로필 계정 <%= account_count %>/2</span>
         <span class="text-gray-600">채널 <%= channel_count %>/3</span>
