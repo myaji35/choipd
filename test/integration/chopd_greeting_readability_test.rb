@@ -25,4 +25,24 @@ class ChopdGreetingReadabilityTest < ActionDispatch::IntegrationTest
       end
     end
   end
+
+  test "publisher greeting ends with next-step links" do
+    get media_greeting_path
+    assert_response :ok
+
+    assert_select "main .greeting-actions", count: 1 do
+      assert_select "a.greeting-btn-primary[href=?]", education_path, text: /교육 과정 보기/, count: 1 do
+        assert_select "i.lni.lni-arrow-right", count: 1
+      end
+
+      assert_select "a.greeting-btn-secondary[href=?]", new_inquiry_path, text: /강좌 문의/, count: 1 do
+        assert_select "i.lni.lni-chat-bubble-2", count: 1
+      end
+
+      assert_select "a", count: 2
+      assert_select "svg", count: 0
+    end
+
+    assert_select ".greeting-heading .max-w-3xl", count: 1
+  end
 end
