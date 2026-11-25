@@ -1,0 +1,84 @@
+<% content_for :title, "스캔 정리 — #{@member.name}" %>
+<% categories = { "business_card" => "명함", "receipt" => "영수증", "document" => "문서" } %>
+<% input_style = "width: 100%; border: 1px solid var(--impd-rule); background: var(--impd-paper); padding: 10px 12px; color: var(--impd-ink);" %>
+<% statuses = { "pending" => "대기", "processing" => "처리 중", "processed" => "완료", "needs_review" => "확인 필요", "failed" => "실패" } %>
+<article class="impd-wrap" style="max-width: 900px; margin: 0 auto; padding: 40px 20px;">
+  <header style="margin-bottom: 32px;">
+    <h1 class="impd-display" style="font-size: 36px;">스캔 정리</h1>
+  </header>
+
+  <section class="impd-card" style="margin-bottom: 16px;">
+    <h2 style="font-size: 20px;">① 클라우드 연결 상태</h2>
+    <p>구글 드라이브 연결은 운영 승인 후 열립니다</p>
+    <% if @setting.cloud_connected_at? %>
+      <p>연결됨<%= " · #{@setting.cloud_account_email}" if @setting.cloud_account_email.present? %></p>
+    <% end %>
+  </section>
+
+  <%= form_with model: @setting, url: slug_admin_scan_organizer_path(slug: @member.slug), method: :patch,
+      style: "display: grid; gap: 16px; margin-bottom: 16px;" do |form| %>
+    <section class="impd-card" style="display: grid; gap: 12px;">
+      <h2 style="font-size: 20px;">② 스캔 폴더 설정</h2>
+      <%= form.label :scan_folder_name, "스캔 폴더 이름" %>
+      <%= form.text_field :scan_folder_name, style: input_style %>
+      <%= form.label :scan_folder_id, "스캔 폴더 ID" %>
+      <%= form.text_field :scan_folder_id, style: input_style %>
+    </section>
+
+    <section class="impd-card" style="display: grid; gap: 12px;">
+      <h2 style="font-size: 20px;">③ AI 키 등록</h2>
+      <%= form.label :ai_provider, "AI 제공자" %>
+      <%= form.select :ai_provider, [["Gemini", "gemini"], ["OpenAI", "openai"], ["Anthropic", "anthropic"]],
+          { include_blank: "제공자를 선택해 주세요" }, style: input_style %>
+      <%= form.label :ai_api_key, "AI 키" %>
+      <%= form.password_field :ai_api_key, value: "", autocomplete: "new-password", style: input_style %>
+      <% if @setting.ai_api_key.present? %>
+        <p>••••<%= "#{@setting.ai_key_last4} " if @setting.ai_key_last4.present? %>등록됨</p>
+      <% end %>
+      <p style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <%= form.submit "설정 저장", class: "impd-btn impd-btn-primary" %>
+        <%= button_tag "연결 시험", type: "submit", form: "scan-ai-key-test", class: "impd-btn impd-btn-secondary" %>
+      </p>
+    </section>
+  <% end %>
+  <%= form_with url: test_ai_key_slug_admin_scan_organizer_path(slug: @member.slug), id: "scan-ai-key-test" do %>
+  <% end %>
+
+  <section class="impd-card" style="overflow-x: auto;">
+    <h2 style="font-size: 20px; margin-bottom: 12px;">처리 내역</h2>
+    <% if @scan_items.empty? %>
+      <p>아직 처리 내역이 없습니다.</p>
+    <% else %>
+      <table style="width: 100%; text-align: left; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <% ["원본 파일명", "분류", "상태", "결과 위치", "실패 사유", "분류 선택"].each do |heading| %>
+              <th scope="col" style="padding: 8px; white-space: nowrap; border-bottom: 1px solid var(--impd-rule);"><%= heading %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% @scan_items.each do |item| %>
+            <tr style="border-bottom: 1px solid var(--impd-rule);">
+              <td style="padding: 8px; overflow-wrap: anywhere;"><%= item.source_name %></td>
+              <td style="padding: 8px;"><%= categories.fetch(item.category, "—") %></td>
+              <td style="padding: 8px;"><%= statuses.fetch(item.status) %></td>
+              <td style="padding: 8px; overflow-wrap: anywhere;"><%= item.result_location.presence || "—" %></td>
+              <td style="padding: 8px; overflow-wrap: anywhere;"><%= item.failure_reason.presence || "—" %></td>
+              <td style="padding: 8px;">
+                <% if item.status == "needs_review" %>
+                  <% categories.each do |category, label| %>
+                    <%= button_to label, resolve_slug_admin_scan_item_path(slug: @member.slug, id: item),
+                        params: { category: category }, class: "impd-btn impd-btn-secondary", form: { style: "margin-bottom: 4px;" } %>
+                  <% end %>
+                <% else %>
+                  —
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </section>
+</article>

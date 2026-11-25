@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_25_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_25_020100) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -1116,6 +1116,41 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_010000) do
     t.index ["tenant_id"], name: "index_rfm_segments_on_tenant_id"
   end
 
+  create_table "scan_items", force: :cascade do |t|
+    t.integer "member_id", null: false
+    t.string "source_file_id", null: false
+    t.string "source_name"
+    t.string "mime_type"
+    t.string "status", default: "pending", null: false
+    t.string "category"
+    t.decimal "confidence", precision: 4, scale: 3
+    t.text "extracted_json"
+    t.string "result_location"
+    t.string "failure_reason"
+    t.datetime "processed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index [ "member_id", "source_file_id" ], name: "index_scan_items_on_member_id_and_source_file_id", unique: true
+    t.index [ "member_id" ], name: "index_scan_items_on_member_id"
+  end
+
+  create_table "scan_organizer_settings", force: :cascade do |t|
+    t.integer "member_id", null: false
+    t.string "cloud_provider", default: "google_drive", null: false
+    t.string "cloud_account_email"
+    t.text "cloud_refresh_token"
+    t.datetime "cloud_connected_at"
+    t.string "scan_folder_id"
+    t.string "scan_folder_name"
+    t.string "ai_provider"
+    t.text "ai_api_key"
+    t.string "ai_key_last4"
+    t.datetime "ai_key_verified_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index [ "member_id" ], name: "index_scan_organizer_settings_on_member_id", unique: true
+  end
+
   create_table "settings", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "key"
@@ -1357,6 +1392,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_010000) do
   add_foreign_key "naver_people_targets", "profile_accounts"
   add_foreign_key "payments", "distributors"
   add_foreign_key "profile_snapshots", "profile_accounts"
+  add_foreign_key "scan_items", "members"
+  add_foreign_key "scan_organizer_settings", "members"
   add_foreign_key "short_links", "members"
   add_foreign_key "sns_accounts", "members"
   add_foreign_key "sns_follower_snapshots", "sns_accounts"
