@@ -70,6 +70,14 @@
   .impd-section-header { margin-bottom: 20px; }
   .impd-section-header .impd-display, h2.impd-display, h3.impd-display, h4.impd-display { word-break: keep-all; }
   @media (max-width: 768px) { .impd-wrap { padding-inline: 20px; } .impd-section { padding-block: 28px; } }
+  #gallery, #classes, #faq, #posts { scroll-margin-top: 80px; }
+  .impd-photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .impd-photo-grid .impd-photo-title { font-family: var(--impd-font-display); font-size: 18px; margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.4); word-break: keep-all; overflow-wrap: anywhere; }
+  @media (max-width: 768px) {
+    .impd-photo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .impd-photo-grid .impd-photo-title { font-size: 14px; line-height: 1.35; }
+    .impd-photo-grid figcaption { left: 10px !important; right: 10px !important; bottom: 10px !important; }
+  }
 </style>
 
 <%= render "public_profile/profile_intro", member: @member, services: @services, moments: @moments %>
@@ -99,7 +107,7 @@
     gallery_tiles << {
       kind: :portfolio,
       title: p.title,
-      category: p.category || "WORK",
+      category: p.category.presence || "작업 사례",
       media_url: p.media_url,
       is_video: false,
     }
@@ -109,12 +117,12 @@
     사진이 3장 이상이거나 포트폴리오가 있을 때만 노출.
     1~2장은 B-2 에디토리얼 그리드에서 충분히 큼직하게 보여줌. %>
 <% if gallery_tiles.any? && ((@moments || []).size >= 3 || @portfolio.any?) %>
-  <section class="impd-wrap impd-section">
+  <section class="impd-wrap impd-section" id="gallery">
     <div class="impd-section-header">
-      <span class="impd-display impd-stat-num">갤러리</span>
+      <span class="impd-display impd-stat-num">사진·사례</span>
       <span class="impd-label-muted">사진 <%= gallery_tiles.size %>개</span>
     </div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
+    <div class="impd-photo-grid">
       <% gallery_tiles.each_with_index do |t, i| %>
         <% bg_color = ["#ff5a1f", "#3a2af0", "#2a9d8f", "#e4b230", "#1a1a1a", "#aa2a6a"][i % 6] %>
         <figure style="aspect-ratio: 1 / 1.1; background: <%= bg_color %>; position: relative; overflow: hidden; margin: 0;" class="<%= 'impd-stripe' unless t[:media_url].present? %>">
@@ -139,7 +147,7 @@
           <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 35%, transparent 65%); pointer-events: none;"></div>
           <figcaption style="position: absolute; bottom: 12px; left: 12px; right: 12px; color: #fff;">
             <p class="impd-label" style="color: rgba(255,255,255,.92);"><%= t[:category] %></p>
-            <p style="font-family: var(--impd-font-display); font-size: 18px; margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.4);"><%= t[:title] %></p>
+            <p class="impd-photo-title"><%= t[:title] %></p>
           </figcaption>
         </figure>
       <% end %>
@@ -467,7 +475,7 @@
 <% if @services.any? %>
   <section class="impd-wrap impd-section" id="classes">
     <div class="impd-section-header">
-      <span class="impd-display impd-stat-num">서비스 / 수업</span>
+      <span class="impd-display impd-stat-num">서비스</span>
       <span class="impd-label-muted">서비스 <%= @services.size %>개</span>
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
@@ -554,9 +562,9 @@
 
 <!-- ── D 활동 연대기 (CV) ───────────────────────── -->
 <% if @posts.any? %>
-  <section class="impd-wrap impd-section">
+  <section class="impd-wrap impd-section" id="posts">
     <div class="impd-section-header">
-      <span class="impd-display impd-stat-num">활동 기록</span>
+      <span class="impd-display impd-stat-num">소식</span>
       <% if @member.activity_live? %>
         <span class="impd-live-badge">
           <span class="impd-live-dot"></span>
@@ -669,46 +677,15 @@
   </section>
 <% end %>
 
-<!-- ── Y "제공 가능한 가치" — 포트폴리오 없어도 자동 생성되는 가치 카드 4종 ─ -->
 <%
-  # profession 기반 표준 가치 제안 (포트폴리오·서비스 없어도 이 회원이 "뭐 하는 사람"인지 즉시 전달)
-  base_kit = ProfessionPreset.value_cards(@member.profession).map { |card| { head: card["head"], desc: card["desc"] } }.presence ||
-             ProfessionPreset.value_cards("custom").map { |card| { head: card["head"], desc: card["desc"] } }
-
-  # 개인화: 회원 고유 데이터 우선, 부족분을 직종 fallback 로 채움.
-  personal = []
-  # 1) bio 첫 문장을 첫 카드로 (35자 이상일 때만)
-  if @member.bio.to_s.length > 35
-    first_sent = @member.bio.to_s.split(/[.。!?]/).first&.strip
-    personal << { head: "나의 방식", desc: first_sent[0, 90] } if first_sent&.length.to_i > 15
-  end
-  # 2) 포트폴리오 제목들 (최대 2개)
-  @portfolio.first(2).each do |p|
-    personal << { head: p.title.to_s[0, 30], desc: (p.category.presence || "포트폴리오").to_s.upcase }
-  end
-  # 3) 서비스 제목들 (최대 2개)
-  @services.first(2).each do |s|
-    personal << { head: s.title.to_s[0, 30], desc: (s.price_label.presence || s.description.to_s[0, 60] || "문의") }
-  end
-  # 4) 달란트 상위 2개 (skills, 아래 Skills 섹션에서 풀 노출되므로 여기는 2개만)
-  @member.member_skills.includes(:skill).order(weight: :desc).limit(2).each do |ms|
-    name = ms.skill&.canonical_name.to_s
-    personal << { head: name[0, 20], desc: "검증된 역량 · #{ms.source}" } if name.present?
-  end rescue nil
-
-  # 본인 페이지 소유자에게는 편집 독려를 위해 fallback을 보여주되, 외부 방문자에게는
-  # 개인 데이터가 없으면 섹션 전체를 숨겨 공용 템플릿으로 인한 AI 주장 모순을 제거한다.
+  has_own_content = @member.bio.to_s.length > 35 || @portfolio.any? || @services.any? || (@skills.present? && @skills.any?)
   viewing_as_owner = (defined?(current_member) && current_member&.id == @member.id)
-  kit_personalized = personal.any?
-  kit = if kit_personalized
-          personal.first(4)
-        elsif viewing_as_owner
-          base_kit.first(4)
-        else
-          []
-        end
 %>
-<% if kit.any? %>
+<% if !has_own_content && viewing_as_owner %>
+<%
+  base_kit = ProfessionPreset.value_cards(@member.profession).presence || ProfessionPreset.value_cards("custom")
+  kit = base_kit.first(4)
+%>
 <section class="impd-wrap impd-section">
   <div class="impd-section-header">
     <span class="impd-display impd-stat-num">이렇게 도와드립니다.</span>
@@ -718,17 +695,13 @@
     <% kit.each_with_index do |item, i| %>
       <div style="background: <%= ["var(--impd-card)", "var(--impd-paper)"][i % 2] %>; border: 1px solid var(--impd-rule); padding: 24px 20px; min-height: 140px;">
         <div class="impd-label-muted" style="margin-bottom: 10px;">0<%= i + 1 %></div>
-        <div class="impd-display" style="font-size: 20px; letter-spacing: -0.3px;"><%= item[:head] %></div>
-        <p style="margin-top: 8px; font-size: 13px; color: var(--impd-ink2); line-height: 1.5;"><%= item[:desc] %></p>
+        <div class="impd-display" style="font-size: 20px; letter-spacing: -0.3px;"><%= item["head"] %></div>
+        <p style="margin-top: 8px; font-size: 13px; color: var(--impd-ink2); line-height: 1.5;"><%= item["desc"] %></p>
       </div>
     <% end %>
   </div>
   <p class="impd-section-note" style="font-family: var(--impd-font-sans); letter-spacing: 0;">
-    <% if kit_personalized %>
-      <%= @member.name %>님의 기록에서 자동 구성 · 상세는 문의 후 상담
-    <% else %>
-      임시 예시입니다. 회원 편집에서 나만의 서비스를 추가하면 이 섹션이 채워집니다.
-    <% end %>
+    나에게만 보이는 예시예요. 고객에게는 보이지 않아요. 서비스를 추가하면 '서비스' 칸에 실제 내용이 보여요.
   </p>
 </section>
 <% end %>

@@ -13,9 +13,45 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
       assert_response :success
       assert_not_includes response.body, "지금 가입하면 첫 페이지 제작 무료"
       assert_no_match(/현장 사진/, response.body)
-      assert_no_match(/서비스 \/ 수업/, response.body)
+      assert_select "#classes", count: 0
+      assert_select ".impd-bento .impd-label", text: "서비스", count: 0
       assert_includes response.body, "모집인 등록번호는 상담 시 안내해 드려요."
       assert_includes response.body, "보험설계사(모집인)의 안내입니다."
+    end
+  end
+
+  test "이미 보여 준 내용을 다시 늘어놓는 칸은 그리지 않는다" do
+    @member.update!(bio: "고객의 상황을 먼저 듣고 필요한 보험을 알기 쉽게 설명하며 함께 선택할 수 있도록 도와드립니다.")
+    @member.member_services.create!(title: "보험 상담", is_active: 1)
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_not_includes response.body, "이렇게 도와드립니다"
+    assert_not_includes response.body, "자동 구성"
+    assert_select "#classes"
+    assert_select "#contact form"
+  end
+
+  test "자료가 하나도 없는 방문자 화면에도 예시 칸은 없다" do
+    get public_profile_path(slug: @member.slug)
+
+    assert_response :success
+    assert_not_includes response.body, "이렇게 도와드립니다"
+  end
+
+  test "칸 이름이 관리 화면과 같다" do
+    @member.member_services.create!(title: "보험 상담", is_active: 1)
+    @member.member_posts.create!(title: "상담 소식", content: "상담 일정을 안내해요.", is_published: 1)
+    @member.member_portfolio_items.create!(title: "상담 사례", media_url: "https://example.com/photo.jpg")
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select "#classes .impd-section-header .impd-display", text: "서비스"
+    assert_select "#posts .impd-section-header .impd-display", text: "소식"
+    assert_select "#gallery .impd-section-header .impd-display", text: "사진·사례"
+    assert_select "#gallery .impd-photo-grid figure figcaption", text: /작업 사례/
+    [ "갤러리", "서비스 / 수업", "활동 기록", "WORK" ].each do |phrase|
+      assert_not_includes response.body, phrase
     end
   end
 

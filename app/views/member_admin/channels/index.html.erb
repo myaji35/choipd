@@ -124,6 +124,10 @@
   .channel-stat-grid dd { white-space: nowrap; overflow-wrap: normal; }
   .channel-stat-grid dd:first-of-type { font-size: 22px; font-weight: 700; }
   .channel-stat-grid .channel-stat-note { font-size: 12px; color: var(--impd-muted); }
+  .channel-posts-older { margin-top: 8px; }
+  .channel-posts-older > summary { display: flex; align-items: center; justify-content: center; min-height: 44px; border: 1px dashed var(--impd-rule); color: var(--impd-ink2); cursor: pointer; font-size: 14px; font-weight: 600; list-style: none; }
+  .channel-posts-older > summary::-webkit-details-marker { display: none; }
+  .channel-posts-older[open] > summary { margin-bottom: 4px; }
   @media (max-width: 768px) {
     .channel-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .channel-stat-grid dd:first-of-type { font-size: 20px; }

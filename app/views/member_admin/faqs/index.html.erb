@@ -7,6 +7,9 @@
     <p style="margin-top: 12px; color: var(--impd-ink2); font-size: 14px; line-height: 1.7; word-break: keep-all;">
       고객이 자주 묻는 것과 답을 미리 적어 두면, 내 페이지에 보이고 검색에도 더 잘 나와요. 3~5개면 충분해요.
     </p>
+    <% if @faqs.to_a.any? { |faq| faq.is_published.to_i == 1 } %>
+      <%= render "member_admin/shared/public_section_link", label: "자주 묻는 질문", anchor: "faq" %>
+    <% end %>
     <% if @faqs.any? %>
       <a href="#new-faq" class="impd-btn impd-btn-accent impd-jump-new">+ 새 질문 추가</a>
     <% end %>

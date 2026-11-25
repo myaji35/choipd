@@ -8,6 +8,13 @@
     <p style="margin-top: 12px; color: var(--impd-ink2); font-size: 14px; line-height: 1.7;">
       요즘 하는 일을 짧게 적어 두세요. 공개한 소식이 있으면 내 페이지에 '오늘도 활동 중' 표시가 7일 동안 켜져요.
     </p>
+    <% published_post_count = posts.count { |post| post.is_published.to_i == 1 } %>
+    <% if published_post_count.positive? %>
+      <%= render "member_admin/shared/public_section_link", label: "소식", anchor: "posts" %>
+      <% if published_post_count >= 4 %>
+        <p class="impd-label-muted">내 페이지에는 가장 최근 소식 3개가 보여요.</p>
+      <% end %>
+    <% end %>
     <% if posts.any? %>
       <a href="#new-post" class="impd-btn impd-btn-accent impd-jump-new">+ 새 소식 쓰기</a>
     <% end %>

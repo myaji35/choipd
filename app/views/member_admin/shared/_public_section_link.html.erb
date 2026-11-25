@@ -1,0 +1,5 @@
+<% href = "/#{@member.slug}" %>
+<% href += "##{anchor}" unless @member.layout_preset == "grid" %>
+<p class="impd-public-section-link" style="margin-top: 8px;">
+  <%= link_to href, target: "_blank", rel: "noopener", style: "display: inline-flex; align-items: center; min-height: 44px; color: var(--impd-accent); font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px;" do %>내 페이지에서 '<%= label %>' 칸 보기 <%= lni_icon "arrow-angular-top-right" %><% end %>
+</p>

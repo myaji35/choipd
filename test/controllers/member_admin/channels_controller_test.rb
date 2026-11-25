@@ -51,6 +51,33 @@ class MemberAdmin::ChannelsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href^='/admin/brands']", count: 0
   end
 
+  test "올린 글이 4개 이상이면 최근 3개만 펼치고 나머지는 접는다" do
+    channel = create_channel("naver_blog", delegation_consent_at: seoul_time(10, 3))
+    create_published_posts(channel, 5)
+
+    get @path
+
+    assert_response :ok
+    assert_select "#channel-#{channel.id}" do
+      assert_select "h3 + ul li", count: 3
+      assert_select "details.channel-posts-older[open]", count: 0
+      assert_select "details.channel-posts-older summary", text: "지난 글 2개 더 보기"
+      assert_select "details.channel-posts-older li", count: 2
+      assert_select "li", count: 5
+    end
+  end
+
+  test "올린 글이 3개 이하면 접지 않는다" do
+    channel = create_channel("naver_blog", delegation_consent_at: seoul_time(10, 3))
+    create_published_posts(channel, 3)
+
+    get @path
+
+    assert_response :ok
+    assert_select "#channel-#{channel.id} li", count: 3
+    assert_select "details.channel-posts-older", count: 0
+  end
+
   test "페이스북은 연결된 계정의 글과 팔로워 변화를 보여 준다" do
     account = SnsAccount.create!(member: @member, platform: "facebook", account_name: "내 페이지")
     channel = create_channel("facebook_page", sns_account: account, delegation_consent_at: seoul_time(10, 3))
@@ -252,6 +279,14 @@ class MemberAdmin::ChannelsControllerTest < ActionDispatch::IntegrationTest
   def create_channel(platform, **attributes)
     brand = @member.brands.find_or_create_by!(name: "개인 브랜드", personal: true)
     brand.brand_channels.create!(platform: platform, **attributes)
+  end
+
+  def create_published_posts(channel, count)
+    count.times do |index|
+      posted_at = seoul_time(11, 20 + index)
+      SnsScheduledPost.create!(brand_channel: channel, platform: "naver_blog", title: "올린 글 #{index}", message: "본문",
+        status: "published", scheduled_at: posted_at, published_at: posted_at)
+    end
   end
 
   def seoul_time(month, day, hour = 0, minute = 0)

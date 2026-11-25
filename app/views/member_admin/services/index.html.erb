@@ -8,6 +8,13 @@
     <p style="margin-top: 12px; color: var(--impd-ink2); font-size: 14px; line-height: 1.7;">
       내 페이지의 '서비스' 칸에 보여요. 고객이 무엇을 얼마에 받을 수 있는지 적어 주세요.
     </p>
+    <% active_service_count = @services.to_a.count { |service| service.is_active.to_i == 1 } %>
+    <% if active_service_count.positive? %>
+      <%= render "member_admin/shared/public_section_link", label: "서비스", anchor: "classes" %>
+      <% if active_service_count >= 7 %>
+        <p class="impd-label-muted">내 페이지에는 위에서부터 6개까지 보여요.</p>
+      <% end %>
+    <% end %>
     <% if @services.any? %>
       <a href="#new-service" class="impd-btn impd-btn-accent impd-jump-new">+ 새 서비스 추가</a>
     <% end %>

@@ -1,29 +1,40 @@
 <% if posts.any? %>
-  <ul style="list-style: none; margin-top: 8px; padding: 0;">
-    <% posts.each do |post| %>
-      <% message = post.message.to_s.squish %>
-      <li style="padding: 12px 0; border-top: 1px solid var(--impd-rule);">
-        <p style="font-weight: 700; font-size: 15px;"><%= post.title.presence || truncate(message, length: 60) %></p>
-        <% if post.title.present? %>
-          <p style="font-size: 14px; color: var(--impd-ink2);"><%= truncate(message, length: 100) %></p>
-        <% end %>
-        <p style="font-size: 13px; color: var(--impd-muted);">
-          <% if published %>
-            <%= channel_date(post.published_at || post.scheduled_at, with_time: true) %>에 올림
-            <% if (published_url = http_url(post.published_url)) %>
-              · <%= link_to "올라간 글 보기 ↗", published_url, target: "_blank", rel: "noopener", style: channel_link_style %>
-            <% end %>
-          <% elsif post.scheduled_at <= Time.current %>
-            곧 올라가요
-          <% else %>
-            <%= channel_date(post.scheduled_at, with_time: true) %>에 올릴 예정
+  <% render_list = ->(entries) do %>
+    <ul style="list-style: none; margin-top: 8px; padding: 0;">
+      <% entries.each do |post| %>
+        <% message = post.message.to_s.squish %>
+        <li style="padding: 12px 0; border-top: 1px solid var(--impd-rule);">
+          <p style="font-weight: 700; font-size: 15px;"><%= post.title.presence || truncate(message, length: 60) %></p>
+          <% if post.title.present? %>
+            <p style="font-size: 14px; color: var(--impd-ink2);"><%= truncate(message, length: 100) %></p>
           <% end %>
-        </p>
-      </li>
-    <% end %>
-  </ul>
-  <% if published && posts.size == 10 %>
-    <p class="impd-label-muted" style="margin-top: 8px;">최근 10개만 보여요.</p>
+          <p style="font-size: 13px; color: var(--impd-muted);">
+            <% if published %>
+              <%= channel_date(post.published_at || post.scheduled_at, with_time: true) %>에 올림
+              <% if (published_url = http_url(post.published_url)) %>
+                · <%= link_to "올라간 글 보기 ↗", published_url, target: "_blank", rel: "noopener", style: channel_link_style %>
+              <% end %>
+            <% elsif post.scheduled_at <= Time.current %>
+              곧 올라가요
+            <% else %>
+              <%= channel_date(post.scheduled_at, with_time: true) %>에 올릴 예정
+            <% end %>
+          </p>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+  <% if published && posts.size > 3 %>
+    <% render_list.call(posts.first(3)) %>
+    <details class="channel-posts-older">
+      <summary>지난 글 <%= posts.size - 3 %>개 더 보기</summary>
+      <% render_list.call(posts.drop(3)) %>
+      <% if posts.size == 10 %>
+        <p class="impd-label-muted" style="margin-top: 8px;">최근 10개만 보여요.</p>
+      <% end %>
+    </details>
+  <% else %>
+    <% render_list.call(posts) %>
   <% end %>
 <% else %>
   <p class="impd-label-muted" style="margin-top: 8px;"><%= published ? "아직 올린 글이 없어요. 운영팀이 올리면 여기에 보여요." : "지금 예약된 글은 없어요." %></p>
