@@ -112,7 +112,12 @@ if REASON == "SCOPE_CONFLICT" and not breaker_reason:
 
 if breaker_reason:
     # Circuit Breaker 발동 → meta-agent로 승격
-    next_id = f"ISS-{registry['stats']['total_issues'] + 1:03d}"
+    next_num = max(
+        registry['stats']['total_issues'],
+        max((int(issue_id[4:]) for issue_id in (str(issue.get('id', '')) for issue in registry['issues'])
+             if issue_id.startswith('ISS-') and issue_id[4:].isdecimal()), default=0),
+    ) + 1
+    next_id = f"ISS-{next_num:03d}"
     escalation = {
         "id": next_id,
         "title": f"[Hermes Circuit Break] {EXECUTOR_ID} — {breaker_reason}",
@@ -149,7 +154,12 @@ if breaker_reason:
     sys.exit(3)
 
 # ── 통과: HERMES_CONSULT 이슈 생성 ──────────────────────
-next_id = f"ISS-{registry['stats']['total_issues'] + 1:03d}"
+next_num = max(
+    registry['stats']['total_issues'],
+    max((int(issue_id[4:]) for issue_id in (str(issue.get('id', '')) for issue in registry['issues'])
+         if issue_id.startswith('ISS-') and issue_id[4:].isdecimal()), default=0),
+) + 1
+next_id = f"ISS-{next_num:03d}"
 consult_issue = {
     "id": next_id,
     "title": f"[Hermes 자문] {EXECUTOR_ID} — {REASON}",

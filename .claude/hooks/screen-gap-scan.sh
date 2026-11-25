@@ -400,7 +400,12 @@ for route_path, route_gaps in grouped.items():
     screen_label = route_gaps[0]["screen_label"]
     missing_names = [g["missing_feature"] for g in route_gaps]
 
-    next_id = f"ISS-{registry['stats']['total_issues'] + 1:03d}"
+    next_num = max(
+        registry['stats']['total_issues'],
+        max((int(issue_id[4:]) for issue_id in (str(issue.get('id', '')) for issue in registry['issues'])
+             if issue_id.startswith('ISS-') and issue_id[4:].isdecimal()), default=0),
+    ) + 1
+    next_id = f"ISS-{next_num:03d}"
     issue = {
         "id": next_id,
         "title": f"[Screen Gap] {route_path} ({screen_label}) — {', '.join(missing_names[:3])}{'...' if len(missing_names) > 3 else ''}",

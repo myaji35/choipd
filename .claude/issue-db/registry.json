@@ -5269,7 +5269,7 @@
       "id": "ISS-520",
       "type": "FIX_BUG",
       "priority": "P2",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "origin": "factory-observation",
       "depth": 1,
       "retry_count": 0,
@@ -5319,7 +5319,182 @@
             "note": "착수. 원인: 바닥글 인라인 style grid 2fr 1fr 1fr / gap 48px 고정, 하단 링크 줄도 flex space-between 고정 — 모바일 분기 없음. Tailwind(CDN, chopd 레이아웃) 반응형 클래스로 전환."
           }
         ]
+      },
+      "completed_at": "2026-11-25T10:10:06.744001",
+      "result": {
+        "commit": "373e8d1",
+        "files_changed": [
+          "app/views/layouts/_chopd_footer.html.erb",
+          "script/qa/layout_check.cjs"
+        ],
+        "ui_files": [
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "files_created": [
+          "qa/ISS-520/before/inquiries-new-390.png",
+          "qa/ISS-520/after/inquiries-new-390.png",
+          "qa/ISS-520/before/inquiries-new-1280.png",
+          "qa/ISS-520/after/inquiries-new-1280.png"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "390px에서 바닥글 링크가 한 글자씩 세로로 쪼개지지 않는다",
+            "met": true,
+            "how": "layout_check footerWrapped: 수정 전 8건(교육 과정·한국환경저널·작품 갤러리·B2B/B2G 문의하기·뉴스레터 구독·교육·미디어·작품) → 수정 후 0건, 육안으로 2열·한 줄 확인"
+          },
+          {
+            "criterion": "1280px 바닥글 배치는 지금과 같다",
+            "met": true,
+            "how": "inquiries-new-1280.png 수정 전후 모두 55426 바이트, md 이상 클래스가 기존 px 값(48/64/40, 2fr 1fr 1fr, gap 48)과 동일"
+          },
+          {
+            "criterion": "node script/qa/layout_check.cjs 가 계속 통과한다",
+            "met": true,
+            "how": "4조합 hScroll false, clipped 0, footerWrapped 0, SUMMARY pass=true, exit 0"
+          },
+          {
+            "criterion": "수정 전후 390px 스크린샷으로 확인",
+            "met": true,
+            "how": "qa/ISS-520/before|after/inquiries-new-390.png 커밋, after 육안 확인"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "/inquiries/new 390 hScroll false clipped 0 footerWrapped 0 ... SUMMARY pass=true"
+          },
+          {
+            "cmd": "node script/qa/layout_check.cjs (수정 전 바닥글, OUT_DIR=qa/ISS-520/before)",
+            "exit_code": 1,
+            "output": "/inquiries/new 390 footerWrapped 8 ['교육 과정','한국환경저널',...,'작품'] SUMMARY pass=false"
+          },
+          {
+            "cmd": "bin/rails test",
+            "exit_code": 0,
+            "output": "352 runs, 2364 assertions, 0 failures, 0 errors, 1 skips"
+          },
+          {
+            "cmd": "bin/rubocop",
+            "exit_code": 0,
+            "output": "445 files inspected — 남은 2건은 ISS-518 테스트 파일, 후속 커밋에서 정리 후 no offenses"
+          }
+        ],
+        "review": {
+          "gemini": "gemini-4-hydrogen-high 결함 없음",
+          "opus": "줄바꿈 판정 1차안이 터치영역 44px 링크를 오탐 → 글자 줄 수 판정으로 재위임 후 오탐 0 확인"
+        }
       }
+    },
+    {
+      "id": "ISS-523",
+      "title": "[Plan:테스트] ISS-520 변경사항 검증",
+      "type": "RUN_TESTS",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "test-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-520",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:10:06.744001",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-520",
+        "scope": "changed",
+        "renumbered_from": "ISS-518"
+      },
+      "result": null,
+      "spawn_rules": []
+    },
+    {
+      "id": "ISS-524",
+      "title": "[Plan:도메인분석] ISS-520 비즈니스 규칙/시나리오 도출",
+      "type": "DOMAIN_ANALYZE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "domain-analyst",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-520",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:10:06.744001",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-520",
+        "renumbered_from": "ISS-519"
+      },
+      "result": null,
+      "spawn_rules": []
+    },
+    {
+      "id": "ISS-525",
+      "title": "[Plan:UX리뷰] ISS-520 UI 변경 검증",
+      "type": "UI_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "ux-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-520",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:10:06.744001",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-520",
+        "renumbered_from": "ISS-520"
+      },
+      "result": null,
+      "spawn_rules": []
+    },
+    {
+      "id": "ISS-521",
+      "title": "[Plan:브랜드검증] ISS-520 아젠다 표현 + Action Clarity",
+      "type": "BRAND_GUARD",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "brand-guardian",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-520",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:10:06.744001",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-520"
+      },
+      "result": null,
+      "spawn_rules": []
+    },
+    {
+      "id": "ISS-522",
+      "title": "[Plan:브라우저QA] ISS-520 콘솔 에러 + 스크린샷 검증",
+      "type": "BROWSER_QA",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "agent-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-520",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:10:06.744001",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-520",
+        "action": "run_browse_qa"
+      },
+      "result": null,
+      "spawn_rules": []
     }
   ],
   "hooks": {
@@ -5517,6 +5692,12 @@
         "issue_type": "FEATURE",
         "plan_created": 0,
         "timestamp": "2026-11-25T10:01:35.715609"
+      },
+      {
+        "issue_id": "ISS-520",
+        "issue_type": "FIX_BUG",
+        "plan_created": 5,
+        "timestamp": "2026-11-25T10:10:06.744001"
       }
     ],
     "on_fail": [],
@@ -9486,8 +9667,8 @@
     ]
   },
   "stats": {
-    "total_issues": 517,
-    "completed": 32,
+    "total_issues": 525,
+    "completed": 33,
     "failed": 0,
     "evolved": 211
   },

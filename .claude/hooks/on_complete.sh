@@ -31,7 +31,11 @@ result_raw = os.environ.get('ON_COMPLETE_RESULT', '')
 
 now = datetime.datetime.now().isoformat()
 new_issues = []
-next_num = registry['stats']['total_issues'] + 1
+next_num = max(
+    registry['stats']['total_issues'],
+    max((int(issue_id[4:]) for issue_id in (str(issue.get('id', '')) for issue in registry['issues'])
+         if issue_id.startswith('ISS-') and issue_id[4:].isdecimal()), default=0),
+) + 1
 
 def add_issue(title, itype, priority, assign_to, payload=None):
     global next_num

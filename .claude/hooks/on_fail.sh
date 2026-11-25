@@ -32,7 +32,12 @@ for issue in registry['issues']:
         else:
             # 에스컬레이션
             issue['status'] = 'ESCALATED'
-            next_id = f"ISS-{registry['stats']['total_issues'] + 1:03d}"
+            next_num = max(
+                registry['stats']['total_issues'],
+                max((int(issue_id[4:]) for issue_id in (str(issue.get('id', '')) for issue in registry['issues'])
+                     if issue_id.startswith('ISS-') and issue_id[4:].isdecimal()), default=0),
+            ) + 1
+            next_id = f"ISS-{next_num:03d}"
             escalation = {
                 'id': next_id,
                 'title': f"[에스컬레이션] {issue['title']} 반복 실패",
