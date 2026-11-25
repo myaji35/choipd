@@ -216,6 +216,8 @@
         </div>
       </section>
 
+      <%= render "member_admin/channels/overview_section", items: @channel_overview %>
+
       <% fourteen_total = @bar_data.sum(&:last) %>
       <div style="background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 24px;">
         <div class="impd-section-header" style="margin-bottom: 16px;">
@@ -300,6 +302,7 @@
   .dashboard-overview-value.needs-attention { color: var(--impd-accent); }
   .dashboard-overview-links { display: flex; flex-wrap: wrap; column-gap: 12px; margin-top: 8px; color: var(--impd-muted); font-size: 13px; }
   .dashboard-overview-links a { display: inline-flex; align-items: center; min-height: 44px; }
+  .channel-overview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
   .profile-accounts-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
   .profile-account-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; margin-top: 8px; }
   .profile-account-actions details[open] { flex-basis: 100%; }
@@ -317,6 +320,7 @@
     .dashboard-main > * { order: 3; }
     .dashboard-main > .dashboard-next { order: 1; }
     .dashboard-overview { order: 2; margin-bottom: 24px; }
+    .channel-overview-grid { grid-template-columns: minmax(0, 1fr); }
     .profile-accounts-grid { grid-template-columns: minmax(0, 1fr); }
     .dashboard-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .dashboard-stat { padding: 16px 12px; }

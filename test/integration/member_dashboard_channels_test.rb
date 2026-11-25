@@ -1,0 +1,70 @@
+require "test_helper"
+
+class MemberDashboardChannelsTest < ActionDispatch::IntegrationTest
+  include Devise::Test::IntegrationHelpers
+
+  setup do
+    travel_to Time.find_zone!("Asia/Seoul").local(2026, 11, 25, 12)
+    @member = Member.create!(
+      name: "테스트 회원", email: "dashboard-channel@example.test", slug: "dashboard-channel",
+      status: "approved", business_type: "individual", profession: "custom",
+      password: "password1234", password_confirmation: "password1234"
+    )
+    post "/auth/login", params: { email: @member.email, password: "password1234" }
+    @path = slug_admin_dashboard_path(slug: @member.slug)
+  end
+
+  test "채널이 없으면 프로필과 방문 현황 사이에 세 채널의 등록 전 안내를 보여 준다" do
+    get @path
+
+    assert_response :ok
+    assert_select "#channel-status" do
+      assert_select "article", count: 3
+      assert_select "article h3", count: 3 do |headings|
+        assert_equal ["네이버 블로그 등록 전", "페이스북 등록 전", "인스타그램 등록 전"], headings.map(&:text)
+      end
+      assert_select "article p", text: "등록은 운영자·PD에게 요청해 주세요.", count: 3
+      assert_select "a[href=?]", slug_admin_channels_path(slug: @member.slug), text: "올린 글·예약된 글 모두 보기 →", count: 1
+    end
+    profile_position = response.body.index('id="profile-accounts-status"')
+    channel_position = response.body.index('id="channel-status"')
+    visits_position = response.body.index("최근 14일 방문")
+    assert_operator profile_position, :<, channel_position
+    assert_operator channel_position, :<, visits_position
+  end
+
+  test "운영 중인 채널의 최근 게시 건수와 예약 건수를 보여 준다" do
+    brand = @member.brands.create!(name: "개인 브랜드", personal: true)
+    channel = brand.brand_channels.create!(platform: "naver_blog", delegation_consent_at: 45.days.ago)
+    [5.days.ago, 40.days.ago].each do |posted_at|
+      SnsScheduledPost.create!(brand_channel: channel, platform: "naver_blog", title: "올린 글", message: "본문",
+        status: "published", scheduled_at: posted_at, published_at: posted_at)
+    end
+    SnsScheduledPost.create!(brand_channel: channel, platform: "naver_blog", title: "예약 글", message: "본문",
+      status: "scheduled", scheduled_at: 2.days.from_now)
+
+    get @path
+
+    assert_response :ok
+    assert_select "#channel-status" do |section|
+      assert_select "article span", text: "운영 중"
+      assert_select "dl div", text: /최근 30일 올린 글\s*1건/, count: 1
+      assert_select "dl div", text: /예약된 글\s*1건/, count: 1
+      assert_select "a[href=?]", slug_admin_channels_path(slug: @member.slug, anchor: "channel-#{channel.id}"), text: "자세히 보기"
+      assert_not_includes section.first.text, "팔로워"
+    end
+  end
+
+  test "운영자 대리 접속에서만 각 카드에 관리 화면 링크를 보여 준다" do
+    get @path
+    assert_response :ok
+    assert_select "#channel-status a", text: "관리 화면에서 열기", count: 0
+
+    reset!
+    sign_in AdminUser.create!(email: "dashboard-channel-admin@example.test", password: "password1234", role: "admin")
+    get @path
+
+    assert_response :ok
+    assert_select "#channel-status a[href=?]", admin_brands_path, text: "관리 화면에서 열기", count: 3
+  end
+end

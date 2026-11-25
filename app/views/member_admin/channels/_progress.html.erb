@@ -1,0 +1,12 @@
+<% unless item[:steps].all?(&:last) %>
+  <ol aria-label="<%= item[:label] %> 진행 상태" style="display: flex; flex-wrap: wrap; gap: 4px 8px; list-style: none; padding: 0; margin: 10px 0 0; font-size: 12px; color: var(--impd-muted);">
+    <% item[:steps].each_with_index do |(step, complete), index| %>
+      <li style="color: var(<%= complete ? '--impd-accent' : '--impd-muted' %>);">
+        <%= complete ? "✓" : "○" %> <%= step %>
+        <% if index < item[:steps].size - 1 %>
+          <span aria-hidden="true" style="color: var(--impd-muted); margin-left: 4px;">→</span>
+        <% end %>
+      </li>
+    <% end %>
+  </ol>
+<% end %>

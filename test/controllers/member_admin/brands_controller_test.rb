@@ -24,6 +24,7 @@ class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "아직 등록된 브랜드가 없어요"
     assert_includes response.body, "브랜드는 운영팀이 등록을 도와드려요"
     assert_select "a.impd-btn-secondary", text: "공개하려면 노출 동의하기"
+    assert_select "a[href=?]", slug_admin_channels_path(slug: @member.slug), text: "내 채널 보기"
   end
 
   test "shows only the member's brands" do

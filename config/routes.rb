@@ -361,6 +361,7 @@ Rails.application.routes.draw do
       end
       resources :faqs, controller: "faqs", only: [ :index, :create, :update, :destroy ]
       resources :bookings, only: [ :index, :create, :update, :destroy ]
+      get "/channels", to: "channels#index", as: :channels
       resource :brand, only: [ :show ] do
         resources :brand_channels, path: "channels", only: [ :edit, :update ]
       end

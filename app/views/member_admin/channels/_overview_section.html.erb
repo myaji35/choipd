@@ -1,0 +1,46 @@
+<section id="channel-status" aria-labelledby="channel-status-title" style="background: #fff; border: 1px solid var(--impd-rule); padding: 24px; margin-bottom: 24px;">
+  <p class="impd-label">내 채널 운영 현황</p>
+  <h2 id="channel-status-title" style="font-size: 24px; margin-top: 10px;">블로그 · 페이스북 · 인스타그램</h2>
+  <p style="font-size: 14px; color: var(--impd-muted); margin: 8px 0 18px;">운영팀이 내 채널에 글을 대신 올려 드려요. 여기서는 어떻게 되고 있는지만 보시면 돼요.</p>
+  <div class="channel-overview-grid">
+    <% items.each do |item| %>
+      <% channel = item[:channel] %>
+      <article style="border: 1px solid var(--impd-rule); padding: 16px; font-size: 14px; min-width: 0; overflow-wrap: anywhere;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;">
+          <p class="impd-label-muted"><%= item[:label] %></p>
+          <%= render "member_admin/channels/state_badge", item: item if channel %>
+        </div>
+        <% if channel %>
+          <p class="impd-label-muted" style="margin-top: 8px;">운영 계정</p>
+          <h3 style="font-size: 16px; margin-top: 8px;"><%= channel.account_handle.presence || "이름을 아직 적지 않았어요" %></h3>
+          <%= render "member_admin/channels/progress", item: item %>
+          <%= render "member_admin/channels/state_note", item: item %>
+          <dl style="margin-top: 8px;">
+            <% channel_summary(item).each do |label, value| %>
+              <% next if value.nil? %>
+              <div style="display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-top: 1px solid var(--impd-rule);">
+                <dt style="color: var(--impd-muted); font-size: 13px;"><%= label %></dt>
+                <dd style="font-weight: 700; text-align: right;"><%= value %></dd>
+              </div>
+            <% end %>
+          </dl>
+          <div style="display: flex; flex-wrap: wrap; gap: 0 16px; margin-top: 8px;">
+            <% if (profile_url = http_url(channel.profile_url)) %>
+              <%= link_to "프로필 열기 ↗", profile_url, target: "_blank", rel: "noopener", style: channel_link_style %>
+            <% end %>
+            <%= link_to "자세히 보기", slug_admin_channels_path(slug: @member.slug, anchor: "channel-#{channel.id}"), style: channel_link_style %>
+          </div>
+        <% else %>
+          <h3 style="font-size: 16px; margin-top: 8px;"><%= item[:label] %> 등록 전</h3>
+          <p style="color: var(--impd-muted); margin-top: 4px;">등록하면 운영팀이 글을 대신 올려 드려요.</p>
+          <p style="color: var(--impd-muted); margin-top: 4px;">등록은 운영자·PD에게 요청해 주세요.</p>
+          <%= render "member_admin/channels/progress", item: item %>
+        <% end %>
+        <% if impersonating_admin_user&.admin? %>
+          <%= link_to "관리 화면에서 열기", channel_management_path(item), style: "#{channel_link_style} font-size: 12px;" %>
+        <% end %>
+      </article>
+    <% end %>
+  </div>
+  <p style="margin-top: 12px;"><%= link_to "올린 글·예약된 글 모두 보기 →", slug_admin_channels_path(slug: @member.slug), style: channel_link_style %></p>
+</section>

@@ -1,5 +1,6 @@
 class MemberAdmin::DashboardController < MemberAdmin::BaseController
   include MemberAdmin::ProfileChecklist
+  include MemberAdmin::ChannelOverview
 
   def show
     today = Date.current
@@ -38,6 +39,7 @@ class MemberAdmin::DashboardController < MemberAdmin::BaseController
 
     @checklist = build_profile_checklist(from_checklist: true)
     @completion_pct = (@checklist.count { |c| c[:done] } * 100 / @checklist.size)
+    @channel_overview = build_channel_overview
   end
 
   private

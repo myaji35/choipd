@@ -19,13 +19,17 @@ class MemberAdminNavTest < ActionDispatch::IntegrationTest
     assert_current_navigation "reviews", "고객", "후기"
   end
 
+  test "channels highlights the promotion group and channels link" do
+    assert_current_navigation "channels", "홍보", "내 채널"
+  end
+
   test "legacy SNS screens highlight the promotion group without a current submenu link" do
     %w[sns_accounts scheduled_posts].each do |screen|
       get "/#{@member.slug}/admin/#{screen}"
 
       assert_response :success
       assert_select '.admin-nav-links a[aria-current="page"]', text: "홍보", count: 1
-      assert_select '.admin-subnav[aria-label="홍보 메뉴"] a', count: 2
+      assert_select '.admin-subnav[aria-label="홍보 메뉴"] a', count: 3
       assert_select '.admin-subnav a[aria-current="page"]', count: 0
       assert_select '.admin-mobile-panel a[aria-current="page"]', count: 0
     end

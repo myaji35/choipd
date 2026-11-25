@@ -22,7 +22,7 @@ class MemberAdminPageWidthTest < ActionDispatch::IntegrationTest
   end
 
   test "목록과 홍보 화면은 같은 본문 폭과 여백을 쓴다" do
-    %w[services faqs posts inquiries reviews bookings brand brand_consents].each do |page|
+    %w[services faqs posts inquiries reviews bookings brand channels brand_consents].each do |page|
       get public_send("slug_admin_#{page}_path", slug: @slug)
 
       assert_response :ok

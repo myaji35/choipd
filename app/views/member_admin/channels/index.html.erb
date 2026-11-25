@@ -1,0 +1,108 @@
+<% content_for :title, "내 채널" %>
+<div class="impd-wrap" style="max-width: 1120px; margin: 0 auto; padding: 40px;">
+  <header style="margin-bottom: 32px;">
+    <p class="impd-label-muted">홍보 › 내 채널</p>
+    <h1 class="impd-display" style="font-size: 44px; margin-top: 12px;">내 채널</h1>
+    <p style="margin-top: 12px; color: var(--impd-ink2); font-size: 14px; line-height: 1.7;">운영팀이 내 블로그·페이스북·인스타그램에 올린 글과 올릴 글을 보는 곳이에요. 글은 운영팀이 올리고, 여기서는 보기만 해요.</p>
+  </header>
+
+  <% registered = @channel_overview.select { |item| item[:channel] } %>
+  <% if registered.size >= 2 %>
+    <nav aria-label="채널 바로가기" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;">
+      <% registered.each do |item| %>
+        <%= link_to item[:label], "#channel-#{item[:channel].id}", class: "impd-btn impd-btn-secondary impd-btn-sm" %>
+      <% end %>
+    </nav>
+  <% end %>
+
+  <% @channel_overview.each do |item| %>
+    <% channel = item[:channel] %>
+    <section class="impd-card" id="channel-<%= channel&.id || "#{item[:platform]}-missing" %>" style="margin-bottom: 24px; scroll-margin-top: 96px; min-width: 0; overflow-wrap: anywhere;">
+      <% if channel %>
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
+          <h2 style="font-size: 22px;"><%= item[:label] %></h2>
+          <%= render "member_admin/channels/state_badge", item: item %>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px;">
+          <p style="margin-top: 6px;">운영 계정: <% if channel.account_handle.present? %><strong><%= channel.account_handle %></strong><% else %>아직 적지 않았어요<% end %></p>
+          <% if (profile_url = http_url(channel.profile_url)) %>
+            <%= link_to "프로필 열기 ↗", profile_url, target: "_blank", rel: "noopener", style: channel_link_style %>
+          <% end %>
+        </div>
+        <%= render "member_admin/channels/state_note", item: item %>
+        <%= render "member_admin/channels/progress", item: item %>
+
+        <dl style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 12px; margin-top: 16px;">
+          <% channel_summary(item).each do |label, value| %>
+            <div style="border: 1px solid var(--impd-rule); padding: 12px; background: #fff;">
+              <dt style="color: var(--impd-muted); font-size: 13px;"><%= label %></dt>
+              <% if value %>
+                <dd style="font-size: 22px; font-weight: 700;"><%= value %></dd>
+              <% else %>
+                <dd style="font-size: 14px; color: var(--impd-muted);">아직 기록이 없어요</dd>
+              <% end %>
+            </div>
+          <% end %>
+        </dl>
+
+        <h3 style="font-size: 17px; margin-top: 24px;">최근 올린 글</h3>
+        <%= render "member_admin/channels/post_list", posts: item[:recent_posts], published: true %>
+
+        <h3 style="font-size: 17px; margin-top: 24px;">예약된 글</h3>
+        <%= render "member_admin/channels/post_list", posts: item[:scheduled_posts], published: false %>
+
+        <h3 style="font-size: 17px; margin-top: 24px;">팔로워 변화</h3>
+        <% if item[:follower_snapshots].any? %>
+          <p style="margin-top: 8px;">지금 <strong><%= number_with_delimiter(item[:followers]) %>명</strong><% if (change = channel_follower_change(item[:follower_delta])) %> · <%= change %><% end %></p>
+          <ul style="list-style: none; padding: 0; margin-top: 8px; font-size: 13px; color: var(--impd-muted);">
+            <% item[:follower_snapshots].each do |snapshot| %>
+              <li><%= channel_date(snapshot.captured_at) %> · <%= number_with_delimiter(snapshot.follower_count) %>명</li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="impd-label-muted" style="margin-top: 8px;">아직 팔로워를 센 기록이 없어요. 운영팀이 세면 여기에 보여요.</p>
+        <% end %>
+
+        <h3 style="font-size: 17px; margin-top: 24px;">운영 위탁 동의</h3>
+        <% if channel.delegated? %>
+          <p style="margin-top: 8px;">✓ 동의함 · <%= channel_date(channel.delegation_consent_at) %></p>
+          <p class="impd-label-muted">운영팀이 이 채널에 글을 대신 올릴 수 있어요. 언제든 그만둘 수 있어요.</p>
+        <% else %>
+          <p style="margin-top: 8px;">○ 아직 동의하지 않았어요</p>
+          <p class="impd-label-muted">동의해야 운영팀이 이 채널에 글을 올릴 수 있어요.</p>
+        <% end %>
+        <% if @own_session %>
+          <%= link_to (channel.delegated? ? "동의 내용 보기·바꾸기" : "동의하러 가기"),
+            edit_slug_admin_brand_brand_channel_path(slug: @member.slug, id: channel.id),
+            class: "impd-btn impd-btn-secondary", style: "margin-top: 12px; min-height: 44px;" %>
+        <% else %>
+          <p class="impd-label-muted" style="margin-top: 8px;">동의는 회원 본인만 바꿀 수 있어요.</p>
+        <% end %>
+      <% else %>
+        <h2 style="font-size: 22px;"><%= item[:label] %> 등록 전</h2>
+        <p style="margin-top: 8px;">등록하면 운영팀이 글을 대신 올려 드리고, 올린 글과 예약된 글을 여기서 볼 수 있어요.</p>
+        <p class="impd-label-muted" style="margin-top: 4px;">등록은 운영자·PD에게 요청해 주세요.</p>
+        <%= render "member_admin/channels/progress", item: item %>
+      <% end %>
+
+      <% if impersonating_admin_user&.admin? %>
+        <p style="margin-top: 8px;"><%= link_to (channel ? "채널 수정 (운영자 화면)" : "채널 등록 (운영자 화면)"), channel_management_path(item), style: channel_link_style %></p>
+      <% end %>
+    </section>
+  <% end %>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 0 16px; color: var(--impd-muted); font-size: 13px;">
+    <% footer_link_style = "#{channel_link_style} color: inherit;" %>
+    <%= link_to "내 브랜드", slug_admin_brand_path(slug: @member.slug), style: footer_link_style %>
+    <%= link_to "노출·광고 동의", slug_admin_brand_consents_path(slug: @member.slug), style: footer_link_style %>
+    <%= link_to "대시보드", slug_admin_dashboard_path(slug: @member.slug), style: footer_link_style %>
+  </div>
+</div>
+
+<style>
+  .impd-wrap, .impd-wrap * { min-width: 0; overflow-wrap: anywhere; }
+  @media (max-width: 768px) {
+    .impd-wrap { padding: 20px 16px !important; }
+    .impd-wrap h1 { font-size: 32px !important; }
+  }
+</style>

@@ -53,6 +53,17 @@ class MemberAdminPlainWordsTest < ActionDispatch::IntegrationTest
     assert_select "select option[value=custom]", text: "목록에 없어요 (직접 적기)"
   end
 
+  test "작업 사진·사례 줄에서 사진·영상으로 이동할 수 있다" do
+    get slug_admin_editor_path(slug: @member.slug, step: 2)
+
+    assert_response :ok
+    assert_not_includes response.body, "운영팀이 정리해 드려요"
+    assert_select "#editor-added-materials-title + p + ul li:last-child" do
+      assert_select "a[href=?]", "?step=1&tab=media#media", text: /작업 사진·사례.*사진 올리러 가기 →/m
+      assert_select "p", text: "작업 사진은 1단계 '사진·영상'에서 올릴 수 있어요."
+    end
+  end
+
   test "에디터 3·4단계에 발행·프리셋 같은 말이 없다" do
     get slug_admin_editor_path(slug: @member.slug, step: 3)
     assert_response :ok

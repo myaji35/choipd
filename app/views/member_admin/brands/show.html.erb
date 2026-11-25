@@ -61,8 +61,11 @@
       <section class="impd-card">
         <h3>이번 달 올린 글</h3>
         <p style="margin-top: 12px;">이번 달 소식 <%= number_with_delimiter(@month_posts) %>건 · SNS에 올린 글 <%= number_with_delimiter(@month_sns_posts) %>건</p>
-        <p class="impd-label-muted" style="margin: 8px 0 12px;">SNS 종류별 숫자는 준비되면 여기에 함께 보여요.</p>
-        <%= link_to "소식 쓰러 가기", slug_admin_posts_path(slug: @member.slug), class: "impd-btn impd-btn-secondary" %>
+        <p class="impd-label-muted" style="margin: 8px 0 12px;">블로그·페이스북·인스타그램별 숫자는 '내 채널'에서 볼 수 있어요.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <%= link_to "소식 쓰러 가기", slug_admin_posts_path(slug: @member.slug), class: "impd-btn impd-btn-secondary", style: "min-height: 44px;" %>
+          <%= link_to "내 채널 보기", slug_admin_channels_path(slug: @member.slug), class: "impd-btn impd-btn-secondary", style: "min-height: 44px;" %>
+        </div>
       </section>
     </div>
   </section>
