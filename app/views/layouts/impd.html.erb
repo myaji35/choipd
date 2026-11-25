@@ -211,7 +211,7 @@
     <% end %>
 
     <!-- imPD TopNav — C2 whisper-soft shadow -->
-    <% nav_links = [["홈", root_path, request.path == "/"], ["둘러보기", explore_path, request.path.start_with?("/explore")], ["예시", "/choi-pd", false], ["가격", root_path(anchor: "pricing"), false], ["도움말", root_path(anchor: "faq"), false]] %>
+    <% nav_links = [["홈", root_path, request.path == "/"], ["둘러보기", explore_path, request.path.start_with?("/explore")], ["예시", example_profile_path, false], ["가격", root_path(anchor: "pricing"), false], ["도움말", root_path(anchor: "faq"), false]] %>
     <style>
       .impd-topnav { position: sticky; top: 0; z-index: 20; background: var(--impd-card); box-shadow: var(--impd-shadow-nav); }
       .impd-topnav-bar { padding: 18px 24px; display: flex; align-items: center; gap: 20px; }
