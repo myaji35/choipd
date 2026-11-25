@@ -2,7 +2,12 @@ module Pd::MembersHelper
   def profile_account_next_step(account)
     case account.session_status
     when "unknown"
-      ["아직 점검 전입니다. 점검을 돌리면 회원 화면의 '계정 확인'이 채워집니다.", "점검하러 가기", pd_profile_accounts_path]
+      message = if account.external_id.blank?
+        "아직 점검 전입니다. 점검을 돌린 뒤 이 화면으로 돌아오면 찾은 계정으로 바꿀 수 있습니다."
+      else
+        "아직 점검 전입니다. 점검을 돌리면 회원 화면의 '계정 확인'이 채워집니다."
+      end
+      [message, "점검하러 가기", pd_profile_accounts_path]
     when "logged_out"
       ["로그인이 풀려 있습니다. ego 브라우저에서 다시 로그인한 뒤 점검해 주세요.", "점검하러 가기", pd_profile_accounts_path]
     when "error"

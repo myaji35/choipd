@@ -220,6 +220,112 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "이미 다른 회원에게 연결된 계정이에요.", flash[:alert]
   end
 
+  test "찾은 계정으로 바꾸면 손 등록 계정을 지우고 메모와 로그인 아이디를 옮긴다" do
+    member = Member.create!(name: "교체 회원", email: "replace@example.test", slug: "replace")
+    manual = member.profile_accounts.create!(platform: "linkedin", display_name: member.name,
+      notes: "손 등록 메모", login_id: "manual-id", profile_url: "https://example.test/manual")
+    @account.update!(notes: "점검 메모", profile_url: "https://example.test/found", session_status: "logged_in")
+    snapshot = @account.profile_snapshots.create!(captured_at: Time.current)
+
+    assert_difference "ProfileAccount.count", -1 do
+      patch pd_profile_account_path(@account), params: {
+        profile_account: { member_id: member.id }, link: "1", replace_id: manual.id
+      }
+    end
+
+    assert_response :see_other
+    assert_redirected_to pd_member_path(member, anchor: "accounts")
+    assert_equal "LinkedIn 계정을 점검이 찾은 계정으로 바꿨습니다. 손으로 등록한 계정은 지우고 메모는 옮겼습니다.", flash[:notice]
+    assert_equal @account, member.profile_accounts.where(platform: "linkedin").sole
+    assert_equal "점검 메모\n손 등록 메모", @account.reload.notes
+    assert_equal "manual-id", @account.login_id
+    assert_equal "https://example.test/found", @account.profile_url
+    assert_equal snapshot, @account.latest_snapshot
+    get slug_admin_dashboard_path(slug: member.slug)
+    assert_response :ok
+    assert_select "#profile-accounts-status article", text: /LinkedIn.*관리 중/m, count: 1 do
+      assert_select "li", text: /○ 계정 확인/, count: 0
+    end
+  end
+
+  test "운영자는 기존 로그인 아이디를 유지하고 빈 주소를 손 등록 계정에서 옮긴다" do
+    sign_in AdminUser.create!(email: "replace-admin@example.test", password: "password123", role: "admin")
+    member = Member.create!(name: "교체 회원", email: "replace@example.test", slug: "replace")
+    manual = member.profile_accounts.create!(platform: "linkedin", display_name: member.name,
+      login_id: "manual-id", profile_url: "https://example.test/manual")
+    @account.update!(login_id: "checked-id", notes: "점검 메모")
+
+    patch pd_profile_account_path(@account), params: {
+      profile_account: { member_id: member.id }, link: "1", replace_id: manual.id
+    }
+
+    assert_response :see_other
+    assert_equal @account, member.profile_accounts.sole
+    assert_equal "checked-id", @account.reload.login_id
+    assert_equal "https://example.test/manual", @account.profile_url
+    assert_equal "점검 메모", @account.notes
+  end
+
+  test "기록이 있는 손 등록 계정은 바꾸지 않는다" do
+    member = Member.create!(name: "기록 회원", email: "history@example.test", slug: "history")
+    manual = member.profile_accounts.create!(platform: "linkedin", display_name: member.name)
+    snapshot = manual.profile_snapshots.create!(captured_at: Time.current)
+
+    assert_no_difference "ProfileAccount.count" do
+      patch pd_profile_account_path(@account), params: {
+        profile_account: { member_id: member.id }, link: "1", replace_id: manual.id
+      }
+    end
+
+    assert_response :see_other
+    assert_redirected_to pd_member_path(member, anchor: "accounts")
+    assert_equal "이 계정에는 이미 점검 기록이나 작성한 내용이 있어 바꿀 수 없어요.", flash[:alert]
+    assert_nil @account.reload.member_id
+    assert_equal member, manual.reload.member
+    assert_equal snapshot, manual.latest_snapshot
+  end
+
+  test "다른 회원의 계정을 replace_id 로 보내면 거부한다" do
+    member = Member.create!(name: "요청 회원", email: "request@example.test", slug: "request")
+    other = Member.create!(name: "다른 회원", email: "other-manual@example.test", slug: "other-manual")
+    manuals = [
+      other.profile_accounts.create!(platform: "linkedin", display_name: other.name),
+      member.profile_accounts.create!(platform: "naver_people", display_name: member.name),
+      member.profile_accounts.create!(platform: "linkedin", display_name: member.name, tenant_id: 2)
+    ]
+
+    manuals.each do |manual|
+      assert_no_difference "ProfileAccount.count" do
+        patch pd_profile_account_path(@account), params: {
+          profile_account: { member_id: member.id }, link: "1", replace_id: manual.id
+        }
+      end
+      assert_response :see_other
+      assert_redirected_to pd_member_path(member, anchor: "accounts")
+      assert_equal "이 계정에는 이미 점검 기록이나 작성한 내용이 있어 바꿀 수 없어요.", flash[:alert]
+      assert_nil @account.reload.member_id
+    end
+  end
+
+  test "이미 연결된 찾은 계정은 바꾸기를 거부하고 손 등록 계정을 남긴다" do
+    member = Member.create!(name: "요청 회원", email: "request@example.test", slug: "request")
+    other = Member.create!(name: "기존 회원", email: "linked@example.test", slug: "linked")
+    manual = member.profile_accounts.create!(platform: "linkedin", display_name: member.name)
+    @account.update!(member: other)
+
+    assert_no_difference "ProfileAccount.count" do
+      patch pd_profile_account_path(@account), params: {
+        profile_account: { member_id: member.id }, link: "1", replace_id: manual.id
+      }
+    end
+
+    assert_response :see_other
+    assert_redirected_to pd_member_path(member, anchor: "accounts")
+    assert_equal "이미 다른 회원에게 연결된 계정이에요.", flash[:alert]
+    assert_equal other, @account.reload.member
+    assert_equal member, manual.reload.member
+  end
+
   test "기존 계정을 연결하면 계정 수를 유지하고 회원 화면으로 돌아간다" do
     member = Member.create!(name: "계정 연결 회원", email: "profile-connect@example.test", slug: "profile-connect")
 

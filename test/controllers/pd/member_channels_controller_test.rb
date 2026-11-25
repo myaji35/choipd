@@ -12,7 +12,12 @@ class Pd::MemberChannelsControllerTest < ActionDispatch::IntegrationTest
     sign_in @pd
     get new_pd_member_channel_path(@member, platform: "naver_blog")
     assert_response :ok
-    assert_select "select[name='brand_channel[platform]'] option[value=naver_blog][selected]"
+    assert_select "input[type=hidden][name='brand_channel[platform]'][value=naver_blog]"
+    assert_select "select[name='brand_channel[platform]']", count: 0
+    assert_select "h1", text: "네이버 블로그 채널 등록"
+    assert_select "p", text: "종류: 네이버 블로그"
+    assert_select "#channel-handle-help", text: "블로그 아이디 — blog.naver.com/ 뒤에 오는 글자"
+    assert_select "input[name='brand_channel[profile_url]'][placeholder='https://blog.naver.com/아이디']"
     assert_select "input[name^='brand_channel'], select[name^='brand_channel'], textarea[name^='brand_channel']", count: 4
 
     assert_difference({ "Brand.where(personal: true).count" => 1, "BrandChannel.count" => 1 }) do
@@ -79,6 +84,19 @@ class Pd::MemberChannelsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#brand_channel_platform option[value=naver_blog][selected]"
   end
 
+  test "고정된 채널 종류는 저장 실패 후에도 고정을 유지한다" do
+    sign_in @pd
+    post pd_member_channels_path(@member), params: {
+      lock_platform: "1", brand_channel: { platform: "naver_blog", profile_url: "ftp://example.test" }
+    }
+
+    assert_response :unprocessable_entity
+    assert_select "input[name=lock_platform][value='1']"
+    assert_select "input[type=hidden][name='brand_channel[platform]'][value=naver_blog]"
+    assert_select "select[name='brand_channel[platform]']", count: 0
+    assert_select "h1", text: "네이버 블로그 채널 등록"
+  end
+
   test "같은 종류의 채널이 다른 브랜드에 있어도 해당 수정 화면으로 이동한다" do
     channel = @member.brands.create!(name: "기존 브랜드").brand_channels.create!(platform: "naver_blog")
     sign_in @pd
@@ -137,13 +155,13 @@ class Pd::MemberChannelsControllerTest < ActionDispatch::IntegrationTest
     sign_in @pd
 
     get new_pd_member_channel_path(@member, platform: "naver_blog")
-    assert_select "button[name=next][value='1']", text: "등록하고 다음 채널"
+    assert_select "button[name=next][value='1']", text: "등록하고 다음: 페이스북"
 
     post pd_member_channels_path(@member), params: { next: "1", brand_channel: { platform: "naver_blog" } }
     assert_redirected_to new_pd_member_channel_path(@member, platform: "facebook_page")
     assert_equal "네이버 블로그 채널을 등록했습니다. 이어서 페이스북을 등록하세요.", flash[:notice]
     follow_redirect!
-    assert_select "button[name=next][value='1']", text: "등록하고 다음 채널"
+    assert_select "button[name=next][value='1']", text: "등록하고 다음: 인스타그램"
 
     post pd_member_channels_path(@member), params: { next: "1", brand_channel: { platform: "facebook_page" } }
     assert_redirected_to new_pd_member_channel_path(@member, platform: "instagram")

@@ -9,6 +9,10 @@ class Pd::BaseController < ApplicationController
 
   private
 
+  def tenant_accounts
+    ProfileAccount.where(tenant_id: 1)
+  end
+
   def require_pd_role!
     unless current_admin_user&.pd? || current_admin_user&.admin?
       redirect_to root_path, alert: "접근 권한이 없습니다."

@@ -16,6 +16,7 @@ class Pd::DashboardControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :ok
     assert_select "h2", text: "회원 대행 등록"
+    assert_select "a[href=?]", pd_members_path(filter: "progress"), text: "등록하다 만 회원 1명"
     assert_select "a[href=?]", pd_members_path(filter: "todo"), text: "등록이 남은 회원 2명"
     assert_select "a[href=?]", pd_members_path(filter: "consent"), text: "위탁 동의 대기 1명"
     assert_select "a[href^='/admin']", count: 0
@@ -28,6 +29,7 @@ class Pd::DashboardControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :ok
     assert_select "a[href=?]", admin_inquiries_path, text: "전체 보기"
+    assert_select "a[href=?]", pd_members_path(filter: "progress"), count: 0
     assert_select "p", text: "지금 남은 대행 등록이 없습니다."
     assert_select "a[href=?]", pd_members_path, text: "회원 대행 등록 열기"
   end

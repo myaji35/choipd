@@ -15,6 +15,20 @@ module Pd::MemberRegistrationStatus
     end
   end
 
+  def registration_in_progress?(row)
+    (row.fetch(:account_count) + row.fetch(:channel_count)).positive? && registration_todo?(row)
+  end
+
+  def replaceable_manual_account?(account)
+    account.external_id.blank? &&
+      !account.profile_snapshots.exists? &&
+      account.naver_people_target.nil? &&
+      !account.naver_people_submissions.exists? &&
+      !account.linkedin_share_posts.exists? &&
+      !account.linkedin_newsletter_drafts.exists? &&
+      !account.linkedin_invitation_actions.exists?
+  end
+
   def registration_todo?(row)
     row.fetch(:account_count) < ProfileAccount::PLATFORMS.size ||
       row.fetch(:channel_count) < MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS.size

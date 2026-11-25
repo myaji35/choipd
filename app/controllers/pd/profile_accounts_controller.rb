@@ -1,4 +1,6 @@
 class Pd::ProfileAccountsController < Pd::BaseController
+  include Pd::MemberRegistrationStatus
+
   before_action :set_account, only: [ :show, :edit, :update, :destroy, :invitation_action, :search_queries ]
 
   helper_method :more_registrations?
@@ -189,10 +191,6 @@ class Pd::ProfileAccountsController < Pd::BaseController
     @account = tenant_accounts.find(params[:id])
   end
 
-  def tenant_accounts
-    ProfileAccount.where(tenant_id: 1)
-  end
-
   def assign_account_attributes
     attributes = account_params
     @account.assign_attributes(attributes.except(:member_id))
@@ -211,8 +209,9 @@ class Pd::ProfileAccountsController < Pd::BaseController
       return render :edit, status: :unprocessable_entity
     end
 
-    linked = tenant_accounts.where(id: @account.id, member_id: nil)
-      .update_all(member_id: @member.id, updated_at: Time.current)
+    return replace_manual_account if params.key?(:replace_id)
+
+    linked = link_unassigned_account
 
     if linked == 1
       flash[:notice] = "#{@account.platform_label} 계정을 #{@member.name} 회원에 연결했습니다."
@@ -220,6 +219,46 @@ class Pd::ProfileAccountsController < Pd::BaseController
       flash[:alert] = "이미 다른 회원에게 연결된 계정이에요."
     end
     redirect_to pd_member_path(@member, anchor: "accounts"), status: :see_other
+  end
+
+  def replace_manual_account
+    alert = "이 계정에는 이미 점검 기록이나 작성한 내용이 있어 바꿀 수 없어요."
+    ProfileAccount.transaction(requires_new: true) do
+      @account.lock!
+      raise ActiveRecord::Rollback if @account.external_id.blank?
+
+      manual = tenant_accounts.where(member_id: @member.id, platform: @account.platform).lock.find_by(id: params[:replace_id])
+      unless manual && replaceable_manual_account?(manual)
+        raise ActiveRecord::Rollback
+      end
+
+      unless link_unassigned_account == 1
+        alert = "이미 다른 회원에게 연결된 계정이에요."
+        raise ActiveRecord::Rollback
+      end
+
+      @account.reload
+      @account.login_id = manual.login_id if @account.login_id.blank?
+      @account.profile_url = manual.profile_url if @account.profile_url.blank?
+      if manual.notes.present?
+        @account.notes = [@account.notes.presence, manual.notes].compact.join("\n")
+      end
+      @account.save!
+      manual.destroy!
+      alert = nil
+    end
+
+    if alert
+      flash[:alert] = alert
+    else
+      flash[:notice] = "#{@account.platform_label} 계정을 점검이 찾은 계정으로 바꿨습니다. 손으로 등록한 계정은 지우고 메모는 옮겼습니다."
+    end
+    redirect_to pd_member_path(@member, anchor: "accounts"), status: :see_other
+  end
+
+  def link_unassigned_account
+    tenant_accounts.where(id: @account.id, member_id: nil)
+      .update_all(member_id: @member.id, updated_at: Time.current)
   end
 
   def account_params

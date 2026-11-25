@@ -34,6 +34,9 @@
     <%= link_to "회원 대행 등록 열기", pd_members_path, class: registration_link_class, style: "min-height: 44px;" %>
   <% else %>
     <div class="flex flex-wrap gap-4">
+      <% if @registration_progress_count.positive? %>
+        <%= link_to "등록하다 만 회원 #{@registration_progress_count}명", pd_members_path(filter: "progress"), class: registration_link_class, style: "min-height: 44px;" %>
+      <% end %>
       <%= link_to "등록이 남은 회원 #{@registration_todo_count}명", pd_members_path(filter: "todo"), class: registration_link_class, style: "min-height: 44px;" %>
       <%= link_to "위탁 동의 대기 #{@consent_waiting_count}명", pd_members_path(filter: "consent"), class: registration_link_class, style: "min-height: 44px;" %>
     </div>

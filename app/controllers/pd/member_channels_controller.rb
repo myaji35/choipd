@@ -7,12 +7,14 @@ class Pd::MemberChannelsController < Pd::BaseController
   helper_method :remaining_channel_platforms
 
   def new
+    @lock_platform = CHANNEL_PLATFORMS.key?(params[:platform])
     @brand_channel = BrandChannel.new(platform: params[:platform].presence_in(CHANNEL_PLATFORMS.keys))
   end
 
   def create
     attributes = create_params
     @brand_channel = BrandChannel.new(attributes)
+    @lock_platform = params[:lock_platform] == "1" && CHANNEL_PLATFORMS.key?(@brand_channel.platform)
     unless CHANNEL_PLATFORMS.key?(@brand_channel.platform)
       @brand_channel.errors.add(:platform, "채널 종류를 선택해 주세요.")
       return render :new, status: :unprocessable_entity

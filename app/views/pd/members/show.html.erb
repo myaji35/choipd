@@ -61,6 +61,38 @@
                 <%= link_to link_label, link_path, class: row_link_class, style: link_height %>
               <% end %>
             </p>
+            <% if (groups = @replacement_candidates[account.id]) %>
+              <% groups.each_with_index do |candidates, index| %>
+                <% next if candidates.empty? %>
+                <% candidate_list = capture do %>
+                  <ul class="mt-2">
+                    <% candidates.each do |candidate| %>
+                      <% login_id = candidate.login_id.presence || "아이디 없음" %>
+                      <li class="flex flex-wrap items-center justify-between gap-2 py-2">
+                        <p class="min-w-0 max-w-full break-words text-navy"><%= candidate.display_name %> · <%= login_id %> · <%= candidate.session_status_label %></p>
+                        <%= button_to "찾은 계정으로 바꾸기", pd_profile_account_path(candidate), method: :patch,
+                            params: { profile_account: { member_id: @member.id }, link: "1", replace_id: account.id },
+                            form: { data: { turbo_confirm: "#{candidate.display_name}(#{login_id}) 계정을 #{@member.name} 회원의 #{label} 계정으로 바꿀까요? 손으로 등록한 계정은 지워지고 되돌릴 수 없습니다." } },
+                            class: "rounded-lg border border-gray-300 px-3 py-2 text-primary cursor-pointer", style: link_height %>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% end %>
+                <% if index.zero? %>
+                  <div class="w-full min-w-0 rounded-lg border border-gray-300 p-3">
+                    <p class="font-medium text-navy">점검이 찾은 계정이 따로 있습니다</p>
+                    <p class="mt-1 text-gray-700">손으로 등록한 계정은 점검과 이어지지 않아 '계정 확인'이 채워지지 않습니다. 같은 계정이면 찾은 계정으로 바꿔 주세요. 메모와 로그인 아이디는 옮겨집니다.</p>
+                    <%= candidate_list %>
+                  </div>
+                <% else %>
+                  <details class="w-full min-w-0">
+                    <summary class="cursor-pointer text-primary" style="min-height: 44px; padding-block: 12px;">이름이 다른 찾은 계정 <%= candidates.size %>개 보기</summary>
+                    <p class="text-gray-600">이 회원의 계정이 확실할 때만 바꿔 주세요.</p>
+                    <%= candidate_list %>
+                  </details>
+                <% end %>
+              <% end %>
+            <% end %>
           </li>
         <% end %>
       <% else %>

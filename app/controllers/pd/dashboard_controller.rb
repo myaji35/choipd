@@ -3,6 +3,7 @@ class Pd::DashboardController < Pd::BaseController
 
   def index
     rows = member_registration_rows(Member.for_tenant.includes(:profile_accounts, brands: :brand_channels))
+    @registration_progress_count = rows.count { |row| registration_in_progress?(row) }
     @registration_todo_count = rows.count { |row| registration_todo?(row) }
     @consent_waiting_count = rows.count { |row| row.fetch(:consent_waiting).positive? }
     @upcoming_posts = SnsScheduledPost.upcoming.limit(5)

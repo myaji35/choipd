@@ -75,7 +75,7 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     sign_in @pd
     account = @member.profile_accounts.create!(platform: "linkedin", display_name: @member.name)
     messages = {
-      "unknown" => "아직 점검 전입니다. 점검을 돌리면 회원 화면의 '계정 확인'이 채워집니다.",
+      "unknown" => "아직 점검 전입니다. 점검을 돌린 뒤 이 화면으로 돌아오면 찾은 계정으로 바꿀 수 있습니다.",
       "logged_out" => "로그인이 풀려 있습니다. ego 브라우저에서 다시 로그인한 뒤 점검해 주세요.",
       "error" => "점검 중 오류가 났습니다. 계정 상세에서 내용을 확인해 주세요.",
       "logged_in" => "계정 확인까지 끝났습니다. 다음은 계정 상세에서 내용 손보기입니다."
@@ -92,6 +92,34 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     account.profile_snapshots.create!(captured_at: Time.current)
     get pd_member_path(@member)
     assert_select "#accounts li p", text: "관리 중 — 회원 화면에도 '관리 중'으로 보입니다."
+  end
+
+  test "손으로 등록한 계정에 점검이 찾은 계정이 있으면 바꾸기를 안내한다" do
+    sign_in @pd
+    manual = @member.profile_accounts.create!(platform: "linkedin", display_name: @member.name)
+    found = ProfileAccount.create!(platform: "linkedin", display_name: @member.name, external_id: "checked", login_id: "checked-id")
+    other = ProfileAccount.create!(platform: "linkedin", display_name: "다른 이름", external_id: "other")
+    unchecked = ProfileAccount.create!(platform: "linkedin", display_name: @member.name)
+
+    get pd_member_path(@member)
+
+    assert_select "#accounts p", text: "점검이 찾은 계정이 따로 있습니다"
+    assert_select "#accounts form[action=?]", pd_profile_account_path(found) do
+      assert_select "button", text: "찾은 계정으로 바꾸기"
+      assert_select "input[name=replace_id][value=?]", manual.id.to_s
+      assert_select "input[name='_method'][value=patch]"
+    end
+    assert_select "#accounts form[data-turbo-confirm=?]",
+      "#{found.display_name}(checked-id) 계정을 #{@member.name} 회원의 LinkedIn 계정으로 바꿀까요? 손으로 등록한 계정은 지워지고 되돌릴 수 없습니다."
+    assert_select "#accounts details:not([open])" do
+      assert_select "summary", text: "이름이 다른 찾은 계정 1개 보기"
+      assert_select "form[action=?] button", pd_profile_account_path(other), text: "찾은 계정으로 바꾸기"
+    end
+    assert_select "#accounts form[action=?]", pd_profile_account_path(unchecked), count: 0
+
+    manual.profile_snapshots.create!(captured_at: Time.current)
+    get pd_member_path(@member)
+    assert_select "#accounts button", text: "찾은 계정으로 바꾸기", count: 0
   end
 
   test "등록 전 플랫폼에는 같은 테넌트의 미연결 계정만 표시한다" do
@@ -175,11 +203,13 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS.each_key do |platform|
       brand.brand_channels.create!(platform: platform, delegation_consent_at: Time.current)
     end
+    waiting.profile_accounts.create!(platform: "linkedin", display_name: waiting.name)
     waiting.ensure_personal_brand!.brand_channels.create!(platform: "naver_blog")
     sign_in @pd
 
     get pd_members_path, params: { filter: "unexpected" }
     assert_select "a[aria-current=true]", text: "전체 3"
+    assert_select "a[href=?]", pd_members_path(filter: "progress"), text: "등록 중 1"
     assert_select "a[href=?]", pd_members_path(filter: "todo"), text: "등록 남음 2"
     assert_select "a[href=?]", pd_members_path(filter: "consent"), text: "위탁 동의 대기 1"
     assert_select "li", text: /#{@member.name}.*등록 완료/m
@@ -188,8 +218,18 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
 
     get pd_members_path, params: { filter: "todo" }
     assert_select "li strong", count: 2
+    assert_select "ul > li:first-child strong", text: waiting.name
     assert_select "li strong", text: waiting.name
     assert_select "li strong", text: empty.name
+
+    get pd_members_path, params: { filter: "progress", q: "필터" }
+    assert_select "li strong", count: 1, text: waiting.name
+    assert_select "li span", text: "등록 중"
+    assert_select "a[href=?][aria-current=true]", pd_members_path(q: "필터", filter: "progress"), text: "등록 중 1"
+    assert_select "input[name=filter][value=progress]"
+
+    get pd_members_path, params: { filter: "progress", q: empty.slug }
+    assert_select "p", text: "등록하다 만 회원이 없습니다."
 
     get pd_members_path, params: { filter: "consent", q: "필터" }
     assert_select "li strong", count: 1, text: waiting.name
