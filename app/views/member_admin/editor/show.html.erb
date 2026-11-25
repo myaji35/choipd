@@ -12,7 +12,7 @@
     steps = [
       [1, "자료 올리기", "", step1_done],
       [2, "정보 확인", "", @can_publish],
-      [3, "스타일", step3_done ? "" : "기본 스타일 사용 중", step3_done],
+      [3, "스타일", step3_done ? "" : "기본 그대로", step3_done],
       [4, "공개", "", step4_done],
     ]
   %>
@@ -61,7 +61,7 @@
       </div>
 
       <ul class="editor-file-rules">
-        <li><strong>글</strong> — 이력서·경력을 적은 글 파일(.txt). 한글·워드 문서는 내용을 복사해 메모장에 붙여 저장한 뒤 올려 주세요.</li>
+        <li><strong>글</strong> — 이력·경력을 적은 글 파일(.txt)을 올리거나, 올리는 칸 아래에 바로 적어도 돼요. 한글·워드 문서는 내용을 복사해 그 칸에 붙여 넣어 주세요.</li>
         <li><strong>사진</strong> — 휴대폰 사진 그대로 올려도 돼요. 한 장에 25MB까지.</li>
         <li><strong>영상</strong> — 한 개에 100MB까지.</li>
       </ul>
@@ -80,7 +80,7 @@
       <section class="impd-card" aria-labelledby="basic-info-heading" data-controller="editor-info">
         <h2 id="basic-info-heading" class="impd-label">기본 정보</h2>
         <%= render "member_admin/editor/profile_photo" %>
-        <%= form_with url: slug_admin_editor_update_info_path(slug: @member.slug), method: :patch, local: true, class: "editor-fields", data: { turbo: false } do %>
+        <%= form_with url: slug_admin_editor_update_info_path(slug: @member.slug), method: :patch, local: true, class: "editor-fields", data: { turbo: false, controller: "unsaved-guard" } do %>
           <%
             info = @info_draft || @member
             errors = @info_errors || {}
@@ -183,6 +183,7 @@
           <button type="submit" class="impd-btn impd-btn-accent" style="margin-top: 20px; height: 52px; padding: 0 28px; font-size: 15px; width: 100%; justify-content: center;">
             정보 저장하고 다음 →
           </button>
+          <p class="impd-label-muted" style="font-size: 14px; margin-top: 10px; text-align: center;">저장을 눌러야 내 페이지에 반영돼요.</p>
         <% end %>
       </section>
 
@@ -387,6 +388,15 @@
             </p>
             <a href="<%= slug_admin_editor_path(slug: @member.slug, step: 2, anchor: @publish_missing.include?("자기소개 20자 이상") ? "bio" : "profession-region") %>"
                class="impd-btn impd-btn-secondary" style="width: 100%; height: 48px; margin-bottom: 12px; justify-content: center;">내 정보 적으러 가기 →</a>
+          <% else %>
+            <% remaining_count = @checklist.size - done_count %>
+            <p id="publish-ready-hint" style="font-size: 14px; color: var(--impd-ink2); line-height: 1.55; margin-bottom: 12px;">
+              <% if remaining_count.positive? %>
+                <strong>지금 공개할 수 있어요.</strong> 남은 준비 항목 <%= remaining_count %>개는 공개한 뒤에 채워도 돼요.
+              <% else %>
+                <strong>준비를 모두 마쳤어요.</strong> 이제 공개만 하면 돼요.
+              <% end %>
+            </p>
           <% end %>
 
           <%= form_with url: slug_admin_editor_publish_path(slug: @member.slug), method: :patch, local: true, data: { turbo: false } do %>
@@ -481,7 +491,7 @@
   .editor-publish-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; }
   .editor-publish-links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--impd-accent); text-decoration: underline; }
   @media (max-width: 480px) { #publish-next-actions { grid-template-columns: minmax(0, 1fr); } }
-  @media (max-width: 768px) { .editor-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 24px !important; } .editor-page > div:first-of-type a { padding: 12px 4px !important; min-width: 0; } .editor-page > div:first-of-type a p { font-size: 13px !important; overflow-wrap: anywhere; } .editor-page .impd-section-header { flex-wrap: wrap; } }
+  @media (max-width: 768px) { .editor-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 24px !important; } .editor-page > div:first-of-type a { padding: 12px 4px !important; min-width: 0; } .editor-page > div:first-of-type a p { font-size: 13px !important; word-break: keep-all; overflow-wrap: break-word; } .editor-page .impd-section-header { flex-wrap: wrap; } }
   @media (max-width: 480px) { .editor-pair { grid-template-columns: minmax(0, 1fr) !important; } }
   .theme-card, .layout-card { position: relative; }
   .theme-radio:checked + .theme-card, .layout-radio:checked + .layout-card {

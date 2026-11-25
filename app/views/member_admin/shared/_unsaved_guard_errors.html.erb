@@ -1,0 +1,7 @@
+<% if record.errors.any? %>
+  <ul role="alert" data-unsaved-guard-error>
+    <% record.errors.full_messages.each do |message| %>
+      <li><%= message %></li>
+    <% end %>
+  </ul>
+<% end %>

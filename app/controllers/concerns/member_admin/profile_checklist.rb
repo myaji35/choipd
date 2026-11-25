@@ -10,7 +10,7 @@ module MemberAdmin::ProfileChecklist
       [ "profession-region", "직업·지역 정하기", "고객이 나에게 맞는 전문가인지 알 수 있어요.", @member.profession.present? && @member.region.present?, { step: 2 } ],
       [ "media", "작업 사진 올리기", "작업 사례로 경험을 보여주세요.", @member.member_portfolio_items.exists? || @member.member_photos.exists?, { step: 1, tab: "media" } ],
       [ "services", "서비스 등록하기", "고객이 제공하는 서비스를 쉽게 확인할 수 있어요.", @member.member_services.exists?, nil ],
-      [ "docs", "경력 문서 올리기", "경험과 강점을 페이지에 담을 수 있어요.", @member.member_documents.exists?, { step: 1, tab: "docs" } ]
+      [ "docs", "경력 글 올리기", "경험과 강점을 페이지에 담을 수 있어요.", @member.member_documents.exists?, { step: 1, tab: "docs" } ]
     ].map do |task, action, why, done, editor_options|
       options = { slug: @member.slug }
       options.merge!(from: "checklist", task: task) if from_checklist

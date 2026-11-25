@@ -45,10 +45,10 @@
       <div class="impd-section-header" style="margin-bottom: 20px;">
         <h2 class="impd-display" style="font-size: 24px;">새 소식 쓰기</h2>
       </div>
-      <%= form_with model: MemberPost.new, url: slug_admin_posts_path(slug: @member.slug) do |form| %>
+      <%= form_with model: (@new_post || MemberPost.new), url: slug_admin_posts_path(slug: @member.slug), data: { controller: "unsaved-guard" } do |form| %>
         <%= render "post_fields", form: form %>
         <label class="impd-check">
-          <%= form.check_box :is_published, { checked: true, aria: { describedby: "post-visibility-help" } }, 1, 0 %>
+          <%= form.check_box :is_published, { checked: @new_post.nil? || @new_post.is_published.to_i == 1, aria: { describedby: "post-visibility-help" } }, 1, 0 %>
           내 페이지에 바로 보이기
         </label>
         <p id="post-visibility-help" class="impd-field-help">체크를 풀면 나만 보는 글로 저장돼요.</p>

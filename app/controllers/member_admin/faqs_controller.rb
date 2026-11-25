@@ -13,7 +13,7 @@ class MemberAdmin::FaqsController < MemberAdmin::BaseController
       redirect_to slug_admin_faqs_path(slug: @member.slug), notice: "질문을 저장했어요. 내 페이지에서 볼 수 있어요."
     else
       @faqs = @member.member_faqs.sorted
-      flash.now[:alert] = faq.errors.full_messages.join(", ")
+      @new_faq = faq
       render :index, status: :unprocessable_entity
     end
   end
@@ -29,7 +29,7 @@ class MemberAdmin::FaqsController < MemberAdmin::BaseController
       redirect_to slug_admin_faqs_path(slug: @member.slug), notice: message
     else
       @faqs = @member.member_faqs.sorted
-      flash.now[:alert] = @faq.errors.full_messages.join(", ")
+      flash.now[:alert] = @faq.errors.full_messages.join(", ") if params[:visibility_toggle].present?
       render :index, status: :unprocessable_entity
     end
   end

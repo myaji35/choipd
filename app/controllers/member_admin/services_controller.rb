@@ -13,7 +13,7 @@ class MemberAdmin::ServicesController < MemberAdmin::BaseController
       redirect_to slug_admin_services_path(slug: @member.slug), notice: "서비스를 저장했어요. 내 페이지 '서비스' 칸에서 볼 수 있어요."
     else
       @services = @member.member_services.sorted
-      flash.now[:alert] = service.errors.full_messages.join(", ")
+      @new_service = service
       render :index, status: :unprocessable_entity
     end
   end
@@ -29,7 +29,7 @@ class MemberAdmin::ServicesController < MemberAdmin::BaseController
       redirect_to slug_admin_services_path(slug: @member.slug), notice: message
     else
       @services = @member.member_services.sorted
-      flash.now[:alert] = @service.errors.full_messages.join(", ")
+      flash.now[:alert] = @service.errors.full_messages.join(", ") if params[:visibility_toggle].present?
       render :index, status: :unprocessable_entity
     end
   end

@@ -39,9 +39,10 @@
               </p>
 
               <div class="impd-item-actions">
-                <details>
+                <% edit_failed = @service == service && @service.errors.any? %>
+                <details<%= " open" if edit_failed %>>
                   <summary>수정</summary>
-                  <%= form_with model: service, url: slug_admin_service_path(slug: @member.slug, id: service), method: :patch, style: "margin-top: 18px;" do |form| %>
+                  <%= form_with model: (edit_failed ? @service : service), url: slug_admin_service_path(slug: @member.slug, id: service), method: :patch, style: "margin-top: 18px;", data: { controller: "unsaved-guard" } do |form| %>
                     <%= render "service_fields", form: form, submit_label: "변경사항 저장" %>
                   <% end %>
                 </details>
@@ -67,7 +68,7 @@
       <div class="impd-section-header" style="margin-bottom: 20px;">
         <h2 class="impd-display" style="font-size: 24px;">새 서비스 추가</h2>
       </div>
-      <%= form_with model: MemberService.new, url: slug_admin_services_path(slug: @member.slug) do |form| %>
+      <%= form_with model: (@new_service || MemberService.new), url: slug_admin_services_path(slug: @member.slug), data: { controller: "unsaved-guard" } do |form| %>
         <%= render "service_fields", form: form, submit_label: "서비스 저장" %>
       <% end %>
     </section>

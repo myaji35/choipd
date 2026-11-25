@@ -1,3 +1,4 @@
+<%= render "member_admin/shared/unsaved_guard_errors", record: form.object %>
 <div class="impd-field">
   <%= form.label :title, "제목 (필수)" %>
   <%= form.text_field :title, class: "impd-input", required: true, placeholder: "예: 11월 무료 상담 주간 안내" %>

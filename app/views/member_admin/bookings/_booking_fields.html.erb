@@ -1,3 +1,4 @@
+<%= render "member_admin/shared/unsaved_guard_errors", record: form.object %>
 <div class="impd-field">
   <%= form.label :booking_type, "예약 받는 곳 이름" %>
   <%= form.text_field :booking_type, class: "impd-input", placeholder: "예: 네이버 예약, 카카오 예약" %>

@@ -15,7 +15,7 @@ class MemberAdmin::PostsController < MemberAdmin::BaseController
       redirect_to slug_admin_posts_path(slug: @member.slug), notice: message
     else
       @posts = @member.member_posts.recent
-      flash.now[:alert] = post.errors.full_messages.join(", ")
+      @new_post = post
       render :index, status: :unprocessable_entity
     end
   end
@@ -31,7 +31,6 @@ class MemberAdmin::PostsController < MemberAdmin::BaseController
       redirect_to slug_admin_posts_path(slug: @member.slug), notice: "소식을 고쳤어요."
     else
       @posts = @member.member_posts.recent
-      flash.now[:alert] = @post.errors.full_messages.join(", ")
       render :index, status: :unprocessable_entity
     end
   end

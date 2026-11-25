@@ -1,3 +1,4 @@
+<%= render "member_admin/shared/unsaved_guard_errors", record: form.object %>
 <div class="impd-field">
   <%= form.label :question, "질문 (필수)" %>
   <%= form.text_field :question, required: true, class: "impd-input", placeholder: "예: 상담은 어떻게 진행되나요?" %>
@@ -14,7 +15,7 @@
   </div>
 <% end %>
 <label class="impd-check">
-  <%= form.check_box :is_published, { checked: form.object.new_record? || form.object.is_published.to_i == 1 }, 1, 0 %>
+  <%= form.check_box :is_published, { checked: (form.object.new_record? && form.object.errors.empty?) || form.object.is_published.to_i == 1 }, 1, 0 %>
   내 페이지에 보이기
 </label>
 <%= form.submit submit_label, class: "impd-btn impd-btn-primary", style: "width: 100%; justify-content: center; margin-top: 20px;" %>

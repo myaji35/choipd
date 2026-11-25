@@ -15,11 +15,11 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
     assert_response :success
     actions = {
       "사진 올리기" => [ "profile-photo", "프로필 사진 올리기" ],
-      "자기소개 쓰기" => [ "bio", "자기소개 작성 (50자 이상)" ],
-      "직업·지역 정하기" => [ "profession-region", "직업/지역 설정" ],
-      "작업 사진 올리기" => [ "media", "작업 사진·사례 1개 이상" ],
-      "서비스 등록하기" => [ "new-service", "서비스 1개 이상 등록" ],
-      "경력 문서 올리기" => [ "docs", "이력서·경력 문서 올리기" ]
+      "자기소개 쓰기" => [ "bio", "자기소개 50자 넘게 쓰기" ],
+      "직업·지역 정하기" => [ "profession-region", "직업과 지역 적기" ],
+      "작업 사진 올리기" => [ "media", "작업 사진·사례 올리기" ],
+      "서비스 등록하기" => [ "new-service", "서비스 1개 넣기" ],
+      "경력 글 올리기" => [ "docs", "경력을 적은 글 올리기" ]
     }
     links = css_select('a[href*="from=checklist"]').to_h { |link| [ link.text.strip, link["href"] ] }
     assert_equal actions.keys.sort, links.keys.sort

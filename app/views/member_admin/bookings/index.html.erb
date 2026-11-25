@@ -39,9 +39,10 @@
               <% end %>
 
               <div class="impd-item-actions">
-                <details>
+                <% edit_failed = @booking == booking && @booking.errors.any? %>
+                <details<%= " open" if edit_failed %>>
                   <summary>수정</summary>
-                  <%= form_with model: booking, url: slug_admin_booking_path(slug: @member.slug, id: booking), method: :patch, class: "booking-form", style: "margin-top: 18px;" do |form| %>
+                  <%= form_with model: (edit_failed ? @booking : booking), url: slug_admin_booking_path(slug: @member.slug, id: booking), method: :patch, class: "booking-form", style: "margin-top: 18px;", data: { controller: "unsaved-guard" } do |form| %>
                     <%= render "booking_fields", form: form, submit_label: "변경사항 저장" %>
                   <% end %>
                 </details>
@@ -63,7 +64,7 @@
       <div class="impd-section-header" style="margin-bottom: 20px;">
         <h2 class="impd-display" style="font-size: 24px;">새 예약 링크 추가</h2>
       </div>
-      <%= form_with model: MemberBooking.new, url: slug_admin_bookings_path(slug: @member.slug), class: "booking-form" do |form| %>
+      <%= form_with model: (@new_booking || MemberBooking.new), url: slug_admin_bookings_path(slug: @member.slug), class: "booking-form", data: { controller: "unsaved-guard" } do |form| %>
         <%= render "booking_fields", form: form, submit_label: "예약 링크 저장" %>
       <% end %>
     </section>

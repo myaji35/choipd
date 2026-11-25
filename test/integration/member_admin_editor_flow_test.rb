@@ -21,6 +21,48 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "당신의 페이지"
   end
 
+  test "글 파일이 없어도 자료 단계에서 직접 적을 수 있다" do
+    assert_difference -> { @member.member_documents.count }, 1 do
+      post slug_admin_documents_path(slug: @member.slug, format: :json), params: {
+        filename: "직접 쓴 글 2026-11-25 1305.txt", category: "career",
+        content: "2010년부터 보험 설계사로 일하고 있어요."
+      }, as: :json
+      assert_response :created
+    end
+    assert_equal "직접 쓴 글 2026-11-25 1305.txt", @member.member_documents.sole.filename
+  end
+
+  test "자료 목록이 비어 있거나 채워져 있어도 바로 적기 칸을 보여 준다" do
+    path = slug_admin_editor_path(slug: @member.slug, step: 1)
+    assert_write_doc = -> do
+      get path
+
+      assert_response :ok
+      assert_select "#write-doc" do
+        assert_select "label[for=doc_paste_text]", text: "파일이 없으면 여기에 바로 적어도 돼요"
+        assert_select "button[data-action='click->member-doc-uploader#uploadText']", text: "이 글 올리기"
+      end
+      assert_not_includes response.body, "메모장"
+    end
+
+    assert_write_doc.call
+    @member.member_documents.create!(tenant_id: 1, filename: "career.txt", category: "career", content_md: "경력 메모")
+    assert_write_doc.call
+  end
+
+  test "자료와 사진을 올릴 때 쉬운 안내를 쓴다" do
+    doc, photo = %w[member_doc_uploader member_photo_uploader].map do |name|
+      File.read(Rails.root.join("app/javascript/controllers/#{name}_controller.js"))
+    end
+    [ doc, photo ].each do |source|
+      [ "메모장", "확장자 불가", "업로드 중", "업로드 완료", 'HTTP $' ].each do |phrase|
+        assert_not_includes source, phrase
+      end
+    end
+    assert_includes doc, "uploadText"
+    assert_includes doc, "직접 쓴 글"
+  end
+
   test "정보 확인 단계에서 저장과 건너뛰기를 구분하고 쉬운 말을 쓴다" do
     get slug_admin_editor_path(slug: @member.slug, step: 2)
 
@@ -88,6 +130,7 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_response :ok
     assert_select "button[type=submit][disabled]", count: 1
     assert_includes response.body, "공개하려면 아직 필요해요:"
+    assert_select "#publish-ready-hint", count: 0
     assert_select "strong", text: "자기소개 20자 이상 · 직업"
     assert_select "a[href$='step=2#bio']", text: "내 정보 적으러 가기 →"
 
@@ -97,6 +140,25 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_response :ok
     assert_select "button[type=submit][disabled]", count: 0
     assert_select "button[type=submit]", text: "지금 공개하기"
+  end
+
+  test "공개할 수 있으면 남은 준비 항목 개수를 공개 버튼 위에 보여 준다" do
+    @member.update!(bio: "가" * 50, profession: "educator", region: "서울", profile_image: "/icon.png")
+    @member.member_photos.create!(category: "daily", image: fixture_file_upload(Rails.root.join("public/icon.png"), "image/png"))
+    @member.member_services.create!(title: "보장 분석 상담")
+    path = slug_admin_editor_path(slug: @member.slug, step: 4)
+
+    get path
+
+    assert_response :ok
+    assert_select "#publish-ready-hint", text: "지금 공개할 수 있어요. 남은 준비 항목 1개는 공개한 뒤에 채워도 돼요."
+    assert_select "#publish-ready-hint + form button", text: "지금 공개하기"
+
+    @member.member_documents.create!(tenant_id: 1, filename: "career.txt", category: "career", content_md: "경력 메모")
+    get path
+
+    assert_response :ok
+    assert_select "#publish-ready-hint", text: "준비를 모두 마쳤어요. 이제 공개만 하면 돼요."
   end
 
   test "직업만 빠졌으면 직업 입력 칸으로 안내한다" do
@@ -170,6 +232,7 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?]", slug_admin_editor_publish_path(slug: @member.slug), count: 0
     assert_not_includes response.body, "다시 공개하기"
     assert_includes response.body, "다시 공개할 필요는 없어요"
+    assert_select "#publish-ready-hint", count: 0
     assert_select "#publish-done", count: 0
   end
 
@@ -185,12 +248,13 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     path = slug_admin_editor_path(slug: @member.slug, step: 4)
 
     get path
-    assert_select "a[href='?step=3'] p", text: "기본 스타일 사용 중"
+    assert_select "a[href='?step=3'] p", text: "기본 그대로"
+    assert_not_includes response.body, "기본 스타일 사용 중"
 
     @member.update!(theme_preset: "warm")
     get path
     assert_select "a[href='?step=3']", text: /스타일.*\(마침\)/
-    assert_not_includes response.body, "기본 스타일 사용 중"
+    assert_not_includes response.body, "기본 그대로"
   end
 
   test "이메일 저장 실패 후 입력값을 유지하고 수정한 정보는 다시 저장할 수 있다" do

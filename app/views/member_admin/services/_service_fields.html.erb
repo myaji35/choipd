@@ -1,3 +1,4 @@
+<%= render "member_admin/shared/unsaved_guard_errors", record: form.object %>
 <div class="impd-field">
   <%= form.label :title, "서비스 이름 (필수)" %>
   <%= form.text_field :title, required: true, placeholder: "예: 1:1 보장 분석 상담", class: "impd-input" %>

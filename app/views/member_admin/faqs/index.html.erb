@@ -36,9 +36,10 @@
               <p style="margin-top: 8px; color: var(--impd-ink2); font-size: 14px; line-height: 1.7; overflow-wrap: anywhere;"><%= truncate(faq.answer, length: 120) %></p>
 
               <div class="impd-item-actions">
-                <details>
+                <% edit_failed = @faq == faq && @faq.errors.any? %>
+                <details<%= " open" if edit_failed %>>
                   <summary>수정</summary>
-                  <%= form_with model: faq, url: slug_admin_faq_path(slug: @member.slug, id: faq), method: :patch, style: "margin-top: 18px;" do |form| %>
+                  <%= form_with model: (edit_failed ? @faq : faq), url: slug_admin_faq_path(slug: @member.slug, id: faq), method: :patch, style: "margin-top: 18px;", data: { controller: "unsaved-guard" } do |form| %>
                     <%= render "faq_fields", form: form, submit_label: "변경사항 저장" %>
                   <% end %>
                 </details>
@@ -64,7 +65,7 @@
       <div class="impd-section-header" style="margin-bottom: 20px;">
         <h2 class="impd-display" style="font-size: 24px;">새 질문 추가</h2>
       </div>
-      <%= form_with model: MemberFaq.new, url: slug_admin_faqs_path(slug: @member.slug) do |form| %>
+      <%= form_with model: (@new_faq || MemberFaq.new), url: slug_admin_faqs_path(slug: @member.slug), data: { controller: "unsaved-guard" } do |form| %>
         <%= render "faq_fields", form: form, submit_label: "질문 저장" %>
       <% end %>
     </section>
