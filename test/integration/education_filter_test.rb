@@ -34,7 +34,7 @@ class EducationFilterTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".empty-state", count: 1 do
-      assert_select "a[href=?]", new_inquiry_path(type: 'b2b'), text: "원하는 강좌 문의하기", count: 1
+      assert_select "a[href=?]", new_inquiry_path(type: "b2b"), text: "원하는 강좌 문의하기", count: 1
     end
     assert_select ".course-title", count: 0
   end
