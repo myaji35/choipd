@@ -20,7 +20,7 @@ class MemberAdminPlainWordsTest < ActionDispatch::IntegrationTest
       %w[§01 §02 SERVICES BOOKINGS REVIEWS].each do |word|
         assert_no_match word, response.body
       end
-      ["신규 등록", "구조화 데이터", "외부 예약 URL"].each do |phrase|
+      [ "신규 등록", "구조화 데이터", "외부 예약 URL" ].each do |phrase|
         assert_no_match phrase, response.body
       end
       assert_includes response.body, heading
@@ -50,7 +50,7 @@ class MemberAdminPlainWordsTest < ActionDispatch::IntegrationTest
 
     get slug_admin_editor_path(slug: @member.slug, step: 4)
     assert_response :ok
-    ["발행", "OG 메타", "달란트", "활성화"].each do |word|
+    [ "발행", "OG 메타", "달란트", "활성화" ].each do |word|
       assert_no_match word, response.body
     end
     assert_select "h1", count: 1, text: "내 페이지 공개하기"

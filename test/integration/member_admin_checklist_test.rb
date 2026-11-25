@@ -36,7 +36,7 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
       end
       if %w[media docs].include?(anchor)
         assert_select "##{anchor}:not([hidden])", count: 1
-        assert_select '[aria-controls=?][aria-pressed=true]', anchor, count: 1
+        assert_select "[aria-controls=?][aria-pressed=true]", anchor, count: 1
       end
     end
   end
@@ -69,7 +69,7 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
     assert_equal rails_blob_path(photo.image, only_path: true), @member.reload.profile_image
 
     follow_redirect!
-    assert_select '[role=status]', text: /프로필 사진을 바꿨어요/
+    assert_select "[role=status]", text: /프로필 사진을 바꿨어요/
     assert_select 'a[href*="task=profile-photo"], a[href*="task=media"]', count: 0
     assert_select 'a[href*="task=bio"]', text: "자기소개 쓰기"
   end

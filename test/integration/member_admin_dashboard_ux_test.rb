@@ -22,10 +22,10 @@ class MemberAdminDashboardUxTest < ActionDispatch::IntegrationTest
     get slug_admin_dashboard_path(slug: slug)
 
     assert_response :ok
-    ["SNS 팔로워", "준비 중", "운영팀이 SNS 계정을 연결하면 보여요"].each do |text|
+    [ "SNS 팔로워", "준비 중", "운영팀이 SNS 계정을 연결하면 보여요" ].each do |text|
       assert_select ".dashboard-stats p", text: text
     end
-    ["총 추종자", "최신 집계", "총합", "QR·공유 누적", "프로필 사진 업로드", "최근 수집", "등록 정보"].each do |text|
+    [ "총 추종자", "최신 집계", "총합", "QR·공유 누적", "프로필 사진 업로드", "최근 수집", "등록 정보" ].each do |text|
       assert_not_includes response.body, text
     end
     assert_select ".dashboard-stats a[href=?]", slug_admin_inquiries_path(slug: slug), text: "0"
