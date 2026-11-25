@@ -14,4 +14,15 @@ class ChopdGreetingReadabilityTest < ActionDispatch::IntegrationTest
       end
     end
   end
+
+  test "publisher greeting is public and read-only" do
+    get media_greeting_path
+    assert_response :ok
+
+    assert_select "main", count: 1 do
+      [ "form", "input", "textarea", "select", "button[type=submit]", "a[data-turbo-method]", "a[data-method]" ].each do |selector|
+        assert_select selector, count: 0
+      end
+    end
+  end
 end
