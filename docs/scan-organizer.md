@@ -30,6 +30,6 @@
 
 ## 다음 단계
 
-구글 OAuth 연결 화면과 동의 왕복, 폴더 및 파일 선택용 Picker, 주기 처리 잡, 원드라이브 어댑터를 추가합니다. 1차 화면은 구글 드라이브 연결이 운영 승인 후 열린다고 안내합니다.
+구글 OAuth 연결 화면과 동의 왕복, 폴더 및 파일 선택용 Picker, 주기 처리 잡, 원드라이브 어댑터를 추가합니다. 주기 처리 잡은 처리 도중 프로세스가 끊겨 `processing`(처리 중)으로 오래 남은 항목을 일정 시간 뒤 `failed`로 되돌려 다시 처리되게 해야 합니다(1차에는 잡이 없어 해당 경로 없음). 1차 화면은 구글 드라이브 연결이 운영 승인 후 열린다고 안내합니다.
 
 AI 이미지 요청 형식은 각 제공자의 API 문서를 따릅니다. [Gemini 모델](https://aistudio.google.com/docs/models/gemini-3.5-flash-lite) · [OpenAI 이미지 입력](https://developers.openai.com/api/docs/guides/images-vision) · [Anthropic 이미지 입력](https://platform.claude.com/docs/en/build-with-claude/vision)
