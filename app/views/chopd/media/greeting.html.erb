@@ -1,8 +1,16 @@
 <% content_for :title, "발행인 인사말" %>
 
-<section class="bg-gradient-to-br from-green-900 to-green-700 py-12">
+<style>
+  .greeting-heading { padding: 112px 0 48px; }
+
+  @media (max-width: 768px) {
+    .greeting-heading { padding-top: 88px; }
+  }
+</style>
+
+<section class="greeting-heading">
   <div class="max-w-7xl mx-auto px-4">
-    <nav class="text-green-300 text-sm mb-4">
+    <nav aria-label="이동 경로" class="text-sm mb-4" style="color: rgba(255, 255, 255, .75)">
       <%= link_to "미디어", media_path, class: "hover:text-white" %> / 발행인 인사말
     </nav>
     <h1 class="text-3xl font-bold text-white">발행인 인사말</h1>
@@ -11,22 +19,19 @@
 
 <section class="py-16">
   <div class="max-w-3xl mx-auto px-4">
-    <div class="prose prose-lg max-w-none">
-      <div class="flex items-center space-x-4 mb-8 pb-8 border-b">
+    <div class="text-lg">
+      <div class="flex items-center space-x-4 mb-8 pb-8 border-b" style="border-color: rgba(255, 255, 255, .1)">
         <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-          <svg class="w-8 h-8 text-primary" stroke="currentColor" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
+          <%= lni_icon "user-4", size: 32, class: "text-white" %>
         </div>
         <div>
-          <h2 class="text-xl font-bold text-navy">최범희</h2>
-          <p class="text-gray-500 text-sm">한국환경저널 발행인 · 스마트폰 창업 전략가</p>
+          <h2 class="text-xl font-bold text-white">최범희</h2>
+          <p class="text-sm" style="color: rgba(255, 255, 255, .75)">한국환경저널 발행인 · 스마트폰 창업 전략가</p>
         </div>
       </div>
 
-      <div class="text-gray-700 leading-relaxed space-y-6">
-        <p class="text-xl font-medium text-navy">안녕하십니까, 한국환경저널 발행인 최범희입니다.</p>
+      <div class="leading-relaxed space-y-6" style="color: rgba(255, 255, 255, .75)">
+        <p class="text-xl font-medium text-white">안녕하십니까, 한국환경저널 발행인 최범희입니다.</p>
 
         <p>
           우리는 지금 기후위기와 환경 문제가 더 이상 미래의 이야기가 아닌,
@@ -51,7 +56,7 @@
           지속가능한 미래를 향한 여정을 계속 이어나가겠습니다.
         </p>
 
-        <p class="text-right font-semibold text-navy pt-4">
+        <p class="text-right font-semibold text-white pt-4">
           한국환경저널 발행인 최범희 드림
         </p>
       </div>
