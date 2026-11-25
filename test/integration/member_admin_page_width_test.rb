@@ -9,7 +9,7 @@ class MemberAdminPageWidthTest < ActionDispatch::IntegrationTest
   end
 
   test "대시보드와 페이지 만들기는 같은 본문 폭을 쓴다" do
-    paths = [slug_admin_dashboard_path(slug: @slug)] +
+    paths = [ slug_admin_dashboard_path(slug: @slug) ] +
       (1..4).map { |step| slug_admin_editor_path(slug: @slug, step: step) }
     paths.each do |path|
       get path
