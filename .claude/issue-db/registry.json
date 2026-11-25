@@ -1867,20 +1867,32 @@
             "at": "2026-11-24T12:59:59.469Z",
             "by": "대표님(헤르메스)",
             "note": "관제 자율 결정"
+          },
+          {
+            "action": "decide",
+            "at": "2026-11-25T02:35:53.775Z",
+            "by": "대표님(헤르메스)",
+            "note": "관제 자율 결정"
+          },
+          {
+            "action": "decide",
+            "at": "2026-11-25T02:47:02.266Z",
+            "by": "대표님(헤르메스)",
+            "note": "관제 자율 결정"
           }
         ],
-        "approved_at": "2026-11-24T12:59:59.469Z",
+        "approved_at": "2026-11-25T02:47:02.266Z",
         "approved_by": "대표님(헤르메스)",
         "depends_on_external": "0017_SocialDoctors ISS-521 (GET /api/brands/{externalId}/summary)",
         "ask_kind": "external_wait",
         "ask_prompt": "SocialDoctors 쪽 '브랜드 성과 요약 API'(SD ISS-521)가 완료되면 [회신 왔음]을 눌러 주세요. 그때 내 브랜드 화면에 매체별 발행 수와 Townin 성과를 붙입니다.",
         "recommendation": {
-          "verdict": "보류 권장",
-          "reason": "대표님 관제 결정 A(보류). 남은 Townin 성과 칸은 SD 브랜드 요약 API(ISS-521) 형식이 main 에 들어와야 붙일 수 있어, 지금 만들면 재작업 위험이 크다.",
-          "risk": "낮음",
-          "effort": "S",
-          "by": "factory-runner",
-          "at": "2026-11-24T23:30:00+09:00"
+          "verdict": "승인 권장",
+          "reason": "대표님 결정 A(보류)를 따름 — 2026-11-25 확인 시 SocialDoctors 저장소 521번 카드는 여전히 배포 검토 대기(factory 브랜치 미병합). 선행 API 없이 착수하면 재작업 위험",
+          "risk": "—",
+          "effort": "—",
+          "by": "관제실 결정",
+          "at": "2026-11-25T11:47:20+09:00"
         },
         "question": "약속(요약 데이터 형식)이 정해질 때까지 남은 Townin 성과 부분을 멈춰 둘까요?",
         "options": [
@@ -1905,6 +1917,11 @@
         "explained_by": "decision-explain",
         "explained_at": "2026-11-24T20:07:51.752693+09:00",
         "rechecked": [
+          {
+            "at": "2026-11-25T11:47:20+09:00",
+            "by": "factory-runner",
+            "result": "관제실 refsOf 가 추천 이유·막힘 사유의 외부 카드 번호 'ISS-521' 을 이 저장소 ISS-521(완료)로 읽어 자동 해제 — 외부 번호를 'SD 521번 카드'로 바꿔 오인 해제 방지, BLOCKED 복귀"
+          },
           {
             "at": "2026-11-25T10:33:18+09:00",
             "by": "factory-runner",
@@ -1932,12 +1949,19 @@
           "text": "관제 자율 결정",
           "question": "약속(요약 데이터 형식)이 정해질 때까지 남은 Townin 성과 부분을 멈춰 둘까요?",
           "by": "대표님(헤르메스)",
-          "at": "2026-11-24T12:59:59.469Z"
+          "at": "2026-11-25T02:47:02.266Z"
         },
-        "blocked_reason": "외부 저장소 0017_SocialDoctors 의 Townin 매체·브랜드 요약 API 카드(SD 쪽 521번)가 대표님 배포 검토 대기 — 그 API 없이는 화면에 실제 성과를 못 붙임"
+        "blocked_reason": "외부 저장소 SocialDoctors 의 Townin 매체·브랜드 요약 API(SD 521번 카드)가 대표님 배포 검토 대기 — main 병합 전에는 성과 칸을 붙일 수 없음",
+        "notes": [
+          {
+            "at": "2026-11-25T11:37:13+09:00",
+            "by": "factory-runner",
+            "note": "관제 결정 기록 후 자동 READY 로 풀렸으나 결정 내용이 '보류'이고 SD ISS-521 미병합이라 BLOCKED(external_wait)로 되돌림"
+          }
+        ]
       },
-      "updated_at": "2026-11-24T23:30:00+09:00",
-      "blocked_reason": "성과 칸(매체별 발행 수·Townin 읽음·사용 포인트)은 SocialDoctors 브랜드 요약 API(0017 ISS-521, 현재 AWAITING_USER)가 있어야 붙일 수 있다. 브랜드·동의 상태·imPD 콘텐츠 수·4주 운영 그래프는 ac54dd2·ISS-481 에서 이미 한 화면에 들어갔다."
+      "updated_at": "2026-11-25T11:47:20+09:00",
+      "blocked_reason": "성과 칸(매체별 발행 수·Townin 읽음·사용 포인트)은 SocialDoctors 브랜드 요약 API(SD 521번 카드, 현재 AWAITING_USER)가 있어야 붙일 수 있다. 브랜드·동의 상태·imPD 콘텐츠 수·4주 운영 그래프는 ac54dd2·ISS-481 에서 이미 한 화면에 들어갔다."
     },
     {
       "id": "ISS-477",
@@ -1963,11 +1987,11 @@
         "depends_on_external": "0017_SocialDoctors ISS-521 (Townin 매체 추가·발행 어댑터·성과 수집·브랜드 요약 API), imPD ISS-476",
         "recommendation": {
           "verdict": "보류 권장",
-          "reason": "12단계 통합 시험의 절반(SD→Townin 발행·성과·내 브랜드 성과)이 SD ISS-521 미완료로 실행 불가. 지금 돌리면 60칸 중 최대 약 30칸만 판정되어 95% 판정 자체가 성립하지 않는다. SD ISS-521 이 풀리면 바로 시험한다.",
+          "reason": "대표님 결정 A(보류)를 따름 — 2026-11-25 확인 시 SocialDoctors 저장소 521번 카드는 여전히 배포 검토 대기(factory 브랜치 미병합). 선행 API 없이 착수하면 재작업 위험",
           "risk": "낮음",
           "effort": "L",
           "by": "factory-runner",
-          "at": "2026-11-24T12:06:43Z"
+          "at": "2026-11-25T11:47:20+09:00"
         },
         "ask_kind": "external_wait",
         "ask_prompt": "SocialDoctors 쪽 'Townin 매체 추가·성과 요약'(SD ISS-521)이 끝나면 [회신 왔음]을 눌러 주세요. 그때 보험설계사 12단계 통합 시험과 점수표를 진행합니다.",
@@ -1977,6 +2001,11 @@
           "95% 미만이면 미달 칸마다 개선 이슈가 생긴다"
         ],
         "rechecked": [
+          {
+            "at": "2026-11-25T11:47:20+09:00",
+            "by": "factory-runner",
+            "result": "관제실 refsOf 가 추천 이유·막힘 사유의 외부 카드 번호 'ISS-521' 을 이 저장소 ISS-521(완료)로 읽어 자동 해제 — 외부 번호를 'SD 521번 카드'로 바꿔 오인 해제 방지, BLOCKED 복귀"
+          },
           {
             "at": "2026-11-25T10:33:10+09:00",
             "by": "factory-runner",
@@ -1998,10 +2027,18 @@
             "note": "SD ISS-521 여전히 AWAITING_USER(0017_SocialDoctors registry) — 선행 미완료, 막힘 유지"
           }
         ],
-        "blocked_reason": "외부 저장소 0017_SocialDoctors 의 Townin 매체 카드(SD 쪽 521번, 대표님 배포 검토 대기)와 이 저장소 ISS-476 이 끝나야 시험 가능"
+        "policy_decision": "ISS-476 결정(2026-11-25): 관제 자율 결정",
+        "notes": [
+          {
+            "at": "2026-11-25T11:37:13+09:00",
+            "by": "factory-runner",
+            "note": "관제 결정 기록 후 자동 READY 로 풀렸으나 결정 내용이 '보류'이고 SD ISS-521 미병합이라 BLOCKED(external_wait)로 되돌림"
+          }
+        ],
+        "blocked_reason": "외부 저장소 SocialDoctors 의 Townin 매체·브랜드 요약 API(SD 521번 카드)가 대표님 배포 검토 대기 — main 병합 전에는 성과 칸을 붙일 수 없음"
       },
-      "updated_at": "2026-11-25T10:33:10+09:00",
-      "blocked_reason": "12단계 중 6·7(SD→Townin 발행)·10(SD 성과 수집)·11(imPD 내 브랜드 Townin 성과)은 SocialDoctors ISS-521(Townin 매체·발행 어댑터·브랜드 요약 API)이 있어야 시험할 수 있다. SD ISS-521 은 현재 AWAITING_USER, imPD ISS-476 도 같은 이유로 BLOCKED. 나머지 선행(imPD ISS-475, Townin ISS-722, SD ISS-522)은 DONE."
+      "updated_at": "2026-11-25T11:47:20+09:00",
+      "blocked_reason": "12단계 중 6·7(SD→Townin 발행)·10(SD 성과 수집)·11(imPD 내 브랜드 Townin 성과)은 SocialDoctors ISS-521(Townin 매체·발행 어댑터·브랜드 요약 API)이 있어야 시험할 수 있다. SD 521번 카드 은 현재 AWAITING_USER, imPD ISS-476 도 같은 이유로 BLOCKED. 나머지 선행(imPD ISS-475, Townin ISS-722, SD ISS-522)은 DONE."
     },
     {
       "id": "ISS-478",
@@ -2523,7 +2560,7 @@
       "id": "ISS-485",
       "type": "FIX_BUG",
       "priority": "P2",
-      "status": "BLOCKED",
+      "status": "READY",
       "parent": "ISS-480",
       "title": "[법적 고지] 개인정보처리방침 보호책임자 공개 이메일(또는 전화) 기입",
       "description": "ISS-480에서 성명·직책은 반영했고 이메일 칸 3곳은 임시로 '문의하기' 연결. 개인정보보호법상 보호책임자 연락처(전화·이메일 중 하나 이상) 공개가 필요하다.",
@@ -2539,12 +2576,12 @@
           "app/views/legal/privacy.html.erb"
         ],
         "recommendation": {
-          "verdict": "보류 권장",
-          "reason": "대표님 관제 결정 D(보류). 공개 연락처 값은 대표님만 정할 수 있고, 값이 오면 방침 페이지 3곳 교체로 바로 끝난다.",
-          "risk": "낮음(법적 고지 미완성 상태 유지)",
-          "effort": "XS",
-          "by": "factory-runner",
-          "at": "2026-11-24T23:30:00+09:00"
+          "verdict": "승인 권장",
+          "reason": "대표님 결정(D. 보류 — 지금은 정하지 않음) — 이 결정대로 진행",
+          "risk": "—",
+          "effort": "—",
+          "by": "관제실 결정",
+          "at": "2026-11-25T02:47:07.263Z"
         },
         "recall_checked": {
           "at": "2026-11-24T10:41:13Z",
@@ -2593,9 +2630,15 @@
             "at": "2026-11-24T13:00:07.150Z",
             "by": "대표님(헤르메스)",
             "note": "관제 자율 결정"
+          },
+          {
+            "action": "decide",
+            "at": "2026-11-25T02:47:07.263Z",
+            "by": "대표님(헤르메스)",
+            "note": "이미 기록된 대표님 결정 유지; 재질문하지 않음"
           }
         ],
-        "approved_at": "2026-11-24T13:00:07.150Z",
+        "approved_at": "2026-11-25T02:47:07.263Z",
         "approved_by": "대표님(헤르메스)",
         "ask_kind": "provide_value",
         "ask_prompt": "개인정보처리방침에 공개할 보호책임자 연락처(업무용 이메일 또는 전화) 하나를 정하시면 입력칸에 적어 주세요. 지금은 보류로 두셨으므로 다시 묻지 않고 기다립니다.",
@@ -2651,13 +2694,13 @@
         "decision": {
           "choice": "D",
           "label": "보류 — 지금은 정하지 않음",
-          "text": "관제 자율 결정",
+          "text": "이미 기록된 대표님 결정 유지; 재질문하지 않음",
           "question": "개인정보 보호책임자 문의용으로 공개할 이메일(또는 전화번호)은 무엇입니까?",
           "by": "대표님(헤르메스)",
-          "at": "2026-11-24T13:00:07.150Z"
+          "at": "2026-11-25T02:47:07.263Z"
         }
       },
-      "updated_at": "2026-11-24T23:30:00+09:00",
+      "updated_at": "2026-11-25T02:47:07.263Z",
       "blocked_reason": "공개 연락처 값 대기(관제 결정 D 보류). 성명·직책은 ISS-480 에서 반영, 이메일 칸 3곳은 임시로 문의하기 연결."
     },
     {
@@ -4076,12 +4119,12 @@
     {
       "id": "ISS-504",
       "title": "imPD 기본 기능: 스캔 문서 정리 — 플랫폼 AI 프롬프트 방식(구글 드라이브=Gemini), 클라우드 회원 선택, AI 키 등록",
-      "status": "AWAITING_USER",
+      "status": "READY",
       "type": "FEATURE",
       "priority": "P2",
       "assign_to": "agent-harness",
       "created_at": "2026-11-25T09:10:32.423069+09:00",
-      "updated_at": "2026-11-25T09:51:29+09:00",
+      "updated_at": "2026-11-25T02:46:49.447Z",
       "payload": {
         "origin": "chat-delegate",
         "delegated": {
@@ -4102,19 +4145,25 @@
             "at": "2026-11-25T00:10:35.749Z",
             "by": "auto",
             "reason": "「[맡김] imPD 기본 기능: 클라우드 스캔 자동 정리(명함→주소록, 영수증→시트, 문서→폴더·파일명)」(FEATURE, P2)을 다음 실행에 착수할 만합니다."
+          },
+          {
+            "action": "decide",
+            "at": "2026-11-25T02:46:49.447Z",
+            "by": "대표님(헤르메스)",
+            "note": "관제 자율 결정"
           }
         ],
-        "approved_at": "2026-11-25T00:10:35.749Z",
-        "approved_by": "자동 승인(추천: 승인 권장)",
+        "approved_at": "2026-11-25T02:46:49.447Z",
+        "approved_by": "대표님(헤르메스)",
         "gate": "deploy",
         "branch": "factory/ISS-504",
         "recommendation": {
           "verdict": "승인 권장",
-          "reason": "대표님 설계 변경(플랫폼 AI 프롬프트 방식)대로 재작업·검수 완료(전체 365건·rubocop 통과, Gemini 2모델 결함 0건, 화면·복사·키 노출 직접 확인). 스위치 꺼짐이라 병합 영향 없음. 운영 켜기는 AI 키 보관 정책 확인 후.",
-          "risk": "낮음(병합) / 낮음~중간(운영 켜기 — 회원 키 보관)",
-          "effort": "M",
-          "by": "factory-runner",
-          "at": "2026-11-25T09:51:29+09:00"
+          "reason": "대표님 결정(A. 스위치 끈 채로 합치기) — 이 결정대로 진행",
+          "risk": "—",
+          "effort": "—",
+          "by": "관제실 결정",
+          "at": "2026-11-25T02:46:49.447Z"
         },
         "deploy_gate_items": [
           "회원 AI 키 보관·교체·삭제 정책 승인, 운영 AR_ENCRYPTION_* 키 주입 확인(현재 키 용도는 연결 시험뿐)",
@@ -4230,7 +4279,15 @@
         "recommended_why": "스위치가 꺼져 있어 회원 영향이 없고, 구글 민감 권한 검수가 필요 없는 방식이라 공개 전 남은 확인은 AI 키 보관 정책 하나뿐입니다.",
         "if_not_decided": "스캔 정리가 브랜치에 머물러 회원에게 열 수 없고, 본선과 점점 멀어집니다.",
         "reversible": "되돌릴 수 있습니다. 합친 뒤에도 스위치가 꺼져 있으면 보이지 않고, 새 표는 비어 있습니다.",
-        "view_url": "http://127.0.0.1:9130/view/b8691f85d58f/"
+        "view_url": "http://127.0.0.1:9130/view/b8691f85d58f/",
+        "decision": {
+          "choice": "A",
+          "label": "스위치 끈 채로 합치기",
+          "text": "관제 자율 결정",
+          "question": "스위치를 끈 상태의 \"스캔 정리\" 기능을 본선(main)에 합칠까요?",
+          "by": "대표님(헤르메스)",
+          "at": "2026-11-25T02:46:49.447Z"
+        }
       },
       "history": [
         {
@@ -7619,7 +7676,7 @@
       "id": "ISS-544",
       "title": "[Plan:UX리뷰] ISS-539 UI 변경 검증",
       "type": "UI_REVIEW",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "ux-harness",
       "depth": 2,
@@ -7649,17 +7706,70 @@
           "effort": "XS",
           "by": "factory-runner",
           "at": "2026-11-25T02:10:42Z"
-        }
+        },
+        "acceptance_criteria": [
+          "chopd 화면을 Turbo 로 이동해도 본문(.reveal)이 1280·390 두 폭에서 모두 보인다",
+          "모바일 햄버거 메뉴가 한 번에 열리고 닫히며 aria-expanded 로 상태를 알린다",
+          "가로 넘침·콘솔 오류가 없다"
+        ]
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "issues": [],
+        "screenshots": [
+          "tmp/qa/ISS-544/works-390.png",
+          "tmp/qa/ISS-544/works-1280.png"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "chopd 화면을 Turbo 로 이동해도 본문(.reveal)이 1280·390 두 폭에서 모두 보인다",
+            "met": true,
+            "how": "turbo_reveal_check 390·1280 모두 revealHidden 0 / revealTotal 6, scrollListenerGrowth 0, 스크린샷 육안 확인(히어로·대표 저서·바닥글 표시)"
+          },
+          {
+            "criterion": "모바일 햄버거 메뉴가 한 번에 열리고 닫히며 aria-expanded 로 상태를 알린다",
+            "met": true,
+            "how": "chopd_mobile_menu_check: /education 열림 flex·true → 닫힘 none·false, Turbo 로 /works 이동 뒤 열림 flex·true"
+          },
+          {
+            "criterion": "가로 넘침·콘솔 오류가 없다",
+            "met": true,
+            "how": "layout_check 전 화면 hScroll false·consoleErrors 0, 위 두 점검 consoleErrors 0"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "WIDTH=390 OUT_DIR=tmp/qa/ISS-544 node script/qa/turbo_reveal_check.cjs",
+            "exit_code": 0,
+            "output": "revealTotal 6, revealHidden 0, scrollListenerGrowth 0, consoleErrors 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "WIDTH=1280 OUT_DIR=tmp/qa/ISS-544 node script/qa/turbo_reveal_check.cjs",
+            "exit_code": 0,
+            "output": "revealHidden 0, scrollListenerGrowth 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "node script/qa/chopd_mobile_menu_check.cjs",
+            "exit_code": 0,
+            "output": "educationOpen flex/true, educationClosed none/false, worksOpen flex/true, consoleErrors 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "hScroll false 전 화면, SUMMARY pass=true"
+          }
+        ],
+        "note": "바닥글 글자 대비(ISS-532)·소개 문장 낱글자 줄바꿈(ISS-551)은 ISS-539 이전부터 있던 결함으로 별도 카드에서 처리. 전체 캡처 중간의 고정 메뉴 띠는 fixed 요소 캡처 특성"
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T02:08:31.656Z"
+      "updated_at": "2026-11-25T11:37:13+09:00",
+      "completed_at": "2026-11-25T11:46:39.716895"
     },
     {
       "id": "ISS-545",
       "title": "[Plan:브랜드검증] ISS-539 아젠다 표현 + Action Clarity",
       "type": "BRAND_GUARD",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "brand-guardian",
       "depth": 2,
@@ -7689,11 +7799,52 @@
           "effort": "XS",
           "by": "factory-runner",
           "at": "2026-11-25T02:10:42Z"
-        }
+        },
+        "acceptance_criteria": [
+          "ISS-539 변경 뒤에도 chopd 히어로 문구·주요 버튼(CTA)이 그대로 보인다",
+          "화면마다 다음 행동(문의·과정 보기 등) 버튼이 1개 이상 보인다",
+          "brand-dna 의 금지 패턴을 새로 어기지 않았다"
+        ]
       },
-      "result": null,
+      "result": {
+        "brand_score": 17,
+        "agenda_expression": 8,
+        "action_clarity": 8,
+        "anti_patterns_found": [],
+        "criteria_check": [
+          {
+            "criterion": "ISS-539 변경 뒤에도 chopd 히어로 문구·주요 버튼(CTA)이 그대로 보인다",
+            "met": true,
+            "how": "git show 82c315b --stat: 레이아웃·헤더 인라인 스크립트만 변경(문구·버튼 마크업 변경 0). works 1280 캡처에 히어로 '글로 쓰고 그림으로 남기다'·헤더 '강좌 문의'(hero 주황) 버튼 표시"
+          },
+          {
+            "criterion": "화면마다 다음 행동(문의·과정 보기 등) 버튼이 1개 이상 보인다",
+            "met": true,
+            "how": "1280 헤더 '강좌 문의' CTA, 390 은 햄버거 메뉴 + 바닥글 'B2B/B2G 문의하기'(주황). 교육 화면 과정 카드 '문의하기' CTA 유지"
+          },
+          {
+            "criterion": "brand-dna 의 금지 패턴을 새로 어기지 않았다",
+            "met": true,
+            "how": "스크립트 수정만이라 금지 9개 항목 신규 위반 없음. 기존 결함(바닥글 대비 부족 ISS-532, 'WORKS' 영문 장식 소제목)은 이전부터 있던 것"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "git show 82c315b --stat",
+            "exit_code": 0,
+            "output": "app/views/layouts/_chopd_header.html.erb | 25, app/views/layouts/chopd.html.erb | 34, script/qa/turbo_reveal_check.cjs | 143 — 스크립트 블록만 변경"
+          },
+          {
+            "cmd": "WIDTH=1280 OUT_DIR=tmp/qa/ISS-544 node script/qa/turbo_reveal_check.cjs",
+            "exit_code": 0,
+            "output": "SUMMARY pass=true (캡처 tmp/qa/ISS-544/works-1280.png)"
+          }
+        ],
+        "note": "agenda_expression 8: 작품 화면 히어로가 '나도 이렇게 보이고 싶다'는 아젠다를 표현. action_clarity 8: 데스크톱은 헤더 CTA 즉시 식별, 모바일 작품 화면은 첫 화면에 CTA 없이 메뉴에 의존(기존 구조, ISS-539 무관)"
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T02:08:31.656Z"
+      "updated_at": "2026-11-25T11:37:13+09:00",
+      "completed_at": "2026-11-25T11:46:48.865910"
     },
     {
       "id": "ISS-546",
@@ -7777,7 +7928,7 @@
       "id": "ISS-547",
       "title": "[Plan:품질평가] ISS-542 품질 점수 산출",
       "type": "SCORE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "eval-harness",
       "depth": 3,
@@ -7809,11 +7960,50 @@
           "effort": "XS",
           "by": "factory-runner",
           "at": "2026-11-25T02:10:42Z"
-        }
+        },
+        "acceptance_criteria": [
+          "전체 테스트·린트를 다시 돌려 점수 근거를 남긴다",
+          "점수와 영역별 내역을 result 에 기록하고 이전 점수와 비교한다"
+        ]
       },
-      "result": null,
+      "result": {
+        "score": 87,
+        "prev_score": 88,
+        "breakdown": {
+          "quality": 90,
+          "tests": 92,
+          "ux": 86,
+          "docs": 80
+        },
+        "basis": "quality: RuboCop 452파일 위반 2건(test/integration/member_admin_checklist_test.rb 따옴표, 75fab8e 디자인 루프 0회차 커밋) — 이전 0건에서 -3 / tests: 전체 372 runs 0 failures 0 errors 1 skip(이전 363), 교육 필터 브라우저 시나리오 점검 추가(2a55bfa) / ux: Turbo 이동 본문·모바일 메뉴 점검 pass, 바닥글 대비(ISS-532)·낱글자 줄바꿈(ISS-551)·빈 목록 안내 대비(ISS-552) 미처리 감점 유지 / docs: 커밋 메시지 카드 ID·QA 근거 유지. 커버리지 도구 미설정(null)",
+        "criteria_check": [
+          {
+            "criterion": "전체 테스트·린트를 다시 돌려 점수 근거를 남긴다",
+            "met": true,
+            "how": "bin/rails test 372 runs 0 failures 0 errors 1 skip, bin/rubocop 452 files 2 offenses(원인 파일·커밋 특정)"
+          },
+          {
+            "criterion": "점수와 영역별 내역을 result 에 기록하고 이전 점수와 비교한다",
+            "met": true,
+            "how": "87점, 4영역 breakdown, 이전 ISS-540 88점 대비 -1(린트 위반 2건)"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test",
+            "exit_code": 0,
+            "output": "372 runs, 2697 assertions, 0 failures, 0 errors, 1 skips"
+          },
+          {
+            "cmd": "bin/rubocop test/integration/member_admin_checklist_test.rb",
+            "exit_code": 1,
+            "output": "1 file inspected, 2 offenses detected, 2 offenses autocorrectable (Style/StringLiterals 39:23, 72:19)"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T02:09:10.791Z"
+      "updated_at": "2026-11-25T11:37:13+09:00",
+      "completed_at": "2026-11-25T11:48:06.970431"
     },
     {
       "id": "ISS-548",
@@ -7908,7 +8098,7 @@
       "id": "ISS-549",
       "title": "[Plan:비즈니스검증] education-filter 규칙 6개 정적 검증",
       "type": "BIZ_VALIDATE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "biz-validator",
       "depth": 3,
@@ -7974,17 +8164,72 @@
           }
         ],
         "approved_at": "2026-11-25T02:24:22.499Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "acceptance_criteria": [
+          "교육 분류 규칙 R1~R6 이 코드 어디에서 지켜지는지 짚는다",
+          "규칙마다 자동 테스트·점검이 있고 통과한다",
+          "빠진 규칙이 있으면 수정 카드를 만든다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-534 수정(27e0f98)에 대한 검증 카드 — 기존 테스트(education_filter_test)·layout_check 재사용으로 빠르게 확인 가능",
+          "risk": "T0 — 검증만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T11:37:13+09:00"
+        }
       },
-      "result": null,
+      "result": {
+        "coverage_rate": 100,
+        "gaps": [],
+        "rules_checked": 6,
+        "rule_map": {
+          "R1": "education_controller.rb:3 — 분류 없으면 @course_type nil → Course.published 전체 + '전체' active",
+          "R2": "education_controller.rb:6 by_type + index.html.erb:160-171 각 버튼 active 조건",
+          "R3": "education_controller.rb:3 Course.course_types.key?(params[:type]) — 알 수 없는·빈·배열 값은 nil(전체)",
+          "R4": "Course.published scope(course.rb:9) 를 모든 경로에서 먼저 적용",
+          "R5": "index.html.erb 4개 버튼 aria-current 조건이 @course_type 과 1:1, enum 값 3개(online·offline·b2b)와 버튼 3개 일치 → 항상 정확히 1개",
+          "R6": "layout_check 1280·390·320 pillWrapped 0, pillMinHeight 37.5"
+        },
+        "criteria_check": [
+          {
+            "criterion": "교육 분류 규칙 R1~R6 이 코드 어디에서 지켜지는지 짚는다",
+            "met": true,
+            "how": "rule_map 에 규칙별 파일·줄 기록. enum(course.rb:4) 값 3개가 버튼 3개와 정확히 일치해 R5 '정확히 1개'가 모든 입력에서 성립"
+          },
+          {
+            "criterion": "규칙마다 자동 테스트·점검이 있고 통과한다",
+            "met": true,
+            "how": "education_filter_test 3 runs 30 assertions 0 failures(R1~R5), layout_check /education 1280·390·320 pass(R6)"
+          },
+          {
+            "criterion": "빠진 규칙이 있으면 수정 카드를 만든다",
+            "met": true,
+            "how": "갭 0 — 수정 카드 불필요. 관찰: 개발 DB 에 과정 0개라 브라우저 확인은 사본 DB(ISS-550)로 수행"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "3 runs, 30 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "ROUTES=/education WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "width 1280/390/320 pillWrapped 0 pillMinHeight 37.5 consoleErrors 0 / SUMMARY pass=true"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T02:24:22.499Z"
+      "updated_at": "2026-11-25T11:37:13+09:00",
+      "completed_at": "2026-11-25T11:47:30.195348"
     },
     {
       "id": "ISS-550",
       "title": "[Plan:시나리오실행] education-filter 시나리오 2개 E2E 실행",
       "type": "SCENARIO_PLAY",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "scenario-player",
       "depth": 3,
@@ -8018,11 +8263,77 @@
           }
         ],
         "approved_at": "2026-11-25T02:24:22.499Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "acceptance_criteria": [
+          "390px 교육 화면에서 '온라인'을 누르면 온라인 과정만 보이고 분류 버튼이 한 줄로 보인다",
+          "오타 링크(/education?type=onlne)로 들어오면 전체 과정과 '전체' 선택이 보인다",
+          "두 시나리오 모두 콘솔 오류 0"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-534 수정(27e0f98)에 대한 검증 카드 — 기존 테스트(education_filter_test)·layout_check 재사용으로 빠르게 확인 가능",
+          "risk": "T0 — 검증만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T11:37:13+09:00"
+        }
       },
-      "result": null,
+      "result": {
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "failures": [],
+        "scenarios": [
+          {
+            "id": "S1",
+            "result": "PASS",
+            "detail": "390px /education → '온라인' 클릭: 선택 버튼 '온라인' 1개, 분류 버튼 4개 한 줄(top 454.9 동일)·각 글자 1줄·높이 37.5·모두 390px 안, 온라인 과정 2개만(기대 2, 비공개 온라인 1개 제외), 서버 HTML 제목 수 = 화면 카드 수"
+          },
+          {
+            "id": "S2",
+            "result": "PASS",
+            "detail": "/education?type=onlne: 응답 200, 선택 '전체' 1개, 카드 4개 = 필터 없는 목록 4개"
+          }
+        ],
+        "commit": "2a55bfa",
+        "criteria_check": [
+          {
+            "criterion": "390px 교육 화면에서 '온라인'을 누르면 온라인 과정만 보이고 분류 버튼이 한 줄로 보인다",
+            "met": true,
+            "how": "개발 DB 사본(공개 4·비공개 1 예시 과정)으로 띄운 임시 서버 3099 에서 education_filter_flow S1 pass — 온라인 2개만, 버튼 한 줄. 공용 개발 DB(3008, 과정 0개)에서도 pass(dataLimited 기록)"
+          },
+          {
+            "criterion": "오타 링크(/education?type=onlne)로 들어오면 전체 과정과 '전체' 선택이 보인다",
+            "met": true,
+            "how": "S2 pass — 응답 200, '전체' 선택, 4개 = 필터 없는 4개"
+          },
+          {
+            "criterion": "두 시나리오 모두 콘솔 오류 0",
+            "met": true,
+            "how": "consoleErrors 0, pageErrors 0 (3008·3099 모두)"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/education_filter_flow.cjs",
+            "exit_code": 0,
+            "output": "s1 selected ['온라인'] buttons textLines 1×4, s2 selected ['전체'], dataLimited true(공용 개발 DB 과정 0개), consoleErrors 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "bin/rails test test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "3 runs, 30 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ],
+        "review": {
+          "gemini": "gemini-4-hydrogen-high 지적 7건 — 맞음 4건(선택 버튼 범위 미한정·온라인 누락 거짓 통과·가로 잘림 미검출·오타 링크 응답코드 미확인) Codex 재위임 후 수정, 틀림 3건(현재 화면에 없는 turbo-frame·아이콘·turbo-stream 가정)",
+          "opus": "3008(빈 DB)·3099(사본 DB) 두 환경 직접 실행 pass, 공용 개발 DB 과정 수 0 유지 확인"
+        },
+        "note": "공용 개발 DB 에 공개 과정이 0개 — 교육 화면이 빈 목록으로 보인다(ISS-552 빈 목록 안내 대비 카드와 연관). 시드(db/seeds.rb 과정 4개)는 공용 DB 라 넣지 않았다"
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T02:24:22.499Z"
+      "updated_at": "2026-11-25T11:37:13+09:00",
+      "completed_at": "2026-11-25T11:47:46.790890"
     },
     {
       "id": "ISS-551",
@@ -8232,6 +8543,89 @@
       "result": null,
       "spawn_rules": [],
       "updated_at": "2026-11-25T02:29:35.739Z"
+    },
+    {
+      "id": "ISS-555",
+      "title": "[Plan:디자인리뷰] ISS-544 시각적 완성도 검증",
+      "type": "DESIGN_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "design-critic",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-544",
+      "depends_on": [],
+      "created_at": "2026-11-25T11:46:39.716895",
+      "payload": {
+        "files": [
+          "app/views/layouts/chopd.html.erb"
+        ],
+        "source_issue": "ISS-544",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T02:46:42.555Z",
+            "by": "auto",
+            "reason": "「[Plan:디자인리뷰] ISS-544 시각적 완성도 검증」(DESIGN_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T02:46:42.555Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-539 는 레이아웃 인라인 스크립트만 바꿔 시각 변화가 없다 — ISS-544 캡처(tmp/qa/ISS-544)로 '변화 없음'만 확인하고 빠르게 마감 가능",
+          "risk": "T0 — 검증만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T11:48:22+09:00"
+        },
+        "acceptance_criteria": [
+          "ISS-539 전후로 chopd 작품·교육 화면의 배치·색·글자가 달라지지 않았다",
+          "새로 생긴 시각 결함이 없다(기존 ISS-532·551·552 제외)"
+        ]
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T02:46:42.555Z"
+    },
+    {
+      "id": "ISS-556",
+      "title": "[린트] member_admin_checklist_test 따옴표 스타일 위반 2건 — 전체 rubocop 실패",
+      "type": "STYLE_FIX",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "codex",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": "ISS-547",
+      "depends_on": [],
+      "created_at": "2026-11-25T11:48:22+09:00",
+      "updated_at": "2026-11-25T11:48:22+09:00",
+      "result": null,
+      "spawn_rules": [],
+      "payload": {
+        "origin": "factory-run-end",
+        "files": [
+          "test/integration/member_admin_checklist_test.rb"
+        ],
+        "errors": [
+          "39:23 Style/StringLiterals",
+          "72:19 Style/StringLiterals"
+        ],
+        "source_commit": "75fab8e",
+        "acceptance_criteria": [
+          "bin/rubocop 전체가 위반 0으로 끝난다",
+          "member_admin_checklist_test 가 그대로 통과한다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "자동 교정 가능한 따옴표 2곳. 단 2026-11-25 회원 디자인 루프 세션이 같은 파일을 작업 중이라 그 세션 커밋 뒤에 처리(이미 고쳐졌으면 rubocop 확인 후 DONE)",
+          "risk": "낮음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T11:48:22+09:00"
+        }
+      }
     }
   ],
   "hooks": {
@@ -8573,13 +8967,50 @@
         "issue_type": "DOMAIN_ANALYZE",
         "plan_created": 2,
         "timestamp": "2026-11-25T11:29:32.948327"
+      },
+      {
+        "issue_id": "ISS-544",
+        "issue_type": "UI_REVIEW",
+        "plan_created": 1,
+        "timestamp": "2026-11-25T11:46:39.716895"
+      },
+      {
+        "issue_id": "ISS-545",
+        "issue_type": "BRAND_GUARD",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T11:46:48.865910"
+      },
+      {
+        "issue_id": "ISS-549",
+        "issue_type": "BIZ_VALIDATE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T11:47:30.195348"
+      },
+      {
+        "issue_id": "ISS-550",
+        "issue_type": "SCENARIO_PLAY",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T11:47:46.790890"
+      },
+      {
+        "issue_id": "ISS-547",
+        "issue_type": "SCORE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T11:48:06.970431"
       }
     ],
     "on_fail": [],
     "on_learn": []
   },
   "knowledge": {
-    "success_patterns": [],
+    "success_patterns": [
+      {
+        "pattern": "biz_coverage_100",
+        "context": "ISS-549 full scenario coverage",
+        "frequency": 1,
+        "discovered_at": "2026-11-25T11:47:30.195348"
+      }
+    ],
     "failure_patterns": [],
     "meta_observations": [
       {
@@ -12796,8 +13227,8 @@
     ]
   },
   "stats": {
-    "total_issues": 549,
-    "completed": 56,
+    "total_issues": 556,
+    "completed": 61,
     "failed": 0,
     "evolved": 223
   },
@@ -12836,6 +13267,13 @@
         "passed": true,
         "total": 363,
         "coverage": null
+      }
+    },
+    {
+      "source_issue": "ISS-549",
+      "source_type": "BIZ_VALIDATE",
+      "result": {
+        "biz_coverage": 100
       }
     }
   ],
