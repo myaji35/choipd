@@ -3,7 +3,7 @@ const path = require('node:path');
 
 const root = fs.realpathSync(path.resolve(__dirname, '../..'));
 const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3008';
-const outDir = process.env.OUT_DIR || path.resolve(__dirname, '../../qa/ISS-508');
+const outDir = process.env.OUT_DIR || path.resolve(__dirname, '../../tmp/qa/layout');
 const routes = [{ name: 'home', path: '/' }, { name: 'inquiries-new', path: '/inquiries/new' }];
 const viewports = [{ width: 1280, height: 900 }, { width: 390, height: 844 }];
 
@@ -17,6 +17,20 @@ async function main() {
     for (const route of routes) {
       for (const viewport of viewports) {
         const page = await browser.newPage({ viewport });
+        const consoleErrorItems = [];
+        const badResponseItems = [];
+        const baseOrigin = new URL(baseUrl).origin;
+        page.on('console', message => {
+          if (message.type() === 'error') consoleErrorItems.push(message.text().slice(0, 200));
+        });
+        page.on('pageerror', error => {
+          consoleErrorItems.push(`pageerror: ${error.message}`.slice(0, 200));
+        });
+        page.on('response', response => {
+          const status = response.status();
+          const url = response.url();
+          if (status >= 400 && new URL(url).origin === baseOrigin) badResponseItems.push({ status, url });
+        });
         const url = new URL(route.path, baseUrl).href;
         try {
           await page.goto(url, { waitUntil: 'networkidle' });
@@ -64,10 +78,14 @@ async function main() {
             footerWrapped: footerWrappedItems.length, footerWrappedItems,
           };
         });
+        const consoleErrors = consoleErrorItems.length;
+        const badResponses = badResponseItems.length;
         console.log(JSON.stringify({
           route: route.path, width: viewport.width, file: path.relative(root, fs.realpathSync(file)), bytes: fs.statSync(file).size, ...result,
+          consoleErrors, consoleErrorItems, badResponses, badResponseItems,
         }));
-        pass = pass && !result.hScroll && result.clipped === 0 && result.footerWrapped === 0;
+        pass = pass && !result.hScroll && result.clipped === 0 && result.footerWrapped === 0
+          && consoleErrors === 0 && badResponses === 0;
         await page.close();
       }
     }
