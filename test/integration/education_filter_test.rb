@@ -47,7 +47,44 @@ class EducationFilterTest < ActionDispatch::IntegrationTest
     assert_select ".empty-state-cta", count: 0
   end
 
+  test "empty state text meets WCAG contrast against the page background" do
+    Course.update_all(published: false)
+
+    get education_path
+
+    assert_response :success
+    assert_select ".empty-state", count: 1
+    rule = css_select("style").map(&:text).join("\n")[/(?:^|\})\s*\.empty-state\s*\{([^}]+)\}/, 1]
+    flunk "Expected an .empty-state rule in the page styles" unless rule
+
+    color = rule.match(/(?:\A|;)\s*color:\s*rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d*\.?\d+)\s*\)/)
+    flunk "Expected an rgba color in the .empty-state rule" unless color
+
+    red, green, blue, alpha = color.captures.map(&:to_f)
+    background = [ 0x0a, 0x0e, 0x1a ]
+    foreground = [ red, green, blue ].zip(background).map do |text, base|
+      text * alpha + base * (1 - alpha)
+    end
+    ratio = contrast_ratio(foreground, background)
+
+    assert_operator ratio, :>=, 4.5, format("Empty state text on #0a0e1a has a contrast ratio of %.4f:1", ratio)
+  end
+
   private
+
+  def contrast_ratio(first, second)
+    darker, lighter = [ relative_luminance(first), relative_luminance(second) ].sort
+    (lighter + 0.05) / (darker + 0.05)
+  end
+
+  def relative_luminance(rgb)
+    red, green, blue = rgb.map do |value|
+      channel = value / 255.0
+      channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055)**2.4
+    end
+
+    0.2126 * red + 0.7152 * green + 0.0722 * blue
+  end
 
   def assert_courses_and_filter(courses, label)
     assert_response :success
