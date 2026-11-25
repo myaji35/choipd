@@ -4003,12 +4003,12 @@
     {
       "id": "ISS-504",
       "title": "[맡김] imPD 기본 기능: 클라우드 스캔 자동 정리(명함→주소록, 영수증→시트, 문서→폴더·파일명)",
-      "status": "IN_PROGRESS",
+      "status": "AWAITING_USER",
       "type": "FEATURE",
       "priority": "P2",
       "assign_to": "agent-harness",
       "created_at": "2026-11-25T09:10:32.423069+09:00",
-      "updated_at": "2026-11-25T09:20:56+09:00",
+      "updated_at": "2026-11-25T09:41:50+09:00",
       "payload": {
         "origin": "chat-delegate",
         "delegated": {
@@ -4016,7 +4016,7 @@
           "session": null,
           "notify": "buzz"
         },
-        "plain_summary": "대표님 지시(2026-11-25): 구글 드라이브 스캔(명함·영수증·문서)을 인식해 명함은 구글 주소록, 영수증은 구글 시트, 문서는 관련 폴더에 파일명을 바꿔 저장. imPD 기본 기능으로 운영하고, 클라우드는 회원이 고른다(1차 구글 드라이브, 원드라이브 등은 같은 연결 규격으로 다음 단계). AI는 회원이 자기 API 키를 등록해 쓴다(키는 ActiveRecord Encryption 으로 암호화 저장, 화면에 다시 보여주지 않음, 로그·에러에 남기지 않음). 회원 화면에 '스캔 정리' 메뉴: 클라우드 연결 → 스캔 폴더 지정 → AI 키 등록(Gemini·OpenAI·Anthropic 중 선택, 연결 시험 버튼) → 처리 내역(원본·분류·결과 위치·실패 사유) 목록. 분류 결과가 애매하면 자동 저장하지 말고 '확인 필요'로 두고 회원이 고르게 한다. 구글 권한은 필요한 최소 범위로(drive.file 와 Picker 로 되는지 먼저 확인, 안 되면 사유를 기록). 기능 스위치 기본 꺼짐. 운영 켜기 전 대표님 컨펌 필요 항목(구글 민감·제한 권한 앱 검수, 개인정보처리방침 수집 항목, API 키 보관 정책)은 payload.gate=deploy 로 남긴다.",
+        "plain_summary": "회원이 구글 드라이브에 올린 명함·영수증·문서 사진을 회원 본인 AI 키로 읽어 주소록·시트·폴더로 정리하는 기능의 1차입니다. 화면·저장·분류 규칙은 완성했고 실제 구글 연결 화면은 아직 없습니다. 합쳐도 스위치가 꺼져 있어 회원에게는 보이지 않습니다.",
         "acceptance_criteria": [
           "회원 화면에 스캔 정리 메뉴가 있고 기능 스위치가 꺼져 있으면 보이지 않는다",
           "회원이 AI 키를 등록하면 암호화되어 저장되고 화면·로그 어디에도 원문이 나오지 않는다(테스트로 확인)",
@@ -4038,18 +4038,101 @@
         "branch": "factory/ISS-504",
         "recommendation": {
           "verdict": "승인 권장",
-          "reason": "회원 기본 기능으로 가치가 크고 1차는 기능 스위치 꺼짐·외부 API 가짜 대체 테스트로 안전하게 만들 수 있다. 다만 회원 AI 키 보관·구글 주소록/시트/드라이브 권한·개인정보처리방침 수집 항목이 걸려 있어 구현은 브랜치에서 하고 운영 켜기 전 대표님 확인(gate=deploy).",
-          "risk": "중간(개인정보·외부 권한) — 스위치 기본 꺼짐으로 운영 영향 없음",
+          "reason": "1차 구현·검수 완료(전체 373건 통과, Gemini 2모델 검수 지적 7건 반영). 스위치 기본 꺼짐이라 병합해도 회원 영향 없음. 운영 켜기는 별도 확인.",
+          "risk": "낮음(병합) / 중간(운영 켜기 — 개인정보·외부 권한)",
           "effort": "L",
           "by": "factory-runner",
-          "at": "2026-11-25T09:20:56+09:00"
+          "at": "2026-11-25T09:41:50+09:00"
         },
         "deploy_gate_items": [
-          "구글 OAuth 권한 범위(drive.file·contacts·spreadsheets) 앱 검수 필요 여부",
-          "개인정보처리방침에 스캔 이미지·명함 연락처·영수증 항목 추가",
-          "회원 AI 키 보관 정책(암호화 키 AR_ENCRYPTION_* 운영 환경변수 주입 확인)",
-          "기능 스위치 IMPD_SCAN_ORGANIZER_ENABLED 운영 켜기"
-        ]
+          "구글 동의 화면·권한(drive.file·contacts·spreadsheets) 앱 검수, GOOGLE_CLIENT_ID/SECRET",
+          "개인정보처리방침에 명함 연락처·영수증·스캔 이미지 수집 항목과 AI 제공자 전송 안내",
+          "AI 키 보관·교체·삭제 정책, 운영 AR_ENCRYPTION_* 키 주입",
+          "세 AI 제공자 모델 이름 확인(SCAN_ORGANIZER_*_MODEL)",
+          "운영 켜기: IMPD_SCAN_ORGANIZER_ENABLED=1"
+        ],
+        "gate_stage": "deploy-review",
+        "branch_commits": [
+          "67f617b",
+          "20031cc"
+        ],
+        "ask_kind": "decision",
+        "ask_prompt": "회원 \"스캔 정리\" 1차 구현이 브랜치에 준비됐습니다. 기능 스위치가 꺼진 채로 main 에 합칠지 정해 주세요(운영에서 켜는 것은 별도).",
+        "question": "스위치를 끈 상태의 \"스캔 정리\" 1차 코드를 본선(main)에 합칠까요?",
+        "options": [
+          {
+            "key": "A",
+            "label": "스위치 끈 채로 합치기",
+            "pros": "다음 단계(구글 연결 화면·자동 처리)를 바로 이어서 만들 수 있고, 회원에게는 아무 변화가 없습니다.",
+            "cons": "운영 서버에 새 표 2개가 생깁니다(비어 있음)."
+          },
+          {
+            "key": "B",
+            "label": "브랜치에 그대로 보류",
+            "pros": "본선에 아무것도 들어가지 않습니다.",
+            "cons": "다른 작업과 어긋나 나중에 다시 맞추는 일이 생기고, 다음 단계가 멈춥니다."
+          }
+        ],
+        "recommended_option": "A",
+        "recommended_why": "스위치가 꺼져 있어 회원 영향이 없고, 운영에서 켜기 전 확인할 것(구글 권한 검수·개인정보처리방침·AI 키 보관 정책)은 켤 때 따로 정하면 됩니다.",
+        "if_not_decided": "스캔 정리 2단계(구글 연결 화면·자동 처리)를 시작하지 못하고, 브랜치가 본선과 점점 멀어집니다.",
+        "reversible": "되돌릴 수 있습니다. 합친 뒤에도 스위치가 꺼져 있으면 회원에게 보이지 않고, 새 표는 비어 있습니다."
+      },
+      "result": {
+        "criteria_check": [
+          {
+            "criterion": "스캔 정리 메뉴가 있고 스위치 꺼짐이면 안 보인다",
+            "met": true,
+            "how": "통합 테스트(꺼짐: 메뉴 없음·/admin/scan 404, 켜짐: 200) + 브랜치 서버 화면 확인(업무→스캔 정리)"
+          },
+          {
+            "criterion": "AI 키 암호화 저장, 화면·로그에 원문 없음",
+            "met": true,
+            "how": "모델 테스트(DB 원문 컬럼에 평문 없음·inspect/to_json 제외), 통합 테스트(응답·로그 캡처), 브랜치 서버 화면 key leaked:false·••••ABCD, development.log 키 0건"
+          },
+          {
+            "criterion": "예시 이미지 3장으로 연락처·시트 행·새 파일명/폴더 생성(외부 API 가짜)",
+            "met": true,
+            "how": "test/services/scan_organizer/processor_test.rb"
+          },
+          {
+            "criterion": "확신 낮으면 확인 필요, 자동 저장 안 함",
+            "met": true,
+            "how": "processor_test: confidence 0.5 → needs_review, 가짜 cloud 저장 호출 0회; 분류 불일치·정보 부족도 needs_review"
+          },
+          {
+            "criterion": "bin/rails test 전체 통과",
+            "met": true,
+            "how": "브랜치에서 373 runs 0 failures"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "git checkout factory/ISS-504 && bin/rails test",
+            "exit_code": 0,
+            "output": "373 runs, 2522 assertions, 0 failures, 0 errors, 1 skips"
+          },
+          {
+            "cmd": "bin/rails test test/services/scan_organizer test/models/scan_organizer_setting_test.rb test/integration/member_scan_organizer_test.rb",
+            "exit_code": 0,
+            "output": "전체 실행에 포함되어 통과"
+          },
+          {
+            "cmd": "bin/rubocop (변경 Ruby 24파일)",
+            "exit_code": 0,
+            "output": "24 files inspected, no offenses detected"
+          },
+          {
+            "cmd": "playwright /scan-demo/admin/scan (브랜치 전용 DB, 포트 3108)",
+            "exit_code": 0,
+            "output": "key leaked: false | masked: true | menu: true | console errors 0 (데스크톱·모바일)"
+          }
+        ],
+        "db_note": "마이그레이션은 테스트 DB와 브랜치 전용 DB(작업 폴더 storage/choi_pd_dev_ISS-504.sqlite3, 정리됨)에서만 실행. 공용 development DB 미적용 확인(schema_migrations 에 20261125020000/020100 없음).",
+        "review": {
+          "gemini": "hydrogen-high 6건 + neon-high 7건 → 맞음 7건 Codex 재위임 반영, 틀림/보류 2건(직렬화 only 동작, 드라이브 동시 생성 — 문서화)",
+          "opus": "모델 이름 고정 → 환경변수화, 처리 중 상태 회수 필요성 문서화"
+        }
       }
     },
     {
