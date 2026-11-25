@@ -10418,7 +10418,7 @@
       "id": "ISS-574",
       "title": "[Plan:UX리뷰] ISS-557 UI 변경 검증",
       "type": "UI_REVIEW",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "ux-harness",
       "depth": 2,
@@ -10440,17 +10440,84 @@
           }
         ],
         "approved_at": "2026-11-25T03:25:28.924Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-557(헤더 '소개' → /media/greeting, 모바일 메뉴 닫힘) 후속 UX 검증. 코드 변경 없이 브라우저 실측·문서만",
+          "risk": "T0 — 검증·문서",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:00:20Z"
+        },
+        "acceptance_criteria": [
+          "데스크톱·모바일 헤더 '소개'를 누르면 인사말 화면으로 이동하고 콘솔 오류가 없다",
+          "모바일 메뉴에서 링크를 누르면 메뉴가 닫힌다",
+          "헤더가 1280·390·320 에서 가로 넘침·글자 잘림 없이 보인다",
+          "헤더 링크 대상 존재 테스트가 통과한다"
+        ],
+        "files_changed": []
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "issues": [],
+        "doc": "docs/ui-snapshots/review-ISS-574-575-579-580.md",
+        "commit": "5a9d2ba",
+        "screenshots": [
+          "qa/ISS-574/greeting-1280.png",
+          "qa/ISS-574/greeting-390.png"
+        ],
+        "notes": [
+          "도착 화면 /media/greeting 대비·겹침은 기존 ISS-571 에서 처리"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "데스크톱·모바일 헤더 '소개'를 누르면 인사말 화면으로 이동하고 콘솔 오류가 없다",
+            "met": true,
+            "how": "playwright 1280 nav-link·390 모바일 메뉴 클릭 → /media/greeting, h1 '발행인 인사말', 콘솔 오류 0"
+          },
+          {
+            "criterion": "모바일 메뉴에서 링크를 누르면 메뉴가 닫힌다",
+            "met": true,
+            "how": "chopd_mobile_menu_check introNav menuDisplay none, expanded false"
+          },
+          {
+            "criterion": "헤더가 1280·390·320 에서 가로 넘침·글자 잘림 없이 보인다",
+            "met": true,
+            "how": "layout_check 15조합 hScroll false clipped 0, 메뉴 글자 대비 ≈6.1:1"
+          },
+          {
+            "criterion": "헤더 링크 대상 존재 테스트가 통과한다",
+            "met": true,
+            "how": "chopd_header_links_test 포함 7 runs 0 failures"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "cd script/qa && ROUTES=/education,/works,/media,/community,/media/greeting WIDTHS=1280,390,320 node layout_check.cjs",
+            "exit_code": 0,
+            "output": "15조합 hScroll false, clipped 0, consoleErrors 0, badResponses 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "cd script/qa && node chopd_mobile_menu_check.cjs",
+            "exit_code": 0,
+            "output": "introNav finalPath /media/greeting menuDisplay none expanded false consoleErrors 0 pageErrors 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "bin/rails test test/integration/chopd_header_links_test.rb test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "7 runs, 57 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:25:28.924Z"
+      "updated_at": "2026-11-25T04:00:20Z",
+      "completed_at": "2026-11-25T13:09:03.019256"
     },
     {
       "id": "ISS-575",
       "title": "[Plan:브랜드검증] ISS-557 아젠다 표현 + Action Clarity",
       "type": "BRAND_GUARD",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "brand-guardian",
       "depth": 2,
@@ -10472,11 +10539,67 @@
           }
         ],
         "approved_at": "2026-11-25T03:25:28.924Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-557 헤더 링크 변경의 브랜드(아젠다·행동 명확성) 점검. 문서만",
+          "risk": "T0 — 검증·문서",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:00:20Z"
+        },
+        "acceptance_criteria": [
+          "헤더 메뉴 이름이 도착 화면 내용과 맞는다('소개' → 최범희 발행인 소개)",
+          "헤더에 다음 행동(주요 버튼)이 한눈에 보인다",
+          "brand-dna anti_patterns 위반이 없다(위반 시 후속 카드)"
+        ]
       },
-      "result": null,
+      "result": {
+        "brand_score": 15,
+        "agenda_expression": 7,
+        "action_clarity": 8,
+        "anti_patterns_found": [
+          "이모지·직접 그린 SVG 아이콘 사용(아이콘은 LineIcons만) — _chopd_header.html.erb '강좌 문의' 말풍선 아이콘, 모바일 메뉴 버튼 줄 세 개"
+        ],
+        "fix_directives": [
+          "두 SVG 를 lni_icon(LineIcons) 로 교체 — 메뉴는 lni-menu-hamburger 계열, 문의는 말풍선 계열",
+          "aria-label '메뉴'·버튼 크기·색 유지"
+        ],
+        "doc": "docs/ui-snapshots/review-ISS-574-575-579-580.md",
+        "commit": "5a9d2ba",
+        "criteria_check": [
+          {
+            "criterion": "헤더 메뉴 이름이 도착 화면 내용과 맞는다('소개' → 최범희 발행인 소개)",
+            "met": true,
+            "how": "클릭 도착 /media/greeting h1 '발행인 인사말', 최범희 이름·직함 표시"
+          },
+          {
+            "criterion": "헤더에 다음 행동(주요 버튼)이 한눈에 보인다",
+            "met": true,
+            "how": "채움 버튼은 주황 '강좌 문의' 하나, 나머지 글자 링크"
+          },
+          {
+            "criterion": "brand-dna anti_patterns 위반이 없다(위반 시 후속 카드)",
+            "met": true,
+            "how": "위반 1건(직접 그린 SVG 2개) 발견 → 후속 수정 카드로 분리"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "grep -c \"<svg\" app/views/layouts/_chopd_header.html.erb",
+            "exit_code": 0,
+            "output": "2"
+          },
+          {
+            "cmd": "bin/rails test test/integration/chopd_header_links_test.rb test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "7 runs, 57 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:25:28.924Z"
+      "updated_at": "2026-11-25T04:00:20Z",
+      "completed_at": "2026-11-25T13:09:20.448639"
     },
     {
       "id": "ISS-576",
@@ -10692,7 +10815,7 @@
       "id": "ISS-579",
       "title": "[Plan:UX리뷰] ISS-552 UI 변경 검증",
       "type": "UI_REVIEW",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "ux-harness",
       "depth": 2,
@@ -10714,17 +10837,75 @@
           }
         ],
         "approved_at": "2026-11-25T03:27:32.237Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-552(빈 강좌 안내 대비·문의 링크) 후속 UX 검증. 문서만",
+          "risk": "T0 — 검증·문서",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:00:20Z"
+        },
+        "acceptance_criteria": [
+          "빈 강좌 안내와 문의 링크 대비가 4.5:1 이상이다(1280·390·320)",
+          "문의 링크를 누르면 문의 화면으로 이동한다",
+          "/education 가로 넘침·글자 잘림·콘솔 오류가 없다"
+        ]
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "issues": [],
+        "doc": "docs/ui-snapshots/review-ISS-574-575-579-580.md",
+        "commit": "5a9d2ba",
+        "screenshots": [
+          "qa/ISS-579/edu-1280.png",
+          "qa/ISS-579/edu-390.png",
+          "qa/ISS-579/edu-320.png"
+        ],
+        "contrast": {
+          "empty_title": 10.09,
+          "empty_sub": 7.24,
+          "cta": 10.68
+        },
+        "criteria_check": [
+          {
+            "criterion": "빈 강좌 안내와 문의 링크 대비가 4.5:1 이상이다(1280·390·320)",
+            "met": true,
+            "how": "playwright 배경 합성 실측 세 폭 동일 10.09 / 7.24 / 10.68"
+          },
+          {
+            "criterion": "문의 링크를 누르면 문의 화면으로 이동한다",
+            "met": true,
+            "how": "1280·390 클릭 → /inquiries/new?type=b2b, h1 '문의하기'"
+          },
+          {
+            "criterion": "/education 가로 넘침·글자 잘림·콘솔 오류가 없다",
+            "met": true,
+            "how": "layout_check /education 1280·390·320 hScroll false clipped 0 console 0"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "cd script/qa && ROUTES=/education,/works,/media,/community,/media/greeting WIDTHS=1280,390,320 node layout_check.cjs",
+            "exit_code": 0,
+            "output": "15조합 hScroll false, clipped 0, consoleErrors 0, badResponses 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "bin/rails test test/integration/chopd_header_links_test.rb test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "7 runs, 57 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:27:32.237Z"
+      "updated_at": "2026-11-25T04:00:20Z",
+      "completed_at": "2026-11-25T13:09:13.361082"
     },
     {
       "id": "ISS-580",
       "title": "[Plan:브랜드검증] ISS-552 아젠다 표현 + Action Clarity",
       "type": "BRAND_GUARD",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "brand-guardian",
       "depth": 2,
@@ -10746,11 +10927,56 @@
           }
         ],
         "approved_at": "2026-11-25T03:27:32.237Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-552 빈 강좌 화면의 브랜드(아젠다 톤·다음 행동) 점검. 문서만",
+          "risk": "T0 — 검증·문서",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:00:20Z"
+        },
+        "acceptance_criteria": [
+          "빈 강좌 화면에 다음 행동(문의) 하나가 분명히 보인다",
+          "안내 문구 톤이 brand-dna agenda·emotional_tone 과 어긋나지 않는다",
+          "anti_patterns('빈 구역 그대로 노출' 등) 위반이 없다"
+        ]
       },
-      "result": null,
+      "result": {
+        "brand_score": 16,
+        "agenda_expression": 7,
+        "action_clarity": 9,
+        "anti_patterns_found": [],
+        "doc": "docs/ui-snapshots/review-ISS-574-575-579-580.md",
+        "commit": "5a9d2ba",
+        "criteria_check": [
+          {
+            "criterion": "빈 강좌 화면에 다음 행동(문의) 하나가 분명히 보인다",
+            "met": true,
+            "how": "빈 상태에 '원하는 강좌 문의하기' 버튼 1개(44px), 390 캡처 첫 화면 안에 보임"
+          },
+          {
+            "criterion": "안내 문구 톤이 brand-dna agenda·emotional_tone 과 어긋나지 않는다",
+            "met": true,
+            "how": "'곧 새로운 강좌가 추가될 예정입니다' — 부담 없음·따뜻함, 개발자 용어 없음"
+          },
+          {
+            "criterion": "anti_patterns('빈 구역 그대로 노출' 등) 위반이 없다",
+            "met": true,
+            "how": "빈 구역에 안내+행동 제공, 아이콘 lni_icon books-2(LineIcons)"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/integration/chopd_header_links_test.rb test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "7 runs, 57 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:27:32.237Z"
+      "updated_at": "2026-11-25T04:00:20Z",
+      "completed_at": "2026-11-25T13:09:13.452223"
     },
     {
       "id": "ISS-581",
@@ -11487,6 +11713,136 @@
       },
       "spawn_rules": [],
       "completed_at": "2026-11-25T13:00:00.884769"
+    },
+    {
+      "id": "ISS-589",
+      "title": "[Plan:디자인리뷰] ISS-574 시각적 완성도 검증",
+      "type": "DESIGN_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "design-critic",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-574",
+      "depends_on": [],
+      "created_at": "2026-11-25T13:09:03.019256",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_header.html.erb"
+        ],
+        "source_issue": "ISS-574",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T04:09:21.656Z",
+            "by": "auto",
+            "reason": "「[Plan:디자인리뷰] ISS-574 시각적 완성도 검증」(DESIGN_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T04:09:21.656Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T04:09:21.656Z"
+    },
+    {
+      "id": "ISS-590",
+      "title": "[Plan:디자인리뷰] ISS-579 시각적 완성도 검증",
+      "type": "DESIGN_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "design-critic",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-579",
+      "depends_on": [],
+      "created_at": "2026-11-25T13:09:13.361082",
+      "payload": {
+        "files": [
+          "app/views/chopd/education/index.html.erb"
+        ],
+        "source_issue": "ISS-579",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T04:09:21.656Z",
+            "by": "auto",
+            "reason": "「[Plan:디자인리뷰] ISS-579 시각적 완성도 검증」(DESIGN_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T04:09:21.656Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T04:09:21.656Z"
+    },
+    {
+      "id": "ISS-591",
+      "title": "[브랜드] chopd 헤더의 직접 그린 아이콘 2개(강좌 문의 말풍선·모바일 메뉴 줄 세 개)를 LineIcons 로 교체",
+      "type": "DESIGN_FIX",
+      "status": "READY",
+      "priority": "P2",
+      "assign_to": "agent-harness",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-575",
+      "depends_on": [],
+      "created_at": "2026-11-25T13:09:20.448639",
+      "payload": {
+        "reason": "brand_violation",
+        "brand_score": 15,
+        "agenda_expression": 7,
+        "action_clarity": 8,
+        "anti_patterns": [
+          "이모지·직접 그린 SVG 아이콘 사용(아이콘은 LineIcons만) — _chopd_header.html.erb '강좌 문의' 말풍선 아이콘, 모바일 메뉴 버튼 줄 세 개"
+        ],
+        "fix_directives": [
+          "두 SVG 를 lni_icon(LineIcons) 로 교체 — 메뉴는 lni-menu-hamburger 계열, 문의는 말풍선 계열",
+          "aria-label '메뉴'·버튼 크기·색 유지"
+        ],
+        "source_issue": "ISS-575",
+        "action": "fix_brand_violation",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T04:09:21.656Z",
+            "by": "auto",
+            "reason": "「[Plan:브랜드재작성] 아젠다 7/10 · Action 8/10」(DESIGN_FIX, P0)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T04:09:21.656Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "origin": "factory-observation",
+        "files": [
+          "app/views/layouts/_chopd_header.html.erb"
+        ],
+        "evidence": [
+          "grep -c '<svg' app/views/layouts/_chopd_header.html.erb → 2 (95행 nav-cta 말풍선, 103행 nav-mobile-btn)",
+          "brand-dna anti_patterns: 이모지·직접 그린 SVG 아이콘 사용(아이콘은 LineIcons만)",
+          "docs/ui-snapshots/review-ISS-574-575-579-580.md"
+        ],
+        "acceptance_criteria": [
+          "chopd 헤더에 직접 그린 svg 가 0개다(LineIcons 로 표시)",
+          "모바일 메뉴 버튼은 aria-label '메뉴'·열고 닫기 동작이 그대로다(chopd_mobile_menu_check 통과)",
+          "1280·390·320 에서 아이콘이 보이고 버튼 크기·색이 바뀌지 않는다(layout_check 통과)",
+          "아이콘이 LineIcons 인지 확인하는 테스트가 있다"
+        ],
+        "priority_reason": "엔진 기본 P0 이나 표시 아이콘 교체라 사용자 막힘 없음 → P2",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "대표님 지시(2026-11-19, 아이콘은 LineIcons만) 위반이 공개 사이트 모든 화면 헤더에 남아 있음. lineicons 이미 로드·lni_icon 도우미 있어 교체만",
+          "risk": "T0 — 화면 표시만, 데이터 영향 없음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:09:30Z"
+        }
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T04:09:30Z",
+      "origin": "factory-observation"
     }
   ],
   "hooks": {
@@ -12026,6 +12382,30 @@
         "issue_type": "STYLE_FIX",
         "plan_created": 0,
         "timestamp": "2026-11-25T13:00:00.884769"
+      },
+      {
+        "issue_id": "ISS-574",
+        "issue_type": "UI_REVIEW",
+        "plan_created": 1,
+        "timestamp": "2026-11-25T13:09:03.019256"
+      },
+      {
+        "issue_id": "ISS-579",
+        "issue_type": "UI_REVIEW",
+        "plan_created": 1,
+        "timestamp": "2026-11-25T13:09:13.361082"
+      },
+      {
+        "issue_id": "ISS-580",
+        "issue_type": "BRAND_GUARD",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T13:09:13.452223"
+      },
+      {
+        "issue_id": "ISS-575",
+        "issue_type": "BRAND_GUARD",
+        "plan_created": 1,
+        "timestamp": "2026-11-25T13:09:20.448639"
       }
     ],
     "on_fail": [],
@@ -16268,8 +16648,8 @@
     ]
   },
   "stats": {
-    "total_issues": 588,
-    "completed": 89,
+    "total_issues": 591,
+    "completed": 93,
     "failed": 0,
     "evolved": 223
   },
