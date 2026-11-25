@@ -12151,7 +12151,7 @@
       "id": "ISS-590",
       "title": "[Plan:디자인리뷰] ISS-579 시각적 완성도 검증",
       "type": "DESIGN_REVIEW",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "design-critic",
       "depth": 3,
@@ -12173,11 +12173,84 @@
           }
         ],
         "approved_at": "2026-11-25T04:09:21.656Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-579(빈 강좌 안내) 화면 디자인 점수 매기기. 문서·캡처만 남기는 검증",
+          "risk": "T0 — 검증·문서",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:23:47Z"
+        },
+        "acceptance_criteria": [
+          "/education 빈 강좌 안내를 1280·390·320 에서 캡처해 7개 항목으로 점수를 매긴다",
+          "글자 대비·넘침·콘솔 오류를 브라우저로 실측한다",
+          "결함이 있으면 DESIGN_FIX 카드로 남기거나 기존 카드와 연결한다"
+        ]
       },
-      "result": null,
+      "result": {
+        "total_score": 58,
+        "score_pct": 83,
+        "critical_issues": [],
+        "ai_slop_detected": false,
+        "commit": "00210ef",
+        "files_changed": [
+          "docs/ui-snapshots/review-ISS-590-education-empty.md",
+          "qa/ISS-590/empty-1280.png",
+          "qa/ISS-590/empty-390.png",
+          "qa/ISS-590/empty-320.png",
+          "script/qa/education_empty_state_check.cjs"
+        ],
+        "breakdown": {
+          "hierarchy": 9,
+          "readability": 9,
+          "spacing": 8,
+          "responsive": 8,
+          "brand": 8,
+          "action_clarity": 7,
+          "restraint": 9
+        },
+        "non_critical_issues": [
+          {
+            "dimension": "action_clarity",
+            "problem": "문의 링크가 넘긴 유형이 양식에 미리 선택되지 않음",
+            "card": "ISS-595"
+          }
+        ],
+        "criteria_check": [
+          {
+            "criterion": "/education 빈 강좌 안내를 1280·390·320 에서 캡처해 7개 항목으로 점수를 매긴다",
+            "met": true,
+            "how": "qa/ISS-590/empty-*.png 3장, 리뷰 문서 7관점 58/70"
+          },
+          {
+            "criterion": "글자 대비·넘침·콘솔 오류를 브라우저로 실측한다",
+            "met": true,
+            "how": "education_empty_state_check: 대비 10.09/7.24/9.03, 링크 44px, hScroll false, clipped 0, 콘솔·4xx/5xx 0 (3폭)"
+          },
+          {
+            "criterion": "결함이 있으면 DESIGN_FIX 카드로 남기거나 기존 카드와 연결한다",
+            "met": true,
+            "how": "유형 미선택은 기존 ISS-595 와 연결, 새 결함 없음"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/education_empty_state_check.cjs",
+            "exit_code": 0,
+            "output": "1280·390·320 emptyCount 1 ctaCount 1 contrast title 10.09 sub 7.24 cta 9.03 ctaHeight 44 hScroll false clipped 0; clicks finalPath /inquiries/new status 200 formFound true typeSelected \"\"; consoleErrors [] SUMMARY pass=true"
+          },
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "7 runs, 49 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T04:09:21.656Z"
+      "updated_at": "2026-11-25T04:23:47Z",
+      "started_at": "2026-11-25T04:23:47Z",
+      "completed_at": "2026-11-25T13:32:35.263774"
     },
     {
       "id": "ISS-591",
@@ -12328,7 +12401,29 @@
             "exit_code": 0,
             "output": "32 runs, 400 assertions, 0 failures, 0 errors, 0 skips"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T04:22:57Z",
+          "sha": "e2ab55f",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rubocop",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": ".....................................................................................................................................................................................................................................................................................................................................................................\n\n464 files inspected, no offenses detected"
+            },
+            {
+              "cmd": "bin/rails test test/integration/member_admin_unsaved_guard_test.rb test/integration/member_admin_editor_flow_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            }
+          ]
+        }
       },
       "spawn_rules": [],
       "started_at": "2026-11-25T04:12:52Z",
@@ -12392,7 +12487,7 @@
       "id": "ISS-594",
       "title": "[테스트] 로그인한 회원이 보는 chopd 헤더(내 페이지·로그아웃, 데스크톱·모바일)를 확인하는 테스트 추가",
       "type": "IMPROVE_COVERAGE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "assign_to": "test-harness",
       "depth": 3,
@@ -12436,8 +12531,45 @@
         "approved_at": "2026-11-25T04:20:10.552Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
-      "result": null,
-      "spawn_rules": []
+      "result": {
+        "passed": true,
+        "commit": "3da1d8e",
+        "files_changed": [
+          "test/integration/chopd_header_member_session_test.rb"
+        ],
+        "note": "ISS-597 S2 검증용으로 만든 테스트가 이 카드 범위를 그대로 덮어 같은 커밋으로 마감. 기존 chopd_header_links_test.rb 대신 별도 파일로 둠(회원 생성·로그인 준비가 손님 테스트와 섞이지 않게)",
+        "criteria_check": [
+          {
+            "criterion": "로그인한 회원으로 chopd 화면을 열면 데스크톱·모바일 메뉴에 내 페이지(/<회원 주소>)와 로그아웃 양식이 있다",
+            "met": true,
+            "how": ".nav-cta-wrap·#mobile-nav 각각 내 페이지 href=/chopd-header-member 1개, member_logout_path DELETE 폼 1개"
+          },
+          {
+            "criterion": "같은 화면에 회원가입·로그인 링크가 없다",
+            "met": true,
+            "how": "로그인 후 두 영역 모두 member_signup_path·member_login_path 링크 0개"
+          },
+          {
+            "criterion": "내 페이지 링크가 200 으로 열린다",
+            "met": true,
+            "how": "get /chopd-header-member → 200"
+          },
+          {
+            "criterion": "bin/rails test test/integration/chopd_header_links_test.rb 통과",
+            "met": true,
+            "how": "새 테스트와 함께 10 runs 0 failures"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_header_member_session_test.rb test/integration/chopd_header_links_test.rb",
+            "exit_code": 0,
+            "output": "0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "completed_at": "2026-11-25T13:28:01.284874"
     },
     {
       "id": "ISS-595",
@@ -12497,7 +12629,7 @@
       "id": "ISS-596",
       "title": "[Plan:비즈니스검증] chopd-header-links 규칙 6개 정적 검증",
       "type": "BIZ_VALIDATE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "biz-validator",
       "depth": 3,
@@ -12563,17 +12695,113 @@
           }
         ],
         "approved_at": "2026-11-25T04:21:02.442Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "chopd 헤더 규칙 6개를 코드·테스트로 판정. 이미 알려진 갭(ISS-593·594)은 연결만",
+          "risk": "T0 — 검증",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:23:47Z"
+        },
+        "acceptance_criteria": [
+          "헤더 규칙 R1~R6 각각을 코드·테스트·점검 스크립트 근거로 판정한다",
+          "미충족 규칙은 기존 수정 카드(ISS-593·594)에 연결하거나 새 카드로 남긴다",
+          "다시 돌릴 수 있는 검사 명령을 1개 이상 남긴다"
+        ]
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "coverage": 83,
+        "critical_gaps": 0,
+        "major_gaps": 1,
+        "commit": "dc2bcf4",
+        "gaps": [
+          {
+            "id": "R6",
+            "level": "MAJOR",
+            "problem": "강좌 문의 버튼 흰 글자/#ff4d1c 3.32:1",
+            "card": "ISS-593"
+          }
+        ],
+        "rules": [
+          {
+            "id": "R1",
+            "met": true,
+            "how": "chopd_header_links_test 소개 href /media/greeting 데스크톱·모바일"
+          },
+          {
+            "id": "R2",
+            "met": true,
+            "how": "같은 테스트 # 대상 0, 내부 링크 200/3xx"
+          },
+          {
+            "id": "R3",
+            "met": true,
+            "how": "chopd_mobile_menu_check introNav menuDisplay none expanded false"
+          },
+          {
+            "id": "R4",
+            "met": true,
+            "how": "chopd_header_member_session_test(3da1d8e) 로그인 전·후·로그아웃 뒤"
+          },
+          {
+            "id": "R5",
+            "met": true,
+            "how": ".nav-cta·모바일 강좌 문의 new_inquiry_path, 200"
+          },
+          {
+            "id": "R6",
+            "met": false,
+            "how": ".nav-cta color #fff on #ff4d1c 3.32:1 → ISS-593"
+          }
+        ],
+        "criteria_check": [
+          {
+            "criterion": "헤더 규칙 R1~R6 각각을 코드·테스트·점검 스크립트 근거로 판정한다",
+            "met": true,
+            "how": "docs/domain/chopd-header-links-rules.md 검증 결과 표, 5/6 충족"
+          },
+          {
+            "criterion": "미충족 규칙은 기존 수정 카드(ISS-593·594)에 연결하거나 새 카드로 남긴다",
+            "met": true,
+            "how": "R6 → ISS-593(READY). R4 갭은 ISS-594 로 해소·마감"
+          },
+          {
+            "criterion": "다시 돌릴 수 있는 검사 명령을 1개 이상 남긴다",
+            "met": true,
+            "how": "proof 의 rails test·node 점검"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_header_links_test.rb test/integration/chopd_header_member_session_test.rb",
+            "exit_code": 0,
+            "output": "0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "node script/qa/chopd_mobile_menu_check.cjs",
+            "exit_code": 0,
+            "output": "introNav finalPath /media/greeting menuDisplay none expanded false SUMMARY pass=true"
+          },
+          {
+            "cmd": "ROUTES=/education,/media/greeting WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "SUMMARY pass=true"
+          }
+        ],
+        "coverage_rate": 83
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T04:21:02.442Z"
+      "updated_at": "2026-11-25T04:23:47Z",
+      "started_at": "2026-11-25T04:23:47Z",
+      "completed_at": "2026-11-25T13:35:06.014090"
     },
     {
       "id": "ISS-597",
       "title": "[Plan:시나리오실행] chopd-header-links 시나리오 2개 E2E 실행",
       "type": "SCENARIO_PLAY",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "scenario-player",
       "depth": 3,
@@ -12607,17 +12835,78 @@
           }
         ],
         "approved_at": "2026-11-25T04:21:02.442Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "헤더 시나리오 2개를 실제 브라우저로 실행. 로그인 시나리오는 테스트 계정으로 확인",
+          "risk": "T0 — 검증",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:23:47Z"
+        },
+        "acceptance_criteria": [
+          "390px /education 햄버거 → 소개 → /media/greeting, 메뉴 닫힘, 콘솔 오류 0",
+          "로그인한 회원이 chopd 헤더에서 내 페이지·로그아웃을 보고, 로그아웃은 확인 창 뒤 처리된다",
+          "실패 시나리오는 수정 카드로 남긴다"
+        ]
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "scenarios": [
+          {
+            "id": "S1",
+            "result": "PASS"
+          },
+          {
+            "id": "S2",
+            "result": "PASS"
+          }
+        ],
+        "fail_count": 0,
+        "commit": "3da1d8e",
+        "files_changed": [
+          "test/integration/chopd_header_member_session_test.rb"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "390px /education 햄버거 → 소개 → /media/greeting, 메뉴 닫힘, 콘솔 오류 0",
+            "met": true,
+            "how": "chopd_mobile_menu_check: introNav finalPath /media/greeting, menuDisplay none, expanded false, consoleErrors 0"
+          },
+          {
+            "criterion": "로그인한 회원이 chopd 헤더에서 내 페이지·로그아웃을 보고, 로그아웃은 확인 창 뒤 처리된다",
+            "met": true,
+            "how": "새 통합 테스트(3da1d8e): 데스크톱·모바일 각각 내 페이지 href=/<회원 주소> 1개, 로그아웃 폼 data-turbo-confirm 로그아웃하시겠습니까? + DELETE, 공개 페이지 200, 로그아웃 뒤 세션 nil·가입/로그인 링크 복귀. 모바일 내 페이지 주소를 / 로 변조하면 실패 확인. Gemini 독립 검수 결함 0"
+          },
+          {
+            "criterion": "실패 시나리오는 수정 카드로 남긴다",
+            "met": true,
+            "how": "실패 0건 — 수정 카드 불필요"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/chopd_mobile_menu_check.cjs",
+            "exit_code": 0,
+            "output": "introNav {finalPath:/media/greeting, menuDisplay:none, expanded:false} consoleErrors 0 pageErrors 0 SUMMARY pass=true"
+          },
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_header_member_session_test.rb test/integration/chopd_header_links_test.rb test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "10 runs, 104 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T04:21:02.442Z"
+      "updated_at": "2026-11-25T04:23:47Z",
+      "started_at": "2026-11-25T04:23:47Z",
+      "completed_at": "2026-11-25T13:27:48.580437"
     },
     {
       "id": "ISS-598",
       "title": "[Plan:비즈니스검증] education-empty-state 규칙 6개 정적 검증",
       "type": "BIZ_VALIDATE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "biz-validator",
       "depth": 3,
@@ -12689,17 +12978,108 @@
           }
         ],
         "approved_at": "2026-11-25T04:21:02.442Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "빈 강좌 안내 규칙 6개 판정. R6 갭은 ISS-595 와 연결",
+          "risk": "T0 — 검증",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:23:47Z"
+        },
+        "acceptance_criteria": [
+          "빈 강좌 안내 규칙 R1~R6 각각을 코드·테스트·점검 스크립트 근거로 판정한다",
+          "미충족 규칙은 기존 수정 카드(ISS-595)에 연결하거나 새 카드로 남긴다",
+          "다시 돌릴 수 있는 검사 명령을 1개 이상 남긴다"
+        ]
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "coverage": 83,
+        "critical_gaps": 0,
+        "major_gaps": 1,
+        "commit": "753f4ca",
+        "gaps": [
+          {
+            "id": "R6",
+            "level": "MAJOR",
+            "problem": "문의 링크 type=b2b 가 양식에 미리 선택되지 않음(typeSelected 빈 값)",
+            "card": "ISS-595"
+          }
+        ],
+        "rules": [
+          {
+            "id": "R1",
+            "met": true,
+            "how": "education_filter_test 빈 안내·링크 1개"
+          },
+          {
+            "id": "R2",
+            "met": true,
+            "how": "education_filter_test hides the empty state"
+          },
+          {
+            "id": "R3",
+            "met": true,
+            "how": "대비 테스트 + 실측 10.09/7.24/9.03"
+          },
+          {
+            "id": "R4",
+            "met": true,
+            "how": "education_empty_state_check 3폭 넘침·잘림 0, 링크 44px"
+          },
+          {
+            "id": "R5",
+            "met": true,
+            "how": "/education?type=online 분류 0개에서 같은 빈 안내"
+          },
+          {
+            "id": "R6",
+            "met": false,
+            "how": "typeSelected \"\" → ISS-595"
+          }
+        ],
+        "criteria_check": [
+          {
+            "criterion": "빈 강좌 안내 규칙 R1~R6 각각을 코드·테스트·점검 스크립트 근거로 판정한다",
+            "met": true,
+            "how": "docs/domain/education-empty-state-rules.md 검증 결과 표, 5/6 충족"
+          },
+          {
+            "criterion": "미충족 규칙은 기존 수정 카드(ISS-595)에 연결하거나 새 카드로 남긴다",
+            "met": true,
+            "how": "R6 → ISS-595(READY), 확인 명령 EXPECT_TYPE 안내"
+          },
+          {
+            "criterion": "다시 돌릴 수 있는 검사 명령을 1개 이상 남긴다",
+            "met": true,
+            "how": "proof 의 rails test·node 점검"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "7 runs, 49 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "node script/qa/education_empty_state_check.cjs",
+            "exit_code": 0,
+            "output": "3폭 emptyCount 1 ctaCount 1 contrast 10.09/7.24/9.03 ctaHeight 44 hScroll false clipped 0, typeSelected \"\" SUMMARY pass=true"
+          }
+        ],
+        "coverage_rate": 83
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T04:21:02.442Z"
+      "updated_at": "2026-11-25T04:23:47Z",
+      "started_at": "2026-11-25T04:23:47Z",
+      "completed_at": "2026-11-25T13:35:06.069286"
     },
     {
       "id": "ISS-599",
       "title": "[Plan:시나리오실행] education-empty-state 시나리오 3개 E2E 실행",
       "type": "SCENARIO_PLAY",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "scenario-player",
       "depth": 3,
@@ -12739,11 +13119,124 @@
           }
         ],
         "approved_at": "2026-11-25T04:21:02.442Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "빈 강좌 시나리오 3개를 브라우저로 실행(강좌 0개 상태는 화면 분기 테스트+실측)",
+          "risk": "T0 — 검증",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:23:47Z"
+        },
+        "acceptance_criteria": [
+          "강좌 0개 /education → '원하는 강좌 문의하기' → /inquiries/new 200",
+          "/education?type=online 강좌 0개 → 빈 안내 + 문의 링크",
+          "강좌 카드 '문의하기' → 문의 양식 화면"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "scenarios": [
+          {
+            "id": "S1",
+            "result": "PASS"
+          },
+          {
+            "id": "S2",
+            "result": "PASS"
+          },
+          {
+            "id": "S3",
+            "result": "PASS"
+          }
+        ],
+        "fail_count": 0,
+        "commit": "c9886ae",
+        "files_changed": [
+          "test/integration/education_filter_test.rb"
+        ],
+        "note": "문의 유형 미리 선택(R6)은 시나리오 기대(200·양식)에 들어 있지 않아 PASS, 결함은 기존 ISS-595 에서 처리",
+        "criteria_check": [
+          {
+            "criterion": "강좌 0개 /education → 원하는 강좌 문의하기 → /inquiries/new 200",
+            "met": true,
+            "how": "통합 테스트 shows the empty state…(공개 강좌 0개 → 빈 안내·링크 1개) + 브라우저 빈 안내 링크 클릭 1280·390 finalPath /inquiries/new status 200 formFound true"
+          },
+          {
+            "criterion": "/education?type=online 강좌 0개 → 빈 안내 + 문의 링크",
+            "met": true,
+            "how": "education_empty_state_check START=/education?type=online 3폭 emptyCount 1 ctaCount 1, 콘솔 오류 0"
+          },
+          {
+            "criterion": "강좌 카드 문의하기 → 문의 양식 화면",
+            "met": true,
+            "how": "새 통합 테스트: 외부 링크 없는 B2B 카드의 문의하기 href 가 /inquiries/new 로 시작, GET 200, inquiry[inquiry_type] 선택칸 있는 양식"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/education_empty_state_check.cjs",
+            "exit_code": 0,
+            "output": "widths 1280/390/320 emptyCount 1 ctaCount 1; clicks finalPath /inquiries/new status 200 formFound true; consoleErrors [] SUMMARY pass=true"
+          },
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "7 runs, 49 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T04:23:47Z",
+      "started_at": "2026-11-25T04:23:47Z",
+      "completed_at": "2026-11-25T13:32:45.527498"
+    },
+    {
+      "id": "ISS-600",
+      "title": "[린트] 회원 디자인 루프 14회차 커밋(d0b74f3)의 RuboCop 배열 괄호 공백 위반 6건 정리",
+      "type": "STYLE_FIX",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "agent-harness",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": null,
+      "depends_on": [],
+      "created_at": "2026-11-25T04:35:42Z",
+      "updated_at": "2026-11-25T04:35:44.920Z",
+      "payload": {
+        "origin": "factory-ship",
+        "files": [
+          "app/controllers/member_admin/brands_controller.rb",
+          "test/integration/member_admin_page_width_test.rb"
+        ],
+        "detail": "bin/rubocop: Layout/SpaceInsideArrayLiteralBrackets 6건 (brands_controller.rb 6·12행, member_admin_page_width_test.rb 12행). 회차 끝 전체 린트에서 발견, 출고를 막을 수 있음",
+        "acceptance_criteria": [
+          "bin/rubocop 전체가 no offenses detected",
+          "회원 브랜드·페이지 폭 관련 테스트가 그대로 통과(bin/rails test test/integration/member_admin_page_width_test.rb)",
+          "동작 변경 없이 공백만 고친다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "공백만 고치는 자동 수정 수준. 다른 세션(회원 디자인 루프)이 같은 파일을 고치는 중일 수 있어 worktree 에서 고치고 cherry-pick",
+          "risk": "T0 — 형식만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:35:42Z"
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T04:35:44.920Z",
+            "by": "auto",
+            "reason": "공백만 고치는 자동 수정 수준. 다른 세션(회원 디자인 루프)이 같은 파일을 고치는 중일 수 있어 worktree 에서 고치고 cherry-pick"
+          }
+        ],
+        "approved_at": "2026-11-25T04:35:44.920Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
       "result": null,
-      "spawn_rules": [],
-      "updated_at": "2026-11-25T04:21:02.442Z"
+      "spawn_rules": []
     }
   ],
   "hooks": {
@@ -13343,6 +13836,42 @@
         "issue_type": "DESIGN_REVIEW",
         "plan_created": 0,
         "timestamp": "2026-11-25T13:21:36.993704"
+      },
+      {
+        "issue_id": "ISS-597",
+        "issue_type": "SCENARIO_PLAY",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T13:27:48.580437"
+      },
+      {
+        "issue_id": "ISS-594",
+        "issue_type": "IMPROVE_COVERAGE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T13:28:01.284874"
+      },
+      {
+        "issue_id": "ISS-590",
+        "issue_type": "DESIGN_REVIEW",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T13:32:35.263774"
+      },
+      {
+        "issue_id": "ISS-599",
+        "issue_type": "SCENARIO_PLAY",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T13:32:45.527498"
+      },
+      {
+        "issue_id": "ISS-596",
+        "issue_type": "BIZ_VALIDATE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T13:35:06.014090"
+      },
+      {
+        "issue_id": "ISS-598",
+        "issue_type": "BIZ_VALIDATE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T13:35:06.069286"
       }
     ],
     "on_fail": [],
@@ -17586,7 +18115,7 @@
   },
   "stats": {
     "total_issues": 599,
-    "completed": 99,
+    "completed": 105,
     "failed": 0,
     "evolved": 223
   },
