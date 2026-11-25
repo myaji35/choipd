@@ -115,20 +115,26 @@
     <%= render "shared/promo_popup" %>
 
     <script>
-      // 스크롤 진행바
-      window.addEventListener('scroll', () => {
-        const prog = document.getElementById('scroll-prog');
-        if (!prog) return;
-        const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
-        prog.style.width = Math.min(pct, 100) + '%';
-      });
+      (function() {
+        // 스크롤 진행바
+        if (!window.__chopdScrollProgBound) {
+          window.addEventListener('scroll', () => {
+            const prog = document.getElementById('scroll-prog');
+            if (!prog) return;
+            const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+            prog.style.width = Math.min(pct, 100) + '%';
+          });
+          window.__chopdScrollProgBound = true;
+        }
 
-      // Scroll reveal
-      const revealEls = document.querySelectorAll('.reveal');
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
-      }, { threshold: 0.12 });
-      revealEls.forEach(el => observer.observe(el));
+        // Scroll reveal
+        if (window.__chopdRevealObserver) window.__chopdRevealObserver.disconnect();
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+        }, { threshold: 0.12 });
+        window.__chopdRevealObserver = observer;
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+      })();
     </script>
   </body>
 </html>

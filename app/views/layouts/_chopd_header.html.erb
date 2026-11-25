@@ -133,14 +133,19 @@
 </div>
 
 <script>
-  // 스크롤 시 nav 배경
-  window.addEventListener('scroll', () => {
-    const nav = document.getElementById('nav');
-    if (!nav) return;
-    nav.classList.toggle('scrolled', window.scrollY > 40);
-  });
-  // 모바일 메뉴 토글
-  document.querySelector('[data-action="click->mobile-menu#toggle"]')?.addEventListener('click', () => {
-    document.getElementById('mobile-nav')?.classList.toggle('open');
-  });
+  (() => {
+    // 스크롤 시 nav 배경
+    if (!window.__chopdNavScrollBound) {
+      window.addEventListener('scroll', () => {
+        const nav = document.getElementById('nav');
+        if (!nav) return;
+        nav.classList.toggle('scrolled', window.scrollY > 40);
+      });
+      window.__chopdNavScrollBound = true;
+    }
+    // 모바일 메뉴 토글
+    document.querySelector('[data-action="click->mobile-menu#toggle"]')?.addEventListener('click', () => {
+      document.getElementById('mobile-nav')?.classList.toggle('open');
+    });
+  })();
 </script>
