@@ -1,7 +1,7 @@
 module ApplicationHelper
   def example_profile_path
     @example_profile_path ||= begin
-      members = Member.for_tenant.publicly_visible.where.not(slug: [nil, ""])
+      members = Member.for_tenant.publicly_visible.where.not(slug: [ nil, "" ])
       slug = members.find_by(slug: "choi-pd")&.slug || members
         .order(Arel.sql("CASE WHEN is_featured = 1 THEN 0 ELSE 1 END"), featured_order: :asc, created_at: :desc)
         .pick(:slug)
