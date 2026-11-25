@@ -5,12 +5,16 @@ const viewport = { width: 390, height: 844 };
 
 async function clickAndCheck(page, expectedDisplay, expectedExpanded) {
   await page.locator('.nav-mobile-btn').click();
-  const state = await page.evaluate(() => ({
+  const state = await readMenuState(page);
+  assert.deepEqual(state, { display: expectedDisplay, expanded: expectedExpanded });
+  return state;
+}
+
+async function readMenuState(page) {
+  return page.evaluate(() => ({
     display: getComputedStyle(document.getElementById('mobile-nav')).display,
     expanded: document.querySelector('.nav-mobile-btn').getAttribute('aria-expanded'),
   }));
-  assert.deepEqual(state, { display: expectedDisplay, expanded: expectedExpanded });
-  return state;
 }
 
 async function main() {
@@ -47,6 +51,22 @@ async function main() {
     assert.equal(result.worksSameDocument, true, 'Turbo visit replaced the document');
     await page.waitForFunction(() => window.__qaMobileMenuLoadedPath === '/works');
     result.worksOpen = await clickAndCheck(page, 'flex', 'true');
+
+    await page.goto(new URL('/education', baseUrl).href, { waitUntil: 'load' });
+    await clickAndCheck(page, 'flex', 'true');
+    await page.evaluate(() => {
+      window.__qaIntroInitialDocument = document;
+      document.addEventListener('turbo:load', () => {
+        window.__qaIntroLoadedPath = location.pathname;
+      }, { once: true });
+    });
+    await page.locator('#mobile-nav a.mobile-nav-link').filter({ hasText: /^소개$/ }).click();
+    await page.waitForURL(url => url.pathname === '/media/greeting');
+    await page.waitForFunction(() => window.__qaIntroLoadedPath === '/media/greeting', null, { timeout: 10000 });
+    const { display: menuDisplay, expanded } = await readMenuState(page);
+    const sameDocument = await page.evaluate(() => window.__qaIntroInitialDocument === document);
+    result.introNav = { finalPath: new URL(page.url()).pathname, menuDisplay, expanded, sameDocument };
+    assert.deepEqual({ menuDisplay, expanded }, { menuDisplay: 'none', expanded: 'false' });
   } catch (error) {
     result.error = error.message;
   } finally {
