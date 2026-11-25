@@ -214,7 +214,7 @@
               <% if course.external_link.present? %>
                 <%= link_to "수강 신청", course.external_link, target: "_blank", rel: "noopener", class: "course-cta cta-enroll" %>
               <% else %>
-                <%= link_to "문의하기", new_inquiry_path(type: 'b2b'), class: "course-cta cta-inquiry" %>
+                <%= link_to "문의하기", new_inquiry_path(type: course.course_type == 'b2b' ? 'b2b' : 'contact'), class: "course-cta cta-inquiry" %>
               <% end %>
             </div>
           </div>
@@ -226,7 +226,7 @@
       <div style="font-size:48px;margin-bottom:16px;"><%= lni_icon "books-2" %></div>
       <p style="font-size:15px;">등록된 강좌가 없습니다.</p>
       <p style="font-size:13px;margin-top:8px;color:rgba(255,255,255,.6);">곧 새로운 강좌가 추가될 예정입니다.</p>
-      <%= link_to "원하는 강좌 문의하기", new_inquiry_path(type: 'b2b'), class: "course-cta cta-inquiry empty-state-cta" %>
+      <%= link_to "원하는 강좌 문의하기", new_inquiry_path(type: 'contact'), class: "course-cta cta-inquiry empty-state-cta" %>
     </div>
   <% end %>
 </section>

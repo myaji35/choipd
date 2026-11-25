@@ -34,7 +34,7 @@ class EducationFilterTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".empty-state", count: 1 do
-      assert_select "a[href=?]", new_inquiry_path(type: "b2b"), text: "원하는 강좌 문의하기", count: 1
+      assert_select "a[href=?]", new_inquiry_path(type: "contact"), text: "원하는 강좌 문의하기", count: 1
     end
     assert_select ".course-title", count: 0
   end
@@ -86,6 +86,18 @@ class EducationFilterTest < ActionDispatch::IntegrationTest
 
     assert_response :ok
     assert_select "form select[name=?]", "inquiry[inquiry_type]"
+  end
+
+  test "course cards without external links use the appropriate inquiry type" do
+    get education_path
+
+    assert_response :success
+    { @online => "contact", @offline => "contact", @b2b => "b2b" }.each do |course, inquiry_type|
+      title = assert_select(".course-title", text: course.title, count: 1).first
+      card = title.ancestors(".course-card").first
+      assert card, "Expected #{course.title} inside a course card"
+      assert_select card, "a[href=?]", new_inquiry_path(type: inquiry_type), text: "문의하기", count: 1
+    end
   end
 
   private

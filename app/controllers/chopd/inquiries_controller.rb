@@ -1,6 +1,11 @@
 class Chopd::InquiriesController < Chopd::BaseController
   def new
-    @inquiry = Inquiry.new
+    inquiry_type = params[:type]
+    @inquiry = if Inquiry.inquiry_types.key?(inquiry_type)
+      Inquiry.new(inquiry_type: inquiry_type)
+    else
+      Inquiry.new
+    end
   end
 
   def create
