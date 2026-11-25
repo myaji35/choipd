@@ -39,6 +39,20 @@ class MemberAdminPlainWordsTest < ActionDispatch::IntegrationTest
     assert_no_match "비활성", response.body
   end
 
+  test "내 정보에 필수 칸과 선택 칸을 표시한다" do
+    get slug_admin_editor_path(slug: @member.slug, step: 2)
+
+    assert_response :ok
+    %w[자기소개 직업 이메일].each do |label|
+      assert_select "form.editor-fields label", text: "#{label} (필수)", count: 1
+    end
+    %w[지역 전화번호].each do |label|
+      assert_select "form.editor-fields label", text: "#{label} (선택)", count: 1
+    end
+    assert_not_includes response.body, "직업 직접 입력"
+    assert_select "select option[value=custom]", text: "목록에 없어요 (직접 적기)"
+  end
+
   test "에디터 3·4단계에 발행·프리셋 같은 말이 없다" do
     get slug_admin_editor_path(slug: @member.slug, step: 3)
     assert_response :ok

@@ -6,6 +6,15 @@ class MemberAdmin::BaseController < ApplicationController
 
   private
 
+  def normalize_web_address(value)
+    return value unless value.is_a?(String)
+
+    address = value.strip
+    return address if address.empty? || address.match?(/\A[a-z][a-z0-9+.-]*:|[[:space:]]/i)
+
+    "https://#{address}"
+  end
+
   def set_member
     @member = Member.find_by!(slug: params[:slug])
   rescue ActiveRecord::RecordNotFound

@@ -56,7 +56,7 @@
         </div>
       <% else %>
         <div class="impd-card" style="padding: 40px 24px; text-align: center;">
-          <p style="font-size: 14px; color: var(--impd-ink2); line-height: 1.7; word-break: keep-all;">아직 적어 둔 질문이 없어요. 고객이 자주 묻는 것부터 하나 적어 보세요.</p>
+          <p style="font-size: 14px; color: var(--impd-ink2); line-height: 1.7; word-break: keep-all;">아직 적어 둔 질문이 없어요. '새 질문 추가'의 예시 질문을 누르면 바로 시작할 수 있어요.</p>
         </div>
       <% end %>
     </section>
@@ -65,8 +65,8 @@
       <div class="impd-section-header" style="margin-bottom: 20px;">
         <h2 class="impd-display" style="font-size: 24px;">새 질문 추가</h2>
       </div>
-      <%= form_with model: (@new_faq || MemberFaq.new), url: slug_admin_faqs_path(slug: @member.slug), data: { controller: "unsaved-guard" } do |form| %>
-        <%= render "faq_fields", form: form, submit_label: "질문 저장" %>
+      <%= form_with model: (@new_faq || MemberFaq.new), namespace: "new_faq", url: slug_admin_faqs_path(slug: @member.slug), data: { controller: "unsaved-guard example-fill" } do |form| %>
+        <%= render "faq_fields", form: form, submit_label: "질문 저장", show_examples: true %>
       <% end %>
     </section>
   </div>

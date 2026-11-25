@@ -1,4 +1,4 @@
-<% content_for :title, "에디터 — #{@member.name}" %>
+<% content_for :title, "페이지 만들기 — #{@member.name}" %>
 
 <div class="admin-page editor-page" style="--admin-page-max-width: 1200px;">
   <%= render "member_admin/shared/checklist_arrival" %>
@@ -79,6 +79,7 @@
       <%# 좌: 기본 프로필 입력 폼 %>
       <section class="impd-card" aria-labelledby="basic-info-heading" data-controller="editor-info">
         <h2 id="basic-info-heading" class="impd-label">기본 정보</h2>
+        <p style="margin-top: 6px; font-size: 13px; color: var(--impd-muted);">(필수) 세 칸만 채우면 내 페이지를 공개할 수 있어요. 나머지는 나중에 채워도 돼요.</p>
         <%= render "member_admin/editor/profile_photo" %>
         <%= form_with url: slug_admin_editor_update_info_path(slug: @member.slug), method: :patch, local: true, class: "editor-fields", data: { turbo: false, controller: "unsaved-guard" } do %>
           <%
@@ -105,7 +106,7 @@
             </div>
           <% end %>
           <div id="bio" class="checklist-target" style="margin-top: 16px;">
-            <label for="member_bio" class="impd-label-muted">자기소개</label>
+            <label for="member_bio" class="impd-label-muted">자기소개 <span style="font-weight: 400; color: var(--impd-muted);">(필수)</span></label>
             <textarea id="member_bio" name="member[bio]" rows="6" maxlength="200"
                       <%= field_errors.call(:bio, "member_bio_count") %> data-editor-info-target="bio" data-action="input->editor-info#updateBioCount"
                       placeholder="한 줄로 표현할 수 있나요? (예: 스마트폰 하나로 유튜브 채널 만드는 법을 가르치는 강사)"><%= info.bio %></textarea>
@@ -127,22 +128,22 @@
               <% preset_profession = submitted_profession || (Member::PROFESSIONS.include?(info.profession) ? info.profession : "custom") %>
               <% custom_profession = params.dig(:member, :custom_profession) if @info_draft %>
               <% custom_profession ||= info.profession unless Member::PROFESSIONS.include?(info.profession) %>
-              <label for="member_profession" class="impd-label-muted">직업</label>
+              <label for="member_profession" class="impd-label-muted">직업 <span style="font-weight: 400; color: var(--impd-muted);">(필수)</span></label>
               <select id="member_profession" name="member[profession]" data-editor-info-target="profession" data-action="change->editor-info#toggleProfession" <%= field_errors.call(:profession) %>>
-                <% [["직접 입력", "custom"], ["보험 설계사", "insurance_agent"], ["공인중개사", "realtor"], ["강사", "educator"], ["작가", "author"], ["자영업자", "shopowner"], ["프리랜서", "freelancer"]].each do |label, value| %>
+                <% [["목록에 없어요 (직접 적기)", "custom"], ["보험 설계사", "insurance_agent"], ["공인중개사", "realtor"], ["강사", "educator"], ["작가", "author"], ["자영업자", "shopowner"], ["프리랜서", "freelancer"]].each do |label, value| %>
                   <option value="<%= value %>" <%= "selected" if preset_profession == value %>><%= label %></option>
                 <% end %>
               </select>
               <%= error_message.call(:profession) %>
               <div data-editor-info-target="customProfession" style="margin-top: 12px;" <%= "hidden" if preset_profession != "custom" %>>
-                <label for="member_custom_profession" class="impd-label-muted">직업 직접 입력</label>
+                <label for="member_custom_profession" class="impd-label-muted">직업 이름 적기 <span style="font-weight: 400; color: var(--impd-muted);">(필수)</span></label>
                 <input type="text" id="member_custom_profession" name="member[custom_profession]" <%= field_errors.call(:custom_profession) %>
                        value="<%= custom_profession %>" placeholder="예: 스마트폰 강사">
                 <%= error_message.call(:custom_profession) %>
               </div>
             </div>
             <div>
-              <label for="member_region" class="impd-label-muted">지역</label>
+              <label for="member_region" class="impd-label-muted">지역 <span style="font-weight: 400; color: var(--impd-muted);">(선택)</span></label>
               <input type="text" id="member_region" name="member[region]" value="<%= info.region %>" placeholder="예: 서울 · 성북" <%= field_errors.call(:region) %>>
               <%= error_message.call(:region) %>
             </div>
@@ -150,12 +151,12 @@
 
           <div class="editor-pair" style="margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
             <div>
-              <label for="member_email" class="impd-label-muted">이메일</label>
+              <label for="member_email" class="impd-label-muted">이메일 <span style="font-weight: 400; color: var(--impd-muted);">(필수)</span></label>
               <input type="text" inputmode="email" autocomplete="email" id="member_email" name="member[email]" value="<%= info.email %>" <%= field_errors.call(:email) %>>
               <%= error_message.call(:email) %>
             </div>
             <div>
-              <label for="member_phone" class="impd-label-muted">전화번호</label>
+              <label for="member_phone" class="impd-label-muted">전화번호 <span style="font-weight: 400; color: var(--impd-muted);">(선택)</span></label>
               <input type="tel" inputmode="tel" autocomplete="tel" id="member_phone" name="member[phone]" value="<%= info.phone %>" placeholder="010-0000-0000" <%= field_errors.call(:phone) %>>
               <%= error_message.call(:phone) %>
             </div>
@@ -431,7 +432,8 @@
   .profile-photo-picker { position: relative; cursor: pointer; }
   .profile-photo-picker input { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; }
   .profile-photo-picker:focus-within, .profile-photo-choice:focus-visible { outline: 2px solid var(--impd-accent); outline-offset: 2px; }
-  #profile-photo-hint { margin-top: 6px; font-size: 13px; color: var(--impd-muted); }
+  #profile-photo-hint, .profile-photo-reassurance { margin-top: 6px; font-size: 13px; color: var(--impd-muted); }
+  .profile-photo-status { margin-top: 8px; font-size: 13px; color: var(--impd-ink2); }
   .profile-photo-error { margin-top: 8px; font-weight: 600; }
   .profile-photo-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
   .profile-photo-choice { padding: 0; border: 1px solid var(--impd-rule); background: var(--impd-paper); cursor: pointer; }

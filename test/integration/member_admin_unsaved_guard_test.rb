@@ -38,7 +38,7 @@ class MemberAdminUnsavedGuardTest < ActionDispatch::IntegrationTest
       [ :service, @member.member_services.create!(title: "상담"), { title: "", price: "무료" }, :price ],
       [ :faq, @member.member_faqs.create!(question: "질문", answer: "답변"), { answer: "", question: "새 질문" }, :question ],
       [ :post, @member.member_posts.create!(title: "소식", content: "본문"), { content: "", title: "새 소식" }, :title ],
-      [ :booking, @member.member_bookings.create!(external_url: "https://example.com"), { external_url: "invalid", booking_type: "새 예약" }, :booking_type ]
+      [ :booking, @member.member_bookings.create!(external_url: "https://example.com"), { external_url: "주소 없음", booking_type: "새 예약" }, :booking_type ]
     ]
     cases.each do |type, record, attributes, retained_field|
       collection_path = public_send("slug_admin_#{type.to_s.pluralize}_path", slug: @member.slug)

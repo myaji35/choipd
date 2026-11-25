@@ -74,6 +74,27 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_select ".editor-pair", count: 2
   end
 
+  test "프로필 사진 양식은 쓰던 정보와 별도로 제출한다" do
+    path = slug_admin_editor_path(slug: @member.slug, step: 2)
+    get path
+
+    assert_response :ok
+    assert_select '#profile-photo form[data-action*="editor-info#submitProfilePhoto"]', minimum: 1
+    assert_select '#profile-photo form[data-action*="editor-info#submitProfilePhoto"] input[type=file][data-action~="change->editor-info#uploadProfilePhoto"]:not([disabled])', count: 1
+    assert_select '#profile-photo [data-editor-info-target="photoStatus"][role=status]', count: 1
+    assert_select "#profile-photo noscript button[type=submit]", text: "저장"
+    assert_includes response.body, "사진을 올려도 아래에 쓰던 글은 그대로 남아요."
+
+    @member.member_photos.create!(category: "people", image: fixture_file_upload(Rails.root.join("public/icon.png"), "image/png"))
+    get path
+    assert_select '.profile-photo-choices form[data-action*="submitProfilePhoto"]', count: 1
+
+    source = Rails.root.join("app/javascript/controllers/editor_info_controller.js").read
+    [ "submitProfilePhoto", "DOMParser", "사진을 올리는 중이에요" ].each do |phrase|
+      assert_includes source, phrase
+    end
+  end
+
   test "정보 확인 단계의 입력 칸은 흰 바탕이다" do
     get slug_admin_editor_path(slug: @member.slug, step: 2)
 
@@ -96,7 +117,7 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "아직 강점을 찾지 못했어요"
     assert_select "a[href='?step=1&tab=docs#docs']", text: "문서 더 올리기"
     assert_not_includes response.body, "문서 올리러 가기"
-    assert_select "label[for=member_phone]", text: "전화번호"
+    assert_select "label[for=member_phone]", text: "전화번호 (선택)"
     assert_includes response.body, "min-height: 48px"
     assert_not_includes response.body, "카카오톡 채널 URL"
   end

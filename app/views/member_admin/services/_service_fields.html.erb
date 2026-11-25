@@ -23,7 +23,8 @@
 </div>
 <div class="impd-field">
   <%= form.label :cta_url, "신청 받을 주소 (선택)" %>
-  <%= form.url_field :cta_url, placeholder: "예: https://open.kakao.com/...", class: "impd-input" %>
+  <%= form.text_field :cta_url, inputmode: "url", autocapitalize: "none", autocomplete: "off", spellcheck: false, placeholder: "예: open.kakao.com/...", class: "impd-input" %>
+  <p class="impd-field-help">'https://'는 빼고 적어도 돼요.</p>
 </div>
 <label class="impd-check">
   <%= form.check_box :is_active %>

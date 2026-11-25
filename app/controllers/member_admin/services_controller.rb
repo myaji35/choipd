@@ -59,7 +59,7 @@ class MemberAdmin::ServicesController < MemberAdmin::BaseController
   end
 
   def service_params
-    params.require(:member_service).permit(
+    attributes = params.require(:member_service).permit(
       :title,
       :description,
       :price,
@@ -70,5 +70,7 @@ class MemberAdmin::ServicesController < MemberAdmin::BaseController
       :is_active,
       :sort_order
     )
+    attributes[:cta_url] = normalize_web_address(attributes[:cta_url]) if attributes.key?(:cta_url)
+    attributes
   end
 end

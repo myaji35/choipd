@@ -38,6 +38,17 @@ class MemberAdminNavTest < ActionDispatch::IntegrationTest
     assert_select ".admin-subnav", count: 0
   end
 
+  test "회원 메뉴에서는 페이지 만들기라고 부른다" do
+    slug = @member.slug
+    [ slug_admin_editor_path(slug: slug), slug_admin_dashboard_path(slug: slug), slug_admin_services_path(slug: slug) ].each do |path|
+      get path
+
+      assert_response :ok
+      assert_select "a", text: "페이지 만들기", minimum: 1
+      assert_not_includes response.body, "에디터"
+    end
+  end
+
   private
 
   def assert_current_navigation(screen, group_label, screen_label)

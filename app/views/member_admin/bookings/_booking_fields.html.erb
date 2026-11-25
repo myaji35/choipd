@@ -1,17 +1,27 @@
 <%= render "member_admin/shared/unsaved_guard_errors", record: form.object %>
 <div class="impd-field">
-  <%= form.label :booking_type, "예약 받는 곳 이름" %>
-  <%= form.text_field :booking_type, class: "impd-input", placeholder: "예: 네이버 예약, 카카오 예약" %>
+  <%= form.label :external_url, "예약 주소 (필수)" %>
+  <%= form.text_field :external_url, class: "impd-input", inputmode: "url", autocapitalize: "none", autocomplete: "off", spellcheck: false, required: true, placeholder: "예: booking.naver.com/..." %>
+  <p class="impd-field-help">네이버 예약·카카오톡 채널·신청서 주소를 그대로 붙여 넣으세요. 'https://'는 빼고 적어도 돼요.</p>
+</div>
+
+<div class="impd-field">
+  <%= form.label :booking_type, "버튼 옆에 보일 이름 (선택)" %>
+  <%= form.text_field :booking_type, class: "impd-input", placeholder: "예: 네이버 예약" %>
+  <p class="impd-field-help">비워 두면 '예약 링크'로 보여요.</p>
+  <% if local_assigns[:show_examples] %>
+    <div class="impd-example-chips">
+      <% ["네이버 예약", "카카오톡 상담", "신청서 작성"].each do |example| %>
+        <button type="button" class="impd-btn impd-btn-secondary" data-action="example-fill#fill"
+                data-example-fill-field-param="<%= form.field_id(:booking_type) %>" data-example-fill-value-param="<%= example %>"><%= example %></button>
+      <% end %>
+    </div>
+  <% end %>
 </div>
 
 <div class="impd-field">
   <%= form.label :description, "설명 (선택)" %>
   <%= form.text_area :description, class: "impd-input", rows: 3, placeholder: "예: 평일 10시~18시 예약 가능" %>
-</div>
-
-<div class="impd-field">
-  <%= form.label :external_url, "예약 주소 (필수)" %>
-  <%= form.url_field :external_url, class: "impd-input", required: true, placeholder: "예: https://booking.naver.com/..." %>
 </div>
 
 <%= form.submit submit_label, class: "impd-btn impd-btn-primary", style: "width: 100%; justify-content: center; margin-top: 20px;" %>

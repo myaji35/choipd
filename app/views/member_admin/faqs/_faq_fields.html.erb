@@ -1,4 +1,17 @@
 <%= render "member_admin/shared/unsaved_guard_errors", record: form.object %>
+<% if local_assigns[:show_examples] %>
+  <% examples = ["상담은 어떻게 진행되나요?", "비용은 얼마인가요?", "예약은 어떻게 하나요?", "어느 지역까지 가능한가요?", "상담 시간은 얼마나 걸리나요?"] - @faqs.map(&:question) %>
+  <% if examples.any? %>
+    <p style="font-size: 13px; color: var(--impd-ink2);">무엇을 적을지 모르겠다면 아래에서 골라 보세요. 누르면 질문 칸에 들어가요.</p>
+    <div class="impd-example-chips">
+      <% examples.each do |example| %>
+        <button type="button" class="impd-btn impd-btn-secondary" data-action="example-fill#fill"
+                data-example-fill-field-param="<%= form.field_id(:question) %>" data-example-fill-value-param="<%= example %>"
+                data-example-fill-next-param="<%= form.field_id(:answer) %>"><%= example %></button>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
 <div class="impd-field">
   <%= form.label :question, "질문 (필수)" %>
   <%= form.text_field :question, required: true, class: "impd-input", placeholder: "예: 상담은 어떻게 진행되나요?" %>

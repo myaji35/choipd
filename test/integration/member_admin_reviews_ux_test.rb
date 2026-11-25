@@ -26,10 +26,35 @@ class MemberAdminReviewsUxTest < ActionDispatch::IntegrationTest
     assert_response :ok
     assert_select "header span", text: "확인할 후기 1건"
     assert_select "h2", text: "확인할 후기"
+    assert_select "article span", text: "확인할 후기", count: 0
+    assert_select "article button.impd-btn-quiet", text: "공개 안 하고 숨기기"
+    assert_select "article button.impd-btn-secondary", count: 0
     assert_not_includes response.body, "승인 대기"
     assert_select ".review-stars [aria-hidden]", text: "★★★★★"
     assert_select ".review-stars-num", text: "5점"
     assert_includes response.body, "별점만 남긴 후기예요."
+  end
+
+  test "후기 받는 주소 복사를 주 버튼으로 표시한다" do
+    get slug_admin_reviews_path(slug: @member.slug)
+
+    assert_response :ok
+    assert_select "#review-request" do
+      assert_select "button.impd-btn-primary[type=button]", text: "주소 복사", count: 1
+      assert_select "a.impd-btn-secondary", text: "고객이 보는 화면 미리 보기"
+      assert_select "a.impd-btn-primary", count: 0
+      assert_select 'input[aria-label="후기 받는 주소"][readonly]'
+    end
+    assert_includes response.body, "카카오톡이나 문자에 붙여 넣어 보내면 돼요."
+  end
+
+  test "공개된 후기에서는 글자 버튼으로 내 페이지에서 숨길 수 있다" do
+    @member.member_reviews.create!(reviewer_name: "고객", rating: 5, status: "triaged")
+
+    get slug_admin_reviews_path(slug: @member.slug)
+
+    assert_response :ok
+    assert_select "article button.impd-btn-quiet", text: "내 페이지에서 숨기기"
   end
 
   test "후기가 없으면 확인할 후기 배지를 표시하지 않는다" do
@@ -58,7 +83,7 @@ class MemberAdminReviewsUxTest < ActionDispatch::IntegrationTest
     get slug_admin_reviews_path(slug: @member.slug)
 
     assert_select "h2", text: "숨긴 후기"
-    assert_select "button", text: "다시 공개하기"
+    assert_select "article button.impd-btn-secondary", text: "다시 공개하기"
     assert_not_includes response.body, "보관"
   end
 

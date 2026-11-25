@@ -55,7 +55,7 @@
         </div>
       <% else %>
         <div class="impd-card" style="padding: 40px 24px; text-align: center;">
-          <p style="font-size: 14px; color: var(--impd-ink2); line-height: 1.7;">아직 예약 링크가 없어요. 쓰는 예약 주소가 있으면 하나 적어 보세요.</p>
+          <p style="font-size: 14px; color: var(--impd-ink2); line-height: 1.7; word-break: keep-all; max-width: 46em; margin-inline: auto;">아직 예약 링크가 없어요. 네이버 예약, 카카오톡 채널, 신청서 주소처럼 고객이 예약·신청할 수 있는 주소면 무엇이든 돼요. 없으면 비워 둬도 괜찮아요. 고객은 내 페이지의 '상담 문의하기'로 연락할 수 있어요.</p>
         </div>
       <% end %>
     </section>
@@ -64,8 +64,8 @@
       <div class="impd-section-header" style="margin-bottom: 20px;">
         <h2 class="impd-display" style="font-size: 24px;">새 예약 링크 추가</h2>
       </div>
-      <%= form_with model: (@new_booking || MemberBooking.new), url: slug_admin_bookings_path(slug: @member.slug), class: "booking-form", data: { controller: "unsaved-guard" } do |form| %>
-        <%= render "booking_fields", form: form, submit_label: "예약 링크 저장" %>
+      <%= form_with model: (@new_booking || MemberBooking.new), namespace: "new_booking", url: slug_admin_bookings_path(slug: @member.slug), class: "booking-form", data: { controller: "unsaved-guard example-fill" } do |form| %>
+        <%= render "booking_fields", form: form, submit_label: "예약 링크 저장", show_examples: true %>
       <% end %>
     </section>
   </div>

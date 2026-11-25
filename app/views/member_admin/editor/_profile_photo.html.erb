@@ -11,7 +11,7 @@
     <% else %>
       <span class="profile-photo-preview" aria-hidden="true"><%= @member.name.to_s.first %></span>
     <% end %>
-    <%= form_with url: photo_path, method: :patch, multipart: true, data: { turbo: false } do |form| %>
+    <%= form_with url: photo_path, method: :patch, multipart: true, data: { turbo: false, action: "submit->editor-info#submitProfilePhoto" } do |form| %>
       <%= form.label :image, class: "impd-btn impd-btn-secondary profile-photo-picker" do %>
         <%= @member.profile_image.present? ? "사진 바꾸기" : "사진 올리기" %>
         <%= form.file_field :image, accept: "image/*", capture: "user", required: true,
@@ -19,8 +19,10 @@
       <% end %>
       <noscript><button type="submit" class="impd-btn impd-btn-primary">저장</button></noscript>
       <p id="profile-photo-hint">얼굴이 잘 보이는 사진이면 고객이 더 친근하게 느껴요.</p>
+      <p class="profile-photo-reassurance">사진을 올려도 아래에 쓰던 글은 그대로 남아요.</p>
     <% end %>
   </div>
+  <p class="profile-photo-status" data-editor-info-target="photoStatus" role="status" aria-live="polite" hidden></p>
 
   <% if @profile_photo_choices.any? %>
     <h4 class="impd-label-muted">올린 사진에서 고르기</h4>
@@ -28,7 +30,7 @@
       <% @profile_photo_choices.each_with_index do |photo, index| %>
         <% label = "#{index + 1}번 사진을 프로필에 사용" %>
         <%= button_to photo_path, method: :patch, params: { photo_id: photo.id },
-              class: "profile-photo-choice", aria: { label: label }, form: { data: { turbo: false } } do %>
+              class: "profile-photo-choice", aria: { label: label }, form: { data: { turbo: false, action: "submit->editor-info#submitProfilePhoto" } } do %>
           <%= image_tag photo.thumbnail_url, alt: "", loading: "lazy" %>
         <% end %>
       <% end %>
