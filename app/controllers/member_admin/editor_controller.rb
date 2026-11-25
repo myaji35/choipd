@@ -1,4 +1,6 @@
 class MemberAdmin::EditorController < MemberAdmin::BaseController
+  include MemberAdmin::ProfileChecklist
+
   # 4단계 에디터: 업로드 → 정보 확인 → 스타일 선택 → 발행.
   # GET  /<slug>/admin/editor?step=N
   # PATCH /<slug>/admin/editor/update_info   (Step 2 저장)
@@ -19,7 +21,8 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
     @doc_count       = @documents.size
     @presets         = ThemePreset::THEME_PRESETS
     @layout_presets  = LayoutPreset::LAYOUT_PRESETS
-    @checklist       = build_checklist
+    @checklist       = build_profile_checklist(from_checklist: false)
+    @can_publish     = @member.bio.to_s.length >= 20 && @member.profession.present? && @member.email.present?
   end
 
   def update_info
@@ -69,21 +72,5 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
   def publish
     @member.update!(published_at: Time.current)
     redirect_to "/#{@member.slug}", notice: "내 페이지를 공개했어요."
-  end
-
-  private
-
-  def build_checklist
-    [
-      { key: "bio",        label: "자기소개 쓰기", done: @member.bio.to_s.length >= 20 },
-      { key: "profession", label: "직업 정하기",      done: @member.profession.present? && @member.profession != "custom" },
-      { key: "region",     label: "지역 정하기",      done: @member.region.present? },
-      { key: "email",      label: "이메일 적기",          done: @member.email.present? },
-      { key: "phone",      label: "전화번호 적기",    done: @member.phone.present? },
-      { key: "photo",      label: "사진 1장 이상 올리기",  done: @photos_count.to_i > 0 },
-      { key: "doc",        label: "이력·경력 문서 1개 올리기",  done: @doc_count.to_i > 0 },
-      { key: "skill",      label: "자료에서 찾은 강점 3개 이상",    done: @skills.size >= 3 },
-      { key: "theme",      label: "스타일 고르기",    done: @member.theme_preset.present? }
-    ]
   end
 end

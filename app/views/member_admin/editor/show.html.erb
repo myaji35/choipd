@@ -4,15 +4,13 @@
   <%= render "member_admin/shared/checklist_arrival" %>
   <!-- 4단계 progress rail — 모두 클릭 가능. 각 단계별 완료 상태 표시. -->
   <%
-    # 각 Step 완료 기준 (build_checklist 의 key 매핑)
     step1_done = @photos_count.to_i > 0 || @doc_count.to_i > 0
-    step2_done = @member.bio.to_s.length >= 20 && @member.profession.present? && @member.email.present?
     step3_done = @member.theme_preset.present?
     step4_done = @member.published_at.present?
 
     steps = [
       [1, "자료 올리기", "", step1_done],
-      [2, "정보 확인", "", step2_done],
+      [2, "정보 확인", "", @can_publish],
       [3, "스타일", "", step3_done],
       [4, "공개", "", step4_done],
     ]
@@ -43,28 +41,27 @@
 
   <% if @step == 1 %>
     <!-- ── Step 1: 업로드 허브 ───────────────────────── -->
-    <div style="display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.5fr); gap: 56px;" class="editor-grid">
-      <div>
+    <div style="display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.5fr); column-gap: 56px; row-gap: 0; grid-template-rows: auto 1fr;" class="editor-grid editor-upload-grid">
+      <div class="editor-intro">
         <div class="impd-label">자료 올리기</div>
         <h1 class="impd-display" style="font-size: 54px; margin-top: 18px; line-height: 0.95;">
-          뭘 올려야<br>할지<br>
+          뭘 올려야<br class="editor-br-wide"> 할지<br>
           <span class="impd-serif" style="color: var(--impd-accent); font-weight: 400;">고민 마세요.</span>
         </h1>
         <p style="margin-top: 22px; font-size: 15px; color: var(--impd-ink2); line-height: 1.65; max-width: 34ch;">
-          이력·수료증·후기 문서부터 일상 사진, 작업 영상까지 — <strong>무엇이든 그냥 올리세요.</strong>
-          imPD가 자동 분류해서 <span class="impd-serif" style="color: var(--impd-accent-2);">당신의 페이지</span>로 만들어 드립니다.
+          이력·수료증·후기 글부터 일상 사진, 작업 영상까지 — <strong>무엇이든 그냥 올리세요.</strong> 종류는 알아서 나눠서 내 페이지에 넣어 드려요.
         </p>
-
-        <div style="margin-top: 28px; display: grid; gap: 10px; font-size: 14px; color: var(--impd-muted);">
-          <span>이력서·경력 문서 (글 파일 .txt로 올려 주세요 — 한글·워드 문서는 내용을 복사해 메모장에 붙여 저장하면 돼요)</span>
-          <span>사진 (휴대폰 사진 그대로 OK · 25MB까지)</span>
-          <span>영상 (100MB까지)</span>
-        </div>
       </div>
 
-      <div>
+      <div class="editor-upload-card">
         <%= render "member_admin/editor/upload_hub", member: @member %>
       </div>
+
+      <ul class="editor-file-rules">
+        <li><strong>글</strong> — 이력서·경력을 적은 글 파일(.txt). 한글·워드 문서는 내용을 복사해 메모장에 붙여 저장한 뒤 올려 주세요.</li>
+        <li><strong>사진</strong> — 휴대폰 사진 그대로 올려도 돼요. 한 장에 25MB까지.</li>
+        <li><strong>영상</strong> — 한 개에 100MB까지.</li>
+      </ul>
     </div>
 
   <% elsif @step == 2 %>
@@ -73,7 +70,6 @@
         <h1 class="impd-display" style="font-size: 28px;">내 정보 확인하기</h1>
         <p class="impd-label-muted" style="margin-top: 8px;">올린 자료에서 찾은 내용을 확인하고 빈칸을 채워 주세요.</p>
       </div>
-      <span class="impd-label-muted">강점 <%= @skills.size %>개 · 문서 <%= @doc_count %>개 · 사진 <%= @photos_count %>장</span>
     </div>
 
     <div style="display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 40px;" class="editor-grid">
@@ -114,16 +110,16 @@
           <div class="editor-pair" style="margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
             <div>
               <label for="member_email" class="impd-label-muted">이메일</label>
-              <input type="email" id="member_email" name="member[email]" value="<%= @member.email %>">
+              <input type="email" autocomplete="email" id="member_email" name="member[email]" value="<%= @member.email %>">
             </div>
             <div>
-              <label for="member_phone" class="impd-label-muted">전화</label>
-              <input type="tel" id="member_phone" name="member[phone]" value="<%= @member.phone %>" placeholder="010-0000-0000">
+              <label for="member_phone" class="impd-label-muted">전화번호</label>
+              <input type="tel" inputmode="tel" autocomplete="tel" id="member_phone" name="member[phone]" value="<%= @member.phone %>" placeholder="010-0000-0000">
             </div>
           </div>
 
           <div style="margin-top: 14px;">
-            <label for="member_kakao_channel" class="impd-label-muted">카카오톡 채널 URL <span style="font-weight: 400; color: var(--impd-muted);">(선택)</span></label>
+            <label for="member_kakao_channel" class="impd-label-muted">카카오톡 채널 주소 <span style="font-weight: 400; color: var(--impd-muted);">(선택)</span></label>
             <input type="url" id="member_kakao_channel" name="member[kakao_channel]" value="<%= @member.social["kakao_channel"] %>" placeholder="https://pf.kakao.com/...">
           </div>
 
@@ -148,7 +144,7 @@
       <%# 우: AI 추출 달란트 요약 %>
       <div>
         <div class="impd-card" style="margin-bottom: 14px;">
-          <div class="impd-label-muted" style="margin-bottom: 10px;">자료에서 찾은 강점 · <%= @skills.size %>개</div>
+          <div class="impd-label-muted" style="margin-bottom: 10px;">자료에서 찾은 강점<% if @skills.any? %> · <%= @skills.size %>개<% end %></div>
           <% if @skills.any? %>
             <div style="display: flex; flex-wrap: wrap; gap: 6px;">
               <% @skills.each do |ms| %>
@@ -161,11 +157,16 @@
             <p class="impd-label-muted" style="margin-top: 14px;">
               올린 문서 <%= @doc_count %>개에서 찾았어요. 숫자가 클수록 자료에 자주 나온 강점이에요.
             </p>
+          <% elsif @doc_count == 0 %>
+            <p style="font-size: 13px; color: var(--impd-muted); margin: 12px 0;">
+              이력서나 경력을 적은 글을 올리면, 그 안에서 강점을 찾아 여기에 보여 드려요.
+            </p>
+            <a href="?step=1&amp;tab=docs#docs" class="impd-btn impd-btn-secondary" style="margin-top: 6px;">← 문서 올리러 가기</a>
           <% else %>
             <p style="font-size: 13px; color: var(--impd-muted); margin: 12px 0;">
-              자료 올리기에서 이력·수료증을 올리면 강점을 찾아 드려요.
+              올린 문서 <%= @doc_count %>개에서는 아직 강점을 찾지 못했어요. 자격·수상·전문 분야가 적힌 글을 더 올리면 찾기 쉬워요. 없어도 페이지는 공개할 수 있어요.
             </p>
-            <a href="?step=1" class="impd-btn impd-btn-secondary" style="margin-top: 6px;">← 문서 올리러 가기</a>
+            <a href="?step=1&amp;tab=docs#docs" class="impd-btn impd-btn-secondary" style="margin-top: 6px;">문서 더 올리기</a>
           <% end %>
         </div>
 
@@ -277,26 +278,35 @@
         <% done_count = @checklist.count { |c| c[:done] } %>
         <% pct = (done_count * 100.0 / @checklist.size).round %>
 
+        <h2 class="impd-label">내 페이지 준비 항목</h2>
         <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px;">
           <span class="impd-display" style="font-size: 36px; letter-spacing: -1px;"><%= done_count %><span style="color: var(--impd-muted); font-weight: 400;">/<%= @checklist.size %></span></span>
-          <span class="impd-label-muted">준비 <%= pct %>%</span>
+          <span class="impd-label-muted"><%= @checklist.size %>개 중 <%= done_count %>개 마쳤어요</span>
         </div>
+        <p class="impd-label-muted" style="margin-bottom: 14px;">대시보드의 '다음 할 일'과 같은 목록이에요. 많이 채울수록 고객이 믿고 연락해요.</p>
         <div style="height: 6px; background: var(--impd-card); border: 1px solid var(--impd-ink); margin-bottom: 18px;">
           <div style="height: 100%; width: <%= pct %>%; background: var(--impd-accent); transition: width .3s;"></div>
         </div>
 
         <ul style="list-style: none; padding: 0; margin: 0;">
-          <% @checklist.each_with_index do |c, i| %>
-            <li style="display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--impd-rule); font-size: 14px; color: <%= c[:done] ? 'var(--impd-ink)' : 'var(--impd-muted)' %>;">
-              <span style="width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border: 1.5px solid <%= c[:done] ? 'var(--impd-accent)' : 'var(--impd-rule)' %>; color: <%= c[:done] ? 'var(--impd-accent)' : 'transparent' %>; font-weight: 700; font-size: 13px;"><%= lni_icon "check" %></span>
-              <span style="flex: 1;"><%= c[:label] %></span>
-              <% unless c[:done] %>
-                <a href="?step=<%= %w[bio profession region email phone].include?(c[:key]) ? 2 : (c[:key] == 'theme' ? 3 : 1) %>"
-                   style="font-family: var(--impd-font-sans); font-size: 13px; color: var(--impd-accent); display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline;">하러 가기 →</a>
+          <% @checklist.each do |item| %>
+            <li style="display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--impd-rule); font-size: 14px; color: <%= item[:done] ? 'var(--impd-ink)' : 'var(--impd-muted)' %>;">
+              <span aria-hidden="true" style="flex: 0 0 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border: 1.5px <%= item[:done] ? 'solid var(--impd-accent)' : 'dashed var(--impd-rule)' %>; color: <%= item[:done] ? 'var(--impd-accent)' : 'transparent' %>; font-weight: 700; font-size: 13px;"><%= lni_icon "check" %></span>
+              <span style="flex: 1;"><%= item[:label] %> <span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);"><%= item[:done] ? "(마침)" : "(아직)" %></span></span>
+              <% unless item[:done] %>
+                <a href="<%= item[:path] %>"
+                   style="font-family: var(--impd-font-sans); font-size: 13px; color: var(--impd-accent); display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline;"><%= item[:action] %> →</a>
               <% end %>
             </li>
           <% end %>
         </ul>
+        <p class="impd-label-muted" style="margin-top: 14px;">
+          <% if (theme_name = ThemePreset.find(@member.theme_preset)&.dig(:name)) %>
+            스타일: <%= theme_name %> · <a href="?step=3">바꾸기</a>
+          <% else %>
+            스타일을 아직 고르지 않았어요 · <a href="?step=3">고르러 가기</a>
+          <% end %>
+        </p>
       </div>
 
       <%# 우: 공개 카드 %>
@@ -314,20 +324,22 @@
           </div>
         </div>
 
-        <% if done_count < 4 %>
+        <% if !@can_publish %>
           <p style="margin-bottom: 12px; font-size: 14px; color: var(--impd-ink2); line-height: 1.55;">
-            왼쪽 준비 항목을 4개 이상 마치면 공개할 수 있어요. 지금 <%= done_count %>개 마쳤어요.
+            자기소개(20자 이상)·직업·이메일을 적으면 공개할 수 있어요.
           </p>
+          <a href="<%= slug_admin_editor_path(slug: @member.slug, step: 2, anchor: "bio") %>"
+             class="impd-btn impd-btn-secondary" style="width: 100%; height: 48px; margin-bottom: 12px; justify-content: center;">내 정보 적으러 가기 →</a>
         <% end %>
 
         <%= form_with url: slug_admin_editor_publish_path(slug: @member.slug), method: :patch, local: true, data: { turbo: false } do %>
           <button type="submit" class="impd-btn impd-btn-primary"
                   style="width: 100%; height: 56px; font-size: 16px; justify-content: center;"
-                  <%= "disabled" if done_count < 4 %>>
+                  <%= "disabled" if !@can_publish %>>
             <% if @member.published_at %>
               바뀐 내용 다시 공개하기
             <% else %>
-              <%= lni_icon "check" %> 지금 공개하기 →
+              지금 공개하기
             <% end %>
           </button>
         <% end %>
@@ -344,7 +356,9 @@
 
   <!-- 단계 네비 -->
   <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--impd-rule);">
-    <% if @step > 1 %><a href="?step=<%= @step - 1 %>" class="impd-btn impd-btn-secondary">← 이전</a><% else %><span></span><% end %>
+    <% if @step > 1 %><a href="?step=<%= @step - 1 %>" class="impd-btn impd-btn-secondary">← 이전</a><% else %>
+      <span class="impd-label-muted" style="align-self: center;">올린 파일은 바로 저장돼요. 다 올렸으면 다음으로 가세요.</span>
+    <% end %>
     <% if @step == 1 %>
       <a href="?step=2" class="impd-btn impd-btn-primary">다음 →</a>
     <% elsif @step < 4 %>
@@ -365,24 +379,54 @@
   .profile-photo-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
   .profile-photo-choice { padding: 0; border: 1px solid var(--impd-rule); background: var(--impd-paper); cursor: pointer; }
   .profile-photo-choice img { display: block; width: 3.5rem; height: 3.5rem; object-fit: cover; }
+  .editor-file-rules {
+    list-style: none;
+    padding: 0;
+    margin: 28px 0 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--impd-muted);
+  }
+  .editor-file-rules strong { color: var(--impd-ink); font-weight: 600; }
+  .editor-file-rules li + li { margin-top: 8px; }
+  @media (min-width: 769px) {
+    .editor-file-rules { grid-column: 1; grid-row: 2; }
+    .editor-upload-card { grid-column: 2; grid-row: 1 / span 2; }
+  }
+  @media (max-width: 768px) {
+    .editor-upload-grid { grid-template-rows: auto !important; }
+    .editor-intro h1 { font-size: 32px !important; line-height: 1.15 !important; margin-top: 10px !important; }
+    .editor-br-wide { display: none; }
+    .editor-intro p { margin-top: 12px !important; }
+    .editor-file-rules { margin-top: 0; }
+  }
+  .editor-page button, .editor-page select, .editor-page .impd-btn { min-height: 44px; }
   .editor-fields { min-inline-size: 0; }
+  .editor-fields label.impd-label-muted { font-size: 14px; font-weight: 600; color: var(--impd-ink2); }
   .editor-page select, .editor-fields :is(input, textarea) {
     max-width: 100%;
     border: 1px solid var(--impd-rule);
-    background: white;
+    background: var(--impd-paper);
     color: var(--impd-ink);
     font-family: var(--impd-font-sans);
-    font-size: 15px;
+    font-size: 16px;
   }
   .editor-fields :is(input, select, textarea) {
     width: 100%;
     margin-top: 6px;
-    padding: 10px 12px;
+    box-sizing: border-box;
+    min-height: 48px;
+    padding: 11px 12px;
+    border-radius: 0;
+    line-height: 1.5;
   }
-  .editor-page select:focus, .editor-fields :is(input, textarea):focus { border-color: var(--impd-accent); }
+  .editor-page select:focus, .editor-fields :is(input, textarea):focus {
+    border-color: var(--impd-accent);
+    outline: 2px solid var(--impd-accent);
+    outline-offset: 1px;
+  }
   .editor-fields textarea { resize: vertical; }
   @media (max-width: 768px) { .editor-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 24px !important; } .editor-page > div:first-of-type a { padding: 12px 4px !important; min-width: 0; } .editor-page > div:first-of-type a p { font-size: 13px !important; overflow-wrap: anywhere; } .editor-page .impd-section-header { flex-wrap: wrap; } }
-  .editor-page button, .editor-page select, .editor-page .impd-btn { min-height: 44px; }
   @media (max-width: 480px) { .editor-pair { grid-template-columns: minmax(0, 1fr) !important; } }
   .theme-card, .layout-card { position: relative; }
   .theme-radio:checked + .theme-card, .layout-radio:checked + .layout-card {

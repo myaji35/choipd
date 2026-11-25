@@ -11,15 +11,15 @@
             data-upload-hub-target="tab" data-tab-id="docs" aria-controls="docs" aria-pressed="<%= initial_tab == "docs" %>"
             style="flex: 1; padding: 18px 20px; background: <%= initial_tab == "docs" ? "var(--impd-ink)" : "transparent" %>; color: <%= initial_tab == "docs" ? "var(--impd-paper)" : "var(--impd-ink)" %>; border: 0; cursor: pointer; text-align: left; border-right: 1px solid var(--impd-ink);">
       <div class="impd-label" style="margin-bottom: 4px;">자료</div>
-      <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 18px; letter-spacing: -0.4px;">이력 · 수료증 · 포트폴리오</div>
-      <div style="font-size: 13px; color: var(--impd-muted); margin-top: 6px;"><%= member.member_documents.count %>개 자료</div>
+      <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 18px; letter-spacing: -0.4px;">이력 · 수료증 · 후기 글</div>
+      <div style="font-size: 13px; color: var(--impd-muted); margin-top: 6px;">글 <%= member.member_documents.count %>개</div>
     </button>
     <button type="button" data-action="click->upload-hub#switch" data-upload-hub-tab-param="media"
             data-upload-hub-target="tab" data-tab-id="media" aria-controls="media" aria-pressed="<%= initial_tab == "media" %>"
             style="flex: 1; padding: 18px 20px; background: <%= initial_tab == "media" ? "var(--impd-ink)" : "transparent" %>; color: <%= initial_tab == "media" ? "var(--impd-paper)" : "var(--impd-ink)" %>; border: 0; cursor: pointer; text-align: left;">
       <div class="impd-label" style="margin-bottom: 4px;">사진·영상</div>
       <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 18px; letter-spacing: -0.4px;">일상·작업·후기 장면</div>
-      <div style="font-size: 13px; color: var(--impd-muted); margin-top: 6px;"><%= member.member_photos.count %>개 사진·영상</div>
+      <div style="font-size: 13px; color: var(--impd-muted); margin-top: 6px;">사진·영상 <%= member.member_photos.count %>개</div>
     </button>
   </div>
 

@@ -12,20 +12,20 @@ class MemberAdmin::DocumentsController < MemberAdmin::BaseController
     ext = File.extname(filename.downcase)
 
     if !ALLOWED_EXT.include?(ext) && !ext.empty?
-      return render json: { success: false, error: "INVALID_EXT", message: "#{ext} 확장자는 지원되지 않습니다." }, status: :unprocessable_entity
+      return render json: { success: false, error: "INVALID_EXT", message: "이 파일은 올릴 수 없어요. 글 파일(.txt)로 저장해서 올려 주세요." }, status: :unprocessable_entity
     end
 
     if ext == ".pdf"
-      return render json: { success: false, error: "PDF_NOT_SUPPORTED_YET", message: "PDF 지원은 곧 출시 예정입니다. 지금은 .md/.txt만 업로드 가능합니다." }, status: :unprocessable_entity
+      return render json: { success: false, error: "PDF_NOT_SUPPORTED_YET", message: "PDF는 아직 올릴 수 없어요. 내용을 복사해 글 파일(.txt)로 저장해서 올려 주세요." }, status: :unprocessable_entity
     end
 
     content = params[:content].to_s
 
     if content.bytesize > MAX_BYTES
-      return render json: { success: false, error: "FILE_TOO_LARGE", message: "파일이 너무 큽니다." }, status: :unprocessable_entity
+      return render json: { success: false, error: "FILE_TOO_LARGE", message: "파일이 너무 커요. 1MB보다 작은 글 파일로 나눠 올려 주세요." }, status: :unprocessable_entity
     end
     if content.strip.empty?
-      return render json: { success: false, error: "EMPTY_FILE", message: ext == ".pdf" ? "PDF에서 텍스트를 추출하지 못했습니다 (이미지 PDF?)." : "파일 내용이 비어 있습니다." }, status: :unprocessable_entity
+      return render json: { success: false, error: "EMPTY_FILE", message: "파일에 내용이 없어요. 내용을 적은 뒤 다시 올려 주세요." }, status: :unprocessable_entity
     end
 
     doc = @member.member_documents.new(
@@ -43,7 +43,7 @@ class MemberAdmin::DocumentsController < MemberAdmin::BaseController
       render json: { success: false, errors: doc.errors.full_messages, message: doc.errors.full_messages.join(", ") }, status: :unprocessable_entity
     end
   rescue ActiveRecord::RecordNotUnique
-    render json: { success: false, error: "DUPLICATE_CONTENT", message: "동일한 내용의 파일이 이미 있습니다." }, status: :conflict
+    render json: { success: false, error: "DUPLICATE_CONTENT", message: "같은 내용의 파일이 이미 올라가 있어요." }, status: :conflict
   end
 
   def destroy
