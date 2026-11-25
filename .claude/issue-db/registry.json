@@ -1918,6 +1918,11 @@
         "explained_at": "2026-11-24T20:07:51.752693+09:00",
         "rechecked": [
           {
+            "at": "2026-11-25T14:43:54+09:00",
+            "by": "factory-runner",
+            "result": "SD 521번 카드 AWAITING_USER(deploy-review), factory/ISS-521 브랜치 main 미병합 그대로 — 막힘 유지"
+          },
+          {
             "at": "2026-11-25T11:47:20+09:00",
             "by": "factory-runner",
             "result": "관제실 refsOf 가 추천 이유·막힘 사유의 외부 카드 번호 'ISS-521' 을 이 저장소 ISS-521(완료)로 읽어 자동 해제 — 외부 번호를 'SD 521번 카드'로 바꿔 오인 해제 방지, BLOCKED 복귀"
@@ -1960,7 +1965,7 @@
           }
         ]
       },
-      "updated_at": "2026-11-25T11:47:20+09:00",
+      "updated_at": "2026-11-25T14:43:54+09:00",
       "blocked_reason": "성과 칸(매체별 발행 수·Townin 읽음·사용 포인트)은 SocialDoctors 브랜드 요약 API(SD 521번 카드, 현재 AWAITING_USER)가 있어야 붙일 수 있다. 브랜드·동의 상태·imPD 콘텐츠 수·4주 운영 그래프는 ac54dd2·ISS-481 에서 이미 한 화면에 들어갔다."
     },
     {
@@ -2001,6 +2006,11 @@
           "95% 미만이면 미달 칸마다 개선 이슈가 생긴다"
         ],
         "rechecked": [
+          {
+            "at": "2026-11-25T14:43:54+09:00",
+            "by": "factory-runner",
+            "result": "SD 521번 카드 AWAITING_USER(deploy-review), factory/ISS-521 브랜치 main 미병합 그대로 — 막힘 유지"
+          },
           {
             "at": "2026-11-25T11:47:20+09:00",
             "by": "factory-runner",
@@ -2065,7 +2075,7 @@
         "explained_by": "decision-explain",
         "explained_at": "2026-11-25T12:08:58.350805+09:00"
       },
-      "updated_at": "2026-11-25T11:47:20+09:00",
+      "updated_at": "2026-11-25T14:43:54+09:00",
       "blocked_reason": "12단계 중 6·7(SD→Townin 발행)·10(SD 성과 수집)·11(imPD 내 브랜드 Townin 성과)은 SocialDoctors ISS-521(Townin 매체·발행 어댑터·브랜드 요약 API)이 있어야 시험할 수 있다. SD 521번 카드 은 현재 AWAITING_USER, imPD ISS-476 도 같은 이유로 BLOCKED. 나머지 선행(imPD ISS-475, Townin ISS-722, SD ISS-522)은 DONE."
     },
     {
@@ -2704,6 +2714,11 @@
         "explained_at": "2026-11-24T20:07:51.752693+09:00",
         "rechecked": [
           {
+            "at": "2026-11-25T14:43:54+09:00",
+            "by": "factory-runner",
+            "result": "recall 재확인: 공개 연락처 값 없음(2026-11-25 결정 '보류 유지, 재질문하지 않음'). 컨펌 PDF imPD_보호책임자연락처_비밀값위치_재확인_컨펌_261120.pdf 루트에 그대로(필기 없음) — 막힘 유지"
+          },
+          {
             "at": "2026-11-25T09:41:56+09:00",
             "by": "factory-runner",
             "result": "공개 연락처 값 미수신(관제 결정 D 보류) — 유지."
@@ -2729,7 +2744,7 @@
         },
         "hold_reason": "대표님 결정 D(보류, 2026-11-25 02:47Z) — 재질문하지 않고 연락처 값이 들어올 때까지 이 카드만 멈춤. 방침 페이지는 현재 문의하기 연결로 동작 중."
       },
-      "updated_at": "2026-11-25T03:23:19Z",
+      "updated_at": "2026-11-25T14:43:54+09:00",
       "blocked_reason": "공개 연락처 값 대기(관제 결정 D 보류). 성명·직책은 ISS-480 에서 반영, 이메일 칸 3곳은 임시로 문의하기 연결."
     },
     {
@@ -4323,14 +4338,6 @@
           "at": "2026-11-25T02:46:49.447Z"
         },
         "recheck_reopens": 2,
-        "recheck_fail": {
-          "at": "2026-11-25T05:13:31Z",
-          "sha": "6e9e361",
-          "problems": [
-            "다시 돌린 결과가 다름: `PARALLEL_WORKERS=1 bin/rails test test/integration/member_sc` 기록 0 → 실제 1",
-            "다시 돌린 결과가 다름: `bin/rails test` 기록 0 → 실제 1"
-          ]
-        },
         "next_prompt_at": "2026-11-25T04:56:34.706832Z",
         "next_prompt_proposals": [
           {
@@ -4419,7 +4426,36 @@
           }
         ],
         "recheck_cause": "앞선 '환경 원인' 판정은 틀렸다. 재검증기는 CI=1 로 돌고 test.rb 는 CI 가 있으면 eager_load=true — 이때 config/initializers/active_record_encryption.rb 의 after_initialize 키 주입이 적용되지 않아 스캔 정리(ISS-504) 테스트 4건이 Missing primary_key 에러로 실패했다(전체 bin/rails test exit 1). 재검증 출력은 stderr 경고만 400자 남아 원인이 가려졌다. ISS-611(87ea08d)로 고친 뒤 같은 조건(CI=1·rbenv shims)으로 main 에서 재실행 통과.",
-        "verified_sha": "87ea08d"
+        "verified_sha": "87ea08d",
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T05:40:52Z",
+          "sha": "9e1f791",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/member_scan_organizer_test.rb test/models/scan_organizer_setting_test.rb test/services/scan_organizer test/integration/brand_profile_process_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "CI=1 bin/rails test",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "bin/rubocop",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": ".....................................................................................................................................................................................................................................................................................................................................................................\n\n495 files inspected, no offenses detected"
+            }
+          ]
+        }
       },
       "completed_at": "2026-11-25T14:38:58.394291"
     },
@@ -12448,13 +12484,6 @@
           "at": "2026-11-25T05:13:31Z"
         },
         "recheck_reopens": 2,
-        "recheck_fail": {
-          "at": "2026-11-25T05:13:31Z",
-          "sha": "6e9e361",
-          "problems": [
-            "다시 돌린 결과가 다름: `bin/rails test` 기록 0 → 실제 1"
-          ]
-        },
         "next_prompt_at": "2026-11-25T04:56:47.584858Z",
         "next_prompt_proposals": [
           {
@@ -12545,7 +12574,50 @@
           }
         ],
         "recheck_cause": "앞선 '환경 원인' 판정은 틀렸다. 재검증기는 CI=1 로 돌고 test.rb 는 CI 가 있으면 eager_load=true — 이때 config/initializers/active_record_encryption.rb 의 after_initialize 키 주입이 적용되지 않아 스캔 정리(ISS-504) 테스트 4건이 Missing primary_key 에러로 실패했다(전체 bin/rails test exit 1). 재검증 출력은 stderr 경고만 400자 남아 원인이 가려졌다. ISS-611(87ea08d)로 고친 뒤 같은 조건(CI=1·rbenv shims)으로 main 에서 재실행 통과.",
-        "verified_sha": "87ea08d"
+        "verified_sha": "87ea08d",
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T05:40:52Z",
+          "sha": "9e1f791",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_header_icons_test.rb test/integration/chopd_header_links_test.rb test/integration/chopd_header_member_session_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "node script/qa/chopd_mobile_menu_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "\":390,\"height\":844},\"consoleErrorItems\":[],\"pageErrorItems\":[],\"educationOpen\":{\"display\":\"flex\",\"expanded\":\"true\"},\"educationClosed\":{\"display\":\"none\",\"expanded\":\"false\"},\"worksSameDocument\":true,\"worksOpen\":{\"display\":\"flex\",\"expanded\":\"true\"},\"introNav\":{\"finalPath\":\"/media/greeting\",\"menuDisplay\":\"none\",\"expanded\":\"false\",\"sameDocument\":true},\"consoleErrors\":0,\"pageErrors\":0}\nSUMMARY pass=true"
+            },
+            {
+              "cmd": "ROUTES=/education,/media/greeting WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "\"width\":320,\"file\":\"tmp/qa/layout/media-greeting-320.png\",\"bytes\":117055,\"scrollWidth\":320,\"clientWidth\":320,\"hScroll\":false,\"checked\":1,\"clipped\":0,\"clippedItems\":[],\"footerWrapped\":0,\"footerWrappedItems\":[],\"pillWrapped\":0,\"pillWrappedItems\":[],\"pillMinHeight\":null,\"pillShort\":0,\"pillShortItems\":[],\"consoleErrors\":0,\"consoleErrorItems\":[],\"badResponses\":0,\"badResponseItems\":[]}\nSUMMARY pass=true"
+            },
+            {
+              "cmd": "CI=1 bin/rails test",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "bin/rubocop",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": ".....................................................................................................................................................................................................................................................................................................................................................................\n\n495 files inspected, no offenses detected"
+            }
+          ]
+        }
       },
       "spawn_rules": [],
       "updated_at": "2026-11-25T05:38:58Z",
@@ -14153,13 +14225,6 @@
         "approved_at": "2026-11-25T04:52:06.213Z",
         "approved_by": "자동 승인(추천: 승인 권장)",
         "recheck_reopens": 2,
-        "recheck_fail": {
-          "at": "2026-11-25T05:13:31Z",
-          "sha": "6e9e361",
-          "problems": [
-            "다시 돌린 결과가 다름: `bin/rails test` 기록 0 → 실제 1"
-          ]
-        },
         "next_prompt_at": "2026-11-25T05:03:30.659664Z",
         "next_prompt_proposals": [
           {
@@ -14238,7 +14303,36 @@
           }
         ],
         "recheck_cause": "앞선 '환경 원인' 판정은 틀렸다. 재검증기는 CI=1 로 돌고 test.rb 는 CI 가 있으면 eager_load=true — 이때 config/initializers/active_record_encryption.rb 의 after_initialize 키 주입이 적용되지 않아 스캔 정리(ISS-504) 테스트 4건이 Missing primary_key 에러로 실패했다(전체 bin/rails test exit 1). 재검증 출력은 stderr 경고만 400자 남아 원인이 가려졌다. ISS-611(87ea08d)로 고친 뒤 같은 조건(CI=1·rbenv shims)으로 main 에서 재실행 통과.",
-        "verified_sha": "87ea08d"
+        "verified_sha": "87ea08d",
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T05:40:52Z",
+          "sha": "9e1f791",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "PARALLEL_WORKERS=1 bin/rails test test/controllers/member_admin/channels_controller_test.rb test/integration/member_dashboard_channels_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "CI=1 bin/rails test",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "bin/rubocop",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": ".....................................................................................................................................................................................................................................................................................................................................................................\n\n495 files inspected, no offenses detected"
+            }
+          ]
+        }
       },
       "spawn_rules": [],
       "completed_at": "2026-11-25T14:38:58.501951"
@@ -14815,6 +14909,35 @@
         "review": {
           "gemini": "hydrogen-high 1건(credentials 로 키 주입된 환경에서 파생값 테스트가 skip 안 됨) → 맞음, Codex 재위임 반영. neon-high 는 5분·10분 두 번 시간 초과로 결과 없음",
           "opus": "credentials 우선 보존, 파생 공식 불변, 운영 eager_load 실측"
+        },
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T05:40:52Z",
+          "sha": "9e1f791",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "CI=1 bin/rails test",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "CI=1 PARALLEL_WORKERS=1 bin/rails test test/initializers/active_record_encryption_test.rb test/models/scan_organizer_setting_test.rb test/integration/member_scan_organizer_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "bin/rubocop",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": ".....................................................................................................................................................................................................................................................................................................................................................................\n\n495 files inspected, no offenses detected"
+            }
+          ]
         }
       }
     },
@@ -14933,7 +15056,11 @@
           "effort": "작음",
           "by": "factory-runner",
           "at": "2026-11-25T05:39:38Z"
-        }
+        },
+        "next_prompt_at": "2026-11-25T05:43:05.856535Z",
+        "next_prompt_proposals": [],
+        "next_prompt_cost_usd": 0.008788,
+        "next_prompt_converged": "2026-11-25T05:43:05.856535Z"
       },
       "result": {
         "resolution": "no_change",
@@ -15011,7 +15138,40 @@
           "effort": "작음",
           "by": "factory-runner",
           "at": "2026-11-25T05:39:38Z"
-        }
+        },
+        "next_prompt_at": "2026-11-25T05:43:09.531108Z",
+        "next_prompt_proposals": [
+          {
+            "next_prompt": "[Plan:배포] 품질 86점 — 배포 준비 이슈를 ISS-614 결과(품질 88점, 테스트 561건 실패·에러 0, 린트 위반 0)에 맞춰 갱신하라. 제목과 본문의 86점을 88점으로 고치고, 배포 전 체크리스트(마이그레이션 유무, 환경변수와 암호화 키 규칙 4개 반영 여부, 롤백 방법, 미해결 선행 이슈)를 작성하라. 실제 배포 명령은 실행하지 말고 체크리스트와 이슈 갱신까지만 하라.",
+            "basis": "criteria_check: ISS-614 점수 88점(직전 86). proof: CI=1 bin/rails test 561 runs 0 failures 0 errors, bin/rubocop no offenses. 열린 이슈 '[Plan:배포] 품질 86점'이 최신 점수와 어긋나 있다.",
+            "expected_effect": "배포 계획이 최신 품질 상태를 반영하고, 배포 전에 남은 선행 조건이 한눈에 보인다.",
+            "done_when": "배포 이슈가 88점 기준으로 갱신되고 체크리스트가 기록되며, 배포 명령은 실행되지 않은 상태다.",
+            "risk_tier": "T0",
+            "t2_category": null,
+            "reversible": true,
+            "question": "",
+            "plain_summary": "배포 준비 이슈에 아직 예전 점수(86점)가 적혀 있어서 88점으로 고치고 배포 전 체크리스트만 만든다. 실제 배포는 하지 않는다.",
+            "if_not_decided": "",
+            "status": "revert",
+            "at": "2026-11-25T05:43:09.531108Z"
+          },
+          {
+            "next_prompt": "개인정보처리방침에 공개할 보호책임자 연락처(이메일 또는 전화)를 대표님께 받아 [법적 고지] 이슈에 기입하라. 연락처를 임의로 만들거나 추정해서 넣지 마라.",
+            "basis": "열린 이슈 '[법적 고지] 개인정보처리방침 보호책임자 공개 이메일(또는 전화) 기입'. 이 값은 테스트나 린트 결과로는 채울 수 없고, 대표님이 정하는 개인정보 공개 항목이다.",
+            "expected_effect": "배포 전에 법적 고지 공백이 채워진다.",
+            "done_when": "대표님이 정한 연락처가 방침 문서에 반영되고 해당 이슈가 닫힌다.",
+            "risk_tier": "T2",
+            "t2_category": "SECURITY",
+            "reversible": true,
+            "question": "개인정보처리방침에 공개할 보호책임자 연락처(이메일 또는 전화)는 무엇으로 하시겠습니까?",
+            "plain_summary": "방침에 공개할 개인정보 보호책임자 연락처를 대표님이 정해 주셔야 한다. 이 값은 임의로 채울 수 없다.",
+            "if_not_decided": "자리표시 상태로 두고, 배포 체크리스트에 '법적 고지 미완료'로 표시해 배포 전 차단 항목으로 남긴다.",
+            "status": "awaiting_user",
+            "at": "2026-11-25T05:43:09.531108Z",
+            "child_id": "ISS-615"
+          }
+        ],
+        "next_prompt_cost_usd": 0.022526
       },
       "result": {
         "score": 88,
@@ -15046,6 +15206,60 @@
       "spawn_rules": [],
       "updated_at": "2026-11-25T05:39:28.501Z",
       "completed_at": "2026-11-25T14:40:40.080935"
+    },
+    {
+      "title": "[다음] 개인정보처리방침에 공개할 보호책임자 연락처(이메일 또는 전화)를 대표님께 받아 [법적 고지] 이슈에 기입하라. 연락처를 임의로",
+      "type": "FEATURE",
+      "priority": "P1",
+      "origin": "next-prompt",
+      "source_issue": "ISS-614",
+      "status": "CLOSED_SKIP",
+      "created_at": "2026-11-25T05:43:09.531108Z",
+      "updated_at": "2026-11-25T14:43:54+09:00",
+      "payload": {
+        "user_request": "개인정보처리방침에 공개할 보호책임자 연락처(이메일 또는 전화)를 대표님께 받아 [법적 고지] 이슈에 기입하라. 연락처를 임의로 만들거나 추정해서 넣지 마라.",
+        "acceptance_criteria": [
+          "대표님이 정한 연락처가 방침 문서에 반영되고 해당 이슈가 닫힌다."
+        ],
+        "next_prompt_depth": 1,
+        "next_prompt_root": "ISS-614",
+        "next_prompt_basis": "열린 이슈 '[법적 고지] 개인정보처리방침 보호책임자 공개 이메일(또는 전화) 기입'. 이 값은 테스트나 린트 결과로는 채울 수 없고, 대표님이 정하는 개인정보 공개 항목이다.",
+        "expected_effect": "배포 전에 법적 고지 공백이 채워진다.",
+        "recommendation": {
+          "verdict": "반려 권장",
+          "reason": "ISS-485(같은 연락처 값 대기, 대표님 '보류·재질문하지 않음' 결정)의 중복 카드. 같은 질문을 두 번 올리면 보류 결정을 다시 묻는 셈이라 중복으로 닫고 ISS-485 하나로 기다린다",
+          "risk": "없음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T14:43:54+09:00"
+        },
+        "ask_kind": "decision",
+        "ask_prompt": "개인정보처리방침에 공개할 보호책임자 연락처(이메일 또는 전화)는 무엇으로 하시겠습니까?",
+        "question": "개인정보처리방침에 공개할 보호책임자 연락처(이메일 또는 전화)는 무엇으로 하시겠습니까?",
+        "plain_summary": "방침에 공개할 개인정보 보호책임자 연락처를 대표님이 정해 주셔야 한다. 이 값은 임의로 채울 수 없다.",
+        "if_not_decided": "자리표시 상태로 두고, 배포 체크리스트에 '법적 고지 미완료'로 표시해 배포 전 차단 항목으로 남긴다.",
+        "reversible": true,
+        "options": [
+          {
+            "key": "A",
+            "label": "진행",
+            "pros": "배포 전에 법적 고지 공백이 채워진다.",
+            "cons": "위험: SECURITY"
+          },
+          {
+            "key": "B",
+            "label": "보류",
+            "pros": "위험 없음",
+            "cons": "자리표시 상태로 두고, 배포 체크리스트에 '법적 고지 미완료'로 표시해 배포 전 차단 항목으로 남긴다."
+          }
+        ],
+        "recommended_option": "B",
+        "recommended_why": "열린 이슈 '[법적 고지] 개인정보처리방침 보호책임자 공개 이메일(또는 전화) 기입'. 이 값은 테스트나 린트 결과로는 채울 수 없고, 대표님이 정하는 개인정보 공개 항목이다.",
+        "closed_reason": "duplicate_of ISS-485",
+        "duplicate_of": "ISS-485"
+      },
+      "id": "ISS-615",
+      "completed_at": "2026-11-25T14:43:54+09:00"
     }
   ],
   "hooks": {
