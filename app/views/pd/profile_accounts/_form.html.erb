@@ -3,17 +3,39 @@
   <div><%= f.label :platform, "플랫폼", class: "block text-sm font-medium text-gray-700 mb-1" %><%= f.select :platform, ProfileAccount::PLATFORMS.map { |key, value| [value, key] }, {}, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
   <div>
     <%= f.label :member_id, "회원", class: "block text-sm font-medium text-gray-700 mb-1" %>
-    <% member_options = Member.publicly_visible.order(:name, :slug).pluck(:id, :name, :slug).map { |id, name, slug| ["#{name} (#{slug})", id] } %>
-    <% if member_options.none? { |_, id| id == account.member_id } && (member = account.member) %>
-      <% member_options << ["#{member.name} (#{member_status_label(member.status)})", member.id] %>
+    <% member_options = Member.for_tenant.publicly_visible.order(:name, :slug).pluck(:id, :name, :slug).map { |id, name, slug| ["#{name} (#{slug})", id] } %>
+    <% if @member && member_options.none? { |_, id| id == @member.id } %>
+      <% member_options << ["#{@member.name} (#{member_status_label(@member.status)})", @member.id] %>
     <% end %>
     <%= f.select :member_id, member_options,
         { include_blank: "연결 안 함" }, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
   </div>
-  <% { display_name: "이름", login_id: "로그인 아이디", external_id: "외부 ID", headline: "직함/직업", profile_url: "프로필 링크" }.each do |field, label| %>
-    <div><%= f.label field, label, class: "block text-sm font-medium text-gray-700 mb-1" %><%= f.text_field field, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
+  <% field_help = {
+    display_name: "네이버 인물정보·LinkedIn 에 나오는 이름 그대로 적어 주세요.",
+    login_id: "회원이 알려 준 로그인 아이디(이메일)입니다. 비밀번호는 여기에 적지 않습니다.",
+    external_id: "모르면 비워 두세요. 점검이 찾아낸 계정에는 자동으로 채워져 있습니다."
+  } %>
+  <% { display_name: "프로필에 표시되는 이름", login_id: "로그인 아이디", external_id: "외부 ID", headline: "직함/직업", profile_url: "프로필 링크" }.each do |field, label| %>
+    <% help_id = field_help.key?(field) ? f.field_id(field, :help) : nil %>
+    <div>
+      <%= f.label field, label, class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field field, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm", aria: { describedby: help_id } %>
+      <% if help_id %>
+        <p id="<%= help_id %>" class="mt-1 text-xs text-gray-600"><%= field_help.fetch(field) %></p>
+      <% end %>
+    </div>
   <% end %>
   <div><%= f.label :notes, "메모", class: "block text-sm font-medium text-gray-700 mb-1" %><%= f.text_area :notes, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %></div>
   <div><%= f.check_box :is_active, class: "rounded border-gray-300 text-primary" %> <%= f.label :is_active, "활성화", class: "text-sm text-gray-700" %></div>
-  <div class="flex gap-3"><%= f.submit account.persisted? ? "수정" : "추가", class: "bg-primary text-white px-6 py-2 rounded-lg text-sm cursor-pointer" %><%= link_to "취소", pd_profile_accounts_path, class: "bg-gray-100 text-gray-700 px-6 py-2 rounded-lg text-sm" %></div>
+  <% if account.new_record? && @member %>
+    <% submit_label = "계정 등록" %>
+    <% cancel_path = pd_member_path(@member, anchor: "accounts") %>
+  <% else %>
+    <% submit_label = account.persisted? ? "수정" : "추가" %>
+    <% cancel_path = pd_profile_accounts_path %>
+  <% end %>
+  <div class="flex gap-3">
+    <%= f.submit submit_label, class: "bg-primary text-white px-6 py-2 rounded-lg text-sm cursor-pointer" %>
+    <%= link_to "취소", cancel_path, class: "bg-gray-100 text-gray-700 px-6 py-2 rounded-lg text-sm" %>
+  </div>
 <% end %>

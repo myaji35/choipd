@@ -157,7 +157,7 @@
                 </ol>
               <% end %>
               <% if show_management_links %>
-                <% management_path = account ? pd_profile_account_path(account) : new_pd_profile_account_path(member_id: @member.id) %>
+                <% management_path = account ? pd_profile_account_path(account) : new_pd_profile_account_path(member_id: @member.id, platform: platform) %>
                 <% management_link = link_to "관리 화면에서 열기", management_path, style: "#{channel_link_style} font-size: 12px; margin-left: auto;" %>
               <% end %>
               <article style="border-top: 1px solid var(--impd-rule); padding: 14px 0; font-size: 14px; overflow-wrap: anywhere;">

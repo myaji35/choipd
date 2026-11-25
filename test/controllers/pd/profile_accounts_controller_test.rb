@@ -18,6 +18,10 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     get new_pd_profile_account_path
     assert_response :success
+    assert_select "h1", text: "인물정보 계정 추가"
+    assert_select "a[href=?]", pd_profile_accounts_path, text: "← 인물정보 계정"
+    assert_select "a[href=?]", pd_profile_accounts_path, text: "취소"
+    assert_select "input[type=submit][value='추가']"
     get edit_pd_profile_account_path(@account)
     assert_response :success
   end
@@ -28,8 +32,114 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     get new_pd_profile_account_path(member_id: member.id, platform: "linkedin")
 
     assert_response :ok
+    assert_select "h1", text: "LinkedIn 계정 등록"
+    assert_select "a[href=?]", pd_member_path(member, anchor: "accounts"), text: "← #{member.name} 대행 등록"
+    assert_select "a[href=?]", pd_member_path(member, anchor: "accounts"), text: "취소"
+    assert_select "#profile_account_display_name[value=?]", member.name
+    assert_select "input[type=submit][value='계정 등록']"
+    %w[display_name login_id external_id].each do |field|
+      assert_select "input#profile_account_#{field}[aria-describedby=profile_account_#{field}_help] + p#profile_account_#{field}_help"
+    end
     assert_select "#profile_account_platform option[value=linkedin][selected]"
     assert_select "#profile_account_member_id option[value=?][selected]", member.id.to_s
+  end
+
+  test "회원 계정을 등록하면 대행 등록 화면으로 돌아간다" do
+    member = Member.create!(name: "계정 등록 회원", email: "profile-create@example.test", slug: "profile-create")
+    post pd_profile_accounts_path, params: {
+      profile_account: { member_id: member.id, platform: "linkedin", display_name: member.name }
+    }
+
+    assert_redirected_to pd_member_path(member, anchor: "accounts")
+    assert_equal "LinkedIn 계정을 등록했습니다. 회원 대시보드 '내 프로필 관리 현황'에 바로 보입니다.", flash[:notice]
+    follow_redirect!
+    assert_select "#accounts a[href=?]", pd_profile_account_path(member.profile_accounts.sole), text: "계정 상세"
+  end
+
+  test "회원 없이 계정을 추가하면 계정 상세로 이동한다" do
+    post pd_profile_accounts_path, params: {
+      profile_account: { platform: "naver_people", display_name: "직접 추가한 계정" }
+    }
+
+    account = ProfileAccount.find_by!(display_name: "직접 추가한 계정")
+    assert_nil account.member_id
+    assert_redirected_to pd_profile_account_path(account)
+  end
+
+  test "다른 테넌트 회원을 지정하면 생성과 수정을 거부하고 이름을 표시하지 않는다" do
+    foreign_member = Member.create!(name: "외부 테넌트 회원", slug: "foreign-profile-member",
+      email: "foreign-profile@example.test", tenant_id: 2, status: "approved")
+
+    assert_no_difference "ProfileAccount.count" do
+      post pd_profile_accounts_path, params: {
+        profile_account: { member_id: foreign_member.id, platform: "linkedin", display_name: "새 계정" }
+      }
+    end
+    assert_response 422
+    assert_includes response.body, "회원을 찾을 수 없어요."
+    assert_not_includes response.body, foreign_member.name
+
+    assert_no_changes -> { @account.reload.attributes } do
+      patch pd_profile_account_path(@account), params: {
+        profile_account: { member_id: foreign_member.id, display_name: "수정한 계정" }
+      }
+    end
+    assert_response 422
+    assert_includes response.body, "회원을 찾을 수 없어요."
+    assert_not_includes response.body, foreign_member.name
+
+    @account.update!(member: foreign_member)
+    get edit_pd_profile_account_path(@account)
+    assert_response :ok
+    assert_not_includes response.body, foreign_member.name
+  end
+
+  test "다른 테넌트 계정은 조회할 수 없다" do
+    foreign_account = ProfileAccount.create!(platform: "linkedin", display_name: "외부 계정", tenant_id: 2)
+
+    get pd_profile_account_path(foreign_account)
+
+    assert_response :not_found
+  end
+
+  test "이미 연결된 계정의 연결 요청은 거부하고 대행 등록 화면으로 돌아간다" do
+    original_member = Member.create!(name: "기존 연결 회원", email: "profile-original@example.test", slug: "profile-original")
+    target_member = Member.create!(name: "연결 요청 회원", email: "profile-target@example.test", slug: "profile-target")
+    @account.update!(member: original_member)
+
+    assert_no_changes -> { @account.reload.attributes } do
+      patch pd_profile_account_path(@account), params: {
+        profile_account: { member_id: target_member.id }, link: "1"
+      }
+    end
+
+    assert_response :see_other
+    assert_redirected_to pd_member_path(target_member, anchor: "accounts")
+    assert_equal "이미 다른 회원에게 연결된 계정이에요.", flash[:alert]
+  end
+
+  test "기존 계정을 연결하면 계정 수를 유지하고 회원 화면으로 돌아간다" do
+    member = Member.create!(name: "계정 연결 회원", email: "profile-connect@example.test", slug: "profile-connect")
+
+    assert_no_difference "ProfileAccount.count" do
+      patch pd_profile_account_path(@account), params: {
+        profile_account: { member_id: member.id }, link: "1"
+      }
+    end
+
+    assert_response :see_other
+    assert_redirected_to pd_member_path(member, anchor: "accounts")
+    assert_equal "LinkedIn 계정을 #{member.name} 회원에 연결했습니다.", flash[:notice]
+    assert_equal member, @account.reload.member
+    follow_redirect!
+    assert_select "#accounts a[href=?]", pd_profile_account_path(@account), text: "계정 상세"
+  end
+
+  test "대행 등록 복귀값 없이 계정을 수정하면 계정 상세로 이동한다" do
+    patch pd_profile_account_path(@account), params: { profile_account: { display_name: "수정한 계정" } }
+
+    assert_redirected_to pd_profile_account_path(@account)
+    assert_equal "수정한 계정", @account.reload.display_name
   end
 
   test "계정 목록과 상세에서 연결된 회원으로 이동할 수 있다" do

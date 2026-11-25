@@ -48,6 +48,58 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", slug_admin_dashboard_path(slug: @member.slug), text: "회원 화면에서 확인"
   end
 
+  test "등록 전 플랫폼에는 같은 테넌트의 미연결 계정만 표시한다" do
+    account = ProfileAccount.create!(platform: "linkedin", display_name: "점검 계정",
+      login_id: "checked@example.test", session_status: "logged_in", tenant_id: @member.tenant_id)
+    other = Member.create!(name: "다른 회원", email: "linked-other@example.test", slug: "linked-other")
+    linked = other.profile_accounts.create!(platform: "linkedin", display_name: "연결된 계정")
+    foreign = ProfileAccount.create!(platform: "linkedin", display_name: "다른 테넌트 계정", tenant_id: 2)
+    sign_in @pd
+
+    get pd_member_path(@member)
+
+    assert_select "#accounts li p", text: "점검 계정 · checked@example.test · 로그인됨"
+    assert_select "#accounts form[action=?][method=post]", pd_profile_account_path(account) do
+      assert_select "input[name='_method'][value=patch]"
+      assert_select "input[name='profile_account[member_id]'][value=?]", @member.id.to_s
+      assert_select "input[name=link][value=1]"
+      assert_select "button", text: "이 회원에 연결"
+    end
+    [linked, foreign].each do |excluded|
+      assert_select "#accounts li", text: /#{excluded.display_name}/, count: 0
+      assert_select "#accounts form[action=?]", pd_profile_account_path(excluded), count: 0
+    end
+
+    @member.profile_accounts.create!(platform: "linkedin", display_name: "회원의 LinkedIn")
+    get pd_member_path(@member)
+
+    assert_select "#accounts form[action=?]", pd_profile_account_path(account), count: 0
+  end
+
+  test "미연결 계정은 플랫폼별로 5개까지만 표시하고 목록을 안내한다" do
+    6.times do |index|
+      ProfileAccount.create!(platform: "linkedin", display_name: "점검 계정 #{index + 1}")
+    end
+    sign_in @pd
+
+    get pd_member_path(@member)
+
+    assert_select "#accounts button", text: "이 회원에 연결", count: 5
+    assert_select "#accounts li", text: /점검 계정 6/, count: 0
+    assert_select "#accounts a[href=?]", pd_profile_accounts_path, text: "인물정보 계정"
+  end
+
+  test "운영자에게만 대행 등록 화면에 운영자 회원 상세 링크를 표시한다" do
+    sign_in @pd
+    get pd_member_path(@member)
+    assert_select "a[href=?]", admin_member_path(@member), count: 0
+
+    sign_out @pd
+    sign_in AdminUser.create!(email: "admin-members@example.test", password: "password123", role: "admin")
+    get pd_member_path(@member)
+    assert_select "header a[href=?]", admin_member_path(@member), text: "운영자 회원 상세"
+  end
+
   test "회원의 여러 브랜드에 등록된 채널을 개인 브랜드부터 보여 주고 동의 상태를 표시한다" do
     brand = @member.brands.create!(name: "브랜드")
     waiting = brand.brand_channels.create!(platform: "naver_blog", account_handle: "waiting")

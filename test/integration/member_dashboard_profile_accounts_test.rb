@@ -91,8 +91,16 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
     visit_dashboard
 
     assert_select "#profile-accounts-status .profile-account-actions a[href=?]", pd_profile_account_path(account), text: "관리 화면에서 열기"
-    assert_select "#profile-accounts-status a[href=?]", new_pd_profile_account_path(member_id: @member.id),
+    assert_select "#profile-accounts-status a[href=?]", new_pd_profile_account_path(member_id: @member.id, platform: "naver_people"),
       text: "관리 화면에서 열기"
+
+    account.destroy!
+    visit_dashboard
+
+    ProfileAccount::PLATFORMS.each_key do |platform|
+      assert_select "#profile-accounts-status a[href=?]", new_pd_profile_account_path(member_id: @member.id, platform: platform),
+        text: "관리 화면에서 열기"
+    end
   end
 
   test "오류 상세를 숨기고 잘못된 LinkedIn 스냅샷은 완성도에서 생략한다" do

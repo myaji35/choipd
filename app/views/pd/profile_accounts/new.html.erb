@@ -1,2 +1,20 @@
-<% content_for :title, "인물정보 계정 추가" %>
-<div class="max-w-lg"><div class="mb-6"><%= link_to "← 인물정보 계정", pd_profile_accounts_path, class: "text-primary text-sm" %><h1 class="text-xl font-bold text-navy mt-2">인물정보 계정 추가</h1></div><div class="bg-white rounded-lg border border-gray-100 shadow-sm p-6"><%= render "form", account: @account %></div></div>
+<% member = @member %>
+<% title = member ? (@account.platform_label ? "#{@account.platform_label} 계정 등록" : "프로필 계정 등록") : "인물정보 계정 추가" %>
+<% content_for :title, title %>
+
+<div class="max-w-lg">
+  <div class="mb-6">
+    <% if member %>
+      <%= link_to "← #{member.name} 대행 등록", pd_member_path(member, anchor: "accounts"), class: "text-primary text-sm" %>
+    <% else %>
+      <%= link_to "← 인물정보 계정", pd_profile_accounts_path, class: "text-primary text-sm" %>
+    <% end %>
+    <h1 class="text-xl font-bold text-navy mt-2"><%= title %></h1>
+    <% if member %>
+      <p class="mt-2 text-sm text-gray-600"><%= member.name %> (/<%= member.slug %>) 회원 대신 등록합니다. 저장하면 회원 대시보드 '내 프로필 관리 현황'에 바로 보입니다.</p>
+    <% end %>
+  </div>
+  <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-6">
+    <%= render "form", account: @account %>
+  </div>
+</div>

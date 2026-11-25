@@ -6,7 +6,7 @@ class Pd::ProfileAccountNewsletterDraftsControllerTest < ActionDispatch::Integra
   setup do
     @admin = AdminUser.create!(email: "newsletter-test@example.test", password: "password123", role: "pd")
     sign_in @admin
-    @account = ProfileAccount.create!(platform: "linkedin", display_name: "가상 인물", tenant_id: 2)
+    @account = ProfileAccount.create!(platform: "linkedin", display_name: "가상 인물", tenant_id: 1)
     @return_path = pd_profile_account_path(@account, anchor: "newsletter-drafts")
   end
 
@@ -19,7 +19,7 @@ class Pd::ProfileAccountNewsletterDraftsControllerTest < ActionDispatch::Integra
     assert_redirected_to @return_path
     assert_equal "뉴스레터 초안을 저장했습니다.", flash[:notice]
     draft = @account.linkedin_newsletter_drafts.sole
-    assert_equal [ "Dev Notes", "가상 초안", "본문", 2, "draft" ], draft.attributes.symbolize_keys.values_at(:newsletter_name, :title, :body, :tenant_id, :status)
+    assert_equal [ "Dev Notes", "가상 초안", "본문", 1, "draft" ], draft.attributes.symbolize_keys.values_at(:newsletter_name, :title, :body, :tenant_id, :status)
 
     get edit_pd_profile_account_newsletter_draft_path(@account, draft)
     assert_response :success

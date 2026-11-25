@@ -12,7 +12,9 @@
           <span class="ml-2 rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">비공개</span>
         <% end %>
       </p>
-      <div class="mt-2 flex flex-wrap gap-2">
+    <% end %>
+    <div class="mt-2 flex flex-wrap gap-2" id="member-header-links">
+      <% if @member.slug.present? %>
         <%= link_to "/#{@member.slug}",
             target: "_blank", rel: "noopener noreferrer",
             title: "#{@member.name}님의 공개 페이지를 새 탭에서 열기",
@@ -22,8 +24,10 @@
         <% end %>
         <%= link_to "회원 화면 열기 (운영자 권한)", slug_admin_dashboard_path(slug: @member.slug),
             class: "inline-flex items-center px-3.5 py-2 rounded-full border border-gray-400 text-gray-800 text-sm font-semibold hover:bg-gray-900 hover:text-white transition" %>
-      </div>
-    <% end %>
+      <% end %>
+      <%= link_to "계정·채널 대행 등록", pd_member_path(@member),
+          class: "inline-flex items-center px-3.5 py-2 rounded-full border border-gray-400 text-gray-800 text-sm font-semibold hover:bg-gray-900 hover:text-white transition" %>
+    </div>
   </div>
   <div class="flex items-center gap-2 flex-wrap">
     <% if @member.slug.present? %>

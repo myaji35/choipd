@@ -1,7 +1,12 @@
 <% content_for :title, "#{@member.name} 대행 등록" %>
 
 <header class="mb-6">
-  <%= link_to "← 회원 대행 등록", pd_members_path, class: "text-sm text-primary" %>
+  <div class="flex flex-wrap gap-3">
+    <%= link_to "← 회원 대행 등록", pd_members_path, class: "text-sm text-primary" %>
+    <% if current_admin_user.admin? %>
+      <%= link_to "운영자 회원 상세", admin_member_path(@member), class: "text-sm text-primary" %>
+    <% end %>
+  </div>
   <div class="mt-2 flex flex-wrap items-start justify-between gap-3">
     <div class="min-w-0 max-w-full break-words">
       <h1 class="text-xl font-bold text-navy"><%= @member.name %> 대행 등록</h1>
@@ -26,9 +31,29 @@
           </li>
         <% end %>
       <% else %>
-        <li class="flex flex-wrap items-center justify-between gap-2 py-2">
-          <p class="text-gray-600"><%= label %> 등록 전</p>
-          <%= link_to "계정 등록", new_pd_profile_account_path(member_id: @member.id, platform: platform), class: "text-primary hover:underline" %>
+        <li class="py-2">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <p class="text-gray-600"><%= label %> 등록 전</p>
+            <%= link_to "계정 등록", new_pd_profile_account_path(member_id: @member.id, platform: platform), class: "text-primary hover:underline" %>
+          </div>
+          <% if (unlinked_accounts = @unlinked_accounts_by_platform[platform]) %>
+            <p class="mt-2 text-gray-600">점검에서 이미 찾은 계정이 있습니다. 같은 계정이면 새로 등록하지 말고 연결해 주세요. 새로 등록하면 계정이 두 개로 나뉩니다.</p>
+            <ul class="mt-2">
+              <% unlinked_accounts.first(5).each do |account| %>
+                <li class="flex flex-wrap items-center justify-between gap-2 py-2">
+                  <p class="min-w-0 max-w-full break-words text-navy"><%= account.display_name %> · <%= account.login_id.presence || "아이디 없음" %> · <%= account.session_status_label %></p>
+                  <%= button_to "이 회원에 연결", pd_profile_account_path(account), method: :patch,
+                      params: { profile_account: { member_id: @member.id }, link: "1" },
+                      form: { data: { turbo_confirm: "#{account.display_name} 계정을 #{@member.name} 회원에 연결할까요?" } },
+                      class: "rounded-lg border border-gray-300 px-3 py-2 text-primary cursor-pointer",
+                      style: "min-height: 44px;" %>
+                </li>
+              <% end %>
+            </ul>
+            <% if unlinked_accounts.size > 5 %>
+              <p class="mt-2 text-gray-600">그 밖의 계정은 '<%= link_to "인물정보 계정", pd_profile_accounts_path, class: "text-primary hover:underline" %>' 목록에서 회원을 지정하세요.</p>
+            <% end %>
+          <% end %>
         </li>
       <% end %>
     <% end %>

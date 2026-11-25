@@ -51,10 +51,11 @@ class RoleNavigationUxTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select ".admin-impersonation-banner", text: /운영자 권한으로 #{member.name}님/
     assert_select ".admin-impersonation-banner a[href=?]", admin_member_path(member), text: "운영자 화면으로 돌아가기"
+    assert_select ".admin-impersonation-banner a[href=?]", pd_member_path(member), text: "계정·채널 대행 등록"
     assert_select "form[action=?]", logout_member_path(slug: member.slug), count: 0
   end
 
-  test "PD가 회원 화면에 들어가면 대리 접속 띠에서 PD 대시보드로 돌아갈 수 있다" do
+  test "PD가 회원 화면에 들어가면 대리 접속 띠에서 회원 대행 등록 화면으로 돌아갈 수 있다" do
     member = create_member(status: "approved")
     sign_in staff_user("pd")
 
@@ -62,7 +63,7 @@ class RoleNavigationUxTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".admin-impersonation-banner", text: /PD 권한으로 #{member.name}님/
-    assert_select ".admin-impersonation-banner a[href=?]", pd_root_path, text: "PD 대시보드로 돌아가기"
+    assert_select ".admin-impersonation-banner a[href=?]", pd_member_path(member), text: "대행 등록 화면으로 돌아가기"
     assert_select "a[href=?]", admin_member_path(member), count: 0
   end
 
@@ -84,6 +85,8 @@ class RoleNavigationUxTest < ActionDispatch::IntegrationTest
     get admin_members_path
 
     assert_response :success
+    assert_select ".overflow-x-auto > table"
+    assert_select "form.flex-wrap[action=?][method=get]", admin_members_path
     assert_select "tbody td span", text: "승인 대기"
     assert_select "tbody td span", text: "pending_approval", count: 0
     assert_select "nav a[href=?].bg-primary", admin_root_path, count: 0
@@ -143,7 +146,7 @@ class RoleNavigationUxTest < ActionDispatch::IntegrationTest
     assert_response :ok
     assert_select "a[href=?]", admin_brand_path(brand), text: brand.name
     assert_select "a[href=?]", edit_admin_brand_path(brand), text: "수정"
-    assert_select "a[href=?]", pd_member_path(member), text: "계정·채널 대행 등록"
+    assert_select "#member-header-links a[href=?]", pd_member_path(member), text: "계정·채널 대행 등록", count: 1
   end
 
   private

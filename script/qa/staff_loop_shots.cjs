@@ -8,10 +8,15 @@ const sets = [
     ['a-members', '/admin/members'], ['a-member-new', '/admin/members/'+NEW], ['a-member-old', '/admin/members/'+OLD],
     ['a-brand-old', '/admin/brands/'+OLD_BRAND], ['a-channel-new', '/admin/brands/'+OLD_BRAND+'/brand_channels/new'],
     ['a-pa-new', '/pd/people_accounts/new?member_id='+NEW],
+    ['a-pdm-new','/pd/members/'+NEW],
+    ['a-pa-new-li','/pd/people_accounts/new?member_id='+NEW+'&platform=linkedin'],
     ['r-dash-new', '/ux-member/admin/dashboard'], ['r-channels-new', '/ux-member/admin/channels'], ['r-dash-old', '/kang-seung-sig/admin/dashboard']
   ]],
   ['pd', pEmail, pPass, [
     ['p-home', '/pd'], ['p-pa-index', '/pd/people_accounts'], ['p-pa-new', '/pd/people_accounts/new?member_id='+NEW],
+    ['p-members','/pd/members'], ['p-member-new','/pd/members/'+NEW], ['p-member-old','/pd/members/'+OLD],
+    ['p-ch-new','/pd/members/'+NEW+'/channels/new?platform=naver_blog'],
+    ['p-pa-new-li','/pd/people_accounts/new?member_id='+NEW+'&platform=linkedin'],
     ['p-member-dash', '/ux-member/admin/dashboard']
   ]]
 ];

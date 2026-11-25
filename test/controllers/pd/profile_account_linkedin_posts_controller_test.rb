@@ -6,7 +6,7 @@ class Pd::ProfileAccountLinkedinPostsControllerTest < ActionDispatch::Integratio
   setup do
     @admin = AdminUser.create!(email: "linkedin-posts@example.test", password: "password123", role: "pd")
     sign_in @admin
-    @account = ProfileAccount.create!(platform: "linkedin", display_name: "공유 계정", tenant_id: 2)
+    @account = ProfileAccount.create!(platform: "linkedin", display_name: "공유 계정", tenant_id: 1)
     @return_path = pd_profile_account_path(@account, anchor: "linkedin-posts")
   end
 
@@ -17,7 +17,7 @@ class Pd::ProfileAccountLinkedinPostsControllerTest < ActionDispatch::Integratio
       }
       assert_redirected_to @return_path
       record = @account.linkedin_share_posts.sole
-      assert_equal [ "linkedin", 2, "draft", Time.current, nil ],
+      assert_equal [ "linkedin", 1, "draft", Time.current, nil ],
         [ record.platform, record.tenant_id, record.status, record.scheduled_at, record.approved_at ]
 
       get edit_pd_profile_account_linkedin_post_path(@account, record)

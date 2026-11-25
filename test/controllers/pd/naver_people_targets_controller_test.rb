@@ -5,7 +5,7 @@ class Pd::NaverPeopleTargetsControllerTest < ActionDispatch::IntegrationTest
 
   setup do
     sign_in AdminUser.create!(email: "naver-target@example.test", password: "password123", role: "pd")
-    @account = ProfileAccount.create!(platform: "naver_people", display_name: "가상 인물", tenant_id: 2)
+    @account = ProfileAccount.create!(platform: "naver_people", display_name: "가상 인물", tenant_id: 1)
     @path = pd_profile_account_naver_target_path(@account)
     @edit_path = edit_pd_profile_account_naver_target_path(@account)
     @approve_path = approve_pd_profile_account_naver_target_path(@account)
@@ -32,7 +32,7 @@ class Pd::NaverPeopleTargetsControllerTest < ActionDispatch::IntegrationTest
       assert_select "textarea[name='naver_people_target[jobs]']", text: "기업인"
     end
 
-    target = @account.create_naver_people_target!(tenant_id: 2, values: { "jobs" => "작가" })
+    target = @account.create_naver_people_target!(tenant_id: 1, values: { "jobs" => "작가" })
     get @edit_path, params: { source: "naver" }
     assert_select "[role=status]", text: /네이버에서 불러왔습니다. 확인 후 저장하세요./
     assert_select "textarea[name='naver_people_target[jobs]']", text: "기업인"
@@ -44,9 +44,9 @@ class Pd::NaverPeopleTargetsControllerTest < ActionDispatch::IntegrationTest
 
   test "prefills LinkedIn and imPD without saving a target" do
     member = Member.create!(name: @account.display_name, email: "naver-member@example.test", slug: "naver-member",
-      tenant_id: 2, profession: "author")
+      tenant_id: 1, profession: "author")
     @account.update!(member: member)
-    linkedin = ProfileAccount.create!(platform: "linkedin", display_name: member.name, member: member, tenant_id: 2)
+    linkedin = ProfileAccount.create!(platform: "linkedin", display_name: member.name, member: member, tenant_id: 1)
     linkedin.profile_snapshots.create!(captured_at: Time.current, data: {
       "pages" => { "experience" => { "text" => file_fixture("linkedin/experience.txt").read } }
     })
@@ -68,7 +68,7 @@ class Pd::NaverPeopleTargetsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to @path
     assert_equal "목표 프로필을 저장했습니다.", flash[:notice]
     target = @account.naver_people_target
-    assert_equal [ 2, "draft", { "jobs" => [ "작가" ] } ], [ target.tenant_id, target.status, target.values ]
+    assert_equal [ 1, "draft", { "jobs" => [ "작가" ] } ], [ target.tenant_id, target.status, target.values ]
 
     patch @path, params: { naver_people_target: { sites: "ftp://invalid.test" } }
     assert_response :unprocessable_entity

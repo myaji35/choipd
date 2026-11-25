@@ -2,7 +2,7 @@ class Pd::ProfileAccountsController < Pd::BaseController
   before_action :set_account, only: [ :show, :edit, :update, :destroy, :invitation_action, :search_queries ]
 
   def index
-    @accounts = ProfileAccount.includes(:member).order(:platform, :display_name).group_by(&:platform)
+    @accounts = tenant_accounts.includes(:member).order(:platform, :display_name).group_by(&:platform)
     @ego_available = EgoProfile::Runner.available?
   end
 
@@ -39,22 +39,35 @@ class Pd::ProfileAccountsController < Pd::BaseController
 
   def new
     platform = params[:platform].presence_in(ProfileAccount::PLATFORMS.keys)
-    @account = ProfileAccount.new({ member_id: params[:member_id], platform: platform }.compact)
+    @member = Member.for_tenant.find_by(id: params[:member_id])
+    @account = ProfileAccount.new({ member: @member, platform: platform }.compact)
+    @account.display_name = @member.name if @member
   end
 
   def create
-    @account = ProfileAccount.new(account_params)
-    if @account.save
-      redirect_to pd_profile_account_path(@account), notice: "인물정보 계정이 추가되었습니다."
+    @account = tenant_accounts.new
+    assign_account_attributes
+    if @account.errors.empty? && @account.save
+      if @member
+        redirect_to pd_member_path(@member, anchor: "accounts"),
+          notice: "#{@account.platform_label} 계정을 등록했습니다. 회원 대시보드 '내 프로필 관리 현황'에 바로 보입니다."
+      else
+        redirect_to pd_profile_account_path(@account), notice: "인물정보 계정이 추가되었습니다."
+      end
     else
       render :new, status: :unprocessable_entity
     end
   end
 
-  def edit; end
+  def edit
+    @member = Member.for_tenant.find_by(id: @account.member_id)
+  end
 
   def update
-    if @account.update(account_params)
+    return link_account if params[:link] == "1" || params[:return_to] == "member"
+
+    assign_account_attributes
+    if @account.errors.empty? && @account.save
       redirect_to pd_profile_account_path(@account), notice: "인물정보 계정이 수정되었습니다."
     else
       render :edit, status: :unprocessable_entity
@@ -138,7 +151,40 @@ class Pd::ProfileAccountsController < Pd::BaseController
   end
 
   def set_account
-    @account = ProfileAccount.find(params[:id])
+    @account = tenant_accounts.find(params[:id])
+  end
+
+  def tenant_accounts
+    ProfileAccount.where(tenant_id: 1)
+  end
+
+  def assign_account_attributes
+    attributes = account_params
+    @account.assign_attributes(attributes.except(:member_id))
+    member_id = attributes.fetch(:member_id, @account.member_id)
+    @member = Member.for_tenant.find_by(id: member_id) if member_id.present?
+    return unless attributes.key?(:member_id)
+
+    @account.member = @member
+    @account.errors.add(:base, "회원을 찾을 수 없어요.") if member_id.present? && @member.nil?
+  end
+
+  def link_account
+    @member = Member.for_tenant.find_by(id: account_params[:member_id].presence)
+    unless @member
+      @account.errors.add(:base, "회원을 찾을 수 없어요.")
+      return render :edit, status: :unprocessable_entity
+    end
+
+    linked = tenant_accounts.where(id: @account.id, member_id: nil)
+      .update_all(member_id: @member.id, updated_at: Time.current)
+
+    if linked == 1
+      flash[:notice] = "#{@account.platform_label} 계정을 #{@member.name} 회원에 연결했습니다."
+    else
+      flash[:alert] = "이미 다른 회원에게 연결된 계정이에요."
+    end
+    redirect_to pd_member_path(@member, anchor: "accounts"), status: :see_other
   end
 
   def account_params

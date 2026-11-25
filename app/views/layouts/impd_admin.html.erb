@@ -171,9 +171,12 @@
         <div class="admin-impersonation-banner">
           <%= acting_user.admin? ? "운영자" : "PD" %> 권한으로 <%= @member.name %>님(/<%= @member.slug %>) 관리 화면을 보고 있습니다. 여기서 바꾼 내용은 회원 페이지에 바로 반영됩니다.
           <% if acting_user.admin? %>
-            <%= link_to "운영자 화면으로 돌아가기", admin_member_path(@member) %>
+            <span style="display: inline-flex; flex-wrap: wrap; column-gap: 12px; max-width: 100%;">
+              <%= link_to "운영자 화면으로 돌아가기", admin_member_path(@member) %>
+              <%= link_to "계정·채널 대행 등록", pd_member_path(@member) %>
+            </span>
           <% else %>
-            <%= link_to "PD 대시보드로 돌아가기", pd_root_path %>
+            <%= link_to "대행 등록 화면으로 돌아가기", pd_member_path(@member) %>
           <% end %>
         </div>
       <% end %>

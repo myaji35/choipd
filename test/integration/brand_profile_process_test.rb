@@ -143,7 +143,7 @@ class BrandProfileProcessTest < ActionDispatch::IntegrationTest
     end
 
     post pd_profile_accounts_path, params: { profile_account: { member_id: member.id, platform: "linkedin", display_name: "회원 프로필" } }
-    assert_redirected_to pd_profile_account_path(member.profile_accounts.sole)
+    assert_redirected_to pd_member_path(member, anchor: "accounts")
     get pd_profile_accounts_path
     assert_select "td", text: member.name
   end
