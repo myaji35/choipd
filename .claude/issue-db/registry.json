@@ -10251,14 +10251,14 @@
       "title": "[가독성] 발행인 인사말(/media/greeting) 이름·첫 인사·서명이 어두운 배경 위 남색 글씨라 거의 안 보이고, 이동 경로가 헤더와 겹침",
       "type": "FIX_BUG",
       "priority": "P2",
-      "status": "READY",
+      "status": "DONE",
       "origin": "factory-observation",
       "depth": 1,
       "retry_count": 0,
       "parent_id": "ISS-557",
       "depends_on": [],
       "created_at": "2026-11-25T03:25:27Z",
-      "updated_at": "2026-11-25T03:25:28.924Z",
+      "updated_at": "2026-11-25T04:39:51.039003Z",
       "description": "ISS-557로 헤더 '소개'가 /media/greeting 으로 이어지면서 방문자가 처음 보는 소개 화면이 됐다. chopd 레이아웃(어두운 배경 #0a0e1a) 위에 라이트 테마용 클래스(text-navy·text-gray-700·text-gray-500)가 그대로 쓰여 '최범희' 이름, '안녕하십니까…' 첫 문장, 끝 서명이 배경과 거의 같은 색이다. 390px 에서 '미디어 / 발행인 인사말' 이동 경로가 고정 헤더 로고 바로 아래에 붙어 겹쳐 보인다.",
       "payload": {
         "origin": "factory-observation",
@@ -10294,8 +10294,56 @@
         "approved_at": "2026-11-25T03:25:28.924Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
-      "result": null,
-      "spawn_rules": []
+      "result": {
+        "files_changed": [
+          "app/views/chopd/media/greeting.html.erb",
+          "script/qa/greeting_readability_check.cjs",
+          "test/integration/chopd_greeting_readability_test.rb"
+        ],
+        "commit": "1d78a48",
+        "criteria_check": [
+          {
+            "criterion": "인사말 화면의 모든 본문·이름·서명 글자 대비가 4.5:1 이상(수치 근거)",
+            "met": true,
+            "how": "greeting_readability_check: 1280·390·320 모두 main 안 최소 대비 10.9:1, 미달 0"
+          },
+          {
+            "criterion": "390·1280 에서 이동 경로가 헤더와 겹치지 않는다",
+            "met": true,
+            "how": "이동 경로 top 112px > 헤더 bottom 81.5px(1280), 88px > 80px(390·320). 390 캡처 tmp/qa/iss571-greeting-390.png 육안 확인"
+          },
+          {
+            "criterion": "layout_check(/media/greeting, 1280·390·320) 통과",
+            "met": true,
+            "how": "SUMMARY pass=true, 가로 스크롤·잘림·콘솔 오류 0"
+          },
+          {
+            "criterion": "대비·겹침 자동 점검 또는 테스트가 있다",
+            "met": true,
+            "how": "script/qa/greeting_readability_check.cjs + test/integration/chopd_greeting_readability_test.rb(라이트 테마 클래스·svg 부재, lni 아이콘 존재)"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_greeting_readability_test.rb test/integration/public_pages_test.rb test/integration/chopd_header_links_test.rb",
+            "exit_code": 0,
+            "output": "12 runs, 181 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "node script/qa/greeting_readability_check.cjs",
+            "exit_code": 0,
+            "output": "\"pass\": true, minContrast 10.9 (1280/390/320), noHeaderOverlap true"
+          },
+          {
+            "cmd": "ROUTES=/media/greeting WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "SUMMARY pass=true"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "started_at": "2026-11-25T04:39:51.039003Z",
+      "completed_at": "2026-11-25T13:43:53.009869"
     },
     {
       "id": "ISS-572",
@@ -13299,6 +13347,206 @@
       "spawn_rules": [],
       "started_at": "2026-11-25T04:36:16Z",
       "completed_at": "2026-11-25T13:36:54.647934"
+    },
+    {
+      "id": "ISS-601",
+      "title": "[Plan:테스트] ISS-571 변경사항 검증",
+      "type": "RUN_TESTS",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "test-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-571",
+      "depends_on": [],
+      "created_at": "2026-11-25T13:43:53.009869",
+      "payload": {
+        "files": [
+          "app/views/chopd/media/greeting.html.erb"
+        ],
+        "source_issue": "ISS-571",
+        "scope": "changed",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T04:43:54.027Z",
+            "by": "auto",
+            "reason": "「[Plan:테스트] ISS-571 변경사항 검증」(RUN_TESTS, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T04:43:54.027Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T04:43:54.027Z"
+    },
+    {
+      "id": "ISS-602",
+      "title": "[Plan:도메인분석] ISS-571 비즈니스 규칙/시나리오 도출",
+      "type": "DOMAIN_ANALYZE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "domain-analyst",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-571",
+      "depends_on": [],
+      "created_at": "2026-11-25T13:43:53.009869",
+      "payload": {
+        "files": [
+          "app/views/chopd/media/greeting.html.erb"
+        ],
+        "source_issue": "ISS-571",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T04:43:54.027Z",
+            "by": "auto",
+            "reason": "「[Plan:도메인분석] ISS-571 비즈니스 규칙/시나리오 도출」(DOMAIN_ANALYZE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T04:43:54.027Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T04:43:54.027Z"
+    },
+    {
+      "id": "ISS-603",
+      "title": "[Plan:UX리뷰] ISS-571 UI 변경 검증",
+      "type": "UI_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "ux-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-571",
+      "depends_on": [],
+      "created_at": "2026-11-25T13:43:53.009869",
+      "payload": {
+        "files": [
+          "app/views/chopd/media/greeting.html.erb"
+        ],
+        "source_issue": "ISS-571",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T04:43:54.027Z",
+            "by": "auto",
+            "reason": "「[Plan:UX리뷰] ISS-571 UI 변경 검증」(UI_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T04:43:54.027Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T04:43:54.027Z"
+    },
+    {
+      "id": "ISS-604",
+      "title": "[Plan:브랜드검증] ISS-571 아젠다 표현 + Action Clarity",
+      "type": "BRAND_GUARD",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "brand-guardian",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-571",
+      "depends_on": [],
+      "created_at": "2026-11-25T13:43:53.009869",
+      "payload": {
+        "files": [
+          "app/views/chopd/media/greeting.html.erb"
+        ],
+        "source_issue": "ISS-571",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T04:43:54.027Z",
+            "by": "auto",
+            "reason": "「[Plan:브랜드검증] ISS-571 아젠다 표현 + Action Clarity」(BRAND_GUARD, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T04:43:54.027Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T04:43:54.027Z"
+    },
+    {
+      "id": "ISS-605",
+      "title": "[Plan:브라우저QA] ISS-571 콘솔 에러 + 스크린샷 검증",
+      "type": "BROWSER_QA",
+      "status": "DONE",
+      "priority": "P1",
+      "assign_to": "agent-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-571",
+      "depends_on": [],
+      "created_at": "2026-11-25T13:43:53.009869",
+      "payload": {
+        "files": [
+          "app/views/chopd/media/greeting.html.erb"
+        ],
+        "source_issue": "ISS-571",
+        "action": "run_browse_qa",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T04:43:54.027Z",
+            "by": "auto",
+            "reason": "「[Plan:브라우저QA] ISS-571 콘솔 에러 + 스크린샷 검증」(BROWSER_QA, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T04:43:54.027Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-571 수정 직후 같은 회차에서 브라우저 점검(대비·겹침·콘솔 오류)을 이미 실행 — 그 근거로 마감",
+          "risk": "T0",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:44:12Z"
+        },
+        "acceptance_criteria": [
+          "/media/greeting 1280·390·320 에서 콘솔 오류 0",
+          "화면 캡처로 이름·첫 인사·서명이 보이는지 확인"
+        ]
+      },
+      "result": {
+        "criteria_check": [
+          {
+            "criterion": "/media/greeting 1280·390·320 에서 콘솔 오류 0",
+            "met": true,
+            "how": "layout_check consoleErrors 0, badResponses 0 (3폭)"
+          },
+          {
+            "criterion": "화면 캡처로 이름·첫 인사·서명이 보이는지 확인",
+            "met": true,
+            "how": "tmp/qa/iss571-greeting-390.png 육안 확인 — 최범희·안녕하십니까 선명, 이동 경로 헤더 아래"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "ROUTES=/media/greeting WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "consoleErrors 0 ×3, SUMMARY pass=true"
+          },
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_greeting_readability_test.rb",
+            "exit_code": 0,
+            "output": "0 failures, 0 errors"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T04:43:54.027Z",
+      "completed_at": "2026-11-25T13:44:12.156908"
     }
   ],
   "hooks": {
@@ -13946,6 +14194,18 @@
         "issue_type": "FEATURE",
         "plan_created": 0,
         "timestamp": "2026-11-25T13:39:12.290394"
+      },
+      {
+        "issue_id": "ISS-571",
+        "issue_type": "FIX_BUG",
+        "plan_created": 5,
+        "timestamp": "2026-11-25T13:43:53.009869"
+      },
+      {
+        "issue_id": "ISS-605",
+        "issue_type": "BROWSER_QA",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T13:44:12.156908"
       }
     ],
     "on_fail": [],
@@ -18188,8 +18448,8 @@
     ]
   },
   "stats": {
-    "total_issues": 599,
-    "completed": 107,
+    "total_issues": 604,
+    "completed": 109,
     "failed": 0,
     "evolved": 223
   },
