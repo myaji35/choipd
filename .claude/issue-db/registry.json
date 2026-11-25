@@ -6261,7 +6261,34 @@
             "exit_code": 0,
             "output": "(출력 없음 = 동일)"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T01:44:06Z",
+          "sha": "7bc5da6",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "ROUTES=/education,/works,/media,/,/inquiries/new node script/qa/layout_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "nses\":0,\"badResponseItems\":[]}\n{\"route\":\"/inquiries/new\",\"width\":390,\"file\":\"tmp/qa/layout/inquiries-new-390.png\",\"bytes\":46095,\"scrollWidth\":390,\"clientWidth\":390,\"hScroll\":false,\"checked\":7,\"clipped\":0,\"clippedItems\":[],\"footerWrapped\":0,\"footerWrappedItems\":[],\"pillWrapped\":0,\"pillWrappedItems\":[],\"consoleErrors\":0,\"consoleErrorItems\":[],\"badResponses\":0,\"badResponseItems\":[]}\nSUMMARY pass=true"
+            },
+            {
+              "cmd": "bin/rails test test/integration/public_pages_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "cmp qa/ISS-531/before/education-1280.png qa/ISS-531/after/education-1280.png",
+              "status": "skipped",
+              "why": "검사 명령 아님: cmp qa/ISS-531/before/education-1280.png"
+            }
+          ]
+        }
       },
       "spawn_rules": [],
       "completed_at": "2026-11-25T10:41:46.027775"
