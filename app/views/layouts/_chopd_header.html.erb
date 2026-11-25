@@ -1,4 +1,4 @@
-<header id="nav" data-controller="mobile-menu" style="position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:22px 48px;transition:all .3s;">
+<header id="nav" style="position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:22px 48px;transition:all .3s;">
   <style>
     #nav.scrolled {
       background: rgba(10,14,26,0.9);
@@ -98,7 +98,7 @@
   </div>
 
   <!-- 모바일 햄버거 -->
-  <button class="nav-mobile-btn" data-action="click->mobile-menu#toggle" aria-label="메뉴"
+  <button class="nav-mobile-btn" aria-label="메뉴" aria-controls="mobile-nav" aria-expanded="false"
     style="background:none;border:none;cursor:pointer;padding:6px;display:none;">
     <svg width="22" height="22" viewBox="0 0 24 24" stroke="#f5f4f0" fill="none" stroke-width="2" stroke-linecap="round">
       <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
@@ -107,7 +107,7 @@
 </header>
 
 <!-- 모바일 메뉴 -->
-<div id="mobile-nav" class="mobile-menu" data-mobile-menu-target="menu">
+<div id="mobile-nav" class="mobile-menu">
   <%= link_to "소개", "#identity", class: "mobile-nav-link" %>
   <%= link_to "교육", education_path, class: "mobile-nav-link" %>
   <%= link_to "미디어", media_path, class: "mobile-nav-link" %>
@@ -144,8 +144,9 @@
       window.__chopdNavScrollBound = true;
     }
     // 모바일 메뉴 토글
-    document.querySelector('[data-action="click->mobile-menu#toggle"]')?.addEventListener('click', () => {
-      document.getElementById('mobile-nav')?.classList.toggle('open');
+    document.querySelector('.nav-mobile-btn')?.addEventListener('click', (event) => {
+      const open = document.getElementById('mobile-nav')?.classList.toggle('open');
+      event.currentTarget.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
   })();
 </script>
