@@ -27,6 +27,26 @@ class EducationFilterTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "shows the empty state with an inquiry link when no courses are published" do
+    Course.update_all(published: false)
+
+    get education_path
+
+    assert_response :success
+    assert_select ".empty-state", count: 1 do
+      assert_select "a[href=?]", new_inquiry_path(type: 'b2b'), text: "원하는 강좌 문의하기", count: 1
+    end
+    assert_select ".course-title", count: 0
+  end
+
+  test "hides the empty state and its inquiry link when courses are published" do
+    get education_path
+
+    assert_response :success
+    assert_select ".empty-state", count: 0
+    assert_select ".empty-state-cta", count: 0
+  end
+
   private
 
   def assert_courses_and_filter(courses, label)
