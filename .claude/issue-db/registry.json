@@ -10756,7 +10756,7 @@
       "id": "ISS-581",
       "title": "[Plan:브라우저QA] ISS-552 콘솔 에러 + 스크린샷 검증",
       "type": "BROWSER_QA",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "agent-harness",
       "depth": 2,
@@ -10794,9 +10794,51 @@
           "관련 자동 테스트가 통과한다"
         ]
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "console_errors": 0,
+        "bad_responses": 0,
+        "pages_checked": [
+          "/education"
+        ],
+        "widths": [
+          1280,
+          390,
+          320
+        ],
+        "criteria_check": [
+          {
+            "criterion": "/education 1280·390·320 에서 콘솔 오류 0개·가로 넘침 없음",
+            "met": true,
+            "how": "layout_check /education 3개 폭 hScroll false clipped 0 consoleErrors 0 badResponses 0"
+          },
+          {
+            "criterion": "빈 강좌 안내 대비 4.5:1 이상, 강좌 문의 버튼이 /inquiries/new 로 이어진다",
+            "met": true,
+            "how": "개발 화면 빈 상태 글자색 rgba(255,255,255,0.72) on #0a0e1a; 테스트 empty state text meets WCAG contrast 통과; 문의 링크 원하는 강좌 문의하기 → /inquiries/new?type=b2b, 강좌 문의 → /inquiries/new"
+          },
+          {
+            "criterion": "관련 자동 테스트가 통과한다",
+            "met": true,
+            "how": "education_filter_test 단독 3회 연속 6 runs 41 assertions 0 failures 0 errors (첫 시도 1건은 다른 세션 전체 테스트와 겹친 SQLite 잠금, 단독 재실행 시 해소)"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "cd script/qa && ROUTES=/education WIDTHS=1280,390,320 node layout_check.cjs",
+            "exit_code": 0,
+            "output": "/education 1280/390/320 hScroll False clip 0 console 0 bad 0 SUMMARY pass=true"
+          },
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "6 runs, 41 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:48:18Z"
+      "updated_at": "2026-11-25T03:48:18Z",
+      "completed_at": "2026-11-25T12:56:23.037743"
     },
     {
       "id": "ISS-582",
@@ -11798,6 +11840,12 @@
         "issue_type": "BROWSER_QA",
         "plan_created": 0,
         "timestamp": "2026-11-25T12:56:05.762527"
+      },
+      {
+        "issue_id": "ISS-581",
+        "issue_type": "BROWSER_QA",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T12:56:23.037743"
       }
     ],
     "on_fail": [],
@@ -16041,7 +16089,7 @@
   },
   "stats": {
     "total_issues": 583,
-    "completed": 85,
+    "completed": 86,
     "failed": 0,
     "evolved": 223
   },
