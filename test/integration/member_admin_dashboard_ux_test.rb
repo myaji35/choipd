@@ -92,6 +92,65 @@ class MemberAdminDashboardUxTest < ActionDispatch::IntegrationTest
     assert_select ".dashboard-overview a[href=?] .dashboard-overview-value", slug_admin_posts_path(slug: slug), text: "보이는 글 없음"
   end
 
+  test "최근 문의에서 문의함의 해당 문의로 이동할 수 있다" do
+    member = create_overview_member
+    inquiry = member.member_inquiries.create!(sender_name: "방문자", sender_email: "visitor@example.com",
+      message: "상담을 요청합니다", is_read: 0)
+
+    get slug_admin_dashboard_path(slug: member.slug)
+
+    assert_response :ok
+    assert_select "section[aria-labelledby='recent-inquiries-title']" do
+      assert_select "span", text: "새 문의 1건"
+      assert_select "a[href$='#inquiry-#{inquiry.id}'] span", text: "새 문의"
+    end
+  end
+
+  test "방문이 없으면 방문 기간과 주소 공유 방법을 보여 준다" do
+    member = create_overview_member
+
+    get slug_admin_dashboard_path(slug: member.slug)
+
+    assert_response :ok
+    [
+      "아직 방문이 없어요. 내 페이지 주소를 고객에게 보내 보세요.",
+      "최근 14일 방문 0회",
+      "주소 복사",
+      "최근 7일 · 내 페이지가 열린 횟수"
+    ].each { |phrase| assert_includes response.body, phrase }
+    assert_select "a[href=?]", slug_admin_brand_path(slug: member.slug), text: "주별 흐름은 '내 브랜드'에서 보기 →"
+    ["14일 방문 추이", "링크 복사", "명이 방문했어요"].each { |phrase| assert_not_includes response.body, phrase }
+    assert_not_includes Rails.root.join("app/views/member_admin/dashboard/show.html.erb").read, "impd-font-mono"
+  end
+
+  test "오늘 익명 방문이 있으면 페이지가 열린 횟수를 보여 준다" do
+    member = create_overview_member
+    AnalyticsEvent.create!(event_name: "page_view", event_category: "page", tenant_id: 1,
+      user_type: "anonymous", page_path: "/#{member.slug}")
+
+    get slug_admin_dashboard_path(slug: member.slug)
+
+    assert_response :ok
+    assert_select "p", text: /오늘 내 페이지 방문 1회 · 최근 7일 1회/
+  end
+
+  test "방문이 20회 이상이면 날짜별 막대와 하루 평균을 보여 준다" do
+    member = create_overview_member
+    21.times do
+      AnalyticsEvent.create!(event_name: "page_view", event_category: "page", tenant_id: 1,
+        user_type: "anonymous", page_path: "/#{member.slug}", created_at: 1.day.ago)
+    end
+
+    get slug_admin_dashboard_path(slug: member.slug)
+
+    assert_response :ok
+    assert_select "p", text: /오늘은 아직 방문이 없어요\. 최근 7일 동안은 21회 열렸어요\./
+    assert_select "span", text: "최근 14일 방문 21회"
+    assert_select ".dashboard-chart .dashboard-chart-date", text: %r{\A\d+/\d+\z}, count: 14
+    assert_select "p", text: "오늘 0회 · 하루 평균 1.5회"
+    assert_select "a[href=?]", slug_admin_brand_path(slug: member.slug), text: "주별 흐름은 '내 브랜드'에서 보기 →"
+  end
+
   private
 
   def create_overview_member

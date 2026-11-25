@@ -22,7 +22,11 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
     @presets         = ThemePreset::THEME_PRESETS
     @layout_presets  = LayoutPreset::LAYOUT_PRESETS
     @checklist       = build_profile_checklist(from_checklist: false)
-    @can_publish     = @member.bio.to_s.length >= 20 && @member.profession.present? && @member.email.present?
+    @publish_missing = []
+    @publish_missing << "자기소개 20자 이상" if @member.bio.to_s.length < 20
+    @publish_missing << "직업" if @member.profession.blank?
+    @publish_missing << "이메일" if @member.email.blank?
+    @can_publish = @publish_missing.empty?
   end
 
   def update_info
@@ -41,7 +45,7 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
     end
 
     if @member.update(permitted)
-      redirect_to action: :show, params: { slug: @member.slug, step: 3 }, notice: "정보가 저장되었습니다"
+      redirect_to slug_admin_editor_path(slug: @member.slug, step: 3), notice: "내 정보를 저장했어요. 이제 스타일을 골라 주세요."
     else
       redirect_to action: :show, params: { slug: @member.slug, step: 2 }, alert: @member.errors.full_messages.join(" · ")
     end

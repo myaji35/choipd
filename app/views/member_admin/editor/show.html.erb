@@ -27,13 +27,13 @@
         <% end %>
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
           <div class="impd-label" style="color: <%= current ? 'var(--impd-accent)' : (done ? 'var(--impd-ink)' : 'var(--impd-muted)') %>;"><%= n %></div>
-          <% if done && n < @step %>
+          <% if done && !current %>
             <span style="width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; background: #16a34a; color: #fff; font-size: 11px; font-weight: 700; border-radius: 50%;"><%= lni_icon "check" %></span>
           <% elsif current %>
             <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--impd-accent);"></span>
           <% end %>
         </div>
-        <p style="font-family: var(--impd-font-display); font-weight: 800; font-size: 20px; margin-top: 6px; color: var(--impd-ink);"><%= label %></p>
+        <p style="font-family: var(--impd-font-display); font-weight: 800; font-size: 20px; margin-top: 6px; color: var(--impd-ink);"><%= label %><% if done && !current %> <span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">(마침)</span><% end %></p>
         <p style="font-size: 12px; color: var(--impd-muted); margin-top: 4px;"><%= desc %></p>
       </a>
     <% end %>
@@ -83,7 +83,15 @@
             <textarea id="member_bio" name="member[bio]" rows="6" maxlength="200"
                       aria-describedby="member_bio_count" data-editor-info-target="bio" data-action="input->editor-info#updateBioCount"
                       placeholder="한 줄로 표현할 수 있나요? (예: 스마트폰 하나로 유튜브 채널 만드는 법을 가르치는 강사)"><%= @member.bio %></textarea>
-            <p id="member_bio_count" class="impd-label-muted" style="margin-top: 6px;"><span data-editor-info-target="bioCount"><%= @member.bio.to_s.length %></span> / 200자 (50자 이상 권장)</p>
+            <% bio_count = @member.bio.to_s.length %>
+            <% bio_hint = if bio_count < 20
+              "20자를 넘기면 내 페이지를 공개할 수 있어요."
+            elsif bio_count < 50
+              "공개할 수 있어요. 50자를 넘기면 준비 항목 '자기소개'가 채워져요."
+            else
+              "충분해요."
+            end %>
+            <p id="member_bio_count" class="impd-label-muted" style="margin-top: 6px;"><span data-editor-info-target="bioCount"><%= bio_count %></span> / 200자 · <span data-editor-info-target="bioHint"><%= bio_hint %></span></p>
           </div>
 
           <div id="profession-region" class="checklist-target editor-pair" style="margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
@@ -318,9 +326,9 @@
 
         <% if !@can_publish %>
           <p style="margin-bottom: 12px; font-size: 14px; color: var(--impd-ink2); line-height: 1.55;">
-            자기소개(20자 이상)·직업·이메일을 적으면 공개할 수 있어요.
+            공개하려면 아직 필요해요: <strong><%= @publish_missing.join(" · ") %></strong>
           </p>
-          <a href="<%= slug_admin_editor_path(slug: @member.slug, step: 2, anchor: "bio") %>"
+          <a href="<%= slug_admin_editor_path(slug: @member.slug, step: 2, anchor: @publish_missing.include?("자기소개 20자 이상") ? "bio" : "profession-region") %>"
              class="impd-btn impd-btn-secondary" style="width: 100%; height: 48px; margin-bottom: 12px; justify-content: center;">내 정보 적으러 가기 →</a>
         <% end %>
 

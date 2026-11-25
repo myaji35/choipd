@@ -12,42 +12,115 @@
       <% end %>
     </div>
     <p style="margin-top: 12px; font-size: 14px; color: var(--impd-ink2);">
-      내 페이지에서 고객이 남긴 문의예요. '메일로 답장'을 누르면 메일 앱이 열려요.
+      내 페이지에서 고객이 남긴 문의예요. 답장은 '메일로 답장'을 누르면 메일 앱에서 쓸 수 있어요.
     </p>
   </header>
 
-  <% if @inquiries.any? %>
-    <div style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px;">
-      <% @inquiries.each do |inquiry| %>
-        <% unread = inquiry.is_read.to_i.zero? %>
-        <article class="impd-card" style="border-left: 4px solid <%= unread ? 'var(--impd-accent)' : 'var(--impd-rule)' %>; background: <%= unread ? '#fff' : 'var(--impd-card)' %>;">
-          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: flex-start;">
-            <div style="min-width: 0; overflow-wrap: anywhere;">
-              <div style="display: flex; flex-wrap: wrap; gap: 9px; align-items: center;">
-                <h2 style="font-size: 17px; line-height: 1.45;"><%= inquiry.sender_name %></h2>
-                <span style="border: 1px solid <%= unread ? 'var(--impd-accent)' : 'var(--impd-rule)' %>; color: <%= unread ? 'var(--impd-accent)' : 'var(--impd-muted)' %>; padding: 3px 7px; font-size: 12px; font-weight: 600;"><%= unread ? "새 문의" : "확인함" %></span>
+  <% if @new_inquiries.any? || @read_inquiries.any? %>
+    <section aria-labelledby="new-inquiries-title">
+      <h2 id="new-inquiries-title" style="font-size: 20px; font-weight: 700; margin-bottom: 12px;"><%= @new_inquiries.any? ? "새 문의 #{@new_inquiries.size}건" : "새 문의" %></h2>
+      <% if @new_inquiries.empty? %>
+        <p class="impd-card" style="color: var(--impd-muted);">새 문의는 없어요. 문의가 오면 여기에 먼저 보여요.</p>
+      <% else %>
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px;">
+          <% @new_inquiries.each do |inquiry| %>
+            <% item_id = "inquiry-#{inquiry.id}" %>
+            <% just_saved = flash[:saved_item] == item_id %>
+            <article id="<%= item_id %>" class="impd-card<%= ' is-just-saved' if just_saved %>" style="border-left: 4px solid var(--impd-accent); background: white;">
+              <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: flex-start;">
+                <div style="min-width: 0; overflow-wrap: anywhere;">
+                  <div style="display: flex; flex-wrap: wrap; gap: 9px; align-items: center;">
+                    <h3 style="font-size: 17px; line-height: 1.45;"><%= inquiry.sender_name %></h3>
+                    <% if just_saved %><span class="impd-just-saved-tag">방금 옮김</span><% end %>
+                    <span style="border: 1px solid var(--impd-accent); color: var(--impd-accent); padding: 3px 7px; font-size: 12px; font-weight: 600;">새 문의</span>
+                  </div>
+                  <%= mail_to inquiry.sender_email, inquiry.sender_email, class: "inquiry-email" %>
+                </div>
+                <time class="impd-label-muted" datetime="<%= inquiry.created_at.iso8601 %>"><%= inquiry.created_at.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %></time>
               </div>
-              <%= mail_to inquiry.sender_email, inquiry.sender_email, style: "display: inline-block; margin-top: 6px; color: var(--impd-accent); font-size: 13px; word-break: break-all;" %>
-            </div>
-            <time class="impd-label-muted" datetime="<%= inquiry.created_at.iso8601 %>"><%= inquiry.created_at.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %></time>
-          </div>
 
-          <p style="white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 18px; color: var(--impd-ink2); font-size: 14px; line-height: 1.75;"><%= inquiry.message %></p>
-
-          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--impd-rule);">
-            <%= mail_to inquiry.sender_email, "메일로 답장", class: "impd-btn #{unread ? 'impd-btn-primary' : 'impd-btn-secondary'}", style: "height: 44px; padding: 0 18px; font-size: 13px;" %>
-            <%= button_to(unread ? "확인했어요" : "다시 새 문의로", toggle_read_slug_admin_inquiry_path(slug: @member.slug, id: inquiry), method: :post, class: "impd-btn impd-btn-secondary", style: "height: 44px; padding: 0 14px; font-size: 13px;") %>
-          </div>
-        </article>
+              <p class="inquiry-message"><%= inquiry.message %></p>
+              <div class="inquiry-actions">
+                <%= mail_to inquiry.sender_email, "메일로 답장", class: "impd-btn impd-btn-primary" %>
+                <%= button_to "확인했어요", toggle_read_slug_admin_inquiry_path(slug: @member.slug, id: inquiry), method: :post, class: "impd-btn impd-btn-secondary" %>
+              </div>
+            </article>
+          <% end %>
+        </div>
       <% end %>
-    </div>
+    </section>
+
+    <% if @read_inquiries.any? %>
+      <section aria-labelledby="read-inquiries-title" style="margin-top: 40px;">
+        <h2 id="read-inquiries-title" style="font-size: 20px; font-weight: 700;">확인한 문의 <%= @read_inquiries.size %>건</h2>
+        <p class="impd-label-muted" style="margin-top: 6px;">이름을 누르면 내용이 펼쳐져요.</p>
+        <div class="impd-card" style="padding: 0; margin-top: 12px;">
+          <% @read_inquiries.each do |inquiry| %>
+            <% item_id = "inquiry-#{inquiry.id}" %>
+            <% just_saved = flash[:saved_item] == item_id %>
+            <% received_at = inquiry.created_at.in_time_zone("Asia/Seoul") %>
+            <details id="<%= item_id %>" class="inquiry-read<%= ' is-just-saved' if just_saved %>" <%= 'open' if just_saved %>>
+              <summary>
+                <span class="inquiry-summary">
+                  <span class="inquiry-summary-sender">
+                    <strong><%= inquiry.sender_name %></strong>
+                    <% if just_saved %><span class="impd-just-saved-tag">방금 옮김</span><% end %>
+                  </span>
+                  <span class="inquiry-preview"><%= truncate(inquiry.message.to_s.squish, length: 40) %></span>
+                  <time datetime="<%= received_at.iso8601 %>"><%= received_at.strftime("%Y.%m.%d") %></time>
+                </span>
+              </summary>
+              <div style="padding: 4px 20px 20px;">
+                <%= mail_to inquiry.sender_email, inquiry.sender_email, class: "inquiry-email" %>
+                <p class="impd-label-muted">받은 때 <%= received_at.strftime("%Y.%m.%d %H:%M") %></p>
+                <p class="inquiry-message"><%= inquiry.message %></p>
+                <div class="inquiry-actions">
+                  <%= mail_to inquiry.sender_email, "메일로 답장", class: "impd-btn impd-btn-secondary" %>
+                  <%= button_to "다시 새 문의로", toggle_read_slug_admin_inquiry_path(slug: @member.slug, id: inquiry), method: :post, class: "impd-btn impd-btn-secondary" %>
+                </div>
+              </div>
+            </details>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
   <% else %>
     <%= render "shared/empty_state", icon: "envelope-1", title: "아직 받은 문의가 없어요", text: "내 페이지 주소를 고객에게 보내면 여기로 문의가 들어와요." %>
   <% end %>
 </div>
 
 <style>
+  .inquiry-email { display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; color: var(--impd-accent); font-size: 13px; overflow-wrap: anywhere; }
+  .inquiry-message { white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 18px; color: var(--impd-ink2); font-size: 14px; line-height: 1.75; }
+  .inquiry-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--impd-rule); }
+  .inquiry-read + .inquiry-read { border-top: 1px solid var(--impd-rule); }
+  .inquiry-read summary { min-height: 56px; padding: 0 20px; cursor: pointer; line-height: 56px; }
+  .inquiry-summary { display: inline-grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto; align-items: center; gap: 12px; width: calc(100% - 1.5em); vertical-align: middle; line-height: 1.4; }
+  .inquiry-summary-sender { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 15px; }
+  .inquiry-summary-sender strong, .inquiry-preview { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .inquiry-preview, .inquiry-summary time { color: var(--impd-muted); font-size: 13px; }
   @media (max-width: 720px) {
     .inquiries-wrap { padding: 28px 20px !important; }
+    .inquiry-read summary { padding: 10px 16px; line-height: 1.4; }
+    .inquiry-summary { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; }
+    .inquiry-preview { grid-column: 1 / -1; grid-row: 2; }
   }
 </style>
+
+<script>
+  (() => {
+    function openLinkedInquiry() {
+      if (!/^#inquiry-\d+$/.test(window.location.hash)) return;
+      const inquiry = document.getElementById(window.location.hash.slice(1));
+      if (!inquiry?.matches("details.inquiry-read")) return;
+
+      inquiry.open = true;
+      inquiry.scrollIntoView({ block: "center" });
+    }
+
+    document.addEventListener("turbo:load", openLinkedInquiry, { once: true });
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", openLinkedInquiry, { once: true });
+    }
+  })();
+</script>

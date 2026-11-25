@@ -8,7 +8,13 @@
       안녕하세요, <span style="color: var(--impd-accent); font-style: italic;"><%= @member.name %></span>님.
     </h1>
     <p style="margin-top: 12px; font-size: 16px; color: var(--impd-ink2);">
-      오늘 <strong><%= @today_visits %>명</strong>이 방문했어요.
+      <% if @today_visits.positive? %>
+        오늘 내 페이지 방문 <strong><%= number_with_delimiter(@today_visits) %>회</strong> · 최근 7일 <%= number_with_delimiter(@week_visits) %>회
+      <% elsif @week_visits.positive? %>
+        오늘은 아직 방문이 없어요. 최근 7일 동안은 <strong><%= number_with_delimiter(@week_visits) %>회</strong> 열렸어요.
+      <% else %>
+        아직 방문이 없어요. 내 페이지 주소를 고객에게 보내 보세요.
+      <% end %>
     </p>
   </div>
 
@@ -151,7 +157,7 @@
           "연결된 계정 합계"
         end %>
         <% [
-          ["방문", @week_visits, "최근 7일"],
+          ["방문", "#{number_with_delimiter(@week_visits)}회", "최근 7일 · 내 페이지가 열린 횟수"],
           ["문의", @inquiries_count, inquiry_note, slug_admin_inquiries_path(slug: @member.slug)],
           ["링크 열림", @link_clicks, "QR·공유 링크로 들어온 횟수"],
           ["서비스", @services_count, "내 페이지에 올린 수", slug_admin_services_path(slug: @member.slug)],
@@ -171,55 +177,65 @@
         <% end %>
       </div>
 
-      <!-- Bar chart 14일 -->
+      <% fourteen_total = @bar_data.sum(&:last) %>
       <div style="background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 24px;">
         <div class="impd-section-header" style="margin-bottom: 16px;">
-          <span class="impd-display" style="font-size: 24px; flex: 1;">14일 방문 추이</span>
+          <span class="impd-display" style="font-size: 24px; flex: 1;">최근 14일 방문 <%= number_with_delimiter(fourteen_total) %>회</span>
         </div>
-        <% if @bar_data.sum(&:last) < 20 %>
-          <p style="color: var(--impd-ink2); font-size: 15px; line-height: 1.6;">아직 방문이 적어요. 명함 QR이나 링크를 공유해 보세요.</p>
+        <% if fourteen_total < 20 %>
+          <p style="color: var(--impd-ink2); font-size: 15px; line-height: 1.6;">아직 방문이 적어요. 명함 QR이나 내 페이지 주소를 고객에게 보내면 늘어나요.</p>
           <div style="display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
-            <button type="button" class="impd-btn impd-btn-secondary" onclick="navigator.clipboard.writeText(window.location.origin + '/<%= @member.slug %>'); this.textContent='복사됨'">링크 복사</button>
+            <button type="button" class="impd-btn impd-btn-secondary" data-page-path="<%= public_profile_path(slug: @member.slug) %>"
+                    onclick="navigator.clipboard.writeText(window.location.origin + this.dataset.pagePath).then(() => { this.textContent = '복사했어요' })">주소 복사</button>
             <%= link_to "QR 저장", member_qr_path(slug: @member.slug, format: :svg), download: "#{@member.slug}-qr.svg", class: "impd-btn impd-btn-secondary" %>
           </div>
         <% else %>
-        <% max_val = [@bar_data.map(&:last).max, 1].max.to_f %>
-        <div class="dashboard-chart" style="display: flex; align-items: flex-end; gap: 6px; height: 160px;">
-          <% @bar_data.each_with_index do |(date, count), i| %>
-            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
-              <span style="font-family: var(--impd-font-mono); font-size: 9px; color: var(--impd-muted);"><%= count %></span>
-              <div style="width: 100%; background: <%= count > 0 ? 'var(--impd-accent)' : 'var(--impd-rule)' %>; height: <%= [(count.to_f / max_val * 100).round, 4].max %>%; margin-top: 2px;" title="<%= date %>: <%= count %>"></div>
-              <span style="font-family: var(--impd-font-mono); font-size: 9px; color: var(--impd-muted); margin-top: 4px;"><%= date.strftime("%-m월 %-d일") %></span>
-            </div>
-          <% end %>
-        </div>
-        <p class="impd-label-muted" style="margin-top: 12px; text-align: right;">오늘 <%= @today_visits %>명 · 평균 <%= (@bar_data.map(&:last).sum.to_f / @bar_data.size).round %>명/일</p>
+          <% max_val = @bar_data.map(&:last).max.to_f %>
+          <div class="dashboard-chart" style="display: flex; align-items: flex-end; gap: 6px; min-height: 160px;">
+            <% @bar_data.each do |date, count| %>
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                <span style="font-size: 11px; color: var(--impd-muted);"><%= count %></span>
+                <div style="width: 100%; background: <%= count.positive? ? 'var(--impd-accent)' : 'var(--impd-rule)' %>; height: <%= [(count / max_val * 120).round, 4].max %>px; margin-top: 2px;" title="<%= date %>: <%= count %>회"></div>
+                <span class="dashboard-chart-date" style="font-size: 11px; color: var(--impd-muted); margin-top: 4px;"><%= date.strftime("%-m/%-d") %></span>
+              </div>
+            <% end %>
+          </div>
+          <p class="impd-label-muted" style="margin-top: 12px; text-align: right;">오늘 <%= number_with_delimiter(@today_visits) %>회 · 하루 평균 <%= number_with_precision(fourteen_total.fdiv(@bar_data.size), precision: 1, strip_insignificant_zeros: true, delimiter: ",") %>회</p>
         <% end %>
+        <%= link_to "주별 흐름은 '내 브랜드'에서 보기 →", slug_admin_brand_path(slug: @member.slug), style: "display: inline-flex; align-items: center; min-height: 44px; margin-top: 8px; color: var(--impd-accent); text-decoration: underline;" %>
       </div>
 
-      <!-- Inquiries -->
-      <div style="background: #fff; border: 1px solid var(--impd-rule); padding: 24px; margin-top: 16px;">
-        <div class="impd-section-header" style="margin-bottom: 16px;">
-          <span class="impd-display" style="font-size: 24px; flex: 1;">최근 문의</span>
-          <span class="impd-label-muted"><%= @recent_inquiries.size %>건</span>
-          <%= link_to "문의함 보기", slug_admin_inquiries_path(slug: @member.slug), style: "color: var(--impd-accent); font-size: 13px; font-weight: 600;" %>
+      <section aria-labelledby="recent-inquiries-title" style="background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 24px; margin-top: 16px;">
+        <div class="impd-section-header" style="margin-bottom: 16px; flex-wrap: wrap; gap: 4px 12px;">
+          <h2 id="recent-inquiries-title" class="impd-display" style="font-size: 24px; flex: 1 0 auto;">최근 문의</h2>
+          <% if @unread_inquiries.positive? %>
+            <span style="color: var(--impd-accent); font-weight: 700;">새 문의 <%= @unread_inquiries %>건</span>
+          <% end %>
+          <%= link_to "문의함 보기", slug_admin_inquiries_path(slug: @member.slug), style: "display: inline-flex; align-items: center; min-height: 44px; color: var(--impd-accent); font-size: 13px; font-weight: 600;" %>
         </div>
         <% if @recent_inquiries.any? %>
           <div style="display: grid; gap: 12px;">
             <% @recent_inquiries.each do |inq| %>
-              <div style="border-left: 3px solid <%= inq.is_read.to_i.positive? ? 'var(--impd-rule)' : 'var(--impd-accent)' %>; padding-left: 16px; padding: 12px 16px; background: <%= inq.is_read.to_i.positive? ? 'transparent' : 'var(--impd-card)' %>;">
-                <div style="display: flex; justify-content: space-between;">
-                  <p style="font-weight: 600;"><%= inq.sender_name %></p>
+              <% unread = inq.is_read.to_i.zero? %>
+              <%= link_to slug_admin_inquiries_path(slug: @member.slug, anchor: "inquiry-#{inq.id}"),
+                style: "display: block; min-height: 44px; color: inherit; text-decoration: none; border-left: 3px solid #{unread ? 'var(--impd-accent)' : 'var(--impd-rule)'}; padding: 12px 16px; background: #{unread ? 'var(--impd-paper)' : 'transparent'};" do %>
+                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px;">
+                  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 9px;">
+                    <p style="font-weight: 600;"><%= inq.sender_name %></p>
+                    <% if unread %>
+                      <span style="border: 1px solid var(--impd-accent); color: var(--impd-accent); padding: 3px 7px; font-size: 12px; font-weight: 600;">새 문의</span>
+                    <% end %>
+                  </div>
                   <p class="impd-label-muted"><%= inq.created_at.in_time_zone("Asia/Seoul").strftime("%m.%d %H:%M") %></p>
                 </div>
                 <p style="margin-top: 4px; font-size: 13px; color: var(--impd-ink2);"><%= truncate(inq.message, length: 100) %></p>
-              </div>
+              <% end %>
             <% end %>
           </div>
         <% else %>
           <p style="text-align: center; padding: 32px; color: var(--impd-muted); font-size: 14px;">아직 받은 문의가 없어요.</p>
         <% end %>
-      </div>
+      </section>
     </div>
 
     <aside class="dashboard-overview" aria-labelledby="page-overview-title">
@@ -280,6 +296,7 @@
   .dashboard-stat-value { font-family: var(--impd-font-display); font-size: 48px; font-weight: 800; line-height: 1; margin-top: 8px; color: var(--impd-accent); }
   .dashboard-stat-pending { font-size: 22px; color: var(--impd-muted); line-height: 48px; }
   .dashboard-stat-value a { display: inline-block; min-width: 44px; color: inherit; text-decoration: none; }
+  .dashboard-chart-date { white-space: nowrap; }
   .dashboard-grid, .dashboard-grid * { min-width: 0; overflow-wrap: anywhere; }
   @media (max-width: 900px) {
     .dashboard-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 0 !important; }
@@ -290,6 +307,9 @@
     .profile-accounts-grid { grid-template-columns: minmax(0, 1fr) !important; }
     .dashboard-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; margin-bottom: 24px !important; }
     .dashboard-chart { gap: 2px !important; }
-    .dashboard-chart span { font-size: 8px !important; }
+    .dashboard-chart span { font-size: 10px !important; }
+  }
+  @media (max-width: 720px) {
+    .dashboard-chart > div:nth-child(odd) .dashboard-chart-date { visibility: hidden; }
   }
 </style>

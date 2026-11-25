@@ -80,7 +80,8 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :ok
     assert_select "button[type=submit][disabled]", count: 1
-    assert_includes response.body, "자기소개(20자 이상)·직업·이메일을 적으면 공개할 수 있어요."
+    assert_includes response.body, "공개하려면 아직 필요해요:"
+    assert_select "strong", text: "자기소개 20자 이상 · 직업"
     assert_select "a[href$='step=2#bio']", text: "내 정보 적으러 가기 →"
 
     @member.update!(bio: "스마트폰으로 영상 만드는 법을 가르치는 강사입니다.", profession: "educator", email: @member.email)
@@ -89,6 +90,51 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_response :ok
     assert_select "button[type=submit][disabled]", count: 0
     assert_select "button[type=submit]", text: "지금 공개하기"
+  end
+
+  test "직업만 빠졌으면 직업 입력 칸으로 안내한다" do
+    @member.update!(bio: "가" * 30)
+
+    get slug_admin_editor_path(slug: @member.slug, step: 4)
+
+    assert_response :ok
+    assert_select "p", text: "공개하려면 아직 필요해요: 직업" do
+      assert_select "strong", text: "직업"
+    end
+    assert_select "a[href$='#profession-region']", text: "내 정보 적으러 가기 →"
+  end
+
+  test "앞 단계로 돌아가도 마친 단계가 표시된다" do
+    @member.update!(bio: "가" * 30, profession: "educator")
+
+    get slug_admin_editor_path(slug: @member.slug, step: 1)
+
+    assert_response :ok
+    assert_select "a[href='?step=2']", text: /정보 확인.*\(마침\)/
+    assert_select "a[href='?step=1'][aria-current='step']"
+  end
+
+  test "자기소개 길이에 따라 공개와 준비 기준을 안내한다" do
+    {
+      10 => "20자를 넘기면 내 페이지를 공개할 수 있어요.",
+      30 => "공개할 수 있어요. 50자를 넘기면 준비 항목 '자기소개'가 채워져요.",
+      60 => "충분해요."
+    }.each do |length, hint|
+      @member.update!(bio: "가" * length)
+
+      get slug_admin_editor_path(slug: @member.slug, step: 2)
+
+      assert_response :ok
+      assert_select "#member_bio_count", text: "#{length} / 200자 · #{hint}"
+      assert_not_includes response.body, "50자 이상 권장"
+    end
+  end
+
+  test "정보를 저장하면 스타일을 고르도록 안내한다" do
+    patch slug_admin_editor_update_info_path(slug: @member.slug), params: { member: { bio: "가" * 30 } }
+
+    assert_redirected_to slug_admin_editor_path(slug: @member.slug, step: 3)
+    assert_equal "내 정보를 저장했어요. 이제 스타일을 골라 주세요.", flash[:notice]
   end
 
   test "올릴 수 없는 문서는 글 파일로 저장하는 방법을 안내한다" do
