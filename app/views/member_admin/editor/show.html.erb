@@ -183,11 +183,13 @@
     </div>
 
   <% elsif @step == 3 %>
+    <% current_theme_key = ThemePreset.find(@member.theme_preset) ? @member.theme_preset : "editorial" %>
+    <% current_layout_key = LayoutPreset.find(@member.layout_preset) ? @member.layout_preset : "editorial" %>
     <!-- ── Step 3: 스타일 선택 (5개 스타일) ───────────── -->
     <div class="impd-section-header">
       <span class="impd-label">스타일</span>
       <h1 class="impd-display" style="font-size: 36px; flex: 1; margin: 0;">스타일 선택</h1>
-      <span class="impd-label-muted"><%= (ThemePreset.find(@member.theme_preset)&.dig(:name)).then { |n| n ? "지금: #{n}" : "아직 고르지 않았어요 · 아래에서 하나를 눌러 주세요" } %></span>
+      <span class="impd-label-muted"><%= (ThemePreset.find(@member.theme_preset)&.dig(:name)).then { |n| n ? "지금: #{n}" : "지금: 잡지형 (기본)" } %></span>
     </div>
 
     <p style="font-size: 15px; color: var(--impd-ink2); margin-bottom: 24px; max-width: 60ch;">
@@ -198,11 +200,11 @@
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
         <% @presets.each do |p| %>
           <label style="cursor: pointer; display: block;">
-            <input type="radio" name="theme_preset" value="<%= p[:key] %>" <%= "checked" if @member.theme_preset == p[:key] %> style="position: absolute; opacity: 0;" class="theme-radio">
+            <input type="radio" name="theme_preset" value="<%= p[:key] %>" <%= "checked" if current_theme_key == p[:key] %> style="position: absolute; opacity: 0;" class="theme-radio">
             <div class="theme-card" style="background: <%= p[:paper] %>; color: <%= p[:ink] %>; border: 1px solid var(--impd-rule); padding: 20px; min-height: 180px; display: flex; flex-direction: column; justify-content: space-between; transition: all .15s;">
               <div>
                 <div style="font-family: var(--impd-font-sans); font-size: 13px; color: <%= p[:accent] %>;">
-                  <%= "사용 중" if @member.theme_preset == p[:key] %>
+                  <%= "사용 중" if current_theme_key == p[:key] %>
                 </div>
                 <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 28px; letter-spacing: -0.5px; line-height: 1; margin-top: 8px;">
                   <%= p[:name] %>
@@ -221,27 +223,20 @@
         <% end %>
       </div>
 
-      <button type="submit" class="impd-btn impd-btn-primary" style="margin-top: 28px; height: 52px; padding: 0 28px; font-size: 15px;">
-        이 스타일로 저장하고 다음 →
-      </button>
-      <p class="impd-label-muted" style="margin-top: 10px;">카드를 누른 뒤 이 버튼을 눌러야 저장돼요.</p>
-    <% end %>
+      <div class="impd-section-header" style="margin-top: 48px;">
+        <span class="impd-label">페이지 구성</span>
+        <span class="impd-display" style="font-size: 28px; flex: 1;">내용을 어떻게 늘어놓을까요</span>
+        <span class="impd-label-muted">지금: <%= LayoutPreset.find(@member.layout_preset)&.dig(:name) || "길게 읽는 형" %></span>
+      </div>
 
-    <div class="impd-section-header" style="margin-top: 48px;">
-      <span class="impd-label">페이지 구성</span>
-      <span class="impd-display" style="font-size: 28px; flex: 1;">내용을 어떻게 늘어놓을까요</span>
-      <span class="impd-label-muted">지금: <%= LayoutPreset.find(@member.layout_preset)&.dig(:name) || "길게 읽는 형" %></span>
-    </div>
-
-    <%= form_with url: slug_admin_editor_update_layout_path(slug: @member.slug), method: :patch, local: true, data: { turbo: false } do |f| %>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
         <% @layout_presets.each do |p| %>
           <label style="cursor: pointer; display: block;">
-            <input type="radio" name="layout_preset" value="<%= p[:key] %>" <%= "checked" if @member.layout_preset == p[:key] %> style="position: absolute; opacity: 0;" class="layout-radio">
+            <input type="radio" name="layout_preset" value="<%= p[:key] %>" <%= "checked" if current_layout_key == p[:key] %> style="position: absolute; opacity: 0;" class="layout-radio">
             <div class="layout-card" style="background: var(--impd-card); color: var(--impd-ink); border: 1px solid var(--impd-rule); padding: 20px; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; transition: all .15s;">
               <div>
                 <div style="font-family: var(--impd-font-sans); font-size: 13px; color: var(--impd-accent);">
-                  <%= "사용 중" if @member.layout_preset == p[:key] %>
+                  <%= "사용 중" if current_layout_key == p[:key] %>
                 </div>
                 <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 28px; letter-spacing: -0.5px; line-height: 1; margin-top: 8px;">
                   <%= p[:name] %>
@@ -257,9 +252,10 @@
         <% end %>
       </div>
 
-      <button type="submit" class="impd-btn impd-btn-primary" style="margin-top: 20px; height: 46px; padding: 0 24px; font-size: 14px;">
-        이 구성으로 저장
+      <button type="submit" class="impd-btn impd-btn-primary" style="margin-top: 28px; height: 52px; padding: 0 28px; font-size: 15px;">
+        이 스타일로 저장하고 다음 →
       </button>
+      <p class="impd-label-muted" style="margin-top: 10px;">스타일과 구성을 고른 뒤 이 버튼을 한 번만 누르면 함께 저장돼요.</p>
     <% end %>
 
   <% else %>
@@ -301,11 +297,7 @@
           <% end %>
         </ul>
         <p class="impd-label-muted" style="margin-top: 14px;">
-          <% if (theme_name = ThemePreset.find(@member.theme_preset)&.dig(:name)) %>
-            스타일: <%= theme_name %> · <a href="?step=3">바꾸기</a>
-          <% else %>
-            스타일을 아직 고르지 않았어요 · <a href="?step=3">고르러 가기</a>
-          <% end %>
+          스타일: <%= ThemePreset.find(@member.theme_preset)&.dig(:name) || "잡지형 (기본)" %> · <a href="?step=3" style="color: var(--impd-accent); text-decoration: underline; display: inline-flex; align-items: center; min-height: 44px;">바꾸기</a>
         </p>
       </div>
 
@@ -394,6 +386,8 @@
     .editor-upload-card { grid-column: 2; grid-row: 1 / span 2; }
   }
   @media (max-width: 768px) {
+    .editor-page .impd-section-header > .impd-display { flex: 1 1 100% !important; font-size: 28px !important; word-break: keep-all; }
+    .editor-page .impd-section-header > .impd-label-muted { flex: 1 1 100%; }
     .editor-upload-grid { grid-template-rows: auto !important; }
     .editor-intro h1 { font-size: 32px !important; line-height: 1.15 !important; margin-top: 10px !important; }
     .editor-br-wide { display: none; }

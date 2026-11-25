@@ -19,6 +19,7 @@ class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
     get slug_admin_brand_path(slug: @member.slug)
     assert_response :success
     assert_includes response.body, "/kang-seung-sig/brand"
+    assert_includes response.body, "고객도 볼 수 있는 내 활동 화면이 따로 있어요."
     assert_not_includes response.body, "/slug/brand"
     assert_includes response.body, "아직 등록된 브랜드가 없어요"
     assert_includes response.body, "브랜드는 운영팀이 등록을 도와드려요"
@@ -87,5 +88,35 @@ class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
     assert_select "article.impd-card", text: /빈 브랜드.*업종·지역·소개가 아직 비어 있어요/m
     assert_select "article.impd-card", text: /업종이 있는 브랜드.*업종·지역·소개가 아직 비어 있어요/m, count: 0
+  end
+
+  test "개인 브랜드가 비어 있으면 내 페이지 정보를 보여 준다" do
+    @member.update!(region: "성남", bio: "소상공인 홍보를 돕습니다. " * 3)
+    Brand.create!(name: "개인", member_id: @member.id, personal: true)
+
+    get slug_admin_brand_path(slug: @member.slug)
+
+    assert_response :ok
+    assert_select "article.impd-card" do |cards|
+      assert_includes cards.first.text, "지역: 성남"
+      assert_includes cards.first.text, "소상공인 홍보를 돕습니다."
+      assert_includes cards.first.text, "내 페이지에 적은 정보를 그대로 써요."
+      assert_not_includes cards.first.text, "직업: custom"
+      assert_not_includes cards.first.text, "업종·지역·소개가 아직 비어 있어요"
+      assert_select "a[href=?]", slug_admin_editor_path(slug: @member.slug, step: 2), text: "내 정보 고치기"
+    end
+  end
+
+  test "개인 브랜드도 내 정보도 비어 있으면 적으러 가게 안내한다" do
+    @member.update_columns(profession: nil, region: nil, bio: nil)
+    Brand.create!(name: "개인", member_id: @member.id, personal: true)
+
+    get slug_admin_brand_path(slug: @member.slug)
+
+    assert_response :ok
+    assert_select "article.impd-card" do
+      assert_select "p", text: "아직 직업·지역·소개를 적지 않았어요. 적어 두면 운영팀이 홍보할 때 그대로 써요."
+      assert_select "a[href=?]", slug_admin_editor_path(slug: @member.slug, step: 2, anchor: "bio"), text: "내 정보 적으러 가기"
+    end
   end
 end

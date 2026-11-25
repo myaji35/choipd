@@ -48,7 +48,9 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
     visit_dashboard
 
     assert_select "#profile-accounts-status article:first-child" do
-      assert_select "p", text: "올릴 내용: 확정"
+      assert_select "details summary", text: "자세히 보기"
+      assert_select "details p", text: "올릴 내용: 확정"
+      assert_select "article > p", text: "운영팀이 준비하고 있어요. 끝나면 여기에 표시돼요."
       assert_select "p", text: "맡긴 계정: 아직 등록 안 됨"
       assert_select "ol li", text: /✓ 계정 맡기기/
       assert_select "ol li", text: /○ 로그인 확인/
@@ -60,7 +62,11 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
       assert_select "p", text: "맡긴 계정: ka***@example.com"
       assert_select "ol li", text: /✓/, count: 3
       assert_select "span", text: "로그인됨"
-      assert_select "p", text: "운영팀이 마지막으로 확인: 2일 전"
+      assert_select "details:not([open])" do
+        assert_select "summary", text: "자세히 보기"
+        assert_select "p", text: "운영팀이 마지막으로 확인: 2일 전"
+      end
+      assert_select "article > p", text: "운영팀이 관리하고 있어요. 따로 하실 일은 없어요."
       assert_select "p", text: /\bdays\b/, count: 0
       assert_select "p", text: /프로필 완성도 \d+%/
       assert_select "progress[max='100'][value]"
@@ -94,7 +100,7 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
       visit_dashboard
 
       assert_select "#profile-accounts-status span", text: "오류"
-      assert_select "#profile-accounts-status p", text: "운영자가 확인 중이에요"
+      assert_select "#profile-accounts-status p", text: "로그인에 문제가 있어 운영팀이 확인하고 있어요. 따로 하실 일은 없어요."
       assert_select "#profile-accounts-status progress", count: 0
       assert_select "#profile-accounts-status a", text: "프로필 열기 ↗", count: 0
       assert_not_includes response.body, account.last_error

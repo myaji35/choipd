@@ -7,10 +7,21 @@ class MemberAdminDashboardUxTest < ActionDispatch::IntegrationTest
     get slug_admin_dashboard_path(slug: member.slug)
     assert_response :success
     assert_includes response.body, "다음 할 일"
-    assert_includes response.body, "전체 체크리스트"
+    assert_select "details summary", text: /준비 항목 \d+개 중 \d+개 마쳤어요 · 전체 보기/
     %w[내\ 페이지 고객 홍보].each { |heading| assert_includes response.body, heading }
     assert_not_includes response.body, "예시 페이지"
     assert_includes response.body, "아직 방문이 적어요"
+  end
+
+  test "휴대폰에서는 다음 할 일 바로 아래에 내 페이지 한눈에가 온다" do
+    member = create_overview_member
+    get slug_admin_dashboard_path(slug: member.slug)
+
+    assert_response :ok
+    assert_select ".dashboard-grid > .dashboard-main > section.dashboard-next"
+    assert_select ".dashboard-grid > aside.dashboard-overview"
+    assert_includes response.body, ".dashboard-main { display: contents; }"
+    assert_includes response.body, ".dashboard-overview { order: 2;"
   end
 
   test "SNS 팔로워 집계를 기다리는 이유와 숫자 띠 바로가기를 보여 준다" do

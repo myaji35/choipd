@@ -55,13 +55,13 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
   test "공개 단계의 준비 항목은 대시보드와 같다" do
     get slug_admin_dashboard_path(slug: @member.slug)
     assert_response :ok
-    dashboard_count = css_select("summary").map(&:text).filter_map { |text| text[/전체 체크리스트 (\d+\/6)/, 1] }.first
+    dashboard_count = css_select("summary").map(&:text).filter_map { |text| text[/준비 항목 6개 중 (\d+)개 마쳤어요/, 1] }.first
     assert dashboard_count
 
     get slug_admin_editor_path(slug: @member.slug, step: 4)
     assert_response :ok
     assert_select "h2.impd-label", text: "내 페이지 준비 항목"
-    assert_select "span.impd-display", text: dashboard_count
+    assert_select "span.impd-display", text: "#{dashboard_count}/6"
     MemberAdmin::ChecklistHelper::CHECKLIST_LABELS.values.each do |label|
       assert_select "li", text: /#{Regexp.escape(label)}/
     end
@@ -106,8 +106,51 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_select "a.impd-btn-primary", text: /다음/, count: 0
     assert_select "a.editor-skip-link[href='?step=4']", text: /저장하지 않고 다음 단계 보기/
     assert_includes response.body, "골랐어요"
-    assert_includes response.body, "카드를 누른 뒤 이 버튼을 눌러야 저장돼요."
+    assert_includes response.body, "스타일과 구성을 고른 뒤 이 버튼을 한 번만 누르면 함께 저장돼요."
+    assert_select "form[action=?]", slug_admin_editor_update_style_path(slug: @member.slug), count: 1 do
+      assert_select "button[type=submit]", count: 1
+    end
+    assert_select "form[action=?]", slug_admin_editor_update_layout_path(slug: @member.slug), count: 0
+    assert_select "input[name=theme_preset][value=editorial][checked]"
+    assert_select "input[name=layout_preset][value=editorial][checked]"
+    assert_not_includes response.body, "아직 고르지 않았어요"
+    assert_includes response.body, "지금: 잡지형 (기본)"
     assert_not_includes response.body, "에디토리얼"
+  end
+
+  test "스타일과 구성을 한 번에 저장한다" do
+    patch slug_admin_editor_update_style_path(slug: @member.slug), params: { theme_preset: "warm", layout_preset: "grid" }
+
+    assert_response :redirect
+    query = Rack::Utils.parse_query(URI.parse(response.location).query)
+    assert_equal "4", query["step"]
+    assert_includes query["notice"], "'따뜻한' 스타일과 '카드 모음형' 구성으로 저장했어요"
+    @member.reload
+    assert_equal "warm", @member.theme_preset
+    assert_equal "grid", @member.layout_preset
+  end
+
+  test "구성 값이 틀리면 스타일만 저장한다" do
+    @member.update!(layout_preset: "grid")
+
+    patch slug_admin_editor_update_style_path(slug: @member.slug), params: { theme_preset: "warm", layout_preset: "nope" }
+
+    assert_response :redirect
+    query = Rack::Utils.parse_query(URI.parse(response.location).query)
+    assert_equal "4", query["step"]
+    assert_equal "'따뜻한' 스타일로 저장했어요. 이제 공개만 하면 돼요.", query["notice"]
+    @member.reload
+    assert_equal "warm", @member.theme_preset
+    assert_equal "grid", @member.layout_preset
+  end
+
+  test "스타일을 저장한 적 없으면 4단계에서 기본 스타일을 알려 준다" do
+    get slug_admin_editor_path(slug: @member.slug, step: 4)
+
+    assert_response :ok
+    assert_includes response.body, "스타일: 잡지형 (기본)"
+    assert_not_includes response.body, "스타일을 아직 고르지 않았어요"
+    assert_select "a[href='?step=3']", text: "바꾸기"
   end
 
   test "스타일을 고르지 않고 저장하면 선택 방법을 안내한다" do

@@ -4,7 +4,7 @@
   <!-- Masthead -->
   <div style="margin-bottom: 32px;">
     <p class="impd-label">대시보드</p>
-    <h1 class="impd-display" style="font-size: 56px; margin-top: 12px;">
+    <h1 class="impd-display" style="font-size: clamp(32px, 9vw, 56px); margin-top: 12px; word-break: keep-all;">
       안녕하세요, <span style="color: var(--impd-accent); font-style: italic;"><%= @member.name %></span>님.
     </h1>
     <p style="margin-top: 12px; font-size: 16px; color: var(--impd-ink2);">
@@ -14,25 +14,25 @@
 
   <div style="display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 40px;" class="dashboard-grid">
     <!-- Main 영역 -->
-    <div>
+    <div class="dashboard-main">
       <% next_item = @checklist.find { |item| !item[:done] } %>
-      <section style="background: #fff; border: 1px solid var(--impd-rule); padding: 24px; margin-bottom: 24px;">
+      <section class="dashboard-next" style="background: #fff; border: 1px solid var(--impd-rule); padding: 24px; margin-bottom: 24px;">
         <p class="impd-label">다음 할 일</p>
         <% if next_item %>
           <h2 style="font-size: 24px; margin-top: 10px;"><%= next_item[:label] %></h2>
           <p style="font-size: 14px; color: var(--impd-muted); margin: 8px 0 18px;"><%= next_item[:why] %></p>
           <%= link_to next_item[:action], next_item[:path], class: "impd-btn impd-btn-accent" %>
         <% else %>
-          <p style="margin-top: 10px;">체크리스트를 모두 완료했어요.</p>
+          <p style="margin-top: 10px;">준비 항목을 모두 마쳤어요. 이제 주소를 고객에게 보내 보세요.</p>
         <% end %>
-        <details style="margin-top: 20px; font-size: 13px;">
-          <summary style="cursor: pointer;">전체 체크리스트 <%= @checklist.count { |item| item[:done] } %>/<%= @checklist.size %></summary>
+        <details style="margin-top: 20px; font-size: 14px;">
+          <summary style="cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: 6px;">준비 항목 <%= @checklist.size %>개 중 <%= @checklist.count { |item| item[:done] } %>개 마쳤어요 · 전체 보기</summary>
           <ul style="list-style: none; padding: 8px 0 0;">
             <% @checklist.each do |item| %>
               <li style="padding: 6px 0;">
                 <%= lni_icon(item[:done] ? "check-circle-1" : "question-mark-circle") %> <%= item[:label] %>
                 <% unless item[:done] %>
-                  · <%= link_to item[:action], item[:path] %>
+                  · <%= link_to item[:action], item[:path], style: "display: inline-flex; align-items: center; min-height: 44px; color: var(--impd-accent); text-decoration: underline;" %>
                 <% end %>
               </li>
             <% end %>
@@ -53,6 +53,23 @@
             <% accounts_by_platform.fetch(platform, [nil]).each do |account| %>
               <% target = account&.naver_people_target %>
               <% latest_snapshot = account&.profile_snapshots&.max_by { |snapshot| [snapshot.captured_at || snapshot.created_at, snapshot.id] } %>
+              <% steps = [
+                ["계정 맡기기", account.present?],
+                ["로그인 확인", account&.session_status == "logged_in"],
+                ["내용 손보기", (naver ? target : latest_snapshot).present?]
+              ] %>
+              <% progress_steps = capture do %>
+                <ol aria-label="<%= registration_label %> 진행 상태" style="display: flex; flex-wrap: wrap; gap: 4px 8px; list-style: none; padding: 0; margin: <%= account ? 10 : 12 %>px 0 0; font-size: 12px; color: var(--impd-muted);">
+                  <% steps.each_with_index do |(step, complete), index| %>
+                    <li style="white-space: nowrap; color: var(<%= complete ? '--impd-accent' : '--impd-muted' %>);">
+                      <%= complete ? "✓" : "○" %> <%= step %>
+                      <% if index < steps.size - 1 %>
+                        <span aria-hidden="true" style="color: var(--impd-muted); margin-left: 4px;">→</span>
+                      <% end %>
+                    </li>
+                  <% end %>
+                </ol>
+              <% end %>
               <article style="border: 1px solid var(--impd-rule); padding: 16px; font-size: 14px;">
                 <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;">
                   <p class="impd-label-muted"><%= account&.platform_label || label %></p>
@@ -64,36 +81,46 @@
 
                 <% if account %>
                   <h3 style="font-size: 16px; margin-top: 8px;"><%= account.display_name %></h3>
-                  <p style="color: var(--impd-muted);">맡긴 계정: <%= masked_login_id(account.login_id) || "아직 등록 안 됨" %></p>
                   <% if account.headline.present? %>
                     <p style="color: var(--impd-ink2);"><%= account.headline %></p>
                   <% end %>
-                  <div style="display: grid; gap: 4px; margin-top: 8px; color: var(--impd-muted); font-size: 13px;">
-                    <p>운영팀이 마지막으로 확인: <%= account.last_checked_at ? korean_time_ago(account.last_checked_at) : "아직 확인 전" %></p>
-                    <% if latest_snapshot %>
-                      <p>프로필 내용을 가져온 날: <%= (latest_snapshot.captured_at || latest_snapshot.created_at).in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %></p>
-                    <% end %>
-                    <% if platform == "linkedin" %>
-                      <% score = linkedin_completeness_score(latest_snapshot) %>
-                      <% unless score.nil? %>
-                        <p>프로필 완성도 <%= score %>%</p>
-                        <progress max="100" value="<%= score %>" aria-label="프로필 완성도" style="width: 100%; accent-color: var(--impd-accent);"></progress>
-                      <% end %>
-                    <% elsif platform == "naver_people" %>
-                      <% if target %>
-                        <p>올릴 내용: <%= target.status == "approved" ? "확정" : "준비 중" %></p>
-                      <% end %>
-                      <% if (submission = account.naver_people_submissions.max_by { |item| [item.created_at, item.id] }) %>
-                        <p>네이버에 고쳐 달라고 한 날: <%= submission.created_at.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %> (<%= NaverPeopleSubmission::STATUS_LABELS[submission.status] %>)</p>
-                      <% end %>
-                    <% end %>
+                  <%= progress_steps %>
+                  <p style="margin-top: 10px; font-size: 14px; color: <%= account.session_status == "error" ? status_color : "var(--impd-ink2)" %>;">
                     <% if account.session_status == "error" %>
-                      <p style="color: #b42318;">운영자가 확인 중이에요</p>
+                      로그인에 문제가 있어 운영팀이 확인하고 있어요. 따로 하실 일은 없어요.
+                    <% elsif steps.all?(&:last) %>
+                      운영팀이 관리하고 있어요. 따로 하실 일은 없어요.
+                    <% else %>
+                      운영팀이 준비하고 있어요. 끝나면 여기에 표시돼요.
                     <% end %>
-                  </div>
+                  </p>
                   <% if (url = http_url(account.profile_url)) %>
-                    <p style="margin-top: 8px;"><%= link_to "프로필 열기 ↗", url, target: "_blank", rel: "noopener", style: "color: var(--impd-accent);" %></p>
+                    <p style="margin-top: 8px;"><%= link_to "프로필 열기 ↗", url, target: "_blank", rel: "noopener", style: "color: var(--impd-accent); display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline;" %></p>
                   <% end %>
+                  <details>
+                    <summary style="cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--impd-muted); font-size: 13px;">자세히 보기</summary>
+                    <div style="display: grid; gap: 4px; margin-top: 8px; color: var(--impd-muted); font-size: 13px;">
+                      <p style="color: var(--impd-muted);">맡긴 계정: <%= masked_login_id(account.login_id) || "아직 등록 안 됨" %></p>
+                      <p>운영팀이 마지막으로 확인: <%= account.last_checked_at ? korean_time_ago(account.last_checked_at) : "아직 확인 전" %></p>
+                      <% if latest_snapshot %>
+                        <p>프로필 내용을 가져온 날: <%= (latest_snapshot.captured_at || latest_snapshot.created_at).in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %></p>
+                      <% end %>
+                      <% if platform == "linkedin" %>
+                        <% score = linkedin_completeness_score(latest_snapshot) %>
+                        <% unless score.nil? %>
+                          <p>프로필 완성도 <%= score %>%</p>
+                          <progress max="100" value="<%= score %>" aria-label="프로필 완성도" style="width: 100%; accent-color: var(--impd-accent);"></progress>
+                        <% end %>
+                      <% elsif platform == "naver_people" %>
+                        <% if target %>
+                          <p>올릴 내용: <%= target.status == "approved" ? "확정" : "준비 중" %></p>
+                        <% end %>
+                        <% if (submission = account.naver_people_submissions.max_by { |item| [item.created_at, item.id] }) %>
+                          <p>네이버에 고쳐 달라고 한 날: <%= submission.created_at.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %> (<%= NaverPeopleSubmission::STATUS_LABELS[submission.status] %>)</p>
+                        <% end %>
+                      <% end %>
+                    </div>
+                  </details>
                 <% else %>
                   <h3 style="font-size: 16px; margin-top: 8px;"><%= registration_label %> 전</h3>
                   <p style="color: var(--impd-muted); margin-top: 4px;">
@@ -106,21 +133,7 @@
                   <% management_path = account ? pd_profile_account_path(account) : new_pd_profile_account_path(member_id: @member.id) %>
                   <p style="margin-top: 8px;"><%= link_to "관리 화면에서 열기", management_path, style: "color: var(--impd-accent); font-size: 12px;" %></p>
                 <% end %>
-                <% steps = [
-                  ["계정 맡기기", account.present?],
-                  ["로그인 확인", account&.session_status == "logged_in"],
-                  ["내용 손보기", (naver ? target : latest_snapshot).present?]
-                ] %>
-                <ol aria-label="<%= registration_label %> 진행 상태" style="display: flex; flex-wrap: wrap; gap: 4px 8px; list-style: none; padding: 0; margin: 12px 0 0; font-size: 12px; color: var(--impd-muted);">
-                  <% steps.each_with_index do |(step, complete), index| %>
-                    <li style="white-space: nowrap; color: var(<%= complete ? '--impd-accent' : '--impd-muted' %>);">
-                      <%= complete ? "✓" : "○" %> <%= step %>
-                      <% if index < steps.size - 1 %>
-                        <span aria-hidden="true" style="color: var(--impd-muted); margin-left: 4px;">→</span>
-                      <% end %>
-                    </li>
-                  <% end %>
-                </ol>
+                <%= progress_steps unless account %>
               </article>
             <% end %>
           <% end %>
@@ -269,9 +282,13 @@
   .dashboard-stat-value a { display: inline-block; min-width: 44px; color: inherit; text-decoration: none; }
   .dashboard-grid, .dashboard-grid * { min-width: 0; overflow-wrap: anywhere; }
   @media (max-width: 900px) {
-    .dashboard-grid { grid-template-columns: minmax(0, 1fr) !important; }
+    .dashboard-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 0 !important; }
+    .dashboard-main { display: contents; }
+    .dashboard-main > * { order: 3; }
+    .dashboard-main > .dashboard-next { order: 1; }
+    .dashboard-overview { order: 2; margin-bottom: 24px; }
     .profile-accounts-grid { grid-template-columns: minmax(0, 1fr) !important; }
-    .dashboard-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    .dashboard-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; margin-bottom: 24px !important; }
     .dashboard-chart { gap: 2px !important; }
     .dashboard-chart span { font-size: 8px !important; }
   }

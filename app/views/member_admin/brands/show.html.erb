@@ -16,8 +16,8 @@
         <section class="ops-surface-card"><p><%= label %></p><strong><%= number_with_delimiter(stat[:value]) %><%= unit %></strong><p><%= delta.zero? ? "그전 4주와 같아요" : "그전 4주보다 #{number_with_delimiter(delta.abs)}#{unit} #{delta.positive? ? '늘었어요' : '줄었어요'}" %></p></section>
       <% end %>
     </div>
-    <p style="margin:12px 0;">최근 12주 활동이에요.</p>
-    <%= ops_line_chart @series, keys: %i[visits inquiries posts sns_posts], labels: ["방문", "문의 건수", "게시", "SNS 발행"] %>
+    <p style="margin:12px 0;">아래 그래프는 최근 12주 동안의 흐름이에요.</p>
+    <%= ops_line_chart @series, keys: %i[visits inquiries posts sns_posts], labels: ["방문", "문의", "게시", "SNS 발행"] %>
     <details style="margin-top: 16px;">
       <summary style="cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--impd-accent); font-weight: 600;">이 숫자는 누가 볼 수 있나요?</summary>
       <p style="margin-top:12px;line-height:1.7;">공개 페이지(<%= member_brand_ops_path(slug: @member.slug) %>)에는 주간 방문·게시 그래프, 최근 4주 문의 수(1~2건은 '3건 미만'), 연결 매체, 최근 게시물 제목만 보여요. 문의 내용·연락처·방문자 정보는 공개하지 않아요.</p>
@@ -25,9 +25,15 @@
       <p style="margin-top:12px;padding:12px;background:var(--impd-paper);">공개 상태: <% if brand_ops_public? %>공개 중<% if brand_ops_gate[:reason] == "early" %> (회원 <%= brand_ops_gate[:members_threshold] %>명 전까지는 항상 공개 — 지금 <%= brand_ops_gate[:members_total] %>명)<% end %><% else %>아직 비공개 (imPD 전체 활성 회원 <%= brand_ops_gate[:active] %>/<%= brand_ops_gate[:active_required] %>명 · 최근 4주 소통 <%= brand_ops_gate[:communication_4w] %>/<%= brand_ops_gate[:communication_required] %>건이 되면 자동 공개) · 회원 <%= brand_ops_gate[:members_threshold] %>명 이상이라 기준을 적용 중<% end %></p>
     </details>
     <% if brand_ops_public? %>
-      <p class="impd-label-muted" style="margin-top: 12px;">고객에게 보이는 내 브랜드 활동 화면이에요.</p>
+      <p style="margin-top: 12px; font-size: 14px; color: var(--impd-ink2);">고객도 볼 수 있는 내 활동 화면이 따로 있어요. 방문·게시 그래프만 보이고, 문의 내용과 연락처는 보이지 않아요.</p>
+      <p style="margin-top: 12px;">
+        <% if @consented && @member.approved? %>
+          <%= link_to member_brand_ops_path(slug: @member.slug), class: "impd-btn impd-btn-secondary" do %>공개 페이지 보기 <%= lni_icon "arrow-right" %><% end %>
+        <% else %>
+          <%= link_to "공개하려면 노출 동의하기", slug_admin_brand_consents_path(slug: @member.slug), class: "impd-btn impd-btn-secondary" %>
+        <% end %>
+      </p>
     <% end %>
-    <% if brand_ops_public? %><p style="margin-top:12px;"><% if @consented && @member.approved? %><%= link_to member_brand_ops_path(slug: @member.slug), class: "impd-btn impd-btn-secondary" do %>공개 페이지 보기 <%= lni_icon "arrow-right" %><% end %><% else %><%= link_to "공개하려면 노출 동의하기", slug_admin_brand_consents_path(slug: @member.slug), class: "impd-btn impd-btn-secondary" %><% end %></p><% end %>
   </section>
 
   <section style="margin-bottom: 32px;">
@@ -76,7 +82,23 @@
           <% if (url = http_url(brand.website_url)) %>
             <p style="margin-top: 8px;"><%= link_to url, url, target: '_blank', rel: 'noopener', style: 'color: var(--impd-accent); text-decoration: underline; display: inline-flex; align-items: center; min-height: 44px; overflow-wrap: anywhere;' %></p>
           <% end %>
-          <% if industry_and_region.blank? && brand.description.blank? && brand.website_url.blank? %>
+          <% if brand.personal? && industry_and_region.blank? && brand.description.blank? %>
+            <% profession = @member.profession_label if @member.profession.present? %>
+            <% member_line = [["직업", profession == "custom" ? nil : profession], ["지역", @member.region]].filter_map { |label, value| "#{label}: #{value}" if value.present? }.join(" · ") %>
+            <% if member_line.present? || @member.bio.present? %>
+              <% if member_line.present? %>
+                <p style="margin-top: 8px;"><%= member_line %></p>
+              <% end %>
+              <% if @member.bio.present? %>
+                <p style="margin-top: 8px;"><%= truncate(@member.bio, length: 120) %></p>
+              <% end %>
+              <p class="impd-label-muted" style="margin-top: 8px;">내 페이지에 적은 정보를 그대로 써요.</p>
+              <%= link_to "내 정보 고치기", slug_admin_editor_path(slug: @member.slug, step: 2), class: "impd-btn impd-btn-secondary", style: "margin-top: 12px;" %>
+            <% else %>
+              <p class="impd-label-muted" style="margin-top: 8px;">아직 직업·지역·소개를 적지 않았어요. 적어 두면 운영팀이 홍보할 때 그대로 써요.</p>
+              <%= link_to "내 정보 적으러 가기", slug_admin_editor_path(slug: @member.slug, step: 2, anchor: "bio"), class: "impd-btn impd-btn-secondary", style: "margin-top: 12px;" %>
+            <% end %>
+          <% elsif industry_and_region.blank? && brand.description.blank? && brand.website_url.blank? %>
             <p class="impd-label-muted" style="margin-top: 8px;">업종·지역·소개가 아직 비어 있어요. 운영팀에 알려 주시면 채워 드려요 — <%= link_to '문의하기', new_inquiry_path, style: inquiry_link_style %></p>
           <% end %>
           <%= render "channels", brand: brand if @show_brand_channels %>

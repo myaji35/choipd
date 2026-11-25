@@ -51,8 +51,18 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
     key = params[:theme_preset].to_s
     preset = ThemePreset.find(key)
     if preset
-      @member.update!(theme_preset: key)
-      redirect_to action: :show, params: { slug: @member.slug, step: 4 }, notice: "'#{preset[:name]}' 스타일로 저장했어요. 이제 공개만 하면 돼요."
+      layout_key = params[:layout_preset].to_s
+      layout = LayoutPreset.find(layout_key)
+      attributes = { theme_preset: key }
+      attributes[:layout_preset] = layout_key if layout
+      @member.update!(attributes)
+
+      notice = if layout
+        "'#{preset[:name]}' 스타일과 '#{layout[:name]}' 구성으로 저장했어요. 이제 공개만 하면 돼요."
+      else
+        "'#{preset[:name]}' 스타일로 저장했어요. 이제 공개만 하면 돼요."
+      end
+      redirect_to action: :show, params: { slug: @member.slug, step: 4 }, notice: notice
     else
       redirect_to action: :show, params: { slug: @member.slug, step: 3 }, alert: "스타일 카드를 하나 누른 뒤 저장해 주세요."
     end
