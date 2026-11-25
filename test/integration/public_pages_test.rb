@@ -74,7 +74,7 @@ class PublicPagesTest < ActionDispatch::IntegrationTest
   end
 
   test "chopd footer keeps inquiry entry and service links" do
-    [ education_path, media_path, works_path, new_inquiry_path ].each do |path|
+    [ education_path, media_path, media_greeting_path, works_path, new_inquiry_path ].each do |path|
       get path
       assert_response :success
 
@@ -88,6 +88,14 @@ class PublicPagesTest < ActionDispatch::IntegrationTest
       assert_select "footer a[href=?]", media_path, text: "미디어"
       assert_select "footer a[href=?]", works_path, text: "작품"
       assert_select "footer a.whitespace-nowrap", minimum: 9
+    end
+  end
+
+  test "impd layout pages do not render chopd footer" do
+    [ root_path, community_path ].each do |path|
+      get path
+      assert_response :success
+      assert_no_match(/최범희 PD 퍼스널 브랜드 플랫폼/, response.body)
     end
   end
 end
