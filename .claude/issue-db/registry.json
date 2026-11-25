@@ -11398,6 +11398,46 @@
           ]
         }
       }
+    },
+    {
+      "id": "ISS-588",
+      "title": "[린트] 회원 에디터 흐름 테스트 220행 배열 대괄호 띄어쓰기(RuboCop 4건)",
+      "type": "STYLE_FIX",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "agent-harness",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": null,
+      "depends_on": [],
+      "created_at": "2026-11-25T03:57:14Z",
+      "updated_at": "2026-11-25T03:57:14Z",
+      "origin": "factory-observation",
+      "payload": {
+        "origin": "factory-observation",
+        "files": [
+          "test/integration/member_admin_editor_flow_test.rb"
+        ],
+        "evidence": [
+          "bin/rubocop: 462 files inspected, 4 offenses — test/integration/member_admin_editor_flow_test.rb:220 Layout/SpaceInsideArrayLiteralBrackets",
+          "디자인 루프 10회차 커밋 18bd71c 에서 들어옴"
+        ],
+        "acceptance_criteria": [
+          "bin/rubocop 전체가 offenses 0건이다",
+          "test/integration/member_admin_editor_flow_test.rb 가 그대로 통과한다",
+          "220행 검사 내용(원래 소개·이메일 유지 확인)은 바뀌지 않는다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "회차 끝 전체 린트에서 발견. 다른 세션(디자인 루프)이 같은 회원 관리 화면을 동시에 고치는 중이라 이번 회차에서 손대지 않고 카드로 남김. 띄어쓰기만 고치는 수준",
+          "risk": "T0 — 테스트 코드 서식만, 동작 영향 없음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:57:14Z"
+        }
+      },
+      "result": null,
+      "spawn_rules": []
     }
   ],
   "hooks": {
@@ -16173,7 +16213,7 @@
     ]
   },
   "stats": {
-    "total_issues": 583,
+    "total_issues": 588,
     "completed": 88,
     "failed": 0,
     "evolved": 223
