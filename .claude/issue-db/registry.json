@@ -3764,7 +3764,7 @@
       "id": "ISS-502",
       "type": "FIX_BUG",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "assign_to": "codex",
       "origin": "user-test",
       "depth": 1,
@@ -3772,7 +3772,7 @@
       "parent_id": null,
       "depends_on": [],
       "created_at": "2026-11-24T17:23:54Z",
-      "updated_at": "2026-11-24T17:23:56.478Z",
+      "updated_at": "2026-11-25T09:11:36+09:00",
       "title": "[사용자 테스트] 문의하기(/inquiries/new) 제목이 배경에 묻히고 '문의 접수하기' 버튼에 배경이 없으며 오류 문구가 영어로 나옴",
       "description": "문의하기 화면은 어두운 배경(rgb 10,14,26)인데 제목 h1 이 text-navy(rgb 17,24,39)라 거의 안 보이고, 제출 버튼의 bg-primary 가 투명(rgba 0,0,0,0)으로 계산돼 버튼처럼 보이지 않는다. 빈 채로 제출하면 \"Name can't be blank\" 등 영어 오류가 나온다. 문의는 B2B/B2G 매출 입구라 사용자가 망설이는 지점이다.",
       "payload": {
@@ -3822,14 +3822,73 @@
           }
         ],
         "approved_at": "2026-11-24T17:23:56.478Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "factory_note": [
+          {
+            "at": "2026-11-25T09:11:36+09:00",
+            "by": "factory-runner",
+            "note": "착수. 원인: chopd 레이아웃 tailwind.config 에 primary/primary-dark 색 미정의(버튼 투명), h1 text-navy(#111827)가 dark(#0a0e1a) 배경과 대비 1.1:1, ko 로케일 없음(full_messages 영어)."
+          }
+        ]
+      },
+      "completed_at": "2026-11-25T09:14:29.151779",
+      "result": {
+        "commit": "2de2295",
+        "files_changed": [
+          "app/models/inquiry.rb",
+          "app/views/chopd/inquiries/_form.html.erb",
+          "app/views/chopd/inquiries/new.html.erb",
+          "test/integration/inquiries_form_test.rb"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "/inquiries/new 제목이 WCAG AA(4.5:1) 이상 대비",
+            "met": true,
+            "how": "브라우저 계산색 h1 rgb(255,255,255) / 배경 #0a0e1a → 약 19:1 (데스크톱 1280·모바일 390)"
+          },
+          {
+            "criterion": "'문의 접수하기' 버튼 배경이 채워짐",
+            "met": true,
+            "how": "계산된 backgroundColor rgb(255,77,28) (coral)"
+          },
+          {
+            "criterion": "빈 폼 제출 시 한국어 오류",
+            "met": true,
+            "how": "오류 상자: 이름을 입력해 주세요. / 이메일을 입력해 주세요. / 문의 내용을 입력해 주세요. / 문의 유형을 선택해 주세요."
+          },
+          {
+            "criterion": "데스크톱·모바일 스크린샷 확인",
+            "met": true,
+            "how": "Playwright 1280x900·390x844 스크린샷 육안 확인"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/integration/inquiries_form_test.rb",
+            "exit_code": 0,
+            "output": "2 runs, 22 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "playwright 계산색 점검(http://127.0.0.1:3008/inquiries/new)",
+            "exit_code": 0,
+            "output": "desktop h1 rgb(255,255,255) btn bg rgb(255,77,28) label rgb(229,231,235); errors 한국어 4줄"
+          }
+        ],
+        "review": {
+          "gemini": "gemini-4-hydrogen-high 지적 0건",
+          "opus": "범위 4파일, 다른 Inquiry 오류 출력 지점 없음 확인"
+        },
+        "ui_files": [
+          "app/views/chopd/inquiries/_form.html.erb",
+          "app/views/chopd/inquiries/new.html.erb"
+        ]
       }
     },
     {
       "id": "ISS-503",
       "type": "FIX_BUG",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "assign_to": "codex",
       "origin": "user-test",
       "depth": 1,
@@ -3837,7 +3896,7 @@
       "parent_id": null,
       "depends_on": [],
       "created_at": "2026-11-24T17:23:54Z",
-      "updated_at": "2026-11-24T17:23:56.478Z",
+      "updated_at": "2026-11-25T09:15:08+09:00",
       "title": "[사용자 테스트] 상단 메뉴 '예시'와 첫 화면 '예시 먼저 보기'가 고정 주소 /choi-pd 로 가서 404",
       "description": "impd 레이아웃 상단 메뉴의 '예시'(app/views/layouts/impd.html.erb:214)와 첫 화면 하단 CTA '예시 먼저 보기'(app/views/chopd/home/index.html.erb:369)가 회원 slug 'choi-pd' 를 고정으로 쓴다. 그 회원이 없는 환경에서는 Routing Error 404. 같은 첫 화면의 '예시 보기' 버튼(index.html.erb:90)은 @featured_members 첫 회원으로 대체하는 방식이라 정상 동작한다(/na-seolgye).",
       "payload": {
@@ -3884,8 +3943,586 @@
           }
         ],
         "approved_at": "2026-11-24T17:23:56.478Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "factory_note": [
+          {
+            "at": "2026-11-25T09:15:08+09:00",
+            "by": "factory-runner",
+            "note": "착수. impd 레이아웃 nav(214)·첫 화면 하단 CTA(369)가 /choi-pd 고정. 대체 규칙을 ApplicationHelper 헬퍼 하나로 모아 세 곳(nav·히어로 예시 보기·하단 CTA)이 같은 규칙을 쓰게 한다. 공개 회원이 0명이면 /explore 로."
+          }
+        ]
+      },
+      "completed_at": "2026-11-25T09:18:03.736312",
+      "result": {
+        "commit": "074c4cb",
+        "files_changed": [
+          "app/helpers/application_helper.rb",
+          "app/views/chopd/home/index.html.erb",
+          "app/views/layouts/impd.html.erb",
+          "test/integration/example_profile_link_test.rb"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "상단 메뉴 '예시'와 '예시 먼저 보기'가 존재하는 공개 회원 페이지로 이동",
+            "met": true,
+            "how": "3008 서버 첫 화면: 예시(데스크톱·모바일)·예시 보기·예시 먼저 보기 모두 /ux-member(공개 회원, 200). 공개 회원 0명이면 /explore (테스트)"
+          },
+          {
+            "criterion": "첫 화면 내부 링크 404 0개",
+            "met": true,
+            "how": "Playwright로 첫 화면 내부 링크 21개 GET → 4xx/5xx 0건"
+          },
+          {
+            "criterion": "관련 요청 테스트 추가",
+            "met": true,
+            "how": "test/integration/example_profile_link_test.rb 2건"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/integration/example_profile_link_test.rb test/integration/public_pages_test.rb",
+            "exit_code": 0,
+            "output": "10 runs, 55 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "playwright 첫 화면 내부 링크 점검(http://127.0.0.1:3008/)",
+            "exit_code": 0,
+            "output": "internal links 21 404/err 0"
+          }
+        ],
+        "review": {
+          "gemini": "3건 지적 → 모두 틀림 판정(sqlite3·기존 동일 정렬식, 의도된 정렬 일치, 회원 픽스처 없음)",
+          "opus": "범위 4파일, 앱 내 /choi-pd 고정값 잔존 0"
+        },
+        "ui_files": [
+          "app/views/layouts/impd.html.erb",
+          "app/views/chopd/home/index.html.erb"
+        ]
+      }
+    },
+    {
+      "id": "ISS-504",
+      "title": "[맡김] imPD 기본 기능: 클라우드 스캔 자동 정리(명함→주소록, 영수증→시트, 문서→폴더·파일명)",
+      "status": "READY",
+      "type": "FEATURE",
+      "priority": "P2",
+      "assign_to": "agent-harness",
+      "created_at": "2026-11-25T09:10:32.423069+09:00",
+      "updated_at": "2026-11-25T00:10:35.749Z",
+      "payload": {
+        "origin": "chat-delegate",
+        "delegated": {
+          "at": "2026-11-25T09:10:32.423069+09:00",
+          "session": null,
+          "notify": "buzz"
+        },
+        "plain_summary": "대표님 지시(2026-11-25): 구글 드라이브 스캔(명함·영수증·문서)을 인식해 명함은 구글 주소록, 영수증은 구글 시트, 문서는 관련 폴더에 파일명을 바꿔 저장. imPD 기본 기능으로 운영하고, 클라우드는 회원이 고른다(1차 구글 드라이브, 원드라이브 등은 같은 연결 규격으로 다음 단계). AI는 회원이 자기 API 키를 등록해 쓴다(키는 ActiveRecord Encryption 으로 암호화 저장, 화면에 다시 보여주지 않음, 로그·에러에 남기지 않음). 회원 화면에 '스캔 정리' 메뉴: 클라우드 연결 → 스캔 폴더 지정 → AI 키 등록(Gemini·OpenAI·Anthropic 중 선택, 연결 시험 버튼) → 처리 내역(원본·분류·결과 위치·실패 사유) 목록. 분류 결과가 애매하면 자동 저장하지 말고 '확인 필요'로 두고 회원이 고르게 한다. 구글 권한은 필요한 최소 범위로(drive.file 와 Picker 로 되는지 먼저 확인, 안 되면 사유를 기록). 기능 스위치 기본 꺼짐. 운영 켜기 전 대표님 컨펌 필요 항목(구글 민감·제한 권한 앱 검수, 개인정보처리방침 수집 항목, API 키 보관 정책)은 payload.gate=deploy 로 남긴다.",
+        "acceptance_criteria": [
+          "회원 화면에 스캔 정리 메뉴가 있고 기능 스위치가 꺼져 있으면 보이지 않는다",
+          "회원이 AI 키를 등록하면 암호화되어 저장되고 화면·로그 어디에도 원문이 나오지 않는다(테스트로 확인)",
+          "명함·영수증·문서 예시 이미지 3장으로 분류→주소록 연락처 데이터·시트 행 데이터·새 파일명과 폴더 경로가 만들어진다(외부 API는 테스트에서 가짜로 대체)",
+          "분류 확신이 낮으면 확인 필요 상태가 되고 자동 저장하지 않는다",
+          "bin/rails test 전체 통과"
+        ],
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T00:10:35.749Z",
+            "by": "auto",
+            "reason": "「[맡김] imPD 기본 기능: 클라우드 스캔 자동 정리(명함→주소록, 영수증→시트, 문서→폴더·파일명)」(FEATURE, P2)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T00:10:35.749Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       }
+    },
+    {
+      "id": "ISS-509",
+      "title": "[Plan:테스트] ISS-502 변경사항 검증",
+      "type": "RUN_TESTS",
+      "status": "DONE",
+      "priority": "P1",
+      "assign_to": "test-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-502",
+      "depends_on": [],
+      "created_at": "2026-11-25T09:14:29.151779",
+      "payload": {
+        "files": [
+          "app/views/chopd/inquiries/new.html.erb",
+          "config/locales/",
+          "app/views/chopd/inquiries/_form.html.erb"
+        ],
+        "source_issue": "ISS-502",
+        "scope": "changed",
+        "renumbered_from": "ISS-504(번호 충돌, factory-runner 정정)",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T00:15:11.277Z",
+            "by": "auto",
+            "reason": "「[Plan:테스트] ISS-502 변경사항 검증」(RUN_TESTS, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T00:15:11.277Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "회차 검증으로 확인 완료",
+          "risk": "낮음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T09:20:08+09:00"
+        }
+      },
+      "result": {
+        "proof": [
+          {
+            "cmd": "bin/rails test",
+            "exit_code": 0,
+            "output": "351 runs, 2342 assertions, 0 failures, 0 errors, 1 skips"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T09:20:08+09:00",
+      "completed_at": "2026-11-25T09:20:08+09:00"
+    },
+    {
+      "id": "ISS-505",
+      "title": "[Plan:도메인분석] ISS-502 비즈니스 규칙/시나리오 도출",
+      "type": "DOMAIN_ANALYZE",
+      "status": "CLOSED_SKIP",
+      "priority": "P1",
+      "assign_to": "domain-analyst",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-502",
+      "depends_on": [],
+      "created_at": "2026-11-25T09:14:29.151779",
+      "payload": {
+        "files": [
+          "app/views/chopd/inquiries/new.html.erb",
+          "config/locales/",
+          "app/views/chopd/inquiries/_form.html.erb"
+        ],
+        "source_issue": "ISS-502",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T00:15:11.277Z",
+            "by": "auto",
+            "reason": "「[Plan:도메인분석] ISS-502 비즈니스 규칙/시나리오 도출」(DOMAIN_ANALYZE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T00:15:11.277Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "반려 권장",
+          "reason": "변경이 표시 색·검증 문구·링크 대상에 한정되어 새 비즈니스 규칙·시나리오가 생기지 않음. 문의 검증 규칙(필수 4항목·이메일 형식)은 그대로.",
+          "risk": "낮음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T09:20:08+09:00"
+        }
+      },
+      "result": {
+        "skip_reason": "변경이 표시 색·검증 문구·링크 대상에 한정되어 새 비즈니스 규칙·시나리오가 생기지 않음. 문의 검증 규칙(필수 4항목·이메일 형식)은 그대로."
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T09:20:08+09:00",
+      "completed_at": "2026-11-25T09:20:08+09:00"
+    },
+    {
+      "id": "ISS-506",
+      "title": "[Plan:UX리뷰] ISS-502 UI 변경 검증",
+      "type": "UI_REVIEW",
+      "status": "DONE",
+      "priority": "P1",
+      "assign_to": "ux-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-502",
+      "depends_on": [],
+      "created_at": "2026-11-25T09:14:29.151779",
+      "payload": {
+        "files": [
+          "app/views/chopd/inquiries/new.html.erb",
+          "app/views/chopd/inquiries/_form.html.erb"
+        ],
+        "source_issue": "ISS-502",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T00:15:11.277Z",
+            "by": "auto",
+            "reason": "「[Plan:UX리뷰] ISS-502 UI 변경 검증」(UI_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T00:15:11.277Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "회차 검증으로 확인 완료",
+          "risk": "낮음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T09:20:08+09:00"
+        }
+      },
+      "result": {
+        "proof": [
+          {
+            "cmd": "playwright 계산색",
+            "exit_code": 0,
+            "output": "h1 rgb(255,255,255)/배경 #0a0e1a(약 19:1), 버튼 bg rgb(255,77,28), 라벨 rgb(229,231,235) — chopd 레이아웃 팔레트(coral) 안에서 해결"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T09:20:08+09:00",
+      "completed_at": "2026-11-25T09:20:08+09:00"
+    },
+    {
+      "id": "ISS-507",
+      "title": "[Plan:브랜드검증] ISS-502 아젠다 표현 + Action Clarity",
+      "type": "BRAND_GUARD",
+      "status": "CLOSED_SKIP",
+      "priority": "P1",
+      "assign_to": "brand-guardian",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-502",
+      "depends_on": [],
+      "created_at": "2026-11-25T09:14:29.151779",
+      "payload": {
+        "files": [
+          "app/views/chopd/inquiries/new.html.erb",
+          "app/views/chopd/inquiries/_form.html.erb"
+        ],
+        "source_issue": "ISS-502",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T00:15:11.277Z",
+            "by": "auto",
+            "reason": "「[Plan:브랜드검증] ISS-502 아젠다 표현 + Action Clarity」(BRAND_GUARD, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T00:15:11.277Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "반려 권장",
+          "reason": "brand-dna.json 이 저장소에 없어 브랜드 기준 검증 대상이 없음. 변경은 기존 레이아웃 팔레트(chopd coral, impd 링크) 안의 색·링크 수정이라 아젠다·CTA 구조 변화 없음(CTA는 오히려 보이게 됨).",
+          "risk": "낮음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T09:20:08+09:00"
+        }
+      },
+      "result": {
+        "skip_reason": "brand-dna.json 이 저장소에 없어 브랜드 기준 검증 대상이 없음. 변경은 기존 레이아웃 팔레트(chopd coral, impd 링크) 안의 색·링크 수정이라 아젠다·CTA 구조 변화 없음(CTA는 오히려 보이게 됨)."
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T09:20:08+09:00",
+      "completed_at": "2026-11-25T09:20:08+09:00"
+    },
+    {
+      "id": "ISS-508",
+      "title": "[Plan:브라우저QA] ISS-502 콘솔 에러 + 스크린샷 검증",
+      "type": "BROWSER_QA",
+      "status": "DONE",
+      "priority": "P1",
+      "assign_to": "agent-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-502",
+      "depends_on": [],
+      "created_at": "2026-11-25T09:14:29.151779",
+      "payload": {
+        "files": [
+          "app/views/chopd/inquiries/new.html.erb",
+          "app/views/chopd/inquiries/_form.html.erb"
+        ],
+        "source_issue": "ISS-502",
+        "action": "run_browse_qa",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T00:15:11.277Z",
+            "by": "auto",
+            "reason": "「[Plan:브라우저QA] ISS-502 콘솔 에러 + 스크린샷 검증」(BROWSER_QA, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T00:15:11.277Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "회차 검증으로 확인 완료",
+          "risk": "낮음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T09:20:08+09:00"
+        }
+      },
+      "result": {
+        "proof": [
+          {
+            "cmd": "playwright 콘솔·네트워크 점검(/, /inquiries/new × 1280·390)",
+            "exit_code": 0,
+            "output": "console errors 0, local 4xx/5xx 0 (4개 조합 모두)"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T09:20:08+09:00",
+      "completed_at": "2026-11-25T09:20:08+09:00"
+    },
+    {
+      "id": "ISS-510",
+      "title": "[Plan:테스트] ISS-503 변경사항 검증",
+      "type": "RUN_TESTS",
+      "status": "DONE",
+      "priority": "P1",
+      "assign_to": "test-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-503",
+      "depends_on": [],
+      "created_at": "2026-11-25T09:18:03.736312",
+      "payload": {
+        "files": [
+          "app/views/chopd/home/index.html.erb",
+          "app/views/layouts/impd.html.erb"
+        ],
+        "source_issue": "ISS-503",
+        "scope": "changed",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T00:18:05.511Z",
+            "by": "auto",
+            "reason": "「[Plan:테스트] ISS-503 변경사항 검증」(RUN_TESTS, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T00:18:05.511Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "회차 검증으로 확인 완료",
+          "risk": "낮음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T09:20:08+09:00"
+        }
+      },
+      "result": {
+        "proof": [
+          {
+            "cmd": "bin/rails test",
+            "exit_code": 0,
+            "output": "351 runs, 2342 assertions, 0 failures, 0 errors, 1 skips"
+          },
+          {
+            "cmd": "bin/rubocop app/helpers/application_helper.rb app/models/inquiry.rb test/integration/inquiries_form_test.rb test/integration/example_profile_link_test.rb",
+            "exit_code": 0,
+            "output": "4 files inspected, no offenses detected"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T09:20:08+09:00",
+      "completed_at": "2026-11-25T09:20:08+09:00"
+    },
+    {
+      "id": "ISS-511",
+      "title": "[Plan:도메인분석] ISS-503 비즈니스 규칙/시나리오 도출",
+      "type": "DOMAIN_ANALYZE",
+      "status": "CLOSED_SKIP",
+      "priority": "P1",
+      "assign_to": "domain-analyst",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-503",
+      "depends_on": [],
+      "created_at": "2026-11-25T09:18:03.736312",
+      "payload": {
+        "files": [
+          "app/views/chopd/home/index.html.erb",
+          "app/views/layouts/impd.html.erb"
+        ],
+        "source_issue": "ISS-503",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T00:18:05.511Z",
+            "by": "auto",
+            "reason": "「[Plan:도메인분석] ISS-503 비즈니스 규칙/시나리오 도출」(DOMAIN_ANALYZE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T00:18:05.511Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "반려 권장",
+          "reason": "변경이 표시 색·검증 문구·링크 대상에 한정되어 새 비즈니스 규칙·시나리오가 생기지 않음. 문의 검증 규칙(필수 4항목·이메일 형식)은 그대로.",
+          "risk": "낮음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T09:20:08+09:00"
+        }
+      },
+      "result": {
+        "skip_reason": "변경이 표시 색·검증 문구·링크 대상에 한정되어 새 비즈니스 규칙·시나리오가 생기지 않음. 문의 검증 규칙(필수 4항목·이메일 형식)은 그대로."
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T09:20:08+09:00",
+      "completed_at": "2026-11-25T09:20:08+09:00"
+    },
+    {
+      "id": "ISS-512",
+      "title": "[Plan:UX리뷰] ISS-503 UI 변경 검증",
+      "type": "UI_REVIEW",
+      "status": "DONE",
+      "priority": "P1",
+      "assign_to": "ux-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-503",
+      "depends_on": [],
+      "created_at": "2026-11-25T09:18:03.736312",
+      "payload": {
+        "files": [
+          "app/views/chopd/home/index.html.erb",
+          "app/views/layouts/impd.html.erb"
+        ],
+        "source_issue": "ISS-503",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T00:18:05.511Z",
+            "by": "auto",
+            "reason": "「[Plan:UX리뷰] ISS-503 UI 변경 검증」(UI_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T00:18:05.511Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "회차 검증으로 확인 완료",
+          "risk": "낮음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T09:20:08+09:00"
+        }
+      },
+      "result": {
+        "proof": [
+          {
+            "cmd": "playwright 첫 화면 내부 링크 점검",
+            "exit_code": 0,
+            "output": "internal links 21, 4xx/5xx 0; 예시 링크 4곳 같은 공개 회원으로"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T09:20:08+09:00",
+      "completed_at": "2026-11-25T09:20:08+09:00"
+    },
+    {
+      "id": "ISS-513",
+      "title": "[Plan:브랜드검증] ISS-503 아젠다 표현 + Action Clarity",
+      "type": "BRAND_GUARD",
+      "status": "CLOSED_SKIP",
+      "priority": "P1",
+      "assign_to": "brand-guardian",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-503",
+      "depends_on": [],
+      "created_at": "2026-11-25T09:18:03.736312",
+      "payload": {
+        "files": [
+          "app/views/chopd/home/index.html.erb",
+          "app/views/layouts/impd.html.erb"
+        ],
+        "source_issue": "ISS-503",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T00:18:05.511Z",
+            "by": "auto",
+            "reason": "「[Plan:브랜드검증] ISS-503 아젠다 표현 + Action Clarity」(BRAND_GUARD, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T00:18:05.511Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "반려 권장",
+          "reason": "brand-dna.json 이 저장소에 없어 브랜드 기준 검증 대상이 없음. 변경은 기존 레이아웃 팔레트(chopd coral, impd 링크) 안의 색·링크 수정이라 아젠다·CTA 구조 변화 없음(CTA는 오히려 보이게 됨).",
+          "risk": "낮음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T09:20:08+09:00"
+        }
+      },
+      "result": {
+        "skip_reason": "brand-dna.json 이 저장소에 없어 브랜드 기준 검증 대상이 없음. 변경은 기존 레이아웃 팔레트(chopd coral, impd 링크) 안의 색·링크 수정이라 아젠다·CTA 구조 변화 없음(CTA는 오히려 보이게 됨)."
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T09:20:08+09:00",
+      "completed_at": "2026-11-25T09:20:08+09:00"
+    },
+    {
+      "id": "ISS-514",
+      "title": "[Plan:브라우저QA] ISS-503 콘솔 에러 + 스크린샷 검증",
+      "type": "BROWSER_QA",
+      "status": "DONE",
+      "priority": "P1",
+      "assign_to": "agent-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-503",
+      "depends_on": [],
+      "created_at": "2026-11-25T09:18:03.736312",
+      "payload": {
+        "files": [
+          "app/views/chopd/home/index.html.erb",
+          "app/views/layouts/impd.html.erb"
+        ],
+        "source_issue": "ISS-503",
+        "action": "run_browse_qa",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T00:18:05.511Z",
+            "by": "auto",
+            "reason": "「[Plan:브라우저QA] ISS-503 콘솔 에러 + 스크린샷 검증」(BROWSER_QA, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T00:18:05.511Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "회차 검증으로 확인 완료",
+          "risk": "낮음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T09:20:08+09:00"
+        }
+      },
+      "result": {
+        "proof": [
+          {
+            "cmd": "playwright 콘솔·네트워크 점검(/, /inquiries/new × 1280·390)",
+            "exit_code": 0,
+            "output": "console errors 0, local 4xx/5xx 0 (4개 조합 모두)"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T09:20:08+09:00",
+      "completed_at": "2026-11-25T09:20:08+09:00"
     }
   ],
   "hooks": {
@@ -4053,6 +4690,18 @@
         "issue_type": "FIX_BUG",
         "plan_created": 0,
         "timestamp": "2026-11-24T21:49:45.633975"
+      },
+      {
+        "issue_id": "ISS-502",
+        "issue_type": "FIX_BUG",
+        "plan_created": 5,
+        "timestamp": "2026-11-25T09:14:29.151779"
+      },
+      {
+        "issue_id": "ISS-503",
+        "issue_type": "FIX_BUG",
+        "plan_created": 5,
+        "timestamp": "2026-11-25T09:18:03.736312"
       }
     ],
     "on_fail": [],
@@ -7795,14 +8444,194 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 200,
+        "timestamp": "2026-11-25T02:24:35.432345",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (agent-harness, ux-harness, brand-guardian, test-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 7시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 49,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 3,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 201,
+        "timestamp": "2026-11-25T02:24:40.172900",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (brand-guardian, ux-harness, domain-analyst, agent-harness, test-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 7시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 49,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 3,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 202,
+        "timestamp": "2026-11-25T02:24:41.716585",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (brand-guardian, test-harness, agent-harness, domain-analyst, ux-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 7시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 49,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 3,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 203,
+        "timestamp": "2026-11-25T02:24:43.660679",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (test-harness, domain-analyst, ux-harness, brand-guardian, agent-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 7시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 49,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 3,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 204,
+        "timestamp": "2026-11-25T02:24:45.050753",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (ux-harness, agent-harness, brand-guardian, test-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 7시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 49,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 3,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 205,
+        "timestamp": "2026-11-25T02:24:46.766408",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (agent-harness, domain-analyst, brand-guardian, ux-harness, test-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 7시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 49,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 3,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 206,
+        "timestamp": "2026-11-25T02:24:47.826397",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (domain-analyst, agent-harness, ux-harness, test-harness, brand-guardian)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 7시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 49,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 3,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 207,
+        "timestamp": "2026-11-25T02:24:48.980332",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (ux-harness, agent-harness, brand-guardian, test-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 7시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 49,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 3,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 208,
+        "timestamp": "2026-11-25T02:24:49.901658",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (agent-harness, brand-guardian, domain-analyst, ux-harness, test-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 7시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 49,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 3,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 209,
+        "timestamp": "2026-11-25T02:24:52.015746",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (test-harness, domain-analyst, ux-harness, brand-guardian, agent-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 7시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 49,
+          "done": 36,
+          "in_progress": 0,
+          "ready": 3,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
   "stats": {
-    "total_issues": 503,
-    "completed": 27,
+    "total_issues": 514,
+    "completed": 29,
     "failed": 0,
-    "evolved": 199
+    "evolved": 209
   },
   "pending_opportunity_signals": [
     {
