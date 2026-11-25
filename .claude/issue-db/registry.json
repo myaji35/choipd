@@ -4986,7 +4986,7 @@
       "priority": "P1",
       "origin": "next-prompt",
       "source_issue": "ISS-506",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "created_at": "2026-11-25T00:52:35.196961Z",
       "updated_at": "2026-11-25T09:54:13+09:00",
       "payload": {
@@ -5028,7 +5028,86 @@
           }
         ]
       },
-      "id": "ISS-518"
+      "id": "ISS-518",
+      "completed_at": "2026-11-25T09:58:04.381538",
+      "result": {
+        "commit": "f392c1f",
+        "files_changed": [
+          "app/views/chopd/inquiries/_form.html.erb",
+          "test/integration/inquiry_submit_contrast_test.rb",
+          "script/qa/button_contrast.cjs",
+          "script/qa/package.json",
+          "script/qa/package-lock.json",
+          ".gitignore"
+        ],
+        "ui_files": [
+          "app/views/chopd/inquiries/_form.html.erb"
+        ],
+        "before": {
+          "text": "rgb(255,255,255)",
+          "bg": "rgb(255,77,28)",
+          "ratio": 3.32,
+          "hover_bg": "rgb(255,120,80)",
+          "hover_ratio": 2.61,
+          "font": "16px/600(일반 글자)"
+        },
+        "after": {
+          "text": "rgb(10,14,26)",
+          "bg": "rgb(255,77,28)",
+          "ratio": 5.8,
+          "hover_bg": "rgb(255,120,80)",
+          "hover_ratio": 7.39
+        },
+        "criteria_check": [
+          {
+            "criterion": "버튼 글자색·배경색·대비율이 proof에 기록되고 통과 또는 조정 후 통과",
+            "met": true,
+            "how": "변경 전 흰색/coral 3.32:1(미달) → 조정 후 dark/coral 5.80:1 통과, proof 에 전후 값 기록"
+          },
+          {
+            "criterion": "'문의 접수하기' 버튼 글자 대비 4.5:1 이상(16px semibold=일반 글자)",
+            "met": true,
+            "how": "playwright 계산색 1280x900·390x844 모두 5.80:1"
+          },
+          {
+            "criterion": "마우스 올림(coral-light)도 4.5:1 이상",
+            "met": true,
+            "how": "hover 배경 rgb(255,120,80) 대 dark 7.39:1 (변경 전 2.61:1)"
+          },
+          {
+            "criterion": "조정 색은 chopd 팔레트 안의 색",
+            "met": true,
+            "how": "tailwind.config 의 dark #0a0e1a 사용(text-dark), 배경 coral 유지"
+          },
+          {
+            "criterion": "재실행 가능한 측정 명령이 저장소에 있다",
+            "met": true,
+            "how": "node script/qa/button_contrast.cjs(실측) + bin/rails test test/integration/inquiry_submit_contrast_test.rb(회귀)"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/integration/inquiry_submit_contrast_test.rb test/integration/inquiries_form_test.rb",
+            "exit_code": 0,
+            "output": "3 runs, 40 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "node script/qa/button_contrast.cjs",
+            "exit_code": 0,
+            "output": "1280x900 default color rgb(10, 14, 26) bg rgb(255, 77, 28) ratio 5.8 / hover bg rgb(255, 120, 80) ratio 7.39 / 390x844 동일 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "node script/qa/button_contrast.cjs (변경 전, git f392c1f^ 뷰)",
+            "exit_code": 1,
+            "output": "color rgb(255, 255, 255) bg rgb(255, 77, 28) ratio 3.32 required 4.5 pass false / hover ratio 2.61 / SUMMARY pass=false"
+          }
+        ],
+        "review": {
+          "gemini": "gemini-4-hydrogen-high 결함 없음",
+          "opus": "범위 6파일, 다른 화면에 흰 글자 coral 버튼 0건 확인"
+        },
+        "note": "node 스크립트는 npm i --prefix script/qa 후 실행(playwright 1.64.0, 캐시 chromium 1248), 서버 http://127.0.0.1:3008 필요"
+      }
     },
     {
       "title": "[다음] playwright로 /, /inquiries/new 두 화면을 1280px, 390px 폭에서 각각 전체 페이지 스크린샷으로",
@@ -5036,13 +5115,17 @@
       "priority": "P1",
       "origin": "next-prompt",
       "source_issue": "ISS-508",
-      "status": "READY",
+      "status": "IN_PROGRESS",
       "created_at": "2026-11-25T00:52:47.233054Z",
-      "updated_at": "2026-11-25T00:52:58.695Z",
+      "updated_at": "2026-11-25T09:58:13+09:00",
       "payload": {
         "user_request": "playwright로 /, /inquiries/new 두 화면을 1280px, 390px 폭에서 각각 전체 페이지 스크린샷으로 저장하라(총 4장, 경로는 ./qa/ISS-508/{route}-{width}.png). 각 화면에서 가로 스크롤 발생 여부(document.documentElement.scrollWidth > clientWidth)와 주요 버튼 및 입력창이 뷰포트 밖으로 잘리는지를 수치로 함께 출력하라. 파일 경로, 파일 크기, 판정 수치를 proof에 남겨라.",
         "acceptance_criteria": [
-          "4장의 스크린샷 파일이 존재하고, 각 조합의 가로 스크롤과 잘림 판정 수치가 proof에 기록된다."
+          "4장의 스크린샷 파일이 존재하고, 각 조합의 가로 스크롤과 잘림 판정 수치가 proof에 기록된다.",
+          "파일은 qa/ISS-508/{home|inquiries-new}-{1280|390}.png 경로에 있고 크기(바이트)가 proof에 있다.",
+          "네 조합 모두 가로 스크롤이 없다(scrollWidth <= clientWidth).",
+          "주요 버튼·입력창이 화면 가로 폭 밖으로 잘리지 않는다(요소 left>=0, right<=clientWidth).",
+          "같은 점검을 다시 돌릴 수 있는 저장소 안 명령이 있다."
         ],
         "next_prompt_depth": 1,
         "next_prompt_root": "ISS-508",
@@ -5065,9 +5148,60 @@
           }
         ],
         "approved_at": "2026-11-25T00:52:58.695Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "factory_note": [
+          {
+            "at": "2026-11-25T09:58:13+09:00",
+            "by": "factory-runner",
+            "note": "착수. ISS-518 에서 만든 script/qa(playwright 1.64.0)에 레이아웃 점검 스크립트를 더해 4장 저장·수치 출력. 경로명: / → home, /inquiries/new → inquiries-new."
+          },
+          {
+            "at": "2026-11-25T10:01:23+09:00",
+            "by": "factory-runner",
+            "note": "스크린샷 육안 점검 중 chopd 바닥글 390px 비좁음 발견 → ISS-520 로 분리 등록(이 카드 범위는 측정·증거 확보)."
+          }
+        ]
       },
       "id": "ISS-519"
+    },
+    {
+      "id": "ISS-520",
+      "type": "FIX_BUG",
+      "priority": "P2",
+      "status": "READY",
+      "origin": "factory-observation",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": "ISS-519",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:01:23+09:00",
+      "updated_at": "2026-11-25T10:01:23+09:00",
+      "title": "[모바일] 문의하기 등 chopd 화면 바닥글이 390px에서 비좁아 링크 글자가 세로로 쪼개짐",
+      "description": "ISS-519 스크린샷(qa/ISS-508/inquiries-new-390.png) 육안 확인: chopd 레이아웃 바닥글이 390px 폭에서 3열을 유지해 '교육 과정'·'B2B/B2G 문의하기'가 줄바꿈되고, 맨 아래 줄 '교육/미디어/작품' 링크가 한 글자씩 세로로 쪼개진다. 가로 스크롤·화면 밖 잘림은 없음(수치 통과)이라 자동 점검으로는 안 잡힌다.",
+      "payload": {
+        "origin": "factory-observation",
+        "files": [
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "evidence": [
+          "qa/ISS-508/inquiries-new-390.png 하단",
+          "node script/qa/layout_check.cjs — hScroll false, clipped 0 (수치로는 미검출)"
+        ],
+        "acceptance_criteria": [
+          "390px 폭에서 바닥글 링크가 한 글자씩 세로로 쪼개지지 않는다(링크 한 개가 한 줄 또는 자연스러운 단어 단위 줄바꿈)",
+          "1280px 바닥글 배치는 지금과 같다",
+          "node script/qa/layout_check.cjs 가 계속 통과한다",
+          "수정 전후 390px 스크린샷으로 확인"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "문의하기(B2B/B2G 매출 입구) 모바일 하단이 깨져 보여 신뢰감을 떨어뜨림. 바닥글 파셜의 반응형 클래스만 고치면 되는 작은 수정",
+          "risk": "T0 — 레이아웃 파셜 클래스만, 데이터 영향 없음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T10:01:23+09:00"
+        }
+      }
     }
   ],
   "hooks": {
@@ -5253,6 +5387,12 @@
         "issue_type": "STYLE_FIX",
         "plan_created": 0,
         "timestamp": "2026-11-25T09:42:48.075084"
+      },
+      {
+        "issue_id": "ISS-518",
+        "issue_type": "FEATURE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T09:58:04.381538"
       }
     ],
     "on_fail": [],
@@ -9223,7 +9363,7 @@
   },
   "stats": {
     "total_issues": 517,
-    "completed": 30,
+    "completed": 31,
     "failed": 0,
     "evolved": 211
   },
