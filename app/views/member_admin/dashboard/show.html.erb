@@ -83,6 +83,9 @@
           <%= link_to "문의함 보기", slug_admin_inquiries_path(slug: @member.slug), style: "display: inline-flex; align-items: center; min-height: 44px; color: var(--impd-accent); font-size: 13px; font-weight: 600;" %>
         </div>
         <% if @recent_inquiries.any? %>
+          <% if @unread_inquiries.zero? %>
+            <p style="font-size: 14px; color: var(--impd-ink2); margin-bottom: 12px;">새 문의는 없어요. 아래는 이미 확인한 문의예요.</p>
+          <% end %>
           <div style="display: grid; gap: 12px;">
             <% @recent_inquiries.each do |inq| %>
               <% unread = inq.is_read.to_i.zero? %>
@@ -93,6 +96,8 @@
                     <p style="font-weight: 600;"><%= inq.sender_name %></p>
                     <% if unread %>
                       <span style="border: 1px solid var(--impd-accent); color: var(--impd-accent); padding: 3px 7px; font-size: 12px; font-weight: 600;">새 문의</span>
+                    <% else %>
+                      <span style="font-size: 12px; color: var(--impd-muted);">확인함</span>
                     <% end %>
                   </div>
                   <p class="impd-label-muted"><%= inq.created_at.in_time_zone("Asia/Seoul").strftime("%m.%d %H:%M") %></p>
@@ -101,20 +106,23 @@
               <% end %>
             <% end %>
           </div>
+          <% if @unread_inquiries > 4 %>
+            <p><%= link_to "새 문의 #{@unread_inquiries}건 모두 보기 →", slug_admin_inquiries_path(slug: @member.slug), style: channel_link_style %></p>
+          <% end %>
         <% else %>
-          <p style="text-align: center; padding: 32px; color: var(--impd-muted); font-size: 14px;">아직 받은 문의가 없어요.</p>
+          <p style="text-align: center; padding: 16px; color: var(--impd-muted); font-size: 14px;">아직 받은 문의가 없어요.</p>
         <% end %>
       </section>
 
-      <section id="profile-accounts-status" aria-labelledby="profile-accounts-title" style="background: #fff; border: 1px solid var(--impd-rule); padding: 24px; margin-bottom: 24px;">
+      <section id="profile-accounts-status" aria-labelledby="profile-accounts-title" style="background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 24px; margin-bottom: 24px;">
         <p class="impd-label">내 프로필 관리 현황</p>
         <h2 id="profile-accounts-title" style="font-size: 24px; margin-top: 10px;">네이버 인물정보 · LinkedIn</h2>
-        <p style="font-size: 14px; color: var(--impd-muted); margin: 8px 0 18px;">네이버·LinkedIn 계정을 맡겨 두면 운영팀이 대신 손봐 드려요.</p>
+        <p style="font-size: 14px; color: var(--impd-muted); margin: 8px 0 18px;">네이버·LinkedIn 계정을 맡겨 두면 운영팀이 대신 손봐 드려요. '관리 중'이면 따로 하실 일은 없어요.</p>
 
         <% accounts_by_platform = @profile_accounts.group_by(&:platform) %>
         <% show_management_links = respond_to?(:impersonating_admin_user) && impersonating_admin_user.present? %>
         <div class="profile-accounts-grid">
-          <% ProfileAccount::PLATFORMS.each do |platform, label| %>
+          <% ProfileAccount::PLATFORMS.each_key do |platform| %>
             <% naver = platform == "naver_people" %>
             <% registration_label = naver ? "네이버 계정 등록" : "LinkedIn 계정 등록" %>
             <% accounts_by_platform.fetch(platform, [nil]).each do |account| %>
@@ -138,39 +146,40 @@
                   <% end %>
                 </ol>
               <% end %>
-              <article style="border: 1px solid var(--impd-rule); padding: 16px; font-size: 14px;">
-                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;">
-                  <p class="impd-label-muted"><%= account&.platform_label || label %></p>
-                  <% if account %>
-                    <% status_label, status_color = if all_steps_done
-                      ["관리 중", "var(--impd-accent)"]
-                    elsif account.session_status == "error"
-                      ["확인 중", "#b42318"]
-                    else
-                      ["준비 중", "var(--impd-muted)"]
-                    end %>
-                    <span style="border: 1px solid currentColor; color: <%= status_color %>; padding: 2px 6px; font-size: 12px;"><%= status_label %></span>
-                  <% end %>
-                </div>
-
+              <% if show_management_links %>
+                <% management_path = account ? pd_profile_account_path(account) : new_pd_profile_account_path(member_id: @member.id) %>
+                <% management_link = link_to "관리 화면에서 열기", management_path, style: "#{channel_link_style} font-size: 12px; margin-left: auto;" %>
+              <% end %>
+              <article style="border-top: 1px solid var(--impd-rule); padding: 14px 0; font-size: 14px; overflow-wrap: anywhere;">
                 <% if account %>
-                  <h3 style="font-size: 16px; margin-top: 8px;"><%= account.display_name %></h3>
+                  <% status_label, status_color = if all_steps_done
+                    ["관리 중", "var(--impd-accent)"]
+                  elsif account.session_status == "error"
+                    ["확인 중", "var(--impd-ink2)"]
+                  else
+                    ["준비 중", "var(--impd-muted)"]
+                  end %>
+                  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px;">
+                    <h3 style="font-size: 16px; font-weight: 700;"><%= account.platform_label %></h3>
+                    <span style="border: 1px solid currentColor; color: <%= status_color %>; padding: 2px 6px; font-size: 12px;"><%= status_label %></span>
+                    <span style="font-size: 14px; color: var(--impd-ink2);"><%= account.display_name %></span>
+                  </div>
                   <% if account.headline.present? %>
-                    <p style="color: var(--impd-ink2);"><%= account.headline %></p>
+                    <p style="margin-top: 4px; font-size: 13px; color: var(--impd-muted);"><%= account.headline %></p>
                   <% end %>
-                  <%= progress_steps unless all_steps_done %>
-                  <p style="margin-top: 10px; font-size: 14px; color: <%= account.session_status == "error" ? status_color : "var(--impd-ink2)" %>;">
-                    <% if account.session_status == "error" %>
-                      로그인에 문제가 있어 운영팀이 확인하고 있어요. 따로 하실 일은 없어요.
-                    <% elsif all_steps_done %>
-                      운영팀이 관리하고 있어요. 따로 하실 일은 없어요.
-                    <% else %>
-                      운영팀이 준비하고 있어요. 끝나면 여기에 표시돼요.
-                    <% end %>
-                  </p>
+                  <% unless all_steps_done %>
+                    <%= progress_steps %>
+                    <p style="margin-top: 10px; font-size: 14px; color: var(--impd-ink2);">
+                      <% if account.session_status == "error" %>
+                        로그인에 문제가 있어 운영팀이 확인하고 있어요. 따로 하실 일은 없어요.
+                      <% else %>
+                        운영팀이 준비하고 있어요. 끝나면 여기에 표시돼요.
+                      <% end %>
+                    </p>
+                  <% end %>
                   <div class="profile-account-actions">
                     <% if (url = http_url(account.profile_url)) %>
-                      <%= link_to "프로필 열기 ↗", url, target: "_blank", rel: "noopener", style: "color: var(--impd-accent); display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline;" %>
+                      <%= link_to "프로필 열기 ↗", url, target: "_blank", rel: "noopener", style: channel_link_style %>
                     <% end %>
                     <details>
                       <summary style="cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--impd-muted); font-size: 13px;">자세히 보기</summary>
@@ -196,20 +205,19 @@
                         <% end %>
                       </div>
                     </details>
+                    <%= management_link if show_management_links %>
                   </div>
                 <% else %>
-                  <h3 style="font-size: 16px; margin-top: 8px;"><%= registration_label %> 전</h3>
+                  <h3 style="font-size: 16px; font-weight: 700;"><%= registration_label %> 전</h3>
                   <p style="color: var(--impd-muted); margin-top: 4px;">
                     <%= naver ? "네이버 계정을 등록하면 네이버 인물정보 등록·수정 요청을 대신 진행해요." : "LinkedIn 계정을 등록하면 프로필 점검과 업데이트를 대신 진행해요." %>
                   </p>
                   <p style="color: var(--impd-muted); margin-top: 4px;">맡기려면 운영팀에 말씀해 주세요.</p>
+                  <%= progress_steps %>
+                  <% if show_management_links %>
+                    <div class="profile-account-actions"><%= management_link %></div>
+                  <% end %>
                 <% end %>
-
-                <% if show_management_links %>
-                  <% management_path = account ? pd_profile_account_path(account) : new_pd_profile_account_path(member_id: @member.id) %>
-                  <p style="margin-top: 8px;"><%= link_to "관리 화면에서 열기", management_path, style: "display: inline-flex; align-items: center; min-height: 44px; color: var(--impd-accent); font-size: 12px;" %></p>
-                <% end %>
-                <%= progress_steps unless account %>
               </article>
             <% end %>
           <% end %>
@@ -309,8 +317,8 @@
   .channel-overview-facts dt { display: inline; font-size: 13px; color: var(--impd-muted); }
   .channel-overview-facts dd { display: inline; font-size: 14px; font-weight: 700; }
   .dashboard-grid .channel-overview-facts dd, .dashboard-grid .channel-overview-facts dt { overflow-wrap: normal; }
-  .profile-accounts-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
-  .profile-account-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; margin-top: 8px; }
+  .profile-accounts-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .profile-account-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; }
   .profile-account-actions details[open] { flex-basis: 100%; }
   .dashboard-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--impd-ink); margin-bottom: 24px; }
   .dashboard-stat { padding: 24px 16px; }
@@ -326,7 +334,6 @@
     .dashboard-main > * { order: 3; }
     .dashboard-main > .dashboard-next { order: 1; }
     .dashboard-overview { order: 2; margin-bottom: 24px; }
-    .profile-accounts-grid { grid-template-columns: minmax(0, 1fr); }
     .dashboard-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .dashboard-stat { padding: 16px 12px; }
     .dashboard-stat:nth-child(odd) { border-left: 0; }

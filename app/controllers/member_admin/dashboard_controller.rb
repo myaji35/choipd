@@ -33,7 +33,11 @@ class MemberAdmin::DashboardController < MemberAdmin::BaseController
       [ d, count ]
     }.reverse
 
-    @recent_inquiries = @member.member_inquiries.recent.limit(4)
+    @recent_inquiries = if @unread_inquiries.positive?
+      @member.member_inquiries.unread.recent.limit(4)
+    else
+      @member.member_inquiries.recent.limit(2)
+    end
 
     @profile_accounts = @member.profile_accounts.active.includes(:profile_snapshots, :naver_people_target, :naver_people_submissions).order(:platform, :id).to_a
 

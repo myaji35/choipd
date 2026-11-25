@@ -135,6 +135,49 @@ class MemberAdminDashboardUxTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "새 문의가 없으면 확인한 문의를 두 건만 확인함으로 보여 준다" do
+    member = create_overview_member
+    5.times { create_inquiry(member, is_read: 1) }
+
+    get slug_admin_dashboard_path(slug: member.slug)
+
+    assert_response :ok
+    assert_select "section[aria-labelledby='recent-inquiries-title']" do
+      assert_select "a[href*='#inquiry-']", count: 2
+      assert_select "span", text: "확인함", count: 2
+      assert_select "span", text: /새 문의/, count: 0
+      assert_select "p", text: "새 문의는 없어요. 아래는 이미 확인한 문의예요."
+    end
+  end
+
+  test "새 문의가 있으면 새 문의만 보여 준다" do
+    member = create_overview_member
+    unread = create_inquiry(member, is_read: 0)
+    3.times { create_inquiry(member, is_read: 1) }
+
+    get slug_admin_dashboard_path(slug: member.slug)
+
+    assert_response :ok
+    assert_select "section[aria-labelledby='recent-inquiries-title']" do
+      assert_select "a[href*='#inquiry-']", count: 1
+      assert_select "a[href$='#inquiry-#{unread.id}'] span", text: "새 문의"
+      assert_select "span", text: "확인함", count: 0
+    end
+  end
+
+  test "새 문의가 다섯 건이면 네 건과 모두 보기 링크를 보여 준다" do
+    member = create_overview_member
+    5.times { create_inquiry(member, is_read: 0) }
+
+    get slug_admin_dashboard_path(slug: member.slug)
+
+    assert_response :ok
+    assert_select "section[aria-labelledby='recent-inquiries-title']" do
+      assert_select "a[href*='#inquiry-']", count: 4
+      assert_select "a[href=?]", slug_admin_inquiries_path(slug: member.slug), text: "새 문의 5건 모두 보기 →"
+    end
+  end
+
   test "방문이 없으면 방문 기간과 주소 공유 방법을 보여 준다" do
     member = create_overview_member
 
@@ -181,6 +224,11 @@ class MemberAdminDashboardUxTest < ActionDispatch::IntegrationTest
   end
 
   private
+
+  def create_inquiry(member, is_read:)
+    member.member_inquiries.create!(sender_name: "방문자", sender_email: "visitor@example.com",
+      message: "상담을 요청합니다", is_read: is_read)
+  end
 
   def create_overview_member
     slug = "dashboard-#{SecureRandom.hex(4)}"

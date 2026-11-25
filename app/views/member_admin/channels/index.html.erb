@@ -10,7 +10,7 @@
   <% if registered.size >= 2 %>
     <nav aria-label="채널 바로가기" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;">
       <% registered.each do |item| %>
-        <%= link_to item[:label], "#channel-#{item[:channel].id}", class: "impd-btn impd-btn-secondary impd-btn-sm" %>
+        <%= link_to "#{item[:label]} · #{channel_state_label(item)}", "#channel-#{item[:channel].id}", class: "impd-btn impd-btn-secondary impd-btn-sm", style: "min-height: 44px;" %>
       <% end %>
     </nav>
   <% end %>
@@ -60,30 +60,32 @@
           <%= render "member_admin/channels/post_list", posts: item[:scheduled_posts], published: false %>
         <% end %>
 
-        <h3 style="font-size: 17px; margin-top: 24px;">팔로워 변화</h3>
-        <% if item[:follower_snapshots].any? %>
+        <% if item[:follower_snapshots].size >= 2 %>
+          <h3 style="font-size: 17px; margin-top: 24px;">팔로워 변화</h3>
           <p style="margin-top: 8px;">지금 <strong><%= number_with_delimiter(item[:followers]) %>명</strong><% if (change = channel_follower_change(item[:follower_delta])) %> · <%= change %><% end %></p>
-          <ul style="list-style: none; padding: 0; margin-top: 8px; font-size: 13px; color: var(--impd-muted);">
+          <ul style="display: flex; flex-wrap: wrap; gap: 4px 16px; list-style: none; padding: 0; margin-top: 8px; font-size: 13px; color: var(--impd-muted);">
             <% item[:follower_snapshots].each do |snapshot| %>
-              <li><%= channel_date(snapshot.captured_at) %> · <%= number_with_delimiter(snapshot.follower_count) %>명</li>
+              <li><%= channel_short_date(snapshot.captured_at) %> <%= number_with_delimiter(snapshot.follower_count) %>명</li>
             <% end %>
           </ul>
-        <% else %>
-          <p class="impd-label-muted" style="margin-top: 8px;">아직 팔로워를 센 기록이 없어요. 운영팀이 세면 여기에 보여요.</p>
+        <% elsif item[:follower_snapshots].empty? && stats.empty? %>
+          <p class="impd-label-muted" style="margin-top: 16px;">팔로워는 아직 못 셌어요. 운영팀이 세면 여기에 보여요.</p>
         <% end %>
 
-        <h3 style="font-size: 17px; margin-top: 24px;">운영 위탁 동의</h3>
         <% if channel.delegated? %>
-          <p style="margin-top: 8px;">✓ 동의함 · <%= channel_date(channel.delegation_consent_at) %></p>
-          <p class="impd-label-muted">운영팀이 이 채널에 글을 대신 올릴 수 있어요. 언제든 그만둘 수 있어요.</p>
+          <p style="margin-top: 24px; font-size: 14px;">✓ 운영 위탁 동의함 · <%= channel_date(channel.delegation_consent_at) %> <span style="color: var(--impd-muted);">· 언제든 그만둘 수 있어요.</span></p>
         <% else %>
+          <h3 style="font-size: 17px; margin-top: 24px;">운영 위탁 동의</h3>
           <p style="margin-top: 8px;">○ 아직 동의하지 않았어요</p>
           <p class="impd-label-muted">동의해야 운영팀이 이 채널에 글을 올릴 수 있어요.</p>
         <% end %>
         <% if @own_session %>
-          <%= link_to (channel.delegated? ? "동의 내용 보기·바꾸기" : "동의하러 가기"),
-            edit_slug_admin_brand_brand_channel_path(slug: @member.slug, id: channel.id),
-            class: "impd-btn impd-btn-secondary", style: "margin-top: 12px; min-height: 44px;" %>
+          <% consent_path = edit_slug_admin_brand_brand_channel_path(slug: @member.slug, id: channel.id) %>
+          <% if channel.delegated? %>
+            <%= link_to "동의 내용 보기·바꾸기", consent_path, style: channel_link_style %>
+          <% else %>
+            <%= link_to "동의하러 가기", consent_path, class: "impd-btn impd-btn-secondary", style: "margin-top: 12px; min-height: 44px;" %>
+          <% end %>
         <% else %>
           <p class="impd-label-muted" style="margin-top: 8px;">동의는 회원 본인만 바꿀 수 있어요.</p>
         <% end %>

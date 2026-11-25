@@ -54,6 +54,25 @@ class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "이번 달 소식 0건 · SNS에 올린 글 2건"
   end
 
+  test "내 채널에 올린 블로그 글이 내 브랜드 숫자에도 잡힌다" do
+    seoul = Time.find_zone!("Asia/Seoul")
+    travel_to seoul.local(2026, 11, 25, 12) do
+      brand = @member.brands.create!(name: "개인 브랜드", personal: true)
+      channel = brand.brand_channels.create!(platform: "naver_blog", delegation_consent_at: seoul.local(2026, 11, 1))
+      [ 8, 16, 22 ].each do |day|
+        published_at = seoul.local(2026, 11, day, 12)
+        SnsScheduledPost.create!(brand_channel: channel, platform: "naver_blog", title: "블로그 글", message: "블로그 글",
+          status: "published", scheduled_at: published_at, published_at: published_at)
+      end
+
+      get slug_admin_brand_path(slug: @member.slug)
+
+      assert_response :ok
+      assert_select ".ops-owner-stats section", text: /SNS에 올린 글.*3건/m
+      assert_includes response.body, "이번 달 소식 0건 · SNS에 올린 글 3건"
+    end
+  end
+
   test "끝난 4주만 비교하고 이번 주 방문은 따로 보여 준다" do
     travel_to Time.find_zone!("Asia/Seoul").local(2026, 11, 25, 12) do
       { 0 => 5, 1 => 3, 5 => 1 }.each do |weeks_ago, count|

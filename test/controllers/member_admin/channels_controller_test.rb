@@ -40,7 +40,7 @@ class MemberAdmin::ChannelsControllerTest < ActionDispatch::IntegrationTest
     get @path
 
     assert_response :ok
-    [ "운영 중", "myblog", "가을 보험 점검", "2026.11.20 09:30에 올림", "2026.11.27 10:00에 올릴 예정", "✓ 동의함 · 2026.10.03" ].each do |phrase|
+    [ "운영 중", "myblog", "가을 보험 점검", "2026.11.20 09:30에 올림", "2026.11.27 10:00에 올릴 예정", "✓ 운영 위탁 동의함 · 2026.10.03" ].each do |phrase|
       assert_includes response.body, phrase
     end
     assert_select "a[href=?]", published_url, text: "올라간 글 보기 ↗"
@@ -66,7 +66,8 @@ class MemberAdmin::ChannelsControllerTest < ActionDispatch::IntegrationTest
       assert_select "p", text: "페이스북 글의 본문 앞부분"
       assert_select "p", text: "2026.11.20 09:30에 올림"
       assert_select "p", text: /지금\s+112명\s*·\s*지난 기록보다 12명 늘었어요/
-      assert_select "li", text: "2026.11.20 · 112명"
+      assert_select "ul[style*='flex-wrap: wrap'] li", text: "11.20 112명"
+      assert_select "ul[style*='flex-wrap: wrap'] li", text: "11.19 100명"
     end
   end
 
@@ -95,6 +96,7 @@ class MemberAdmin::ChannelsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :ok
     assert_select "#channel-#{channel.id}" do |section|
+      assert_select "h3", text: "팔로워 변화", count: 0
       assert_select "h3", text: "올린 글·예약된 글", count: 1
       assert_select "p", text: "아직 없어요. 운영팀이 첫 글을 올리거나 예약하면 여기에 보여요.", count: 1
       assert_select "dl.channel-stat-grid div", count: 1 do
@@ -121,6 +123,49 @@ class MemberAdmin::ChannelsControllerTest < ActionDispatch::IntegrationTest
       assert_select "dd", text: "아직 못 셌어요"
     end
     assert_match(/@media \(max-width: 768px\) \{\s*\.channel-stat-grid \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/, response.body)
+  end
+
+  test "동의한 채널은 동의 안내를 한 줄로 줄이고 동의 전 채널은 그대로 보여 준다" do
+    delegated = create_channel("naver_blog", delegation_consent_at: seoul_time(10, 3))
+    pending = create_channel("facebook_page")
+
+    get @path
+
+    assert_response :ok
+    assert_select "section.impd-card h3", text: "운영 위탁 동의", count: 1
+    assert_select "#channel-#{delegated.id} p", text: "✓ 운영 위탁 동의함 · 2026.10.03 · 언제든 그만둘 수 있어요."
+    assert_select "#channel-#{pending.id} h3", text: "운영 위탁 동의"
+    assert_select "#channel-#{pending.id} a", text: "동의하러 가기"
+  end
+
+  test "팔로워 기록이 없으면 팔로워 변화 구역을 보이지 않는다" do
+    blog = create_channel("naver_blog", delegation_consent_at: seoul_time(10, 3))
+    facebook = create_channel("facebook_page")
+    SnsScheduledPost.create!(brand_channel: blog, platform: "naver_blog", title: "블로그 글", message: "올린 글",
+      status: "published", scheduled_at: seoul_time(11, 20))
+
+    get @path
+
+    assert_response :ok
+    assert_select "section.impd-card h3", text: "팔로워 변화", count: 0
+    assert_select "#channel-#{blog.id} dd", text: "아직 못 셌어요"
+    note = "팔로워는 아직 못 셌어요. 운영팀이 세면 여기에 보여요."
+    assert_select "#channel-#{blog.id} p", text: note, count: 0
+    assert_select "#channel-#{facebook.id} p", text: note, count: 1
+  end
+
+  test "바로가기 버튼에 채널 상태를 함께 보여 준다" do
+    blog = create_channel("naver_blog", delegation_consent_at: seoul_time(10, 3))
+    create_channel("facebook_page")
+    SnsScheduledPost.create!(brand_channel: blog, platform: "naver_blog", title: "블로그 글", message: "올린 글",
+      status: "published", scheduled_at: seoul_time(11, 20))
+
+    get @path
+
+    assert_response :ok
+    assert_select "nav[aria-label='채널 바로가기'] a[style*='min-height: 44px']", count: 2 do |links|
+      assert_equal [ "네이버 블로그 · 운영 중", "페이스북 · 준비 중" ], links.map(&:text)
+    end
   end
 
   test "연결에 문제가 있으면 확인 중으로만 알린다" do
@@ -187,7 +232,7 @@ class MemberAdmin::ChannelsControllerTest < ActionDispatch::IntegrationTest
   private
 
   def create_channel(platform, **attributes)
-    brand = @member.brands.create!(name: "개인 브랜드", personal: true)
+    brand = @member.brands.find_or_create_by!(name: "개인 브랜드", personal: true)
     brand.brand_channels.create!(platform: platform, **attributes)
   end
 

@@ -16,15 +16,13 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
     visit_dashboard
 
     assert_select "#profile-accounts-status" do
-      assert_select "article h3", text: "네이버 계정 등록 전"
-      assert_select "article h3", text: "LinkedIn 계정 등록 전"
+      assert_select "article h3", count: 2 do |headings|
+        assert_equal [ "네이버 계정 등록 전", "LinkedIn 계정 등록 전" ], headings.map(&:text)
+      end
       assert_select "article p", text: "네이버 계정을 등록하면 네이버 인물정보 등록·수정 요청을 대신 진행해요."
       assert_select "article p", text: "LinkedIn 계정을 등록하면 프로필 점검과 업데이트를 대신 진행해요."
       assert_select "article p", text: "맡기려면 운영팀에 말씀해 주세요.", count: 2
       assert_select "article ol li", text: /○/, count: 6
-      assert_select "article .impd-label-muted", count: 2 do |labels|
-        assert_equal [ "네이버 인물정보", "LinkedIn" ], labels.map(&:text)
-      end
     end
     assert_select "a[href^='/pd/']", count: 0
   end
@@ -47,7 +45,13 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
     sign_in_member
     visit_dashboard
 
+    assert_includes response.body, ".profile-accounts-grid { display: grid; grid-template-columns: minmax(0, 1fr)"
+    assert_no_match(/\.profile-accounts-grid\s*\{[^}]*repeat\(2,/, response.body)
+    assert_select "#profile-accounts-status > p", text: /'관리 중'이면 따로 하실 일은 없어요\./
+    assert_select "#profile-accounts-status article:last-child p", text: /운영팀이 관리하고 있어요/, count: 0
     assert_select "#profile-accounts-status article:first-child" do
+      assert_select "h3", text: "네이버 인물정보"
+      assert_select "span", text: naver.display_name
       assert_select "details summary", text: "자세히 보기"
       assert_select "details p", text: "올릴 내용: 확정"
       assert_select "article > p", text: "운영팀이 준비하고 있어요. 끝나면 여기에 표시돼요."
@@ -59,7 +63,8 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
       assert_select "p", text: "네이버에 고쳐 달라고 한 날: #{submission.created_at.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M")} (제출함)"
     end
     assert_select "#profile-accounts-status article:last-child" do
-      assert_select "h3", text: linkedin.display_name
+      assert_select "h3", text: "LinkedIn"
+      assert_select "span", text: linkedin.display_name
       assert_select "p", text: "맡긴 계정: ka***@example.com"
       assert_select "ol", count: 0
       assert_select "span", text: "관리 중"
@@ -67,7 +72,6 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
         assert_select "summary", text: "자세히 보기"
         assert_select "p", text: "운영팀이 마지막으로 확인: 2일 전"
       end
-      assert_select "article > p", text: "운영팀이 관리하고 있어요. 따로 하실 일은 없어요."
       assert_select "p", text: /\bdays\b/, count: 0
       assert_select "p", text: /프로필 완성도 \d+%/
       assert_select "progress[max='100'][value]"
@@ -86,7 +90,7 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
 
     visit_dashboard
 
-    assert_select "#profile-accounts-status a[href=?]", pd_profile_account_path(account), text: "관리 화면에서 열기"
+    assert_select "#profile-accounts-status .profile-account-actions a[href=?]", pd_profile_account_path(account), text: "관리 화면에서 열기"
     assert_select "#profile-accounts-status a[href=?]", new_pd_profile_account_path(member_id: @member.id),
       text: "관리 화면에서 열기"
   end

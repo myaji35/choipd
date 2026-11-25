@@ -27,6 +27,21 @@ module BrandOps
       KEYS.index_with { |key| { value: current.fetch(key, 0), delta: current.fetch(key, 0) - previous.fetch(key, 0) } }
     end
 
+    def self.sns_publications(member_ids, range)
+      owner_id = Arel.sql("COALESCE(sns_scheduled_posts.member_id, brands.member_id, sns_accounts.member_id)")
+      posts = SnsScheduledPost.left_joins(:sns_account, brand_channel: :brand).where("#{owner_id} IN (?)", member_ids)
+      histories = SnsPostHistory.where(status: %w[success published], created_at: range)
+      recorded = posts.joins(:sns_post_histories).merge(histories).pluck(owner_id, "sns_post_histories.created_at")
+
+      publication_time = Arel::Nodes::NamedFunction.new("COALESCE", [ SnsScheduledPost.arel_table[:published_at], SnsScheduledPost.arel_table[:scheduled_at] ])
+      unrecorded = posts.where(status: "published").or(posts.where.not(published_at: nil))
+        .where(publication_time.between(range))
+        .where.not(id: histories.where.not(sns_scheduled_post_id: nil).select(:sns_scheduled_post_id))
+        .pluck(owner_id, :published_at, :scheduled_at)
+
+      recorded + unrecorded.map { |id, published_at, scheduled_at| [ id, published_at || scheduled_at ] }
+    end
+
     def initialize(weeks, now, member = nil)
       @weeks, @now, @member = weeks.to_i.clamp(1, 260), now.in_time_zone(ZONE), member
     end
@@ -41,7 +56,7 @@ module BrandOps
       posts = MemberPost.where(member_id: ids, is_published: 1).where("published_at >= ? AND published_at <= ?", from - 30.days, @now).pluck(:member_id, :published_at)
       inquiries = MemberInquiry.where(member_id: ids).where("created_at >= ? AND created_at <= ?", from - 30.days, @now).to_a
       reviews = MemberReview.where(member_id: ids, is_approved: 1).where(created_at: from..@now).pluck(:member_id, :created_at)
-      sns = SnsPostHistory.joins(:sns_scheduled_post).where(status: "success", sns_scheduled_posts: { member_id: ids }).where(sns_post_histories: { created_at: (from - 30.days)..@now }).pluck("sns_scheduled_posts.member_id", "sns_post_histories.created_at")
+      sns = self.class.sns_publications(ids, (from - 30.days)..@now)
       by_slug = people.index_by(&:slug)
       visits = AnalyticsEvent.where(event_name: "page_view", created_at: from..@now).filter_map do |event|
         slug = event.page_path.to_s.split("/")[1]
