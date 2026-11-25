@@ -6264,7 +6264,7 @@
       "id": "ISS-530",
       "title": "[Plan:디자인리뷰] ISS-525 시각적 완성도 검증",
       "type": "DESIGN_REVIEW",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "design-critic",
       "depth": 3,
@@ -6286,11 +6286,61 @@
           }
         ],
         "approved_at": "2026-11-25T01:32:21.582Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "acceptance_criteria": [
+          "390px·1280px 실측 화면으로 바닥글 시각 완성도 점수를 남긴다",
+          "바닥글 정렬·간격·위계가 화면 폭마다 무너지지 않는다",
+          "발견한 결함은 별도 카드(이미 있으면 그 카드)로 연결하고 통과 여부를 기록한다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-520 바닥글 반응형 변경의 시각 확인. 대비 문제는 ISS-532 로 이미 분리돼 있어 중복 카드 없이 연결만 함",
+          "risk": "T0 — 검증만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T11:13:35+09:00"
+        }
       },
-      "result": null,
+      "result": {
+        "total_score": 54,
+        "critical_issues": [],
+        "ai_slop_detected": false,
+        "commit": "7f59323",
+        "files_created": [
+          "docs/ui-snapshots/review-ISS-530-536-538.md"
+        ],
+        "linked_issues": [
+          "ISS-532 대비(기존)",
+          "ISS-551 낱글자 줄바꿈(신규)"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "390px·1280px 실측 화면으로 바닥글 시각 완성도 점수를 남긴다",
+            "met": true,
+            "how": "qa/ISS-530 교육·작품·미디어·문의 8장 검토, 54/70, docs/ui-snapshots/review-ISS-530-536-538.md"
+          },
+          {
+            "criterion": "바닥글 정렬·간격·위계가 화면 폭마다 무너지지 않는다",
+            "met": true,
+            "how": "layout_check 8측정 footerWrapped 0·hScroll false, 1280 3열/390 브랜드 전폭+2열 열 시작선 일치 육안 확인"
+          },
+          {
+            "criterion": "발견한 결함은 별도 카드(이미 있으면 그 카드)로 연결하고 통과 여부를 기록한다",
+            "met": true,
+            "how": "대비→ISS-532 연결, 소개 문장 낱글자 줄바꿈→ISS-551 신규"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "OUT_DIR=qa/ISS-530 ROUTES=/education,/works,/media,/inquiries/new WIDTHS=1280,390 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "8측정 hScroll false clipped 0 footerWrapped 0 consoleErrors 0 / SUMMARY pass=true"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T01:32:21.582Z"
+      "updated_at": "2026-11-25T11:13:35+09:00",
+      "completed_at": "2026-11-25T11:25:31.669154"
     },
     {
       "id": "ISS-531",
@@ -6569,7 +6619,7 @@
       "id": "ISS-534",
       "title": "[Plan:도메인분석] ISS-531 비즈니스 규칙/시나리오 도출",
       "type": "DOMAIN_ANALYZE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "domain-analyst",
       "depth": 2,
@@ -6592,11 +6642,117 @@
           }
         ],
         "approved_at": "2026-11-25T01:41:46.751Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "acceptance_criteria": [
+          "ISS-531 분류 버튼 변경에 걸린 업무 규칙(분류별 과정 고르기)을 문서로 정리한다",
+          "규칙마다 지키는 자동 테스트가 있고 통과한다",
+          "분류 버튼을 누르면 해당 분류 과정만 보이는 동작이 바뀌지 않았음을 확인한다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "분류 버튼 CSS 변경이라 새 업무 규칙은 없음 — 분류 필터 동작이 그대로인지 테스트로 고정하는 수준",
+          "risk": "T0 — 검증만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T11:13:35+09:00"
+        }
       },
-      "result": null,
+      "result": {
+        "domain": "education-filter",
+        "commit": "27e0f98",
+        "files_changed": [
+          "app/controllers/chopd/education_controller.rb",
+          "app/views/chopd/education/index.html.erb",
+          "test/integration/education_filter_test.rb",
+          "docs/domain/education-filter-rules.md"
+        ],
+        "rules": [
+          {
+            "id": "R1",
+            "rule": "분류 없음 → 공개 과정 전부, '전체' 선택",
+            "role": "guest"
+          },
+          {
+            "id": "R2",
+            "rule": "online/offline/b2b → 그 분류 공개 과정만, 해당 버튼 하나만 선택",
+            "role": "guest"
+          },
+          {
+            "id": "R3",
+            "rule": "알 수 없는·빈 분류 값은 '전체'로 처리(빈 목록·선택 없음 금지)",
+            "role": "guest"
+          },
+          {
+            "id": "R4",
+            "rule": "비공개 과정은 어떤 분류에서도 안 보임",
+            "role": "guest"
+          },
+          {
+            "id": "R5",
+            "rule": "선택 분류는 aria-current=page 로도 알림(정확히 1개)",
+            "role": "guest"
+          },
+          {
+            "id": "R6",
+            "rule": "390·320px 분류 버튼 글자 쪼개짐 없음, 높이 32px 이상",
+            "role": "guest"
+          }
+        ],
+        "scenarios": [
+          {
+            "id": "S1",
+            "role": "guest",
+            "flow": "390px /education → 온라인",
+            "expect": "온라인 과정만, 버튼 한 줄"
+          },
+          {
+            "id": "S2",
+            "role": "guest",
+            "flow": "/education?type=onlne (오타 링크)",
+            "expect": "전체 과정 + 전체 선택"
+          }
+        ],
+        "gaps_fixed": [
+          "R3 알 수 없는 분류 값이 빈 목록·선택 없음을 만들던 갭",
+          "R5 선택 상태를 색으로만 구분하던 갭"
+        ],
+        "review": {
+          "gemini": "gemini-4-hydrogen-high 결함 없음",
+          "opus": "diff 범위 확인, 컨트롤러를 params[:type].presence 로 되돌리면 테스트 1건 실패(돌연변이 검출)"
+        },
+        "criteria_check": [
+          {
+            "criterion": "ISS-531 분류 버튼 변경에 걸린 업무 규칙(분류별 과정 고르기)을 문서로 정리한다",
+            "met": true,
+            "how": "docs/domain/education-filter-rules.md R1~R6·시나리오 2개·테스트 대응표"
+          },
+          {
+            "criterion": "규칙마다 지키는 자동 테스트가 있고 통과한다",
+            "met": true,
+            "how": "education_filter_test 3 runs(R1~R5), layout_check(R6) 통과"
+          },
+          {
+            "criterion": "분류 버튼을 누르면 해당 분류 과정만 보이는 동작이 바뀌지 않았음을 확인한다",
+            "met": true,
+            "how": "type=online/offline/b2b 각각 해당 공개 과정 제목만 표시되는 테스트 통과"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/integration/education_filter_test.rb test/integration/public_pages_test.rb",
+            "exit_code": 0,
+            "output": "13 runs, 185 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "ROUTES=/education,/education?type=online WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "6개 측정 pillWrapped 0, pillMinHeight 37.5, hScroll false / SUMMARY pass=true"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T01:41:46.751Z"
+      "updated_at": "2026-11-25T11:13:35+09:00",
+      "completed_at": "2026-11-25T11:24:20.485345"
     },
     {
       "id": "ISS-535",
@@ -6682,7 +6838,7 @@
       "id": "ISS-536",
       "title": "[Plan:브랜드검증] ISS-531 아젠다 표현 + Action Clarity",
       "type": "BRAND_GUARD",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "brand-guardian",
       "depth": 2,
@@ -6704,11 +6860,66 @@
           }
         ],
         "approved_at": "2026-11-25T01:41:46.751Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "acceptance_criteria": [
+          "이번 변경이 brand-dna 금지 패턴을 새로 어기지 않는다",
+          "선택된 분류(주요 행동)가 모바일에서 한눈에 식별된다",
+          "브랜드·아젠다·행동 명확성 점수를 근거와 함께 남긴다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "문구·색 변경 없는 배치 수정 — 금지 패턴·선택 상태 식별만 확인",
+          "risk": "T0 — 검증만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T11:13:35+09:00"
+        }
       },
-      "result": null,
+      "result": {
+        "brand_score": 16,
+        "agenda_expression": 7,
+        "action_clarity": 8,
+        "anti_patterns_found": [],
+        "commit": "7f59323",
+        "scope": "ISS-531 분류 버튼 배치 변경(b384f7d) + 27e0f98 aria-current",
+        "notes": [
+          "문구·색 변경 없음, 배치 CSS만 — 새 금지 패턴 없음",
+          "'색만으로 상태 구분'은 27e0f98 aria-current 로 보강",
+          "범위 밖 기존: chopd 주황 강조와 brand-dna 초록 토큰 차이 기록만"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "이번 변경이 brand-dna 금지 패턴을 새로 어기지 않는다",
+            "met": true,
+            "how": "b384f7d diff: white-space nowrap·flex-wrap·좁은 폭 padding 만, 글씨 13px(≥12)·색·문구 그대로. 버튼 4개(같은 무게 5개 기준 미만)"
+          },
+          {
+            "criterion": "선택된 분류(주요 행동)가 모바일에서 한눈에 식별된다",
+            "met": true,
+            "how": "qa/ISS-538 390·320 캡처: 선택 버튼만 채움·그림자, aria-current 1개(테스트 고정)"
+          },
+          {
+            "criterion": "브랜드·아젠다·행동 명확성 점수를 근거와 함께 남긴다",
+            "met": true,
+            "how": "16/20·7/10·8/10, docs/ui-snapshots/review-ISS-530-536-538.md"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "3 runs, 22 assertions, 0 failures"
+          },
+          {
+            "cmd": "git diff b384f7d^ b384f7d -- app/views/chopd/education/index.html.erb --stat",
+            "exit_code": 0,
+            "output": "교육 화면 CSS 배치 규칙만 변경"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T01:41:46.751Z"
+      "updated_at": "2026-11-25T11:13:35+09:00",
+      "completed_at": "2026-11-25T11:25:43.725831"
     },
     {
       "id": "ISS-537",
@@ -6792,7 +7003,7 @@
       "id": "ISS-538",
       "title": "[Plan:디자인리뷰] ISS-535 시각적 완성도 검증",
       "type": "DESIGN_REVIEW",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "design-critic",
       "depth": 3,
@@ -6822,11 +7033,58 @@
           }
         ],
         "approved_at": "2026-11-25T01:56:26.968Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "acceptance_criteria": [
+          "390·320·1280px 교육 화면 실측으로 분류 버튼 시각 완성도 점수를 남긴다",
+          "버튼 간격·정렬·선택 상태가 일관되다",
+          "결함은 DESIGN_FIX 로 분리, 없으면 통과 기록"
+        ]
       },
-      "result": null,
+      "result": {
+        "total_score": 58,
+        "critical_issues": [],
+        "ai_slop_detected": false,
+        "commit": "7f59323",
+        "files_created": [
+          "docs/ui-snapshots/review-ISS-530-536-538.md"
+        ],
+        "linked_issues": [
+          "ISS-551 320px 소개 문장 낱글자 줄바꿈",
+          "ISS-552 빈 목록 안내 대비"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "390·320·1280px 교육 화면 실측으로 분류 버튼 시각 완성도 점수를 남긴다",
+            "met": true,
+            "how": "qa/ISS-538 전체·온라인 × 1280/390/320 6장 검토, 58/70"
+          },
+          {
+            "criterion": "버튼 간격·정렬·선택 상태가 일관되다",
+            "met": true,
+            "how": "390 한 줄 4개·320 3+1, 간격 8px, 높이 37.5px, 선택은 채움+그림자+진한 글자(형태 차이)+aria-current"
+          },
+          {
+            "criterion": "결함은 DESIGN_FIX 로 분리, 없으면 통과 기록",
+            "met": true,
+            "how": "분류 버튼 결함 없음, 주변 관찰 2건 ISS-551·552 로 분리"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "ROUTES=/education,/education?type=online WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "6측정 pillWrapped 0 pillMinHeight 37.5 hScroll false / SUMMARY pass=true"
+          },
+          {
+            "cmd": "bin/rails test test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "3 runs, 0 failures (선택 버튼 aria-current 정확히 1개)"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T01:56:26.968Z"
+      "updated_at": "2026-11-25T11:13:35+09:00",
+      "completed_at": "2026-11-25T11:25:43.608462"
     },
     {
       "id": "ISS-539",
@@ -6938,7 +7196,41 @@
           "gemini": "gemini-4-hydrogen-high 결함 없음",
           "opus": "Turbo 캐시 복원·모바일 메뉴 재등록 확인, 문제 없음"
         },
-        "regression_probe": "HEAD 레이아웃으로 되돌려 turbo_reveal_check 실행 → revealEls 재선언 pageerror 3건, pass=false (복원 후 pass=true)"
+        "regression_probe": "HEAD 레이아웃으로 되돌려 turbo_reveal_check 실행 → revealEls 재선언 pageerror 3건, pass=false (복원 후 pass=true)",
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T02:11:28Z",
+          "sha": "62310dc",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "node script/qa/turbo_reveal_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": ":\"/education\",\"width\":1280,\"consoleErrors\":0,\"consoleErrorItems\":[],\"files\":[\"tmp/qa/turbo-reveal/works-1280.png\"],\"initialScrollListenerCount\":3,\"revealTotal\":6,\"revealHidden\":0,\"revealNotVisibleClass\":0,\"revealSkippedHidden\":14,\"worksScrollListenerCount\":3,\"worksSameDocument\":true,\"scrollProgBound\":true,\"scrollListenerCount\":3,\"returnSameDocument\":true,\"scrollListenerGrowth\":0}\nSUMMARY pass=true"
+            },
+            {
+              "cmd": "node script/qa/footer_inquiry_flow.cjs",
+              "status": "skipped",
+              "why": "검사 명령 아님: node script/qa/footer_inquiry_flow.cjs"
+            },
+            {
+              "cmd": "node script/qa/layout_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "\",\"width\":390,\"file\":\"tmp/qa/layout/inquiries-new-390.png\",\"bytes\":46095,\"scrollWidth\":390,\"clientWidth\":390,\"hScroll\":false,\"checked\":7,\"clipped\":0,\"clippedItems\":[],\"footerWrapped\":0,\"footerWrappedItems\":[],\"pillWrapped\":0,\"pillWrappedItems\":[],\"pillMinHeight\":null,\"pillShort\":0,\"pillShortItems\":[],\"consoleErrors\":0,\"consoleErrorItems\":[],\"badResponses\":0,\"badResponseItems\":[]}\nSUMMARY pass=true"
+            },
+            {
+              "cmd": "bin/rails test test/integration/public_pages_test.rb test/integration/inquiry_submit_contrast_test.rb test/integration/inquiries_form_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            }
+          ]
+        }
       },
       "spawn_rules": [],
       "completed_at": "2026-11-25T11:08:29.496229"
@@ -7094,7 +7386,27 @@
             "exit_code": 0,
             "output": "consoleErrors 0, revealHidden 0, scrollListenerGrowth 0, SUMMARY pass=true"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T02:11:28Z",
+          "sha": "62310dc",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "node script/qa/footer_inquiry_flow.cjs",
+              "status": "skipped",
+              "why": "검사 명령 아님: node script/qa/footer_inquiry_flow.cjs"
+            },
+            {
+              "cmd": "node script/qa/turbo_reveal_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": ":\"/education\",\"width\":1280,\"consoleErrors\":0,\"consoleErrorItems\":[],\"files\":[\"tmp/qa/turbo-reveal/works-1280.png\"],\"initialScrollListenerCount\":3,\"revealTotal\":6,\"revealHidden\":0,\"revealNotVisibleClass\":0,\"revealSkippedHidden\":14,\"worksScrollListenerCount\":3,\"worksSameDocument\":true,\"scrollProgBound\":true,\"scrollListenerCount\":3,\"returnSameDocument\":true,\"scrollListenerGrowth\":0}\nSUMMARY pass=true"
+            }
+          ]
+        }
       }
     },
     {
@@ -7176,7 +7488,7 @@
       "id": "ISS-543",
       "title": "[Plan:도메인분석] ISS-539 비즈니스 규칙/시나리오 도출",
       "type": "DOMAIN_ANALYZE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "domain-analyst",
       "depth": 2,
@@ -7206,11 +7518,102 @@
           "effort": "XS",
           "by": "factory-runner",
           "at": "2026-11-25T02:10:42Z"
-        }
+        },
+        "acceptance_criteria": [
+          "ISS-539 레이아웃 스크립트 수정에 걸린 화면 동작 규칙(본문 표시·진행바·메뉴)을 정리한다",
+          "규칙마다 자동 점검(turbo_reveal_check·테스트)이 대응되고 통과한다",
+          "새 업무 규칙이 생기지 않았음을 근거로 남긴다"
+        ]
       },
-      "result": null,
+      "result": {
+        "domain": "chopd-layout-script",
+        "commit": "1141a68",
+        "files_changed": [
+          "app/views/layouts/_chopd_header.html.erb",
+          "script/qa/chopd_mobile_menu_check.cjs",
+          "docs/domain/chopd-layout-script-rules.md"
+        ],
+        "rules": [
+          {
+            "id": "R1",
+            "rule": "Turbo 이동 화면 .reveal 본문이 스크롤하면 모두 보임",
+            "role": "guest"
+          },
+          {
+            "id": "R2",
+            "rule": "이동 반복해도 스크롤 리스너 증가 0",
+            "role": "guest"
+          },
+          {
+            "id": "R3",
+            "rule": "chopd 화면 이동·조작 중 브라우저 오류 0",
+            "role": "guest"
+          },
+          {
+            "id": "R4",
+            "rule": "모바일 햄버거 한 번에 열림/닫힘, Turbo 이동 뒤에도 동일",
+            "role": "guest"
+          },
+          {
+            "id": "R5",
+            "rule": "햄버거 버튼 aria-expanded 로 열림 상태 알림",
+            "role": "guest"
+          }
+        ],
+        "scenarios": [
+          {
+            "id": "S1",
+            "role": "guest",
+            "flow": "390px /education → 햄버거 열기·닫기 → Turbo 로 /works → 햄버거",
+            "expect": "매번 한 번에 열림, 콘솔 오류 0"
+          }
+        ],
+        "gaps_fixed": [
+          "모바일 메뉴 클릭마다 Stimulus 'Missing target element menu' 콘솔 오류(메뉴가 컨트롤러 범위 밖)",
+          "햄버거 버튼 aria-expanded 없음"
+        ],
+        "review": {
+          "gemini": "gemini-4-hydrogen-high 결함 없음",
+          "opus": "수정 전 헤더로 되돌리면 chopd_mobile_menu_check consoleErrors 1·pass=false, 복원 후 pass=true. mobile_menu_controller.js 는 다른 레이아웃 미사용이나 삭제하지 않음"
+        },
+        "criteria_check": [
+          {
+            "criterion": "ISS-539 레이아웃 스크립트 수정에 걸린 화면 동작 규칙(본문 표시·진행바·메뉴)을 정리한다",
+            "met": true,
+            "how": "docs/domain/chopd-layout-script-rules.md R1~R5"
+          },
+          {
+            "criterion": "규칙마다 자동 점검(turbo_reveal_check·테스트)이 대응되고 통과한다",
+            "met": true,
+            "how": "turbo_reveal_check(R1~R3) pass, 신규 chopd_mobile_menu_check(R3~R5) pass"
+          },
+          {
+            "criterion": "새 업무 규칙이 생기지 않았음을 근거로 남긴다",
+            "met": true,
+            "how": "82c315b 는 레이아웃 인라인 스크립트만 변경(모델·컨트롤러·라우트 변경 없음, git show --stat) — 문서 서두에 기록"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/chopd_mobile_menu_check.cjs",
+            "exit_code": 0,
+            "output": "educationOpen flex/true, educationClosed none/false, worksSameDocument true, worksOpen flex/true, consoleErrors 0, pageErrors 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "node script/qa/turbo_reveal_check.cjs",
+            "exit_code": 0,
+            "output": "revealHidden 0, scrollListenerGrowth 0, consoleErrors 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "bin/rails test test/integration/public_pages_test.rb test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "13 runs, 185 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T02:08:31.656Z"
+      "updated_at": "2026-11-25T11:13:35+09:00",
+      "completed_at": "2026-11-25T11:29:32.948327"
     },
     {
       "id": "ISS-544",
@@ -7474,10 +7877,361 @@
             "output": "8 runs, 87 assertions, 0 failures, 0 errors, 0 skips"
           }
         ],
-        "note": "구현은 rubocop -a 자동 교정기(공백만), 코드 작성 없음"
+        "note": "구현은 rubocop -a 자동 교정기(공백만), 코드 작성 없음",
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T02:11:28Z",
+          "sha": "62310dc",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rubocop",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": ".....................................................................................................................................................................................................................................................................................................................................................................\n\n448 files inspected, no offenses detected"
+            },
+            {
+              "cmd": "bin/rails test test/helpers/member_admin/profile_accounts_helper_test.rb test/integration/member_dashboard_profile_accounts_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            }
+          ]
+        }
       },
       "spawn_rules": [],
       "completed_at": "2026-11-25T11:10:12.786679"
+    },
+    {
+      "id": "ISS-549",
+      "title": "[Plan:비즈니스검증] education-filter 규칙 6개 정적 검증",
+      "type": "BIZ_VALIDATE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "biz-validator",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-534",
+      "depends_on": [],
+      "created_at": "2026-11-25T11:24:20.485345",
+      "payload": {
+        "rules": [
+          {
+            "id": "R1",
+            "rule": "분류 없음 → 공개 과정 전부, '전체' 선택",
+            "role": "guest"
+          },
+          {
+            "id": "R2",
+            "rule": "online/offline/b2b → 그 분류 공개 과정만, 해당 버튼 하나만 선택",
+            "role": "guest"
+          },
+          {
+            "id": "R3",
+            "rule": "알 수 없는·빈 분류 값은 '전체'로 처리(빈 목록·선택 없음 금지)",
+            "role": "guest"
+          },
+          {
+            "id": "R4",
+            "rule": "비공개 과정은 어떤 분류에서도 안 보임",
+            "role": "guest"
+          },
+          {
+            "id": "R5",
+            "rule": "선택 분류는 aria-current=page 로도 알림(정확히 1개)",
+            "role": "guest"
+          },
+          {
+            "id": "R6",
+            "rule": "390·320px 분류 버튼 글자 쪼개짐 없음, 높이 32px 이상",
+            "role": "guest"
+          }
+        ],
+        "scenarios": [
+          {
+            "id": "S1",
+            "role": "guest",
+            "flow": "390px /education → 온라인",
+            "expect": "온라인 과정만, 버튼 한 줄"
+          },
+          {
+            "id": "S2",
+            "role": "guest",
+            "flow": "/education?type=onlne (오타 링크)",
+            "expect": "전체 과정 + 전체 선택"
+          }
+        ],
+        "domain": "education-filter",
+        "source_issue": "ISS-534",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T02:24:22.499Z",
+            "by": "auto",
+            "reason": "「[Plan:비즈니스검증] education-filter 규칙 6개 정적 검증」(BIZ_VALIDATE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T02:24:22.499Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T02:24:22.499Z"
+    },
+    {
+      "id": "ISS-550",
+      "title": "[Plan:시나리오실행] education-filter 시나리오 2개 E2E 실행",
+      "type": "SCENARIO_PLAY",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "scenario-player",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-534",
+      "depends_on": [],
+      "created_at": "2026-11-25T11:24:20.485345",
+      "payload": {
+        "scenarios": [
+          {
+            "id": "S1",
+            "role": "guest",
+            "flow": "390px /education → 온라인",
+            "expect": "온라인 과정만, 버튼 한 줄"
+          },
+          {
+            "id": "S2",
+            "role": "guest",
+            "flow": "/education?type=onlne (오타 링크)",
+            "expect": "전체 과정 + 전체 선택"
+          }
+        ],
+        "domain": "education-filter",
+        "source_issue": "ISS-534",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T02:24:22.499Z",
+            "by": "auto",
+            "reason": "「[Plan:시나리오실행] education-filter 시나리오 2개 E2E 실행」(SCENARIO_PLAY, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T02:24:22.499Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T02:24:22.499Z"
+    },
+    {
+      "id": "ISS-551",
+      "title": "[가독성] chopd 바닥글 소개·교육 소개 문장이 '허/브.', '강좌/로'처럼 낱글자로 줄바꿈됨",
+      "type": "FIX_BUG",
+      "priority": "P2",
+      "status": "READY",
+      "origin": "factory-observation",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": "ISS-530",
+      "depends_on": [],
+      "created_at": "2026-11-25T11:25:22+09:00",
+      "updated_at": "2026-11-25T02:25:22.660Z",
+      "description": "한국어 문장이 글자 단위로 줄바꿈돼 마지막 한 글자가 다음 줄에 혼자 남는다. 바닥글 소개(max-width 280px) 1280·390 모두 '통합 브랜드 허 / 브.', 교육 히어로 소개 320px '맞춤 강좌 / 로'. word-break: keep-all 같은 단어 단위 줄바꿈이 없음.",
+      "payload": {
+        "origin": "factory-observation",
+        "files": [
+          "app/views/layouts/_chopd_footer.html.erb",
+          "app/views/chopd/education/index.html.erb",
+          "app/views/layouts/chopd.html.erb"
+        ],
+        "evidence": [
+          "docs/ui-snapshots/review-ISS-530-536-538.md",
+          "qa/ISS-530/education-390.png",
+          "qa/ISS-538/education-320.png"
+        ],
+        "acceptance_criteria": [
+          "바닥글 소개 문장이 1280·390에서 단어 중간에서 끊기지 않는다",
+          "교육 소개 문장이 320·390에서 단어 중간에서 끊기지 않는다",
+          "긴 영문·URL 때문에 가로 스크롤이 생기지 않는다(layout_check 통과)",
+          "줄바꿈 규칙을 확인하는 자동 점검 또는 테스트가 있다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "브랜드 소개 첫 문장이 '허/브.'로 깨져 보여 단정함(브랜드 감정 톤)을 해침. CSS 한 줄 수준",
+          "risk": "T0 — 화면 표시만, 데이터 영향 없음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T11:25:22+09:00"
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T02:25:22.660Z",
+            "by": "auto",
+            "reason": "브랜드 소개 첫 문장이 '허/브.'로 깨져 보여 단정함(브랜드 감정 톤)을 해침. CSS 한 줄 수준"
+          }
+        ],
+        "approved_at": "2026-11-25T02:25:22.660Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": []
+    },
+    {
+      "id": "ISS-552",
+      "title": "[접근성] 교육 화면 빈 목록 안내 글자 대비 부족(rgba .3, 약 2.6:1) — 다음 행동 안내 없음",
+      "type": "FIX_BUG",
+      "priority": "P3",
+      "status": "READY",
+      "origin": "factory-observation",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": "ISS-530",
+      "depends_on": [],
+      "created_at": "2026-11-25T11:25:22+09:00",
+      "updated_at": "2026-11-25T02:25:22.660Z",
+      "description": "강좌가 없을 때 '등록된 강좌가 없습니다 / 곧 새로운 강좌가 추가될 예정입니다' 안내가 rgba(255,255,255,.3) 이하라 4.5:1 미달, 문의로 이어지는 다음 행동도 없다(brand-dna 금지 패턴 '빈 구역 그대로 노출').",
+      "payload": {
+        "origin": "factory-observation",
+        "files": [
+          "app/views/chopd/education/index.html.erb"
+        ],
+        "evidence": [
+          "docs/ui-snapshots/review-ISS-530-536-538.md",
+          "qa/ISS-530/education-390.png",
+          "qa/ISS-538/education-320.png"
+        ],
+        "acceptance_criteria": [
+          "빈 목록 안내 글자 대비가 4.5:1 이상이다",
+          "빈 목록에서 강좌 문의(/inquiries/new)로 가는 링크가 하나 있다",
+          "강좌가 있을 때 화면은 바뀌지 않는다",
+          "빈 목록 상태를 확인하는 테스트가 있다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "공개 강좌가 0건일 때 첫 화면이 거의 안 보이는 글씨만 남아 이탈 위험. 색 값·링크 1개 추가 수준",
+          "risk": "T0 — 화면 표시만, 데이터 영향 없음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T11:25:22+09:00"
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T02:25:22.660Z",
+            "by": "auto",
+            "reason": "공개 강좌가 0건일 때 첫 화면이 거의 안 보이는 글씨만 남아 이탈 위험. 색 값·링크 1개 추가 수준"
+          }
+        ],
+        "approved_at": "2026-11-25T02:25:22.660Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": []
+    },
+    {
+      "id": "ISS-553",
+      "title": "[Plan:비즈니스검증] chopd-layout-script 규칙 5개 정적 검증",
+      "type": "BIZ_VALIDATE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "biz-validator",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-543",
+      "depends_on": [],
+      "created_at": "2026-11-25T11:29:32.948327",
+      "payload": {
+        "rules": [
+          {
+            "id": "R1",
+            "rule": "Turbo 이동 화면 .reveal 본문이 스크롤하면 모두 보임",
+            "role": "guest"
+          },
+          {
+            "id": "R2",
+            "rule": "이동 반복해도 스크롤 리스너 증가 0",
+            "role": "guest"
+          },
+          {
+            "id": "R3",
+            "rule": "chopd 화면 이동·조작 중 브라우저 오류 0",
+            "role": "guest"
+          },
+          {
+            "id": "R4",
+            "rule": "모바일 햄버거 한 번에 열림/닫힘, Turbo 이동 뒤에도 동일",
+            "role": "guest"
+          },
+          {
+            "id": "R5",
+            "rule": "햄버거 버튼 aria-expanded 로 열림 상태 알림",
+            "role": "guest"
+          }
+        ],
+        "scenarios": [
+          {
+            "id": "S1",
+            "role": "guest",
+            "flow": "390px /education → 햄버거 열기·닫기 → Turbo 로 /works → 햄버거",
+            "expect": "매번 한 번에 열림, 콘솔 오류 0"
+          }
+        ],
+        "domain": "chopd-layout-script",
+        "source_issue": "ISS-543",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T02:29:35.739Z",
+            "by": "auto",
+            "reason": "「[Plan:비즈니스검증] chopd-layout-script 규칙 5개 정적 검증」(BIZ_VALIDATE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T02:29:35.739Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T02:29:35.739Z"
+    },
+    {
+      "id": "ISS-554",
+      "title": "[Plan:시나리오실행] chopd-layout-script 시나리오 1개 E2E 실행",
+      "type": "SCENARIO_PLAY",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "scenario-player",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-543",
+      "depends_on": [],
+      "created_at": "2026-11-25T11:29:32.948327",
+      "payload": {
+        "scenarios": [
+          {
+            "id": "S1",
+            "role": "guest",
+            "flow": "390px /education → 햄버거 열기·닫기 → Turbo 로 /works → 햄버거",
+            "expect": "매번 한 번에 열림, 콘솔 오류 0"
+          }
+        ],
+        "domain": "chopd-layout-script",
+        "source_issue": "ISS-543",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T02:29:35.739Z",
+            "by": "auto",
+            "reason": "「[Plan:시나리오실행] chopd-layout-script 시나리오 1개 E2E 실행」(SCENARIO_PLAY, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T02:29:35.739Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T02:29:35.739Z"
     }
   ],
   "hooks": {
@@ -7789,6 +8543,36 @@
         "issue_type": "SCORE",
         "plan_created": 0,
         "timestamp": "2026-11-25T11:10:28.127443"
+      },
+      {
+        "issue_id": "ISS-534",
+        "issue_type": "DOMAIN_ANALYZE",
+        "plan_created": 2,
+        "timestamp": "2026-11-25T11:24:20.485345"
+      },
+      {
+        "issue_id": "ISS-530",
+        "issue_type": "DESIGN_REVIEW",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T11:25:31.669154"
+      },
+      {
+        "issue_id": "ISS-538",
+        "issue_type": "DESIGN_REVIEW",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T11:25:43.608462"
+      },
+      {
+        "issue_id": "ISS-536",
+        "issue_type": "BRAND_GUARD",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T11:25:43.725831"
+      },
+      {
+        "issue_id": "ISS-543",
+        "issue_type": "DOMAIN_ANALYZE",
+        "plan_created": 2,
+        "timestamp": "2026-11-25T11:29:32.948327"
       }
     ],
     "on_fail": [],
@@ -12012,8 +12796,8 @@
     ]
   },
   "stats": {
-    "total_issues": 545,
-    "completed": 51,
+    "total_issues": 549,
+    "completed": 56,
     "failed": 0,
     "evolved": 223
   },
