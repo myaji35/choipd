@@ -65,7 +65,7 @@
 
   <!-- 데스크탑 네비 -->
   <nav class="nav-links-desktop" style="display:flex;gap:36px;">
-    <%= link_to "소개", "#identity", class: "nav-link" %>
+    <%= link_to "소개", media_greeting_path, class: "nav-link" %>
     <%= link_to "교육", education_path, class: "nav-link" %>
     <%= link_to "미디어", media_path, class: "nav-link" %>
     <%= link_to "작품", works_path, class: "nav-link" %>
@@ -108,7 +108,7 @@
 
 <!-- 모바일 메뉴 -->
 <div id="mobile-nav" class="mobile-menu">
-  <%= link_to "소개", "#identity", class: "mobile-nav-link" %>
+  <%= link_to "소개", media_greeting_path, class: "mobile-nav-link" %>
   <%= link_to "교육", education_path, class: "mobile-nav-link" %>
   <%= link_to "미디어", media_path, class: "mobile-nav-link" %>
   <%= link_to "작품", works_path, class: "mobile-nav-link" %>
@@ -147,6 +147,11 @@
     document.querySelector('.nav-mobile-btn')?.addEventListener('click', (event) => {
       const open = document.getElementById('mobile-nav')?.classList.toggle('open');
       event.currentTarget.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.getElementById('mobile-nav')?.addEventListener('click', (event) => {
+      if (!event.target.closest('a')) return;
+      event.currentTarget.classList.remove('open');
+      document.querySelector('.nav-mobile-btn')?.setAttribute('aria-expanded', 'false');
     });
   })();
 </script>
