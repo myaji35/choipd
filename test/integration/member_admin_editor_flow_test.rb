@@ -217,7 +217,7 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_select "a[aria-current=step] span", text: "(마침)", count: 0
     assert_select "a[href=?]", slug_admin_editor_path(slug: @member.slug, step: 3), text: /스타일/
     @member.reload
-    assert_equal [original_bio, original_email], [@member.bio, @member.email]
+    assert_equal [ original_bio, original_email ], [ @member.bio, @member.email ]
 
     patch path, params: { member: info.merge(email: original_email) }
 
