@@ -10482,7 +10482,7 @@
       "id": "ISS-576",
       "title": "[Plan:브라우저QA] ISS-557 콘솔 에러 + 스크린샷 검증",
       "type": "BROWSER_QA",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "agent-harness",
       "depth": 2,
@@ -10520,9 +10520,59 @@
           "헤더가 가로 넘침 없이 표시된다(layout_check 통과)"
         ]
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "console_errors": 0,
+        "bad_responses": 0,
+        "pages_checked": [
+          "/",
+          "/media/greeting",
+          "/education"
+        ],
+        "widths": [
+          1280,
+          390,
+          320
+        ],
+        "criteria_check": [
+          {
+            "criterion": "1280·390 주요 화면(/, /media/greeting)에서 콘솔 오류 0개·깨진 요청 0개",
+            "met": true,
+            "how": "layout_check ROUTES=/,/media/greeting,/education WIDTHS=1280,390,320: 9개 조합 모두 consoleErrors 0 badResponses 0"
+          },
+          {
+            "criterion": "390 모바일 메뉴 소개 → /media/greeting 이동, 메뉴 닫힘",
+            "met": true,
+            "how": "chopd_mobile_menu_check: introNav finalPath /media/greeting menuDisplay none expanded false, consoleErrors 0"
+          },
+          {
+            "criterion": "헤더가 가로 넘침 없이 표시된다",
+            "met": true,
+            "how": "layout_check 9개 조합 hScroll false clipped 0"
+          }
+        ],
+        "notes": "인사말 화면 글자 대비 문제는 layout_check 범위 밖 — 기존 카드 ISS-571 에서 처리",
+        "proof": [
+          {
+            "cmd": "cd script/qa && ROUTES=/,/media/greeting,/education WIDTHS=1280,390,320 node layout_check.cjs",
+            "exit_code": 0,
+            "output": "/ 390 hScroll False clip 0 console 0 bad 0 … /media/greeting 320 hScroll False clip 0 console 0 bad 0 … SUMMARY pass=true"
+          },
+          {
+            "cmd": "cd script/qa && node chopd_mobile_menu_check.cjs",
+            "exit_code": 0,
+            "output": "introNav finalPath /media/greeting menuDisplay none expanded false consoleErrors 0 pageErrors 0 SUMMARY pass=true"
+          },
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_header_links_test.rb test/integration/pd_layout_mobile_menu_test.rb",
+            "exit_code": 0,
+            "output": "3 runs, 44 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:48:18Z"
+      "updated_at": "2026-11-25T03:48:18Z",
+      "completed_at": "2026-11-25T12:56:05.762527"
     },
     {
       "id": "ISS-577",
@@ -11742,6 +11792,12 @@
         "issue_type": "SCENARIO_PLAY",
         "plan_created": 0,
         "timestamp": "2026-11-25T12:55:56.308665"
+      },
+      {
+        "issue_id": "ISS-576",
+        "issue_type": "BROWSER_QA",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T12:56:05.762527"
       }
     ],
     "on_fail": [],
@@ -15985,7 +16041,7 @@
   },
   "stats": {
     "total_issues": 583,
-    "completed": 84,
+    "completed": 85,
     "failed": 0,
     "evolved": 223
   },
