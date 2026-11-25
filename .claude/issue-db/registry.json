@@ -9911,6 +9911,27 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 213,
+        "timestamp": "2026-11-25T10:16:59.177925",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (brand-guardian, domain-analyst, ux-harness, test-harness, agent-harness)",
+          "🟠 핑퐁 감지: ISS-502 → 5회 파생 (brand-guardian, domain-analyst, ux-harness, test-harness, agent-harness)",
+          "🟠 핑퐁 감지: ISS-503 → 5회 파생 (brand-guardian, domain-analyst, ux-harness, test-harness, agent-harness)",
+          "🟠 핑퐁 감지: ISS-520 → 5회 파생 (brand-guardian, domain-analyst, ux-harness, test-harness, agent-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 14시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 73,
+          "done": 50,
+          "in_progress": 0,
+          "ready": 5,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
@@ -9918,7 +9939,7 @@
     "total_issues": 527,
     "completed": 35,
     "failed": 0,
-    "evolved": 212
+    "evolved": 213
   },
   "pending_opportunity_signals": [
     {
@@ -9943,13 +9964,13 @@
   "opus_budget_state": {
     "daily": {
       "date": "2026-11-25",
-      "cost_usd": 2.94,
-      "calls": 3
+      "cost_usd": 3.92,
+      "calls": 4
     },
     "monthly": {
       "month": "2026-11",
-      "cost_usd": 2.94,
-      "calls": 3
+      "cost_usd": 3.92,
+      "calls": 4
     },
     "demotion_active": false
   }
