@@ -88,9 +88,25 @@ async function main() {
               footerWrappedItems.push({ text: el.innerText.slice(0, 20), lines });
             }
           }
+          const pillWrappedItems = [];
+          for (const el of document.querySelectorAll('.filter-pill')) {
+            const { visibility, display } = getComputedStyle(el);
+            if (visibility === 'hidden' || display === 'none' || !el.getClientRects().length) continue;
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            const lineTops = new Set();
+            for (const rect of range.getClientRects()) {
+              if (rect.width > 0) lineTops.add(Math.round(rect.top));
+            }
+            const lines = lineTops.size;
+            if (lines > 1) {
+              pillWrappedItems.push({ text: el.innerText, lines });
+            }
+          }
           return {
             scrollWidth, clientWidth, hScroll: scrollWidth > clientWidth, checked, clipped: clippedItems.length, clippedItems,
             footerWrapped: footerWrappedItems.length, footerWrappedItems,
+            pillWrapped: pillWrappedItems.length, pillWrappedItems,
           };
         });
         const consoleErrors = consoleErrorItems.length;
@@ -100,7 +116,7 @@ async function main() {
           consoleErrors, consoleErrorItems, badResponses, badResponseItems,
         }));
         pass = pass && !result.hScroll && result.clipped === 0 && result.footerWrapped === 0
-          && consoleErrors === 0 && badResponses === 0;
+          && result.pillWrapped === 0 && consoleErrors === 0 && badResponses === 0;
         await page.close();
       }
     }

@@ -34,9 +34,12 @@
     border-bottom: 1px solid rgba(255,255,255,.06);
     padding: 16px 48px;
     display: flex; gap: 10px; align-items: center;
+    flex-wrap: wrap;
   }
   .filter-pill {
     padding: 8px 20px; border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
     font-size: 13px; font-weight: 600;
     text-decoration: none; transition: all .2s;
     border: 1px solid rgba(255,255,255,.1);
@@ -131,6 +134,8 @@
   @media (max-width: 640px) {
     .courses-grid { grid-template-columns: 1fr; }
     .filter-bar, .courses-section, .b2b-section { padding-left: 20px; padding-right: 20px; }
+    .filter-pill { padding: 8px 14px; }
+    .filter-bar { gap: 8px; }
     .b2b-inner { grid-template-columns: 1fr; gap: 40px; }
   }
 </style>
