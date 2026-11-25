@@ -1963,7 +1963,12 @@
             "by": "factory-runner",
             "note": "관제 결정 기록 후 자동 READY 로 풀렸으나 결정 내용이 '보류'이고 SD ISS-521 미병합이라 BLOCKED(external_wait)로 되돌림"
           }
-        ]
+        ],
+        "last_recheck": {
+          "at": "2026-11-25T05:44:56Z",
+          "by": "factory-runner",
+          "note": "2026-11-25 공장 회차 재확인: SocialDoctors ISS-521 은 대표님 승인(2026-11-19 approved_at) 상태지만 아직 AWAITING_USER·factory/ISS-521 미병합 — SocialDoctors 공장이 병합해야 풀림. 이쪽에서 할 수 있는 부분 없음."
+        }
       },
       "updated_at": "2026-11-25T14:43:54+09:00",
       "blocked_reason": "성과 칸(매체별 발행 수·Townin 읽음·사용 포인트)은 SocialDoctors 브랜드 요약 API(SD 521번 카드, 현재 AWAITING_USER)가 있어야 붙일 수 있다. 브랜드·동의 상태·imPD 콘텐츠 수·4주 운영 그래프는 ac54dd2·ISS-481 에서 이미 한 화면에 들어갔다."
@@ -2073,7 +2078,12 @@
         "if_not_decided": "이 카드는 계속 막힌 상태로 남을 뿐 다른 카드가 이 때문에 기다리고 있지는 않아(대기 카드 0건) 당장 피해는 없습니다.",
         "reversible": "쉽게 되돌릴 수 있습니다 — 보류는 선행 API가 병합되는 즉시 풀고 착수하면 되고, 비용은 그동안 일정이 밀리는 것뿐입니다.",
         "explained_by": "decision-explain",
-        "explained_at": "2026-11-25T12:08:58.350805+09:00"
+        "explained_at": "2026-11-25T12:08:58.350805+09:00",
+        "last_recheck": {
+          "at": "2026-11-25T05:44:56Z",
+          "by": "factory-runner",
+          "note": "2026-11-25 공장 회차 재확인: SocialDoctors ISS-521 은 대표님 승인(2026-11-19 approved_at) 상태지만 아직 AWAITING_USER·factory/ISS-521 미병합 — SocialDoctors 공장이 병합해야 풀림. 이쪽에서 할 수 있는 부분 없음."
+        }
       },
       "updated_at": "2026-11-25T14:43:54+09:00",
       "blocked_reason": "12단계 중 6·7(SD→Townin 발행)·10(SD 성과 수집)·11(imPD 내 브랜드 Townin 성과)은 SocialDoctors ISS-521(Townin 매체·발행 어댑터·브랜드 요약 API)이 있어야 시험할 수 있다. SD 521번 카드 은 현재 AWAITING_USER, imPD ISS-476 도 같은 이유로 BLOCKED. 나머지 선행(imPD ISS-475, Townin ISS-722, SD ISS-522)은 DONE."
