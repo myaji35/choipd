@@ -11149,7 +11149,7 @@
       "id": "ISS-585",
       "title": "[Plan:품질평가] ISS-572 품질 점수 산출",
       "type": "SCORE",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "eval-harness",
       "depth": 3,
@@ -11187,9 +11187,48 @@
           "품질·커버리지·성능·문서 4개 영역 점수와 총점을 남긴다"
         ]
       },
-      "result": null,
+      "result": {
+        "score": 84,
+        "prev_score": null,
+        "breakdown": {
+          "quality": 88,
+          "coverage": 78,
+          "performance": 85,
+          "docs": 85
+        },
+        "criteria_check": [
+          {
+            "criterion": "관련 테스트와 린트 결과를 직접 다시 돌려 점수 근거로 남긴다",
+            "met": true,
+            "how": "chopd_mobile_menu_check 실행 SUMMARY pass=true, node --check 문법 통과, 헤더·모바일 메뉴 Rails 테스트 3 runs 0 failures"
+          },
+          {
+            "criterion": "품질·커버리지·성능·문서 4개 영역 점수와 총점을 남긴다",
+            "met": true,
+            "how": "quality 88(점검 대상 소개 이동·메뉴 닫힘 명확), coverage 78(브라우저 점검 스크립트라 CI 테스트 묶음 밖), performance 85, docs 85 → 84점"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "cd script/qa && node chopd_mobile_menu_check.cjs",
+            "exit_code": 0,
+            "output": "introNav finalPath /media/greeting menuDisplay none expanded false SUMMARY pass=true"
+          },
+          {
+            "cmd": "node --check script/qa/chopd_mobile_menu_check.cjs",
+            "exit_code": 0,
+            "output": "(출력 없음, 문법 통과)"
+          },
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_header_links_test.rb test/integration/pd_layout_mobile_menu_test.rb",
+            "exit_code": 0,
+            "output": "3 runs, 44 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:48:18Z"
+      "updated_at": "2026-11-25T03:48:18Z",
+      "completed_at": "2026-11-25T12:56:31.663409"
     },
     {
       "id": "ISS-586",
@@ -11846,6 +11885,12 @@
         "issue_type": "BROWSER_QA",
         "plan_created": 0,
         "timestamp": "2026-11-25T12:56:23.037743"
+      },
+      {
+        "issue_id": "ISS-585",
+        "issue_type": "SCORE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T12:56:31.663409"
       }
     ],
     "on_fail": [],
@@ -16089,7 +16134,7 @@
   },
   "stats": {
     "total_issues": 583,
-    "completed": 86,
+    "completed": 87,
     "failed": 0,
     "evolved": 223
   },
