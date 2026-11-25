@@ -13,7 +13,7 @@
     <style>
       :root {
         --impd-paper: #efece4; --impd-card: #fbf8f1; --impd-ink: #0f0d0b;
-        --impd-ink2: rgba(15,13,11,0.85); --impd-muted: rgba(15,13,11,0.55);
+        --impd-ink2: rgba(15,13,11,0.85); --impd-muted: #5c5a55;
         --impd-soft-muted: rgba(15,13,11,0.35); --impd-rule: rgba(15,13,11,0.15);
         --impd-accent: #00754A; --impd-accent-2: #CBA258;
         --impd-font-display: "Inter Tight","Pretendard Variable","Pretendard",system-ui,sans-serif;
@@ -21,15 +21,33 @@
         --impd-font-serif: "Noto Serif KR",serif; --impd-font-mono: "JetBrains Mono",ui-monospace,monospace;
       }
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { background: var(--impd-paper); color: var(--impd-ink); font-family: var(--impd-font-sans); -webkit-font-smoothing: antialiased; }
+      body.impd-admin { display: block; width: 100%; background: var(--impd-paper); color: var(--impd-ink); font-family: var(--impd-font-sans); -webkit-font-smoothing: antialiased; }
       a { color: inherit; text-decoration: none; }
-      .impd-label { font-family: var(--impd-font-sans); font-size: 13px; font-weight: 600; letter-spacing: .02em; color: var(--impd-accent); }
-      .impd-label-muted { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted); }
+      .impd-admin .impd-label, .impd-admin .impd-label-muted {
+        font-family: var(--impd-font-sans);
+        font-size: 13px;
+        letter-spacing: 0;
+        text-transform: none;
+        color: var(--impd-muted);
+      }
+      .impd-admin .impd-label { font-weight: 600; color: var(--impd-accent); }
+      .impd-admin > main { display: block; width: 100%; min-width: 0; }
+      .impd-admin .admin-page {
+        width: 100%;
+        max-width: var(--admin-page-max-width, 1400px);
+        margin-inline: auto;
+        padding: 40px;
+        overflow-wrap: anywhere;
+      }
+      @media (max-width: 768px) {
+        .impd-admin .admin-page { padding: 20px 16px; }
+      }
       .impd-display { font-family: var(--impd-font-display); font-weight: 800; letter-spacing: -1.6px; line-height: 1.05; }
       .impd-section-header { display: flex; align-items: baseline; gap: 16px; border-top: 1px solid var(--impd-ink); padding-top: 14px; margin-bottom: 24px; }
       .impd-btn { display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; height: 44px; font-family: var(--impd-font-sans); font-size: 14px; font-weight: 600; letter-spacing: -0.2px; cursor: pointer; border: none; border-radius: 0; }
       .impd-btn-primary { background: var(--impd-ink); color: var(--impd-paper); }
       .impd-btn-primary:hover { background: var(--impd-accent); }
+      .impd-btn-accent { background: var(--impd-accent); color: white; }
       .impd-btn-secondary { background: transparent; color: var(--impd-ink); border: 1px solid var(--impd-ink); }
       .impd-card { background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 24px; }
     </style>
@@ -38,21 +56,21 @@
     <%= csp_meta_tag %>
     <%= javascript_importmap_tags %>
   </head>
-  <body>
+  <body class="impd-admin">
     <a class="skip-link" href="#main-content">본문 바로가기</a>
     <style>
-      .admin-header { position: sticky; top: 0; z-index: 20; }
-      .admin-impersonation-banner { padding: 10px 18px; background: var(--impd-ink); color: var(--impd-paper); font-size: 13px; line-height: 1.5; }
+      .admin-header { width: 100%; position: sticky; top: 0; z-index: 20; }
+      .admin-impersonation-banner { padding: 10px 18px; background: var(--impd-ink); color: var(--impd-paper); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
       .admin-impersonation-banner a { display: inline-block; font-weight: 700; text-decoration: underline; }
       .admin-nav { background: var(--impd-paper); border-bottom: 1px solid var(--impd-rule); }
       .admin-nav-bar { padding: 14px 40px; display: flex; align-items: center; gap: 24px; }
-      .admin-nav-links { display: flex; align-items: center; gap: 22px; flex: 1; }
+      .admin-nav-links { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 22px; flex: 1; min-width: 0; }
       .admin-nav-link { font-size: 13px; color: var(--impd-muted); padding: 8px 0; border-bottom: 2px solid transparent; }
       .admin-nav-link[aria-current="page"] { color: var(--impd-accent); border-bottom-color: var(--impd-accent); font-weight: 700; }
-      .admin-subnav { display: flex; gap: 22px; padding: 0 40px; border-top: 1px solid var(--impd-rule); overflow-x: auto; white-space: nowrap; }
+      .admin-subnav { max-width: 100%; display: flex; gap: 22px; padding: 0 40px; border-top: 1px solid var(--impd-rule); overflow-x: auto; white-space: nowrap; }
       .admin-subnav .admin-nav-link { flex: none; }
-      .admin-identity { display: flex; flex-direction: column; align-items: flex-end; font-size: 13px; }
-      .admin-email { font-size: 12px; color: var(--impd-muted); }
+      .admin-identity { display: flex; flex-direction: column; align-items: flex-end; min-width: 0; font-size: 13px; overflow-wrap: anywhere; }
+      .admin-email { max-width: 100%; font-size: 13px; color: var(--impd-muted); }
       .admin-menu-button, .admin-mobile-panel { display: none; }
       @media (max-width: 767px) {
         .admin-nav-bar { padding: 12px 18px; gap: 12px; }

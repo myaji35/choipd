@@ -18,7 +18,11 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
   end
 
   def update_info
-    permitted = params.require(:member).permit(:bio, :profession, :region, :phone, :email, :kakao_channel, :career_note)
+    permitted = params.require(:member).permit(:bio, :profession, :region, :phone, :email, :kakao_channel, :career_note, :custom_profession)
+    custom_profession = permitted.delete(:custom_profession).to_s.strip
+    if permitted[:profession] == "custom" && custom_profession.present?
+      permitted[:profession] = custom_profession
+    end
     kakao_ch = permitted.delete(:kakao_channel)
 
     # social_links JSON 안에 kakao_channel 저장

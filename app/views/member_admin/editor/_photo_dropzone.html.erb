@@ -19,7 +19,7 @@
       <p style="font-family: var(--impd-font-display); font-size: 22px; font-weight: 800; letter-spacing: -0.4px; line-height: 1.1;">
         여기에 <span style="font-family: var(--impd-font-serif); font-style: italic; color: var(--impd-accent-2);">올려만</span> 주세요.
       </p>
-      <p style="font-size: 12px; color: var(--impd-muted); margin-top: 6px; font-family: var(--impd-font-mono);">
+      <p style="font-size: 13px; color: var(--impd-muted); margin-top: 6px;">
         사진 (휴대폰 사진 그대로 OK · 25MB까지) · 영상 (100MB까지)
       </p>
     </div>
@@ -49,12 +49,12 @@
   <div style="position: relative; display: flex; align-items: center; gap: 14px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--impd-rule);">
     <span class="impd-label-muted">분류</span>
     <select data-member-photo-uploader-target="category"
-            style="font-size: 12px; padding: 4px 10px; border: 1px solid var(--impd-ink); background: var(--impd-card); font-family: var(--impd-font-mono);">
+            style="padding: 4px 10px; background: var(--impd-card);">
       <% categories.each do |cat| %>
         <option value="<%= cat %>"><%= { "daily" => "일상", "workshop" => "작품", "product" => "작품", "press" => "이력", "people" => "일상" }[cat] %></option>
       <% end %>
     </select>
-    <span style="flex: 1; font-size: 11px; color: var(--impd-muted); font-family: var(--impd-font-mono);">사진 25MB까지 · 영상 100MB까지</span>
+    <span style="flex: 1; font-size: 13px; color: var(--impd-muted);">사진 25MB까지 · 영상 100MB까지</span>
   </div>
 
   <div data-member-photo-uploader-target="progress" style="display: none; margin-top: 14px;">
@@ -64,6 +64,6 @@
   </div>
 
   <div data-member-photo-uploader-target="error"
-       style="display: none; margin-top: 14px; padding: 10px 12px; background: rgba(255,90,31,.08); border-left: 2px solid var(--impd-accent-2); color: var(--impd-accent-2); font-size: 12px; line-height: 1.5; white-space: pre-wrap; font-family: var(--impd-font-mono);"></div>
-  <p data-member-photo-uploader-target="status" class="impd-label-muted" style="margin-top: 10px; min-height: 14px; font-family: var(--impd-font-mono);"></p>
+       style="display: none; margin-top: 14px; padding: 10px 12px; background: rgba(255,90,31,.08); border-left: 2px solid var(--impd-accent-2); color: var(--impd-accent-2); font-size: 13px; line-height: 1.5; white-space: pre-wrap;"></div>
+  <p data-member-photo-uploader-target="status" class="impd-label-muted" style="margin-top: 10px; min-height: 14px;"></p>
 </div>

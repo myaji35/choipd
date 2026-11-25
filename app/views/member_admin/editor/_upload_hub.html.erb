@@ -4,7 +4,7 @@
 <% docs   = member.member_documents.order(uploaded_at: :desc).limit(8) %>
 
 <section data-controller="upload-hub"
-         style="background: var(--impd-card); border: 1px solid var(--impd-ink); border-radius: 0;">
+         style="background: var(--impd-card); border: 1px solid var(--impd-rule);">
   <%# Tab bar %>
   <div style="display: flex; align-items: stretch; border-bottom: 1px solid var(--impd-ink);">
     <button type="button" data-action="click->upload-hub#switch" data-upload-hub-tab-param="docs"
@@ -12,14 +12,14 @@
             style="flex: 1; padding: 18px 20px; background: var(--impd-ink); color: var(--impd-paper); border: 0; cursor: pointer; text-align: left; border-right: 1px solid var(--impd-ink);">
       <div class="impd-label" style="color: rgba(255,255,255,0.55); margin-bottom: 4px;">자료</div>
       <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 18px; letter-spacing: -0.4px;">이력 · 수료증 · 포트폴리오</div>
-      <div style="font-size: 12px; color: rgba(255,255,255,0.55); font-family: var(--impd-font-mono); margin-top: 6px;"><%= member.member_documents.count %>개 자료</div>
+      <div style="font-size: 13px; color: rgba(255,255,255,0.55); margin-top: 6px;"><%= member.member_documents.count %>개 자료</div>
     </button>
     <button type="button" data-action="click->upload-hub#switch" data-upload-hub-tab-param="media"
             data-upload-hub-target="tab" data-tab-id="media"
             style="flex: 1; padding: 18px 20px; background: transparent; color: var(--impd-ink); border: 0; cursor: pointer; text-align: left;">
       <div class="impd-label" style="margin-bottom: 4px;">사진·영상</div>
       <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 18px; letter-spacing: -0.4px;">일상·작업·후기 장면</div>
-      <div style="font-size: 12px; color: var(--impd-muted); font-family: var(--impd-font-mono); margin-top: 6px;"><%= member.member_photos.count %>개 사진·영상</div>
+      <div style="font-size: 13px; color: var(--impd-muted); margin-top: 6px;"><%= member.member_photos.count %>개 사진·영상</div>
     </button>
   </div>
 

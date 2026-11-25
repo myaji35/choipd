@@ -1,6 +1,6 @@
 <% content_for :title, "대시보드 — #{@member.name}" %>
 
-<div style="max-width: 1400px; margin: 0 auto; padding: 40px;">
+<div class="admin-page">
   <!-- Masthead -->
   <div style="margin-bottom: 32px;">
     <p class="impd-label">대시보드</p>
@@ -24,7 +24,7 @@
         <% if next_item %>
           <h2 style="font-size: 24px; margin-top: 10px;"><%= next_item[:label] %></h2>
           <p style="font-size: 14px; color: var(--impd-muted); margin: 8px 0 18px;"><%= next_item[:why] %></p>
-          <%= link_to "바로 하기", next_item[:path], class: "impd-btn impd-btn-primary", style: "background: var(--impd-accent); color: white;" %>
+          <%= link_to "바로 하기", next_item[:path], class: "impd-btn impd-btn-accent" %>
         <% else %>
           <p style="margin-top: 10px;">체크리스트를 모두 완료했어요.</p>
         <% end %>
@@ -214,7 +214,6 @@
 </div>
 
 <style>
-  .dashboard-grid .impd-label-muted { font-family: var(--impd-font-sans); font-size: 13px; letter-spacing: 0; text-transform: none; }
   .dashboard-grid, .dashboard-grid * { min-width: 0; overflow-wrap: anywhere; }
   @media (max-width: 900px) {
     .dashboard-grid { grid-template-columns: minmax(0, 1fr) !important; }
