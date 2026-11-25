@@ -3896,7 +3896,30 @@
         "ui_files": [
           "app/views/chopd/inquiries/_form.html.erb",
           "app/views/chopd/inquiries/new.html.erb"
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T00:52:27Z",
+          "sha": "ebdb471",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rails test test/integration/inquiries_form_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "playwright 계산색 점검(http://127.0.0.1:3008/inquiries/new)",
+              "status": "skipped",
+              "why": "허용 안 되는 연산자 ("
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json"
+          ]
+        }
       }
     },
     {
@@ -4012,7 +4035,30 @@
         "ui_files": [
           "app/views/layouts/impd.html.erb",
           "app/views/chopd/home/index.html.erb"
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T00:52:27Z",
+          "sha": "ebdb471",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rails test test/integration/example_profile_link_test.rb test/integration/public_pages_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "playwright 첫 화면 내부 링크 점검(http://127.0.0.1:3008/)",
+              "status": "skipped",
+              "why": "허용 안 되는 연산자 ("
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json"
+          ]
+        }
       }
     },
     {
@@ -4271,7 +4317,11 @@
           "effort": "XS",
           "by": "factory-runner",
           "at": "2026-11-25T09:20:08+09:00"
-        }
+        },
+        "next_prompt_at": "2026-11-25T00:52:31.589990Z",
+        "next_prompt_proposals": [],
+        "next_prompt_cost_usd": 0.007468,
+        "next_prompt_converged": "2026-11-25T00:52:31.589990Z"
       },
       "result": {
         "proof": [
@@ -4366,7 +4416,26 @@
           "effort": "XS",
           "by": "factory-runner",
           "at": "2026-11-25T09:20:08+09:00"
-        }
+        },
+        "next_prompt_at": "2026-11-25T00:52:35.196961Z",
+        "next_prompt_proposals": [
+          {
+            "next_prompt": "ISS-502에서 바뀐 화면의 주요 버튼(배경 rgb(255,77,28))에 대해 playwright로 글자색 계산값을 읽고, 버튼 글자와 버튼 배경의 대비율을 WCAG 공식으로 계산해 proof에 기록하라. 일반 글자 기준 4.5:1 미만이면 chopd 레이아웃 팔레트 안에서만 글자색(예: 어두운 색) 또는 coral 톤을 조정하고, 조정 후 같은 방식으로 대비율을 다시 측정해 기록하라. 팔레트 밖의 색은 쓰지 말고, 변경 전후 값을 모두 남겨라. 이 이슈의 acceptance_criteria가 비어 있으므로 '버튼 글자 대비 4.5:1 이상, 큰 글자(18px 이상 또는 굵은 14px 이상)는 3:1 이상'을 기준으로 criteria_check에 적어라.",
+            "basis": "proof에는 h1(흰색 대 #0a0e1a, 약 19:1), 버튼 배경 rgb(255,77,28), 라벨색 rgb(229,231,235)만 있다. 버튼 글자색과 버튼 대비율은 측정되지 않았다. 흰 글자 대 rgb(255,77,28)은 대략 3:1대로 추정되어 일반 글자 기준에 못 미칠 수 있다. user_request, acceptance_criteria, criteria_check가 모두 null이라 판정 기준 자체도 없다.",
+            "expected_effect": "버튼 가독성 판정에 필요한 측정값이 생긴다. 기준 미달이면 팔레트 안에서 바로 고쳐지고, 판정 기준도 문서로 남는다.",
+            "done_when": "버튼 글자색, 배경색, 대비율이 proof에 기록되고 criteria_check에 통과 또는 조정 후 통과가 적혀 있다.",
+            "risk_tier": "T0",
+            "t2_category": null,
+            "reversible": true,
+            "question": "",
+            "plain_summary": "제목 글자는 읽기 충분하지만 주황 버튼 위 글자의 선명도는 아직 재지 않았다. 재서 부족하면 기존 색 범위 안에서만 조금 고친다.",
+            "if_not_decided": "T0이라 대표님 결정 없이 바로 진행해도 된다.",
+            "status": "promoted",
+            "at": "2026-11-25T00:52:35.196961Z",
+            "child_id": "ISS-518"
+          }
+        ],
+        "next_prompt_cost_usd": 0.018694000000000002
       },
       "result": {
         "proof": [
@@ -4461,7 +4530,26 @@
           "effort": "XS",
           "by": "factory-runner",
           "at": "2026-11-25T09:20:08+09:00"
-        }
+        },
+        "next_prompt_at": "2026-11-25T00:52:47.233054Z",
+        "next_prompt_proposals": [
+          {
+            "next_prompt": "playwright로 /, /inquiries/new 두 화면을 1280px, 390px 폭에서 각각 전체 페이지 스크린샷으로 저장하라(총 4장, 경로는 ./qa/ISS-508/{route}-{width}.png). 각 화면에서 가로 스크롤 발생 여부(document.documentElement.scrollWidth > clientWidth)와 주요 버튼 및 입력창이 뷰포트 밖으로 잘리는지를 수치로 함께 출력하라. 파일 경로, 파일 크기, 판정 수치를 proof에 남겨라.",
+            "basis": "proof(playwright 콘솔·네트워크 점검, exit_code 0)에는 콘솔 에러 0건과 로컬 4xx/5xx 0건만 있고, 제목에 있는 '스크린샷 검증'을 입증하는 산출물(이미지 파일, 레이아웃 수치)은 없다. acceptance_criteria와 criteria_check는 null이라 이 항목만 남은 차이다.",
+            "expected_effect": "ISS-502에서 바뀐 두 화면이 데스크톱과 모바일 폭에서 깨지지 않았다는 시각 증거와 수치가 확보되어 ISS-508을 닫을 수 있다.",
+            "done_when": "4장의 스크린샷 파일이 존재하고, 각 조합의 가로 스크롤과 잘림 판정 수치가 proof에 기록된다.",
+            "risk_tier": "T0",
+            "t2_category": null,
+            "reversible": true,
+            "question": "",
+            "plain_summary": "콘솔 에러 점검은 끝났지만 화면 캡처 확인은 아직 없다. 두 화면을 PC·모바일 폭으로 캡처해 레이아웃이 깨지지 않았는지 숫자와 함께 남긴다.",
+            "if_not_decided": "T0이므로 대표님 결정 없이 바로 실행한다.",
+            "status": "promoted",
+            "at": "2026-11-25T00:52:47.233054Z",
+            "child_id": "ISS-519"
+          }
+        ],
+        "next_prompt_cost_usd": 0.017204
       },
       "result": {
         "proof": [
@@ -4782,7 +4870,32 @@
             "exit_code": 0,
             "output": "8 runs, 93 assertions, 0 failures, 0 errors, 0 skips"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T00:52:27Z",
+          "sha": "ebdb471",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rubocop",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": ".....................................................................................................................................................................................................................................................................................................................................................................\n\n444 files inspected, no offenses detected"
+            },
+            {
+              "cmd": "bin/rails test test/integration/brand_profile_process_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json"
+          ]
+        }
       }
     },
     {
@@ -4866,6 +4979,84 @@
       "spawn_rules": [],
       "updated_at": "2026-11-25T09:52:18+09:00",
       "completed_at": "2026-11-25T09:52:18+09:00"
+    },
+    {
+      "title": "[다음] ISS-502에서 바뀐 화면의 주요 버튼(배경 rgb(255,77,28))에 대해 playwright로 글자색 계산값을 읽고,",
+      "type": "FEATURE",
+      "priority": "P1",
+      "origin": "next-prompt",
+      "source_issue": "ISS-506",
+      "status": "READY",
+      "created_at": "2026-11-25T00:52:35.196961Z",
+      "updated_at": "2026-11-25T00:52:58.695Z",
+      "payload": {
+        "user_request": "ISS-502에서 바뀐 화면의 주요 버튼(배경 rgb(255,77,28))에 대해 playwright로 글자색 계산값을 읽고, 버튼 글자와 버튼 배경의 대비율을 WCAG 공식으로 계산해 proof에 기록하라. 일반 글자 기준 4.5:1 미만이면 chopd 레이아웃 팔레트 안에서만 글자색(예: 어두운 색) 또는 coral 톤을 조정하고, 조정 후 같은 방식으로 대비율을 다시 측정해 기록하라. 팔레트 밖의 색은 쓰지 말고, 변경 전후 값을 모두 남겨라. 이 이슈의 acceptance_criteria가 비어 있으므로 '버튼 글자 대비 4.5:1 이상, 큰 글자(18px 이상 또는 굵은 14px 이상)는 3:1 이상'을 기준으로 criteria_check에 적어라.",
+        "acceptance_criteria": [
+          "버튼 글자색, 배경색, 대비율이 proof에 기록되고 criteria_check에 통과 또는 조정 후 통과가 적혀 있다."
+        ],
+        "next_prompt_depth": 1,
+        "next_prompt_root": "ISS-506",
+        "next_prompt_basis": "proof에는 h1(흰색 대 #0a0e1a, 약 19:1), 버튼 배경 rgb(255,77,28), 라벨색 rgb(229,231,235)만 있다. 버튼 글자색과 버튼 대비율은 측정되지 않았다. 흰 글자 대 rgb(255,77,28)은 대략 3:1대로 추정되어 일반 글자 기준에 못 미칠 수 있다. user_request, acceptance_criteria, criteria_check가 모두 null이라 판정 기준 자체도 없다.",
+        "expected_effect": "버튼 가독성 판정에 필요한 측정값이 생긴다. 기준 미달이면 팔레트 안에서 바로 고쳐지고, 판정 기준도 문서로 남는다.",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "proof에는 h1(흰색 대 #0a0e1a, 약 19:1), 버튼 배경 rgb(255,77,28), 라벨색 rgb(229,231,235)만 있다. 버튼 글자색과 버튼 대비율은 측정되지 않았다. 흰 글자 대 rgb(255,77,28)은 대략 3:1대로 추정되어 일반 글자 기준에 못 미칠 수 있다. user_request, acceptance_criteria, criteria_check가 모두 null이라 판정 기준 자체도 없다.",
+          "risk": "T0",
+          "effort": "medium",
+          "by": "factory-next-prompt",
+          "at": "2026-11-25T00:52:35.196961Z"
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T00:52:58.695Z",
+            "by": "auto",
+            "reason": "proof에는 h1(흰색 대 #0a0e1a, 약 19:1), 버튼 배경 rgb(255,77,28), 라벨색 rgb(229,231,235)만 있다. 버튼 글자색과 버튼 대비율은 측정되지 않았다. 흰 글자 대 rgb(255,77,28)은 대략 3:1대로 추정되어 일반 글자 기준에 못 미칠 수 있다. user_request, acceptance_criteria, criteria_check가 모두 null이라 판정 기준 자체도 없다."
+          }
+        ],
+        "approved_at": "2026-11-25T00:52:58.695Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "id": "ISS-518"
+    },
+    {
+      "title": "[다음] playwright로 /, /inquiries/new 두 화면을 1280px, 390px 폭에서 각각 전체 페이지 스크린샷으로",
+      "type": "FEATURE",
+      "priority": "P1",
+      "origin": "next-prompt",
+      "source_issue": "ISS-508",
+      "status": "READY",
+      "created_at": "2026-11-25T00:52:47.233054Z",
+      "updated_at": "2026-11-25T00:52:58.695Z",
+      "payload": {
+        "user_request": "playwright로 /, /inquiries/new 두 화면을 1280px, 390px 폭에서 각각 전체 페이지 스크린샷으로 저장하라(총 4장, 경로는 ./qa/ISS-508/{route}-{width}.png). 각 화면에서 가로 스크롤 발생 여부(document.documentElement.scrollWidth > clientWidth)와 주요 버튼 및 입력창이 뷰포트 밖으로 잘리는지를 수치로 함께 출력하라. 파일 경로, 파일 크기, 판정 수치를 proof에 남겨라.",
+        "acceptance_criteria": [
+          "4장의 스크린샷 파일이 존재하고, 각 조합의 가로 스크롤과 잘림 판정 수치가 proof에 기록된다."
+        ],
+        "next_prompt_depth": 1,
+        "next_prompt_root": "ISS-508",
+        "next_prompt_basis": "proof(playwright 콘솔·네트워크 점검, exit_code 0)에는 콘솔 에러 0건과 로컬 4xx/5xx 0건만 있고, 제목에 있는 '스크린샷 검증'을 입증하는 산출물(이미지 파일, 레이아웃 수치)은 없다. acceptance_criteria와 criteria_check는 null이라 이 항목만 남은 차이다.",
+        "expected_effect": "ISS-502에서 바뀐 두 화면이 데스크톱과 모바일 폭에서 깨지지 않았다는 시각 증거와 수치가 확보되어 ISS-508을 닫을 수 있다.",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "proof(playwright 콘솔·네트워크 점검, exit_code 0)에는 콘솔 에러 0건과 로컬 4xx/5xx 0건만 있고, 제목에 있는 '스크린샷 검증'을 입증하는 산출물(이미지 파일, 레이아웃 수치)은 없다. acceptance_criteria와 criteria_check는 null이라 이 항목만 남은 차이다.",
+          "risk": "T0",
+          "effort": "medium",
+          "by": "factory-next-prompt",
+          "at": "2026-11-25T00:52:47.233054Z"
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T00:52:58.695Z",
+            "by": "auto",
+            "reason": "proof(playwright 콘솔·네트워크 점검, exit_code 0)에는 콘솔 에러 0건과 로컬 4xx/5xx 0건만 있고, 제목에 있는 '스크린샷 검증'을 입증하는 산출물(이미지 파일, 레이아웃 수치)은 없다. acceptance_criteria와 criteria_check는 null이라 이 항목만 남은 차이다."
+          }
+        ],
+        "approved_at": "2026-11-25T00:52:58.695Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "id": "ISS-519"
     }
   ],
   "hooks": {
@@ -8996,6 +9187,26 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 211,
+        "timestamp": "2026-11-25T09:52:26.895426",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (test-harness, agent-harness, brand-guardian, domain-analyst, ux-harness)",
+          "🟠 핑퐁 감지: ISS-502 → 5회 파생 (test-harness, agent-harness, brand-guardian, domain-analyst, ux-harness)",
+          "🟠 핑퐁 감지: ISS-503 → 5회 파생 (test-harness, agent-harness, brand-guardian, domain-analyst, ux-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 14시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 63,
+          "done": 45,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
@@ -9003,7 +9214,7 @@
     "total_issues": 517,
     "completed": 30,
     "failed": 0,
-    "evolved": 210
+    "evolved": 211
   },
   "pending_opportunity_signals": [
     {
