@@ -6163,7 +6163,7 @@
       "id": "ISS-531",
       "type": "FIX_BUG",
       "priority": "P2",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "origin": "factory-observation",
       "depth": 1,
       "retry_count": 0,
@@ -6205,8 +6205,66 @@
           }
         ]
       },
-      "result": null,
-      "spawn_rules": []
+      "result": {
+        "commit": "b384f7d",
+        "files_changed": [
+          "app/views/chopd/education/index.html.erb",
+          "script/qa/layout_check.cjs"
+        ],
+        "ui_files": [
+          "app/views/chopd/education/index.html.erb"
+        ],
+        "files_created": [
+          "qa/ISS-531/before/education-390.png",
+          "qa/ISS-531/before/education-1280.png",
+          "qa/ISS-531/after/education-390.png",
+          "qa/ISS-531/after/education-1280.png"
+        ],
+        "review": {
+          "gemini": "gemini-4-hydrogen-high 결함 없음(2차). 1차 구현의 overflow-x 가 그림자 잘림으로 1280 화면을 바꾼 것은 Opus 가 바이트 비교로 발견해 재위임"
+        },
+        "criteria_check": [
+          {
+            "criterion": "390px 교육 화면에서 분류 버튼 글자가 한 줄로 보인다",
+            "met": true,
+            "how": "layout_check pillWrapped 390: 수정 전 3건(전체·온라인·오프라인 2줄) → 수정 후 0, qa/ISS-531/after/education-390.png 육안 4개 한 줄"
+          },
+          {
+            "criterion": "1280px 분류 버튼 배치는 지금과 같다",
+            "met": true,
+            "how": "cmp qa/ISS-531/before/education-1280.png after/education-1280.png 동일(같은 상태 2회 촬영 동일 확인 후 비교)"
+          },
+          {
+            "criterion": "layout_check 가 버튼 안 글자 줄바꿈을 숫자로 잡아낸다",
+            "met": true,
+            "how": "뷰만 원복한 상태에서 pillWrapped 3, SUMMARY pass=false 검출"
+          },
+          {
+            "criterion": "ROUTES=/education,/works,/media node script/qa/layout_check.cjs 통과",
+            "met": true,
+            "how": "+ 홈·문의하기 포함 10개 측정 모두 통과, 320px 에서도 가로 스크롤 없음(버튼 2줄)"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "ROUTES=/education,/works,/media,/,/inquiries/new node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "10줄 모두 hScroll false clipped 0 footerWrapped 0 pillWrapped 0 consoleErrors 0 badResponses 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "bin/rails test test/integration/public_pages_test.rb",
+            "exit_code": 0,
+            "output": "9 runs, 128 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "cmp qa/ISS-531/before/education-1280.png qa/ISS-531/after/education-1280.png",
+            "exit_code": 0,
+            "output": "(출력 없음 = 동일)"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "completed_at": "2026-11-25T10:41:46.027775"
     },
     {
       "id": "ISS-532",
@@ -6219,7 +6277,7 @@
       "parent_id": "ISS-525",
       "depends_on": [],
       "created_at": "2026-11-25T10:33:35+09:00",
-      "updated_at": "2026-11-25T10:33:35+09:00",
+      "updated_at": "2026-11-25T01:33:45.773Z",
       "title": "[접근성] chopd 바닥글 저작권 줄·하단 링크·소제목 글자 대비 1.8~2.6:1 — 기준 4.5:1 미달",
       "description": "배경 #0a0e1a 위 rgba(255,255,255,.2) 저작권 줄 약 1.8:1, rgba(255,255,255,.3) 하단 링크(교육·미디어·작품)와 소제목(서비스·연락처) 약 2.6:1. 12~13px 글씨라 WCAG AA 4.5:1 필요. ISS-520 이전부터 있던 값(ISS-521 브랜드 검증 중 발견).",
       "payload": {
@@ -6244,10 +6302,184 @@
           "effort": "XS",
           "by": "factory-runner",
           "at": "2026-11-25T10:33:35+09:00"
-        }
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T01:33:45.773Z",
+            "by": "auto",
+            "reason": "글씨가 거의 안 보여 저작권·보조 링크를 못 읽는 사용자가 생김. 색 값 몇 개만 올리면 되는 작은 수정(ISS-518 대비 수정과 같은 유형)"
+          }
+        ],
+        "approved_at": "2026-11-25T01:33:45.773Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
       },
       "result": null,
       "spawn_rules": []
+    },
+    {
+      "id": "ISS-533",
+      "title": "[Plan:테스트] ISS-531 변경사항 검증",
+      "type": "RUN_TESTS",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "test-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-531",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:41:46.027775",
+      "payload": {
+        "files": [
+          "app/views/chopd/education/index.html.erb",
+          "script/qa/layout_check.cjs"
+        ],
+        "source_issue": "ISS-531",
+        "scope": "changed",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T01:41:46.751Z",
+            "by": "auto",
+            "reason": "「[Plan:테스트] ISS-531 변경사항 검증」(RUN_TESTS, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T01:41:46.751Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T01:41:46.751Z"
+    },
+    {
+      "id": "ISS-534",
+      "title": "[Plan:도메인분석] ISS-531 비즈니스 규칙/시나리오 도출",
+      "type": "DOMAIN_ANALYZE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "domain-analyst",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-531",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:41:46.027775",
+      "payload": {
+        "files": [
+          "app/views/chopd/education/index.html.erb",
+          "script/qa/layout_check.cjs"
+        ],
+        "source_issue": "ISS-531",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T01:41:46.751Z",
+            "by": "auto",
+            "reason": "「[Plan:도메인분석] ISS-531 비즈니스 규칙/시나리오 도출」(DOMAIN_ANALYZE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T01:41:46.751Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T01:41:46.751Z"
+    },
+    {
+      "id": "ISS-535",
+      "title": "[Plan:UX리뷰] ISS-531 UI 변경 검증",
+      "type": "UI_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "ux-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-531",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:41:46.027775",
+      "payload": {
+        "files": [
+          "app/views/chopd/education/index.html.erb"
+        ],
+        "source_issue": "ISS-531",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T01:41:46.751Z",
+            "by": "auto",
+            "reason": "「[Plan:UX리뷰] ISS-531 UI 변경 검증」(UI_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T01:41:46.751Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T01:41:46.751Z"
+    },
+    {
+      "id": "ISS-536",
+      "title": "[Plan:브랜드검증] ISS-531 아젠다 표현 + Action Clarity",
+      "type": "BRAND_GUARD",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "brand-guardian",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-531",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:41:46.027775",
+      "payload": {
+        "files": [
+          "app/views/chopd/education/index.html.erb"
+        ],
+        "source_issue": "ISS-531",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T01:41:46.751Z",
+            "by": "auto",
+            "reason": "「[Plan:브랜드검증] ISS-531 아젠다 표현 + Action Clarity」(BRAND_GUARD, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T01:41:46.751Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T01:41:46.751Z"
+    },
+    {
+      "id": "ISS-537",
+      "title": "[Plan:브라우저QA] ISS-531 콘솔 에러 + 스크린샷 검증",
+      "type": "BROWSER_QA",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "agent-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-531",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:41:46.027775",
+      "payload": {
+        "files": [
+          "app/views/chopd/education/index.html.erb"
+        ],
+        "source_issue": "ISS-531",
+        "action": "run_browse_qa",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T01:41:46.751Z",
+            "by": "auto",
+            "reason": "「[Plan:브라우저QA] ISS-531 콘솔 에러 + 스크린샷 검증」(BROWSER_QA, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T01:41:46.751Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T01:41:46.751Z"
     }
   ],
   "hooks": {
@@ -6487,6 +6719,12 @@
         "issue_type": "SCORE",
         "plan_created": 0,
         "timestamp": "2026-11-25T10:32:26.219749"
+      },
+      {
+        "issue_id": "ISS-531",
+        "issue_type": "FIX_BUG",
+        "plan_created": 5,
+        "timestamp": "2026-11-25T10:41:46.027775"
       }
     ],
     "on_fail": [],
@@ -10710,8 +10948,8 @@
     ]
   },
   "stats": {
-    "total_issues": 532,
-    "completed": 39,
+    "total_issues": 537,
+    "completed": 40,
     "failed": 0,
     "evolved": 223
   },
