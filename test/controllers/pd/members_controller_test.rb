@@ -37,7 +37,9 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     get pd_member_path(@member)
 
     assert_response :ok
-    assert_select "#accounts a", text: "계정 등록", count: 2
+    assert_select "#consent-request-text", count: 0
+    assert_select "a", text: "회원 화면에서 보기", count: 0
+    assert_select "#accounts a.bg-primary", text: "계정 등록", count: 2
     ProfileAccount::PLATFORMS.each_key do |platform|
       assert_select "a[href=?]", new_pd_profile_account_path(member_id: @member.id, platform: platform), text: "계정 등록"
     end
@@ -59,7 +61,7 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     get pd_member_path(@member)
 
     assert_select "#accounts li p", text: "점검 계정 · checked@example.test · 로그인됨"
-    assert_select "#accounts form[action=?][method=post]", pd_profile_account_path(account) do
+    assert_select "#accounts details form[action=?][method=post]", pd_profile_account_path(account) do
       assert_select "input[name='_method'][value=patch]"
       assert_select "input[name='profile_account[member_id]'][value=?]", @member.id.to_s
       assert_select "input[name=link][value=1]"
@@ -84,7 +86,8 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
 
     get pd_member_path(@member)
 
-    assert_select "#accounts button", text: "이 회원에 연결", count: 5
+    assert_select "#accounts details:not([open]) summary", text: "이름이 다른 미연결 계정 6개 보기"
+    assert_select "#accounts details button", text: "이 회원에 연결", count: 5
     assert_select "#accounts li", text: /점검 계정 6/, count: 0
     assert_select "#accounts a[href=?]", pd_profile_accounts_path, text: "인물정보 계정"
   end
@@ -118,5 +121,95 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
       assert_select "a[href=?]", edit_pd_member_channel_path(@member, consented)
     end
     assert_select "#channels li:first-child", text: /consented/
+  end
+
+  test "등록과 동의 상태로 검색 결과를 걸러 보고 각 회원 수를 표시한다" do
+    waiting = Member.create!(name: "필터 대기", email: "filter-waiting@example.test", slug: "filter-waiting")
+    empty = Member.create!(name: "필터 등록 전", email: "filter-empty@example.test", slug: "filter-empty")
+    ProfileAccount::PLATFORMS.each_key { |platform| @member.profile_accounts.create!(platform: platform, display_name: @member.name) }
+    brand = @member.ensure_personal_brand!
+    MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS.each_key do |platform|
+      brand.brand_channels.create!(platform: platform, delegation_consent_at: Time.current)
+    end
+    waiting.ensure_personal_brand!.brand_channels.create!(platform: "naver_blog")
+    sign_in @pd
+
+    get pd_members_path, params: { filter: "unexpected" }
+    assert_select "a[aria-current=true]", text: "전체 3"
+    assert_select "a[href=?]", pd_members_path(filter: "todo"), text: "등록 남음 2"
+    assert_select "a[href=?]", pd_members_path(filter: "consent"), text: "위탁 동의 대기 1"
+    assert_select "li", text: /#{@member.name}.*등록 완료/m
+    assert_select "li", text: /#{waiting.name}.*동의 대기 1/m
+    assert_select "li strong", text: empty.name
+
+    get pd_members_path, params: { filter: "todo" }
+    assert_select "li strong", count: 2
+    assert_select "li strong", text: waiting.name
+    assert_select "li strong", text: empty.name
+
+    get pd_members_path, params: { filter: "consent", q: "필터" }
+    assert_select "li strong", count: 1, text: waiting.name
+    assert_select "li strong", text: empty.name, count: 0
+    assert_select "input[name=filter][value=consent]"
+    assert_select "a[href=?]", pd_members_path(q: "필터"), text: "전체 2"
+    assert_select "a[href=?][aria-current=true]", pd_members_path(q: "필터", filter: "consent"), text: "위탁 동의 대기 1"
+
+    get pd_members_path, params: { filter: "consent", q: empty.slug }
+    assert_select "p", text: "위탁 동의를 기다리는 회원이 없습니다."
+    get pd_members_path, params: { filter: "todo", q: @member.slug }
+    assert_select "p", text: "등록이 남은 회원이 없습니다."
+  end
+
+  test "동의 대기 채널 안내와 등록한 계정 및 채널 바로가기를 표시한다" do
+    @member.profile_accounts.create!(platform: "linkedin", display_name: @member.name)
+    brand = @member.ensure_personal_brand!
+    waiting = brand.brand_channels.create!(platform: "naver_blog")
+    consented = brand.brand_channels.create!(platform: "facebook_page", delegation_consent_at: Time.current)
+    sign_in @pd
+
+    get pd_member_path(@member)
+    assert_select "#channels h3", text: "위탁 동의 대기 1개 — 회원에게 알려 주세요"
+    assert_select "textarea#consent-request-text[readonly][rows=5]" do |elements|
+      assert_equal [
+        "#{@member.name}님, imPD 운영팀입니다.",
+        "네이버 블로그 채널 등록을 마쳤습니다.",
+        "아래 주소로 로그인한 뒤 채널마다 '동의하러 가기'를 눌러 운영 위탁에 동의해 주세요.",
+        "동의하시기 전에는 글을 올리지 않습니다.",
+        slug_admin_channels_url(slug: @member.slug)
+      ].join("
+"), elements.first.text
+    end
+    assert_select "#channels button[type=button]", text: "안내 복사"
+    assert_select "#accounts a[href=?]", slug_admin_dashboard_path(slug: @member.slug, anchor: "profile-accounts-status"), text: "회원 화면에서 보기"
+    [waiting, consented].each do |channel|
+      assert_select "#channels a[href=?]", slug_admin_channels_path(slug: @member.slug, anchor: "channel-#{channel.id}"), text: "회원 화면에서 보기"
+    end
+    assert_select "#accounts a", text: "회원 화면에서 보기", count: 1
+    assert_select "#channels a", text: "회원 화면에서 보기", count: 2
+
+    waiting.update!(delegation_consent_at: Time.current)
+    get pd_member_path(@member)
+    assert_select "#consent-request-text", count: 0
+  end
+
+  test "이름이나 로그인 아이디가 맞는 미연결 계정만 바로 보여 준다" do
+    @member.update!(name: "홍길동")
+    same_name = ProfileAccount.create!(platform: "naver_people", display_name: "홍 길동 (공식)")
+    other = ProfileAccount.create!(platform: "naver_people", display_name: "점검 계정")
+    matches_email = ProfileAccount.create!(platform: "linkedin", display_name: "다른 이름", login_id: @member.email.upcase)
+    matches_prefix = ProfileAccount.create!(platform: "linkedin", display_name: "또 다른 이름", login_id: @member.email.split("@").first.upcase)
+    sign_in @pd
+
+    get pd_member_path(@member)
+
+    [same_name, matches_email, matches_prefix].each do |account|
+      assert_select "#accounts form[action=?] button", pd_profile_account_path(account), text: "이 회원에 연결"
+      assert_select "#accounts details form[action=?]", pd_profile_account_path(account), count: 0
+    end
+    assert_select "#accounts details:not([open]) summary", text: "이름이 다른 미연결 계정 1개 보기"
+    assert_select "#accounts form[action=?]", pd_profile_account_path(other), count: 1
+    assert_select "#accounts details form[action=?]", pd_profile_account_path(other) do |forms|
+      assert_equal "점검 계정(아이디 없음) 계정을 홍길동 회원에 연결할까요? 연결한 뒤에는 이 화면에서 되돌릴 수 없습니다.", forms.first["data-turbo-confirm"]
+    end
   end
 end

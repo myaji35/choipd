@@ -4,6 +4,8 @@ class Pd::MemberChannelsController < Pd::BaseController
   before_action :set_member
   before_action :set_channel, only: [ :edit, :update ]
 
+  helper_method :remaining_channel_platforms
+
   def new
     @brand_channel = BrandChannel.new(platform: params[:platform].presence_in(CHANNEL_PLATFORMS.keys))
   end
@@ -30,7 +32,7 @@ class Pd::MemberChannelsController < Pd::BaseController
     if existing_channel
       redirect_to edit_pd_member_channel_path(@member, existing_channel), notice: "이미 등록된 채널이 있어 수정 화면으로 이동했습니다."
     elsif @brand_channel.persisted?
-      redirect_to pd_member_path(@member, anchor: "channels"), notice: "#{channel_label} 채널을 등록했습니다. 회원 화면에 바로 보입니다."
+      redirect_after_create
     else
       render :new, status: :unprocessable_entity
     end
@@ -48,6 +50,21 @@ class Pd::MemberChannelsController < Pd::BaseController
   end
 
   private
+
+  def redirect_after_create
+    next_platform = remaining_channel_platforms.first if params[:next] == "1"
+    if next_platform
+      next_label = CHANNEL_PLATFORMS.fetch(next_platform)
+      redirect_to new_pd_member_channel_path(@member, platform: next_platform),
+        notice: "#{channel_label} 채널을 등록했습니다. 이어서 #{next_label}을 등록하세요."
+    else
+      redirect_to pd_member_path(@member, anchor: "channels"), notice: "#{channel_label} 채널을 등록했습니다. 회원 화면에 바로 보입니다."
+    end
+  end
+
+  def remaining_channel_platforms
+    CHANNEL_PLATFORMS.keys - member_channels.distinct.pluck(:platform)
+  end
 
   def set_member
     @member = Member.for_tenant.find(params[:member_id])

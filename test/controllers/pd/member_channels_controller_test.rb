@@ -112,6 +112,7 @@ class Pd::MemberChannelsControllerTest < ActionDispatch::IntegrationTest
     get edit_pd_member_channel_path(@member, channel)
     assert_response :ok
     assert_select "h1", text: "채널 수정"
+    assert_select "button[name=next]", count: 0
     assert_select "select[name='brand_channel[platform]']", count: 0
 
     patch pd_member_channel_path(@member, channel), params: {
@@ -130,5 +131,27 @@ class Pd::MemberChannelsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_admin_user_session_path
     post pd_member_channels_path(@member), params: { brand_channel: { platform: "naver_blog" } }
     assert_redirected_to new_admin_user_session_path
+  end
+
+  test "등록하고 다음 채널로 차례대로 이동하고 마지막 등록 뒤에는 회원 화면으로 돌아간다" do
+    sign_in @pd
+
+    get new_pd_member_channel_path(@member, platform: "naver_blog")
+    assert_select "button[name=next][value='1']", text: "등록하고 다음 채널"
+
+    post pd_member_channels_path(@member), params: { next: "1", brand_channel: { platform: "naver_blog" } }
+    assert_redirected_to new_pd_member_channel_path(@member, platform: "facebook_page")
+    assert_equal "네이버 블로그 채널을 등록했습니다. 이어서 페이스북을 등록하세요.", flash[:notice]
+    follow_redirect!
+    assert_select "button[name=next][value='1']", text: "등록하고 다음 채널"
+
+    post pd_member_channels_path(@member), params: { next: "1", brand_channel: { platform: "facebook_page" } }
+    assert_redirected_to new_pd_member_channel_path(@member, platform: "instagram")
+    follow_redirect!
+    assert_select "button[name=next]", count: 0
+
+    post pd_member_channels_path(@member), params: { next: "1", brand_channel: { platform: "instagram" } }
+    assert_redirected_to pd_member_path(@member, anchor: "channels")
+    assert_equal %w[facebook_page instagram naver_blog], @member.personal_brand.brand_channels.order(:platform).pluck(:platform)
   end
 end

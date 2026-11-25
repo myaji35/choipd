@@ -26,6 +26,20 @@
   </div>
 </div>
 
+<section class="mb-8 rounded-lg border border-gray-100 bg-white p-4 shadow-sm">
+  <h2 class="font-semibold text-navy">회원 대행 등록</h2>
+  <% registration_link_class = "inline-flex items-center text-sm text-primary hover:underline" %>
+  <% if @registration_todo_count.zero? && @consent_waiting_count.zero? %>
+    <p class="mt-2 text-sm text-gray-600">지금 남은 대행 등록이 없습니다.</p>
+    <%= link_to "회원 대행 등록 열기", pd_members_path, class: registration_link_class, style: "min-height: 44px;" %>
+  <% else %>
+    <div class="flex flex-wrap gap-4">
+      <%= link_to "등록이 남은 회원 #{@registration_todo_count}명", pd_members_path(filter: "todo"), class: registration_link_class, style: "min-height: 44px;" %>
+      <%= link_to "위탁 동의 대기 #{@consent_waiting_count}명", pd_members_path(filter: "consent"), class: registration_link_class, style: "min-height: 44px;" %>
+    </div>
+  <% end %>
+</section>
+
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
   <!-- 예약 발행 -->
   <div class="bg-white rounded-lg border border-gray-100 shadow-sm">
@@ -55,7 +69,9 @@
   <div class="bg-white rounded-lg border border-gray-100 shadow-sm">
     <div class="flex items-center justify-between p-4 border-b">
       <h2 class="font-semibold text-navy text-sm">최근 문의</h2>
-      <%= link_to "전체 보기", admin_inquiries_path, class: "text-primary text-xs hover:text-primary-dark" %>
+      <% if current_admin_user.admin? %>
+        <%= link_to "전체 보기", admin_inquiries_path, class: "inline-flex items-center text-primary text-xs hover:text-primary-dark", style: "min-height: 44px;" %>
+      <% end %>
     </div>
     <div class="divide-y">
       <% @recent_inquiries.each do |inquiry| %>

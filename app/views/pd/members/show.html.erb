@@ -1,10 +1,13 @@
 <% content_for :title, "#{@member.name} 대행 등록" %>
 
+<% row_link_class = "inline-flex items-center text-primary hover:underline" %>
+<% link_height = "min-height: 44px;" %>
+
 <header class="mb-6">
   <div class="flex flex-wrap gap-3">
-    <%= link_to "← 회원 대행 등록", pd_members_path, class: "text-sm text-primary" %>
+    <%= link_to "← 회원 대행 등록", pd_members_path, class: "inline-flex items-center text-sm text-primary", style: link_height %>
     <% if current_admin_user.admin? %>
-      <%= link_to "운영자 회원 상세", admin_member_path(@member), class: "text-sm text-primary" %>
+      <%= link_to "운영자 회원 상세", admin_member_path(@member), class: "inline-flex items-center text-sm text-primary", style: link_height %>
     <% end %>
   </div>
   <div class="mt-2 flex flex-wrap items-start justify-between gap-3">
@@ -13,7 +16,7 @@
       <p class="text-sm text-gray-500">/<%= @member.slug %></p>
     </div>
     <% if @member.slug.present? %>
-      <%= link_to "회원 화면에서 확인", slug_admin_dashboard_path(slug: @member.slug), class: "bg-primary text-white px-4 py-2 rounded-lg text-sm" %>
+      <%= link_to "회원 화면에서 확인", slug_admin_dashboard_path(slug: @member.slug), class: "inline-flex items-center bg-primary text-white px-4 py-2 rounded-lg text-sm", style: link_height %>
     <% end %>
   </div>
 </header>
@@ -27,31 +30,49 @@
           <li class="flex flex-wrap items-center gap-x-4 gap-y-1 py-2">
             <p class="min-w-0 max-w-full grow break-words text-navy"><%= label %> · <%= account.display_name %></p>
             <span class="text-gray-600"><%= account.session_status_label %></span>
-            <%= link_to "계정 상세", pd_profile_account_path(account), class: "text-primary hover:underline" %>
+            <%= link_to "계정 상세", pd_profile_account_path(account), class: row_link_class, style: link_height %>
+            <% if @member.slug.present? %>
+              <%= link_to "회원 화면에서 보기", slug_admin_dashboard_path(slug: @member.slug, anchor: "profile-accounts-status"), class: row_link_class, style: link_height %>
+            <% end %>
           </li>
         <% end %>
       <% else %>
+        <% matching_accounts, other_accounts = @unlinked_accounts_by_platform.fetch(platform, [[], []]) %>
         <li class="py-2">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <p class="text-gray-600"><%= label %> 등록 전</p>
-            <%= link_to "계정 등록", new_pd_profile_account_path(member_id: @member.id, platform: platform), class: "text-primary hover:underline" %>
+            <%= link_to "계정 등록", new_pd_profile_account_path(member_id: @member.id, platform: platform),
+                class: matching_accounts.any? ? row_link_class : "inline-flex items-center bg-primary text-white rounded-lg px-4 py-2",
+                style: matching_accounts.any? ? link_height : "#{link_height} background-color: #00A1E0;" %>
           </div>
-          <% if (unlinked_accounts = @unlinked_accounts_by_platform[platform]) %>
-            <p class="mt-2 text-gray-600">점검에서 이미 찾은 계정이 있습니다. 같은 계정이면 새로 등록하지 말고 연결해 주세요. 새로 등록하면 계정이 두 개로 나뉩니다.</p>
-            <ul class="mt-2">
-              <% unlinked_accounts.first(5).each do |account| %>
-                <li class="flex flex-wrap items-center justify-between gap-2 py-2">
-                  <p class="min-w-0 max-w-full break-words text-navy"><%= account.display_name %> · <%= account.login_id.presence || "아이디 없음" %> · <%= account.session_status_label %></p>
-                  <%= button_to "이 회원에 연결", pd_profile_account_path(account), method: :patch,
-                      params: { profile_account: { member_id: @member.id }, link: "1" },
-                      form: { data: { turbo_confirm: "#{account.display_name} 계정을 #{@member.name} 회원에 연결할까요?" } },
-                      class: "rounded-lg border border-gray-300 px-3 py-2 text-primary cursor-pointer",
-                      style: "min-height: 44px;" %>
-                </li>
+          <% [matching_accounts, other_accounts].each do |unlinked_accounts| %>
+            <% next if unlinked_accounts.empty? %>
+            <% account_list = capture do %>
+              <ul class="mt-2">
+                <% unlinked_accounts.first(5).each do |account| %>
+                  <% login_id = account.login_id.presence || "아이디 없음" %>
+                  <li class="flex flex-wrap items-center justify-between gap-2 py-2">
+                    <p class="min-w-0 max-w-full break-words text-navy"><%= account.display_name %> · <%= login_id %> · <%= account.session_status_label %></p>
+                    <%= button_to "이 회원에 연결", pd_profile_account_path(account), method: :patch,
+                        params: { profile_account: { member_id: @member.id }, link: "1" },
+                        form: { data: { turbo_confirm: "#{account.display_name}(#{login_id}) 계정을 #{@member.name} 회원에 연결할까요? 연결한 뒤에는 이 화면에서 되돌릴 수 없습니다." } },
+                        class: "rounded-lg border border-gray-300 px-3 py-2 text-primary cursor-pointer", style: link_height %>
+                  </li>
+                <% end %>
+              </ul>
+              <% if unlinked_accounts.size > 5 %>
+                <p class="mt-2 text-gray-600">그 밖의 계정은 '<%= link_to "인물정보 계정", pd_profile_accounts_path, class: row_link_class, style: link_height %>' 목록에서 회원을 지정하세요.</p>
               <% end %>
-            </ul>
-            <% if unlinked_accounts.size > 5 %>
-              <p class="mt-2 text-gray-600">그 밖의 계정은 '<%= link_to "인물정보 계정", pd_profile_accounts_path, class: "text-primary hover:underline" %>' 목록에서 회원을 지정하세요.</p>
+            <% end %>
+            <% if unlinked_accounts.equal?(matching_accounts) %>
+              <p class="mt-2 text-gray-600">점검에서 이미 찾은 계정이 있습니다. 같은 계정이면 새로 등록하지 말고 연결해 주세요. 새로 등록하면 계정이 두 개로 나뉩니다.</p>
+              <%= account_list %>
+            <% else %>
+              <details class="mt-2">
+                <summary class="cursor-pointer text-primary" style="min-height: 44px; padding-block: 12px;">이름이 다른 미연결 계정 <%= other_accounts.size %>개 보기</summary>
+                <p class="text-gray-600">이 회원의 계정이 확실할 때만 연결하세요. 잘못 연결하면 계정 수정에서 회원을 다시 지정해야 합니다.</p>
+                <%= account_list %>
+              </details>
             <% end %>
           <% end %>
         </li>
@@ -63,6 +84,31 @@
 <section id="channels" class="rounded-lg border border-gray-100 bg-white p-4 shadow-sm">
   <h2 class="font-semibold text-navy">채널</h2>
   <p class="mt-2 text-sm text-gray-600">등록하면 회원 대시보드 '내 채널 운영 현황'과 '내 채널'에 바로 보입니다.</p>
+  <% waiting_channels = @channels_by_platform.values.flatten.reject(&:delegated?) %>
+  <% if waiting_channels.any? %>
+    <% if @member.slug.present? %>
+      <% waiting_labels = Pd::MembersController::CHANNEL_PLATFORMS.values_at(*waiting_channels.map(&:platform).uniq).join("·") %>
+      <% consent_request = <<~TEXT
+        #{@member.name}님, imPD 운영팀입니다.
+        #{waiting_labels} 채널 등록을 마쳤습니다.
+        아래 주소로 로그인한 뒤 채널마다 '동의하러 가기'를 눌러 운영 위탁에 동의해 주세요.
+        동의하시기 전에는 글을 올리지 않습니다.
+        #{slug_admin_channels_url(slug: @member.slug)}
+      TEXT
+      %>
+      <div class="mt-3 rounded-lg border border-gray-300 p-4 text-sm">
+        <h3 class="font-semibold text-navy">위탁 동의 대기 <%= waiting_channels.size %>개 — 회원에게 알려 주세요</h3>
+        <p class="mt-2 text-gray-600">동의는 회원 본인만 할 수 있습니다. 아래 안내를 복사해 문자·카카오톡으로 보내 주세요.</p>
+        <label for="consent-request-text" class="mt-3 block font-medium text-navy">회원에게 보낼 안내</label>
+        <%= text_area_tag "consent-request-text", consent_request.chomp, readonly: true, rows: 5,
+            class: "mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" %>
+        <button type="button" class="mt-2 rounded-lg border border-gray-300 px-4 py-2 text-primary cursor-pointer" style="<%= link_height %>"
+                onclick="navigator.clipboard.writeText(document.getElementById('consent-request-text').value).then(() => { clearTimeout(this.copyTimer); this.textContent = '복사했습니다'; this.copyTimer = setTimeout(() => { this.textContent = '안내 복사' }, 2000) })">안내 복사</button>
+      </div>
+    <% else %>
+      <p class="mt-2 text-sm text-gray-600">회원 주소(슬러그)가 없어 안내 주소를 만들 수 없습니다.</p>
+    <% end %>
+  <% end %>
   <ul class="mt-2 divide-y divide-gray-100 text-sm">
     <% Pd::MembersController::CHANNEL_PLATFORMS.each do |platform, label| %>
       <% if (channels = @channels_by_platform[platform]) %>
@@ -74,17 +120,22 @@
                 <% if channel.delegated? %>
                   운영 위탁 동의함 · <%= channel.delegation_consent_at.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d") %>
                 <% else %>
-                  운영 위탁 동의 대기 — 회원이 '내 채널'에서 직접 동의해야 글을 올릴 수 있습니다.
+                  운영 위탁 동의 대기 — 회원 본인이 '내 채널'에서 동의해야 글을 올릴 수 있습니다.
                 <% end %>
               </p>
             </div>
-            <%= link_to "수정", edit_pd_member_channel_path(@member, channel), class: "text-primary hover:underline" %>
+            <div class="flex flex-wrap gap-3">
+              <%= link_to "수정", edit_pd_member_channel_path(@member, channel), class: row_link_class, style: link_height %>
+              <% if @member.slug.present? %>
+                <%= link_to "회원 화면에서 보기", slug_admin_channels_path(slug: @member.slug, anchor: "channel-#{channel.id}"), class: row_link_class, style: link_height %>
+              <% end %>
+            </div>
           </li>
         <% end %>
       <% else %>
         <li class="flex flex-wrap items-center justify-between gap-2 py-2">
           <p class="text-gray-600"><%= label %> 등록 전</p>
-          <%= link_to "채널 등록", new_pd_member_channel_path(@member, platform: platform), class: "text-primary hover:underline" %>
+          <%= link_to "채널 등록", new_pd_member_channel_path(@member, platform: platform), class: row_link_class, style: link_height %>
         </li>
       <% end %>
     <% end %>

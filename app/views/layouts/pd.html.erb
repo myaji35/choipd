@@ -108,8 +108,8 @@
               <% end %>
             <% end %>
           </div>
-          <%= link_to destroy_admin_user_session_path, data: { turbo_method: :delete },
-              class: "flex items-center space-x-2 px-3 py-2 rounded text-sm text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors" do %>
+          <%= button_to destroy_admin_user_session_path, method: :delete, style: "min-height: 44px;",
+              class: "flex w-full items-center space-x-2 px-3 py-2 rounded text-sm text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors" do %>
             <%= lni_icon "exit", class: "w-4 h-4" %>
             <span>로그아웃</span>
           <% end %>

@@ -14,7 +14,7 @@ const sets = [
   ]],
   ['pd', pEmail, pPass, [
     ['p-home', '/pd'], ['p-pa-index', '/pd/people_accounts'], ['p-pa-new', '/pd/people_accounts/new?member_id='+NEW],
-    ['p-members','/pd/members'], ['p-member-new','/pd/members/'+NEW], ['p-member-old','/pd/members/'+OLD],
+    ['p-members','/pd/members'], ['p-members-todo','/pd/members?filter=todo'], ['p-member-new','/pd/members/'+NEW], ['p-member-old','/pd/members/'+OLD],
     ['p-ch-new','/pd/members/'+NEW+'/channels/new?platform=naver_blog'],
     ['p-pa-new-li','/pd/people_accounts/new?member_id='+NEW+'&platform=linkedin'],
     ['p-member-dash', '/ux-member/admin/dashboard']
