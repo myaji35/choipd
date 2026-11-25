@@ -4784,6 +4784,88 @@
           }
         ]
       }
+    },
+    {
+      "id": "ISS-516",
+      "title": "[Meta] ISS-502 이슈 체인 근본 원인 분석",
+      "type": "PATTERN_ANALYSIS",
+      "status": "CLOSED_SKIP",
+      "priority": "P1",
+      "assign_to": "meta-agent",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": null,
+      "depends_on": [],
+      "created_at": "2026-11-25T09:52:04.370226",
+      "payload": {
+        "parent_id": "ISS-502",
+        "chain_length": 5,
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T00:52:05.549Z",
+            "by": "auto",
+            "reason": "「[Meta] ISS-502 이슈 체인 근본 원인 분석」(PATTERN_ANALYSIS, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T00:52:05.549Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "반려 권장",
+          "reason": "ISS-502 아래 체인 5개는 실패 연쇄가 아니라 on_complete 가 FIX_BUG 완료 시 고정으로 만드는 검증 카드 5종(RUN_TESTS·DOMAIN_ANALYZE·UI_REVIEW·BRAND_GUARD·BROWSER_QA)이며 모두 같은 회차에 근거와 함께 정리됨(DONE 3·CLOSED_SKIP 2). 재발·실패 패턴 없음.",
+          "risk": "낮음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T09:52:18+09:00"
+        }
+      },
+      "result": {
+        "skip_reason": "ISS-502 아래 체인 5개는 실패 연쇄가 아니라 on_complete 가 FIX_BUG 완료 시 고정으로 만드는 검증 카드 5종(RUN_TESTS·DOMAIN_ANALYZE·UI_REVIEW·BRAND_GUARD·BROWSER_QA)이며 모두 같은 회차에 근거와 함께 정리됨(DONE 3·CLOSED_SKIP 2). 재발·실패 패턴 없음."
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T09:52:18+09:00",
+      "completed_at": "2026-11-25T09:52:18+09:00"
+    },
+    {
+      "id": "ISS-517",
+      "title": "[Meta] ISS-503 이슈 체인 근본 원인 분석",
+      "type": "PATTERN_ANALYSIS",
+      "status": "CLOSED_SKIP",
+      "priority": "P1",
+      "assign_to": "meta-agent",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": null,
+      "depends_on": [],
+      "created_at": "2026-11-25T09:52:04.370236",
+      "payload": {
+        "parent_id": "ISS-503",
+        "chain_length": 5,
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T00:52:05.549Z",
+            "by": "auto",
+            "reason": "「[Meta] ISS-503 이슈 체인 근본 원인 분석」(PATTERN_ANALYSIS, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T00:52:05.549Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "반려 권장",
+          "reason": "ISS-503 아래 체인 5개는 실패 연쇄가 아니라 on_complete 가 FIX_BUG 완료 시 고정으로 만드는 검증 카드 5종(RUN_TESTS·DOMAIN_ANALYZE·UI_REVIEW·BRAND_GUARD·BROWSER_QA)이며 모두 같은 회차에 근거와 함께 정리됨(DONE 3·CLOSED_SKIP 2). 재발·실패 패턴 없음.",
+          "risk": "낮음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T09:52:18+09:00"
+        }
+      },
+      "result": {
+        "skip_reason": "ISS-503 아래 체인 5개는 실패 연쇄가 아니라 on_complete 가 FIX_BUG 완료 시 고정으로 만드는 검증 카드 5종(RUN_TESTS·DOMAIN_ANALYZE·UI_REVIEW·BRAND_GUARD·BROWSER_QA)이며 모두 같은 회차에 근거와 함께 정리됨(DONE 3·CLOSED_SKIP 2). 재발·실패 패턴 없음."
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T09:52:18+09:00",
+      "completed_at": "2026-11-25T09:52:18+09:00"
     }
   ],
   "hooks": {
@@ -8891,14 +8973,37 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 210,
+        "timestamp": "2026-11-25T09:52:04.370282",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (test-harness, brand-guardian, domain-analyst, agent-harness, ux-harness)",
+          "🟠 핑퐁 감지: ISS-502 → 5회 파생 (test-harness, brand-guardian, domain-analyst, agent-harness, ux-harness)",
+          "🟠 핑퐁 감지: ISS-503 → 5회 파생 (test-harness, brand-guardian, domain-analyst, agent-harness, ux-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 14시간"
+        ],
+        "issues_created": [
+          "ISS-516",
+          "ISS-517"
+        ],
+        "stats_snapshot": {
+          "total": 63,
+          "done": 45,
+          "in_progress": 0,
+          "ready": 1,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
   "stats": {
-    "total_issues": 515,
+    "total_issues": 517,
     "completed": 30,
     "failed": 0,
-    "evolved": 209
+    "evolved": 210
   },
   "pending_opportunity_signals": [
     {
