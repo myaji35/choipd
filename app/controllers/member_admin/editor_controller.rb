@@ -51,7 +51,7 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
       @member.update!(theme_preset: key)
       redirect_to action: :show, params: { slug: @member.slug, step: 4 }, notice: "'#{preset[:name]}' 스타일로 저장했어요. 이제 공개만 하면 돼요."
     else
-      redirect_to action: :show, params: { slug: @member.slug, step: 3 }, alert: "유효한 스타일을 선택해 주세요"
+      redirect_to action: :show, params: { slug: @member.slug, step: 3 }, alert: "스타일 카드를 하나 누른 뒤 저장해 주세요."
     end
   end
 
@@ -62,7 +62,7 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
       @member.update!(layout_preset: key)
       redirect_to action: :show, params: { slug: @member.slug, step: 3 }, notice: "'#{preset[:name]}' 구성으로 저장했어요."
     else
-      redirect_to action: :show, params: { slug: @member.slug, step: 3 }, alert: "유효한 레이아웃을 선택해 주세요"
+      redirect_to action: :show, params: { slug: @member.slug, step: 3 }, alert: "구성 카드를 하나 누른 뒤 저장해 주세요."
     end
   end
 

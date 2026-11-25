@@ -95,7 +95,8 @@ class BrandProfileProcessTest < ActionDispatch::IntegrationTest
 
     get slug_admin_brand_path(slug: member.slug)
     assert_response :success
-    assert_select "h2", text: "채널 운영"
+    assert_select "h2", text: "내 정보가 실리는 곳"
+    assert_select "h2", text: "채널 운영", count: 0
     assert_select "article.impd-card:first-child h3", text: /#{Regexp.escape(member.name)}.*개인\(기본\)/m
     assert_not_includes response.body, "/api/admin/handoff"
   ensure

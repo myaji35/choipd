@@ -4,11 +4,11 @@ class MemberAdmin::ReviewsController < MemberAdmin::BaseController
   def index
     @reviews = @member.member_reviews.recent
     @review_groups = {
-      "승인 대기" => @reviews.select { |review| review.status == "new" },
+      "확인할 후기" => @reviews.select { |review| review.status == "new" },
       "공개 중" => @reviews.select { |review| review.status.in?(%w[triaged responded]) },
       "보관" => @reviews.select { |review| review.status == "archived" }
     }
-    @pending_count = @review_groups.fetch("승인 대기").size
+    @pending_count = @review_groups.fetch("확인할 후기").size
     @review_request_url = member_review_new_url(slug: @member.slug)
   end
 

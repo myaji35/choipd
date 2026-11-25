@@ -1,18 +1,25 @@
 <% content_for :title, "후기 — #{@member.name}" %>
 
-<main style="max-width: 1100px; margin: 0 auto; padding: 40px;">
-  <div class="impd-section-header" style="flex-wrap: wrap;">
-    <span class="impd-label" style="font-size: 12px;">고객 › 후기</span>
-    <h1 class="impd-display" style="font-size: 42px; flex: 1; white-space: nowrap;">후기</h1>
-    <span style="padding: 6px 10px; background: <%= @pending_count.positive? ? 'var(--impd-accent-2)' : 'var(--impd-rule)' %>; color: <%= @pending_count.positive? ? '#fff' : 'var(--impd-muted)' %>; font-size: 12px; font-weight: 700;">확인할 후기 <%= @pending_count %>건</span>
-  </div>
+<div class="impd-wrap" style="max-width: 1120px; margin: 0 auto; padding: 40px;">
+  <header style="margin-bottom: 32px;">
+    <p class="impd-label-muted">고객 › 후기</p>
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px;">
+      <h1 class="impd-display" style="font-size: 44px;">후기</h1>
+      <% if @pending_count.positive? %>
+        <span style="background: var(--impd-accent); color: var(--impd-card); padding: 5px 9px; font-size: 12px; font-weight: 700;">
+          확인할 후기 <%= @pending_count %>건
+        </span>
+      <% end %>
+    </div>
+    <p style="margin-top: 12px; color: var(--impd-ink2); font-size: 14px; line-height: 1.7;">고객이 남긴 후기를 읽어 보고, 내 페이지에 보여 줄 것만 '공개하기'를 눌러 주세요.</p>
+  </header>
 
   <section class="impd-card" style="margin-bottom: 28px;">
     <p class="impd-label" style="font-size: 12px;">후기 받기</p>
     <h2 style="margin-top: 10px; font-size: 20px;">이 주소를 고객에게 보내 주세요</h2>
     <p style="margin-top: 8px; font-size: 13px; line-height: 1.7; color: var(--impd-muted);">고객이 쓴 후기는 내가 '공개하기'를 누르기 전에는 내 페이지에 보이지 않아요.</p>
     <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;">
-      <input id="review-request-url" type="text" readonly value="<%= @review_request_url %>" style="flex: 1 1 420px; min-width: 0; border: 1px solid var(--impd-rule); padding: 10px 12px; font-size: 14px; color: var(--impd-ink); background: #fff;">
+      <input id="review-request-url" type="text" readonly value="<%= @review_request_url %>" style="flex: 1 1 100%; min-width: 0; border: 1px solid var(--impd-rule); padding: 10px 12px; font-size: 14px; color: var(--impd-ink); background: #fff;">
       <button type="button" class="impd-btn impd-btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('review-request-url').value); this.textContent='복사했어요';">주소 복사</button>
       <%= link_to "후기 쓰는 화면 보기", member_review_new_path(slug: @member.slug), target: "_blank", class: "impd-btn impd-btn-primary" %>
     </div>
@@ -29,7 +36,7 @@
           </div>
           <div style="display: grid; gap: 14px;">
       <% reviews.each do |review| %>
-        <% status_label = { "new" => "확인 전", "triaged" => "공개", "responded" => "공개", "archived" => "숨김" }.fetch(review.status, review.status) %>
+        <% status_label = { "new" => "확인할 후기", "triaged" => "공개", "responded" => "공개", "archived" => "숨김" }.fetch(review.status, review.status) %>
         <% status_color = review.status == "new" ? "var(--impd-accent-2)" : (review.status.in?(%w[triaged responded]) ? "var(--impd-accent)" : "var(--impd-muted)") %>
         <article style="background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 24px;">
           <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
@@ -38,7 +45,7 @@
             <span style="padding: 4px 8px; border: 1px solid <%= status_color %>; color: <%= status_color %>; font-size: 12px; font-weight: 700;"><%= status_label %></span>
             <time datetime="<%= review.created_at.iso8601 %>" style="margin-left: auto; font-size: 12px; color: var(--impd-muted);"><%= review.created_at.strftime("%Y.%m.%d %H:%M") %></time>
           </div>
-          <p style="margin-top: 14px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.75; color: var(--impd-ink2);"><%= review.content.presence || "후기 내용이 없습니다." %></p>
+          <p style="margin-top: 14px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.75; color: var(--impd-ink2);"><%= review.content.presence || "별점만 남긴 후기예요." %></p>
           <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--impd-rule);">
             <% unless review.status.in?(%w[triaged responded]) %>
               <%= button_to "공개하기", approve_slug_admin_review_path(slug: @member.slug, id: review), method: :post, class: "impd-btn impd-btn-primary" %>
@@ -57,4 +64,4 @@
   <% else %>
     <%= render "shared/empty_state", icon: "star-fat", title: "아직 받은 후기가 없어요", text: "위 주소를 고객에게 보내 보세요." %>
   <% end %>
-</main>
+</div>
