@@ -119,7 +119,7 @@ class MemberAdminDashboardUxTest < ActionDispatch::IntegrationTest
       "최근 7일 · 내 페이지가 열린 횟수"
     ].each { |phrase| assert_includes response.body, phrase }
     assert_select "a[href=?]", slug_admin_brand_path(slug: member.slug), text: "주별 흐름은 '내 브랜드'에서 보기 →"
-    ["14일 방문 추이", "링크 복사", "명이 방문했어요"].each { |phrase| assert_not_includes response.body, phrase }
+    [ "14일 방문 추이", "링크 복사", "명이 방문했어요" ].each { |phrase| assert_not_includes response.body, phrase }
     assert_not_includes Rails.root.join("app/views/member_admin/dashboard/show.html.erb").read, "impd-font-mono"
   end
 
