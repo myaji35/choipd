@@ -9314,6 +9314,43 @@
       },
       "result": null,
       "spawn_rules": []
+    },
+    {
+      "id": "ISS-568",
+      "title": "[린트] 회원 관리 테스트 3개 파일 배열 괄호 안 공백 위반 6건(디자인 루프 3·4회차 커밋 71cb1eb·997337d)",
+      "type": "STYLE_FIX",
+      "priority": "P1",
+      "status": "READY",
+      "origin": "factory-ship",
+      "depth": 1,
+      "retry_count": 0,
+      "depends_on": [],
+      "created_at": "2026-11-25T03:11:30Z",
+      "updated_at": "2026-11-25T03:11:30Z",
+      "description": "회차 끝 bin/rubocop 이 459 파일 중 6건(Layout/SpaceInsideArrayLiteralBrackets) 위반으로 실패. 대상: test/controllers/member_admin/brands_controller_test.rb:61, test/integration/member_admin_dashboard_ux_test.rb:56, test/integration/member_admin_editor_flow_test.rb:30. 회원 화면 디자인 루프(별도 대화 세션)가 커밋한 코드이며 작성 시점에 그 세션이 같은 파일을 편집 중이었다.",
+      "payload": {
+        "origin": "factory-ship",
+        "files": [
+          "test/controllers/member_admin/brands_controller_test.rb",
+          "test/integration/member_admin_dashboard_ux_test.rb",
+          "test/integration/member_admin_editor_flow_test.rb"
+        ],
+        "acceptance_criteria": [
+          "bin/rubocop 이 no offenses detected 로 끝난다",
+          "세 테스트 파일이 그대로 통과한다(bin/rails test 세 파일 0 failures)"
+        ],
+        "note": "디자인 루프 세션이 이 파일을 아직 고치는 중이면 그 세션 커밋 뒤에 처리(작업 트리에 미커밋 변경이 있으면 건드리지 말 것)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "린트 실패가 main 출고를 막는다. 배열 괄호 안 공백만 고치는 기계적 수정(bin/rubocop -a 로 3건 자동, 나머지 3건 수동)",
+          "risk": "T0 — 테스트 코드 서식만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:11:30Z"
+        }
+      },
+      "result": null,
+      "spawn_rules": []
     }
   ],
   "hooks": {
