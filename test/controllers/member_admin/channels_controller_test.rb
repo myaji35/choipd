@@ -107,6 +107,24 @@ class MemberAdmin::ChannelsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "글이 없고 팔로워 기록이 두 개면 팔로워 변화를 빈 글 안내보다 먼저 보여 준다" do
+    account = @member.sns_accounts.create!(platform: "instagram", account_name: "내 인스타그램")
+    account.sns_follower_snapshots.create!(follower_count: 211, captured_at: seoul_time(11, 19), source: "manual")
+    account.sns_follower_snapshots.create!(follower_count: 222, captured_at: seoul_time(11, 20), source: "manual")
+    channel = create_channel("instagram", sns_account: account, delegation_consent_at: seoul_time(10, 3))
+
+    get @path
+
+    assert_response :ok
+    assert_select "#channel-#{channel.id}" do |section|
+      assert_select "dl.channel-stat-grid", count: 0
+      assert_select "h3", text: "팔로워 변화", count: 1
+      assert_select "strong", text: "222명", count: 1
+      headings = section.first.css("h3").map(&:text)
+      assert_equal ["팔로워 변화", "올린 글·예약된 글"], headings.first(2)
+    end
+  end
+
   test "운영 중 채널 숫자 상자는 네 개이고 마지막 글은 짧은 날짜로 보여 준다" do
     channel = create_channel("naver_blog", delegation_consent_at: seoul_time(10, 3))
     posted_at = seoul_time(11, 20, 9, 30)

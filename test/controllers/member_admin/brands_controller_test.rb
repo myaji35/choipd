@@ -89,7 +89,8 @@ class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
         assert_select "strong", text: "3회"
         assert_select "p", text: "그전 4주보다 2회 늘었어요"
       end
-      assert_includes response.body, "이번 주(월요일부터 지금까지): 방문 5회"
+      assert_select ".ops-chart-wrapper + p",
+        text: "이번 주(월요일부터 지금까지): 방문 5회 · 문의 0건 · 소식 0건 · SNS에 올린 글 0건"
       assert_includes response.body, "지난 4주(10/26~11/22)"
       assert_includes response.body, "아직 지나고 있는 이번 주는 빼고 셌어요."
       assert_not_includes response.body, "최근 4주 활동과 그전 4주와의 차이예요."
@@ -100,11 +101,34 @@ class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
     get slug_admin_brand_path(slug: @member.slug)
 
     assert_response :ok
-    assert_includes response.body, "이번 주라 아직 세는 중이에요"
-    assert_select ".ops-chart-wrapper + p.impd-label-muted",
-      text: "이번 주(월요일부터 지금까지): 방문 0회 · 문의 0건 · 소식 0건"
+    assert_includes response.body, "이번 주는 아직 세는 중이라 그래프에서 빼고 아래에 따로 적었어요."
+    assert_select ".ops-chart-wrapper + p",
+      text: "이번 주(월요일부터 지금까지): 방문 0회 · 문의 0건 · 소식 0건 · SNS에 올린 글 0건"
     assert_select ".ops-owner-stats .ops-surface-card > p:first-child", text: "올린 소식"
     assert_select ".ops-owner-stats .ops-surface-card > p:first-child", text: "SNS에 올린 글"
+  end
+
+  test "그래프의 점과 날짜 눈금은 끝난 주만 보여 준다" do
+    seoul = Time.find_zone!("Asia/Seoul")
+    travel_to seoul.local(2026, 11, 25, 12) do
+      [1.week.ago, 1.week.ago, 1.week.ago, 1.week.ago, Time.current].each do |date|
+        AnalyticsEvent.create!(event_name: "page_view", event_category: "page", page_path: "/#{@member.slug}",
+          created_at: date, user_agent: "Mozilla/5.0")
+      end
+
+      get slug_admin_brand_path(slug: @member.slug)
+
+      assert_response :ok
+      completed_count = BrandOps::WeeklyStats.member(@member).size - 1
+      monday = Time.current.in_time_zone(seoul).beginning_of_week.strftime("%-m/%-d")
+      assert_not_includes response.body, "낮게 보여도 괜찮아요"
+      assert_includes response.body, "끝난 주만 이은 흐름이에요"
+      assert_select ".ops-weeks span", count: completed_count
+      assert_select ".ops-weeks span", text: monday, count: 0
+      assert_select ".ops-chart-wrapper polyline", count: 4 do |lines|
+        lines.each { |line| assert_equal completed_count, line["points"].split.size }
+      end
+    end
   end
 
   test "화면 순서와 쉬운 말" do
@@ -142,8 +166,43 @@ class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
     get slug_admin_brand_path(slug: @member.slug)
 
     assert_response :ok
-    assert_select "article.impd-card", text: /빈 브랜드.*업종·지역·소개가 아직 비어 있어요/m
-    assert_select "article.impd-card", text: /업종이 있는 브랜드.*업종·지역·소개가 아직 비어 있어요/m, count: 0
+    assert_select "article.impd-card h3", text: /빈 브랜드/, count: 0
+    assert_select "p[data-empty-brands]", text: /정보가 아직 없는 추가 브랜드 1개: 빈 브랜드\./ do
+      assert_select "a[href=?]", new_inquiry_path, text: "문의하기"
+    end
+    assert_select "article.impd-card h3", text: /업종이 있는 브랜드/ do
+      assert_select "span.impd-label-muted", text: "추가 브랜드"
+    end
+  end
+
+  test "개인 브랜드와 이름이 같은 빈 추가 브랜드는 카드로 표시하지 않는다" do
+    @member.brands.create!(name: "같은 이름", personal: true)
+    @member.brands.create!(name: "같은 이름")
+
+    get slug_admin_brand_path(slug: @member.slug)
+
+    assert_response :ok
+    assert_select "article.impd-card h3", text: /같은 이름/, count: 1 do
+      assert_select "span.impd-label", text: "개인(기본)"
+    end
+    assert_select "p[data-empty-brands]", text: /정보가 아직 없는 추가 브랜드 1개: 같은 이름\./
+  end
+
+  test "정보가 비어도 연결 채널이 있는 추가 브랜드는 채널과 함께 보여 준다" do
+    @member.brands.create!(name: "개인 브랜드", personal: true)
+    brand = @member.brands.create!(name: "채널이 있는 브랜드")
+    channel = brand.brand_channels.create!(platform: "naver_blog", account_handle: "my-blog")
+
+    get slug_admin_brand_path(slug: @member.slug)
+
+    assert_response :ok
+    assert_select "[data-empty-brands]", count: 0
+    assert_select "article.impd-card", text: /채널이 있는 브랜드/ do
+      assert_select "h4", text: "브랜드 채널"
+      assert_select "li", text: /my-blog/
+      assert_select "a[href=?]", edit_slug_admin_brand_brand_channel_path(slug: @member.slug, id: channel.id)
+      assert_select "p", text: /업종·지역·소개가 아직 비어 있어요/
+    end
   end
 
   test "개인 브랜드가 비어 있으면 내 페이지 정보를 보여 준다" do

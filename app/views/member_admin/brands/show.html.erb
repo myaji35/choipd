@@ -16,11 +16,16 @@
         <section class="ops-surface-card"><p><%= label %></p><strong><%= number_with_delimiter(stat[:value]) %><%= unit %></strong><p><%= delta.zero? ? "그전 4주와 같아요" : "그전 4주보다 #{number_with_delimiter(delta.abs)}#{unit} #{delta.positive? ? '늘었어요' : '줄었어요'}" %></p></section>
       <% end %>
     </div>
-    <% current_week = @series.last %>
-    <p style="margin:12px 0;">아래 그래프는 최근 12주 동안의 흐름이에요.<% if current_week %> 맨 오른쪽(<%= current_week[:week_start].strftime("%-m/%-d") %> 주)은 이번 주라 아직 세는 중이에요. 낮게 보여도 괜찮아요.<% end %></p>
-    <%= ops_line_chart @series, keys: %i[visits inquiries posts sns_posts], labels: ["방문", "문의", "올린 소식", "SNS에 올린 글"] %>
-    <% if current_week %>
-      <p class="impd-label-muted" style="font-size: 13px;">이번 주(월요일부터 지금까지): 방문 <%= number_with_delimiter(current_week[:visits]) %>회 · 문의 <%= number_with_delimiter(current_week[:inquiries]) %>건 · 소식 <%= number_with_delimiter(current_week[:posts]) %>건</p>
+    <p style="margin:12px 0;">
+      <% if @current_week %>
+        아래 그래프는 끝난 주만 이은 흐름이에요(<%= @chart_series.first[:week_start].strftime("%-m/%-d") %>~<%= (@chart_series.last[:week_start] + 6).strftime("%-m/%-d") %>). 이번 주는 아직 세는 중이라 그래프에서 빼고 아래에 따로 적었어요.
+      <% else %>
+        아래 그래프는 주마다 센 흐름이에요.
+      <% end %>
+    </p>
+    <%= ops_line_chart @chart_series, keys: %i[visits inquiries posts sns_posts], labels: ["방문", "문의", "올린 소식", "SNS에 올린 글"] %>
+    <% if @current_week %>
+      <p style="margin-top: 12px; padding: 12px 16px; background: var(--impd-paper); border-left: 3px solid var(--impd-accent); font-size: 14px; color: var(--impd-ink2);"><strong>이번 주(월요일부터 지금까지):</strong> 방문 <%= number_with_delimiter(@current_week[:visits]) %>회 · 문의 <%= number_with_delimiter(@current_week[:inquiries]) %>건 · 소식 <%= number_with_delimiter(@current_week[:posts]) %>건 · SNS에 올린 글 <%= number_with_delimiter(@current_week[:sns_posts]) %>건</p>
     <% end %>
     <details style="margin-top: 16px;">
       <summary style="cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--impd-accent); font-weight: 600;">이 숫자는 누가 볼 수 있나요?</summary>
@@ -75,10 +80,15 @@
     <p class="impd-label-muted" style="margin: 8px 0 12px;">운영팀이 홍보할 때 쓰는 기본 정보예요.</p>
     <% inquiry_link_style = 'color: var(--impd-accent); text-decoration: underline; display: inline-flex; align-items: center; min-height: 44px;' %>
     <% if @brands.empty? %><div class="impd-card">아직 등록된 브랜드가 없어요.</div><% end %>
+    <% empty_brands, card_brands = @brands.partition do |brand|
+      !brand.personal? && @brands.size > 1 &&
+        [brand.business_type, brand.region, brand.description, brand.website_url].all?(&:blank?) &&
+        brand.brand_channels.empty?
+    end %>
     <div style="display: grid; gap: 12px;">
-      <% @brands.each do |brand| %>
+      <% card_brands.each do |brand| %>
         <article class="impd-card">
-          <h3><%= brand.name %> <% if brand.personal? %><span class="impd-label">개인(기본)</span><% end %></h3>
+          <h3><%= brand.name %> <% if brand.personal? %><span class="impd-label">개인(기본)</span><% elsif @brands.size > 1 %><span class="impd-label-muted">추가 브랜드</span><% end %></h3>
           <% industry_and_region = [['업종', brand.business_type], ['지역', brand.region]].filter_map { |label, value| "#{label}: #{value}" if value.present? }.join(' · ') %>
           <% if industry_and_region.present? %>
             <p style="margin-top: 8px;"><%= industry_and_region %></p>
@@ -112,6 +122,9 @@
         </article>
       <% end %>
     </div>
+    <% if empty_brands.any? %>
+      <p class="impd-label-muted" data-empty-brands style="margin-top: 12px; line-height: 1.7;">정보가 아직 없는 추가 브랜드 <%= empty_brands.size %>개: <%= empty_brands.map(&:name).join(", ") %>. 쓰지 않는 브랜드면 그대로 두셔도 돼요. 채우거나 지우려면 운영팀에 알려 주세요 — <%= link_to '문의하기', new_inquiry_path, style: inquiry_link_style %></p>
+    <% end %>
     <% if @brands.empty? %><p style="margin: 16px 0 32px;">브랜드는 운영팀이 등록을 도와드려요 — <%= link_to '문의하기', new_inquiry_path, style: inquiry_link_style %></p><% end %>
   </section>
 </div>

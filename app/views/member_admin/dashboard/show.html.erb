@@ -7,11 +7,21 @@
     <h1 class="impd-display" style="font-size: clamp(32px, 9vw, 56px); margin-top: 12px; word-break: keep-all;">
       안녕하세요, <span style="color: var(--impd-accent); font-style: italic;"><%= @member.name %></span>님.
     </h1>
-    <p style="margin-top: 12px; font-size: 16px; color: var(--impd-ink2);">
-      <% if @today_visits.positive? %>
-        오늘 내 페이지 방문 <strong><%= number_with_delimiter(@today_visits) %>회</strong> · 최근 7일 <%= number_with_delimiter(@week_visits) %>회
+    <p data-dashboard-lead style="margin-top: 12px; font-size: 16px; color: var(--impd-ink2);">
+      <% if @unread_inquiries.positive? || @pending_reviews_count.positive? %>
+        <% action_link_style = "display: inline-flex; align-items: center; min-height: 44px; color: var(--impd-accent); font-weight: 700; text-decoration: underline;" %>
+        <% actions = [] %>
+        <% if @unread_inquiries.positive? %>
+          <% actions << link_to("새 문의 #{number_with_delimiter(@unread_inquiries)}건", slug_admin_inquiries_path(slug: @member.slug), style: action_link_style) %>
+        <% end %>
+        <% if @pending_reviews_count.positive? %>
+          <% actions << link_to("확인할 후기 #{number_with_delimiter(@pending_reviews_count)}건", slug_admin_reviews_path(slug: @member.slug), style: action_link_style) %>
+        <% end %>
+        지금 확인할 것: <%= safe_join(actions, " · ") %>
+      <% elsif @today_visits.positive? %>
+        새로 확인할 것은 없어요. 오늘 내 페이지가 <strong><%= number_with_delimiter(@today_visits) %>회</strong> 열렸어요.
       <% elsif @week_visits.positive? %>
-        오늘은 아직 방문이 없어요. 최근 7일 동안은 <strong><%= number_with_delimiter(@week_visits) %>회</strong> 열렸어요.
+        새로 확인할 것은 없어요. 방문 숫자는 아래에서 볼 수 있어요.
       <% else %>
         아직 방문이 없어요. 내 페이지 주소를 고객에게 보내 보세요.
       <% end %>
@@ -328,6 +338,9 @@
   .dashboard-stat-value a { display: inline-block; min-width: 44px; min-height: 44px; color: inherit; text-decoration: none; }
   .dashboard-chart-date { white-space: nowrap; }
   .dashboard-grid, .dashboard-grid * { min-width: 0; overflow-wrap: anywhere; }
+  @media (min-width: 901px) {
+    .dashboard-overview { position: sticky; top: 24px; }
+  }
   @media (max-width: 900px) {
     .dashboard-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 0 !important; }
     .dashboard-main { display: contents; }

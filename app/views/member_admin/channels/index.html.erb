@@ -33,9 +33,11 @@
         <%= render "member_admin/channels/state_note", item: item %>
 
         <% no_posts = item[:recent_posts].empty? && item[:scheduled_posts].empty? %>
+        <% has_follower_history = item[:follower_snapshots].size >= 2 %>
+        <% follower_change_first = no_posts && has_follower_history %>
         <% stats = channel_summary(item) %>
         <% stats = stats.select { |label, value| label == "팔로워" && value } if no_posts %>
-        <% if stats.any? %>
+        <% if stats.any? && !follower_change_first %>
           <dl class="channel-stat-grid">
             <% stats.each do |label, value| %>
               <div style="border: 1px solid var(--impd-rule); padding: 12px; background: var(--impd-card);">
@@ -49,6 +51,19 @@
           </dl>
         <% end %>
 
+        <% if has_follower_history %>
+          <% follower_change = capture do %>
+            <h3 style="font-size: 17px; margin-top: 24px;">팔로워 변화</h3>
+            <p style="margin-top: 8px;">지금 <strong><%= number_with_delimiter(item[:followers]) %>명</strong><% if (change = channel_follower_change(item[:follower_delta])) %> · <%= change %><% end %></p>
+            <ul style="display: flex; flex-wrap: wrap; gap: 4px 16px; list-style: none; padding: 0; margin-top: 8px; font-size: 13px; color: var(--impd-muted);">
+              <% item[:follower_snapshots].each do |snapshot| %>
+                <li><%= channel_short_date(snapshot.captured_at) %> <%= number_with_delimiter(snapshot.follower_count) %>명</li>
+              <% end %>
+            </ul>
+          <% end %>
+        <% end %>
+        <%= follower_change if follower_change_first %>
+
         <% if no_posts %>
           <h3 style="font-size: 17px; margin-top: 24px;">올린 글·예약된 글</h3>
           <p style="margin-top: 8px; color: var(--impd-muted);">아직 없어요. 운영팀이 첫 글을 올리거나 예약하면 여기에 보여요.</p>
@@ -60,15 +75,8 @@
           <%= render "member_admin/channels/post_list", posts: item[:scheduled_posts], published: false %>
         <% end %>
 
-        <% if item[:follower_snapshots].size >= 2 %>
-          <h3 style="font-size: 17px; margin-top: 24px;">팔로워 변화</h3>
-          <p style="margin-top: 8px;">지금 <strong><%= number_with_delimiter(item[:followers]) %>명</strong><% if (change = channel_follower_change(item[:follower_delta])) %> · <%= change %><% end %></p>
-          <ul style="display: flex; flex-wrap: wrap; gap: 4px 16px; list-style: none; padding: 0; margin-top: 8px; font-size: 13px; color: var(--impd-muted);">
-            <% item[:follower_snapshots].each do |snapshot| %>
-              <li><%= channel_short_date(snapshot.captured_at) %> <%= number_with_delimiter(snapshot.follower_count) %>명</li>
-            <% end %>
-          </ul>
-        <% elsif item[:follower_snapshots].empty? && stats.empty? %>
+        <%= follower_change if has_follower_history && !follower_change_first %>
+        <% if item[:follower_snapshots].empty? && stats.empty? %>
           <p class="impd-label-muted" style="margin-top: 16px;">팔로워는 아직 못 셌어요. 운영팀이 세면 여기에 보여요.</p>
         <% end %>
 
@@ -87,7 +95,7 @@
             <%= link_to "동의하러 가기", consent_path, class: "impd-btn impd-btn-secondary", style: "margin-top: 12px; min-height: 44px;" %>
           <% end %>
         <% else %>
-          <p class="impd-label-muted" style="margin-top: 8px;">동의는 회원 본인만 바꿀 수 있어요.</p>
+          <p class="impd-label-muted" style="margin-top: 4px;">동의는 회원 본인만 바꿀 수 있어요.</p>
         <% end %>
       <% else %>
         <h2 style="font-size: 22px;"><%= item[:label] %> 등록 전</h2>

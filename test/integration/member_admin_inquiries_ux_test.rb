@@ -24,6 +24,8 @@ class MemberAdminInquiriesUxTest < ActionDispatch::IntegrationTest
       assert_select "a.impd-btn-primary", text: "메일로 답장"
       assert_select "button", text: "확인했어요"
     end
+    assert_includes response.body, "grid-template-columns: minmax(72px, max-content) minmax(0, 1fr) auto"
+    assert_not_includes response.body, "minmax(0, 1fr) minmax(0, 2fr) auto"
     assert_select "details.inquiry-read#inquiry-#{read.id}:not([open])" do
       assert_select "summary strong", text: read.sender_name
       assert_select "summary time", text: "2026.11.03"

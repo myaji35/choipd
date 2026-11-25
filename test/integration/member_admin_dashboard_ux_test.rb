@@ -203,7 +203,7 @@ class MemberAdminDashboardUxTest < ActionDispatch::IntegrationTest
     get slug_admin_dashboard_path(slug: member.slug)
 
     assert_response :ok
-    assert_select "p", text: /오늘 내 페이지 방문 1회 · 최근 7일 1회/
+    assert_select "[data-dashboard-lead]", text: "새로 확인할 것은 없어요. 오늘 내 페이지가 1회 열렸어요."
   end
 
   test "방문이 20회 이상이면 날짜별 막대와 하루 평균을 보여 준다" do
@@ -216,11 +216,47 @@ class MemberAdminDashboardUxTest < ActionDispatch::IntegrationTest
     get slug_admin_dashboard_path(slug: member.slug)
 
     assert_response :ok
-    assert_select "p", text: /오늘은 아직 방문이 없어요\. 최근 7일 동안은 21회 열렸어요\./
+    assert_select "[data-dashboard-lead]", text: "새로 확인할 것은 없어요. 방문 숫자는 아래에서 볼 수 있어요."
+    assert_not_includes response.body, "최근 7일 동안은"
     assert_select "span", text: "최근 14일 방문 21회"
     assert_select ".dashboard-chart .dashboard-chart-date", text: %r{\A\d+/\d+\z}, count: 14
     assert_select "p", text: "오늘 0회 · 하루 평균 1.5회"
     assert_select "a[href=?]", slug_admin_brand_path(slug: member.slug), text: "주별 흐름은 '내 브랜드'에서 보기 →"
+  end
+
+  test "첫 줄에서 새 문의와 확인할 후기로 이동할 수 있다" do
+    member = create_overview_member
+    inquiry = member.member_inquiries.create!(sender_name: "방문자", sender_email: "visitor@example.com",
+      message: "상담을 요청합니다", is_read: 0)
+    2.times { member.member_reviews.create!(reviewer_name: "고객", rating: 5, status: "new") }
+    inquiries_path = slug_admin_inquiries_path(slug: member.slug)
+    reviews_path = slug_admin_reviews_path(slug: member.slug)
+
+    get slug_admin_dashboard_path(slug: member.slug)
+
+    assert_response :ok
+    assert_select "[data-dashboard-lead]", text: "지금 확인할 것: 새 문의 1건 · 확인할 후기 2건" do
+      assert_select "a[href=?]", inquiries_path, text: "새 문의 1건"
+      assert_select "a[href=?]", reviews_path, text: "확인할 후기 2건"
+    end
+
+    inquiry.update!(is_read: 1)
+    get slug_admin_dashboard_path(slug: member.slug)
+
+    assert_response :ok
+    assert_select "[data-dashboard-lead]", text: "지금 확인할 것: 확인할 후기 2건" do
+      assert_select "a[href=?]", inquiries_path, count: 0
+      assert_select "a[href=?]", reviews_path, text: "확인할 후기 2건"
+    end
+  end
+
+  test "내 페이지 한눈에는 데스크톱에서만 화면 위쪽에 붙는다" do
+    member = create_overview_member
+
+    get slug_admin_dashboard_path(slug: member.slug)
+
+    assert_response :ok
+    assert_match(/@media \(min-width: 901px\) \{\s*\.dashboard-overview \{ position: sticky; top: 24px; \}\s*\}/, response.body)
   end
 
   private

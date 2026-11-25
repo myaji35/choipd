@@ -95,8 +95,8 @@
   .inquiry-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--impd-rule); }
   .inquiry-read + .inquiry-read { border-top: 1px solid var(--impd-rule); }
   .inquiry-read summary { min-height: 56px; padding: 0 20px; cursor: pointer; line-height: 56px; }
-  .inquiry-summary { display: inline-grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto; align-items: center; gap: 12px; width: calc(100% - 1.5em); vertical-align: middle; line-height: 1.4; }
-  .inquiry-summary-sender { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 15px; }
+  .inquiry-summary { display: inline-grid; grid-template-columns: minmax(72px, max-content) minmax(0, 1fr) auto; align-items: center; gap: 4px 16px; width: calc(100% - 1.5em); vertical-align: middle; line-height: 1.4; }
+  .inquiry-summary-sender { display: flex; align-items: center; gap: 6px; min-width: 0; max-width: 14em; font-size: 15px; }
   .inquiry-summary-sender strong, .inquiry-preview { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
   .inquiry-preview, .inquiry-summary time { color: var(--impd-muted); font-size: 13px; }
   @media (max-width: 720px) {
