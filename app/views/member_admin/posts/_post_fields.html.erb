@@ -1,0 +1,12 @@
+<div class="post-field">
+  <%= form.label :title, "제목 (필수)" %>
+  <%= form.text_field :title, class: "post-input", required: true, placeholder: "예: 11월 무료 상담 주간 안내" %>
+</div>
+<div class="post-field">
+  <%= form.label :content, "내용 (필수)" %>
+  <%= form.text_area :content, class: "post-input", required: true, rows: 6, placeholder: "예: 이번 주 토요일까지 보장 점검을 무료로 해 드려요." %>
+</div>
+<div class="post-field">
+  <%= form.label :category, "분류 (선택)" %>
+  <%= form.text_field :category, class: "post-input", placeholder: "예: 공지, 후기, 일상" %>
+</div>

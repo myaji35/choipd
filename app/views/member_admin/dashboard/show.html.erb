@@ -10,9 +10,6 @@
     <p style="margin-top: 12px; font-size: 16px; color: var(--impd-ink2);">
       오늘 <strong><%= @today_visits %>명</strong>이 방문했어요.
     </p>
-    <p style="margin-top: 6px; font-size: 12px; color: var(--impd-muted);">
-      최근 7일 <%= @week_visits %>명 · 링크 <%= @link_clicks %>회 열림
-    </p>
   </div>
 
   <div style="display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 40px;" class="dashboard-grid">
@@ -45,7 +42,7 @@
       <section id="profile-accounts-status" aria-labelledby="profile-accounts-title" style="background: #fff; border: 1px solid var(--impd-rule); padding: 24px; margin-bottom: 24px;">
         <p class="impd-label">내 프로필 관리 현황</p>
         <h2 id="profile-accounts-title" style="font-size: 24px; margin-top: 10px;">네이버 인물정보 · LinkedIn</h2>
-        <p style="font-size: 14px; color: var(--impd-muted); margin: 8px 0 18px;">네이버·LinkedIn 계정을 등록해 두면 운영자·PD가 그 계정으로 인물정보와 프로필을 대신 관리해요. 상태는 여기서 확인할 수 있어요.</p>
+        <p style="font-size: 14px; color: var(--impd-muted); margin: 8px 0 18px;">네이버·LinkedIn 계정을 맡겨 두면 운영팀이 인물정보와 프로필을 대신 손봐 드려요. 어디까지 됐는지 여기서 볼 수 있어요.</p>
 
         <% accounts_by_platform = @profile_accounts.group_by(&:platform) %>
         <% show_management_links = respond_to?(:impersonating_admin_user) && impersonating_admin_user.present? %>
@@ -67,14 +64,14 @@
 
                 <% if account %>
                   <h3 style="font-size: 16px; margin-top: 8px;"><%= account.display_name %></h3>
-                  <p style="color: var(--impd-muted);">관리 계정: <%= masked_login_id(account.login_id) || "아직 등록 안 됨" %></p>
+                  <p style="color: var(--impd-muted);">맡긴 계정: <%= masked_login_id(account.login_id) || "아직 등록 안 됨" %></p>
                   <% if account.headline.present? %>
                     <p style="color: var(--impd-ink2);"><%= account.headline %></p>
                   <% end %>
                   <div style="display: grid; gap: 4px; margin-top: 8px; color: var(--impd-muted); font-size: 13px;">
-                    <p>마지막 점검: <%= account.last_checked_at ? korean_time_ago(account.last_checked_at) : "아직 점검 전" %></p>
+                    <p>운영팀이 마지막으로 확인: <%= account.last_checked_at ? korean_time_ago(account.last_checked_at) : "아직 확인 전" %></p>
                     <% if latest_snapshot %>
-                      <p>최근 수집: <%= (latest_snapshot.captured_at || latest_snapshot.created_at).strftime("%Y.%m.%d") %></p>
+                      <p>프로필 내용을 가져온 날: <%= (latest_snapshot.captured_at || latest_snapshot.created_at).in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %></p>
                     <% end %>
                     <% if platform == "linkedin" %>
                       <% score = linkedin_completeness_score(latest_snapshot) %>
@@ -84,10 +81,10 @@
                       <% end %>
                     <% elsif platform == "naver_people" %>
                       <% if target %>
-                        <p>등록 정보: <%= target.status == "approved" ? "승인됨" : "초안" %></p>
+                        <p>올릴 내용: <%= target.status == "approved" ? "확정" : "준비 중" %></p>
                       <% end %>
                       <% if (submission = account.naver_people_submissions.max_by { |item| [item.created_at, item.id] }) %>
-                        <p>최근 반영 요청: <%= NaverPeopleSubmission::STATUS_LABELS[submission.status] %> · <%= submission.created_at.strftime("%Y.%m.%d") %></p>
+                        <p>네이버에 고쳐 달라고 한 날: <%= submission.created_at.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %> (<%= NaverPeopleSubmission::STATUS_LABELS[submission.status] %>)</p>
                       <% end %>
                     <% end %>
                     <% if account.session_status == "error" %>
@@ -102,7 +99,7 @@
                   <p style="color: var(--impd-muted); margin-top: 4px;">
                     <%= naver ? "네이버 계정을 등록하면 네이버 인물정보 등록·수정 요청을 대신 진행해요." : "LinkedIn 계정을 등록하면 프로필 점검과 업데이트를 대신 진행해요." %>
                   </p>
-                  <p style="color: var(--impd-muted); margin-top: 4px;">등록은 운영자·PD에게 요청해 주세요.</p>
+                  <p style="color: var(--impd-muted); margin-top: 4px;">맡기려면 운영팀에 말씀해 주세요.</p>
                 <% end %>
 
                 <% if show_management_links %>
@@ -110,9 +107,9 @@
                   <p style="margin-top: 8px;"><%= link_to "관리 화면에서 열기", management_path, style: "color: var(--impd-accent); font-size: 12px;" %></p>
                 <% end %>
                 <% steps = [
-                  ["계정 등록", account.present?],
+                  ["계정 맡기기", account.present?],
                   ["로그인 확인", account&.session_status == "logged_in"],
-                  ["정보 관리", (naver ? target : latest_snapshot).present?]
+                  ["내용 손보기", (naver ? target : latest_snapshot).present?]
                 ] %>
                 <ol aria-label="<%= registration_label %> 진행 상태" style="display: flex; flex-wrap: wrap; gap: 4px 8px; list-style: none; padding: 0; margin: 12px 0 0; font-size: 12px; color: var(--impd-muted);">
                   <% steps.each_with_index do |(step, complete), index| %>
@@ -132,17 +129,31 @@
 
       <!-- Stats 5 카드 -->
       <div class="dashboard-stats" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--impd-ink); margin-bottom: 40px;">
+        <% inquiry_note = @unread_inquiries.positive? ? "새 문의 #{@unread_inquiries}건" : "지금까지 받은 문의" %>
+        <% follower_note = if @total_followers.nil?
+          "운영팀이 SNS 계정을 연결하면 보여요"
+        elsif @followers_missing_count.positive?
+          "#{@followers_missing_count}개 계정은 아직 못 셌어요"
+        else
+          "연결된 계정 합계"
+        end %>
         <% [
           ["방문", @week_visits, "최근 7일"],
-          ["문의", @inquiries_count, @unread_inquiries.positive? ? "안읽음 #{@unread_inquiries}" : "총합"],
-          ["링크 클릭", @link_clicks, "QR·공유 누적"],
-          ["서비스", @services_count, "활성"],
-          ["총 추종자", @total_followers ? number_with_delimiter(@total_followers) : "—", @followers_missing_count.positive? ? "#{@followers_missing_count}개 계정 미입력" : "최신 집계"]
-        ].each_with_index do |(label, val, sub), i| %>
+          ["문의", @inquiries_count, inquiry_note, slug_admin_inquiries_path(slug: @member.slug)],
+          ["링크 열림", @link_clicks, "QR·공유 링크로 들어온 횟수"],
+          ["서비스", @services_count, "내 페이지에 올린 수", slug_admin_services_path(slug: @member.slug)],
+          ["SNS 팔로워", @total_followers && number_with_delimiter(@total_followers), follower_note]
+        ].each_with_index do |(label, value, note, path), i| %>
           <div style="padding: 24px 20px; <%= 'border-left: 1px solid var(--impd-rule);' if i > 0 %>">
             <p class="impd-label-muted"><%= label %></p>
-            <p style="font-family: var(--impd-font-display); font-size: 48px; font-weight: 800; line-height: 1; margin-top: 8px; color: var(--impd-accent);"><%= val %></p>
-            <p style="font-size: 12px; color: var(--impd-muted); margin-top: 6px;"><%= sub %></p>
+            <p class="dashboard-stat-value<%= ' dashboard-stat-pending' if value.nil? %>">
+              <% if path %>
+                <%= link_to value.to_s, path, aria: { label: "#{label} #{value}" } %>
+              <% else %>
+                <%= value || "준비 중" %>
+              <% end %>
+            </p>
+            <p style="font-size: 12px; color: var(--impd-muted); margin-top: 6px;"><%= note %></p>
           </div>
         <% end %>
       </div>
@@ -183,17 +194,17 @@
         <% if @recent_inquiries.any? %>
           <div style="display: grid; gap: 12px;">
             <% @recent_inquiries.each do |inq| %>
-              <div style="border-left: 3px solid <%= inq.is_read.to_i.positive? ? 'var(--impd-rule)' : 'var(--impd-accent)' %>; padding-left: 16px; padding: 12px 16px; background: <%= inq.is_read.to_i.positive? ? 'transparent' : 'rgba(58,42,240,.04)' %>;">
+              <div style="border-left: 3px solid <%= inq.is_read.to_i.positive? ? 'var(--impd-rule)' : 'var(--impd-accent)' %>; padding-left: 16px; padding: 12px 16px; background: <%= inq.is_read.to_i.positive? ? 'transparent' : 'var(--impd-card)' %>;">
                 <div style="display: flex; justify-content: space-between;">
                   <p style="font-weight: 600;"><%= inq.sender_name %></p>
-                  <p class="impd-label-muted"><%= inq.created_at.strftime("%m/%d %H:%M") %></p>
+                  <p class="impd-label-muted"><%= inq.created_at.in_time_zone("Asia/Seoul").strftime("%m.%d %H:%M") %></p>
                 </div>
                 <p style="margin-top: 4px; font-size: 13px; color: var(--impd-ink2);"><%= truncate(inq.message, length: 100) %></p>
               </div>
             <% end %>
           </div>
         <% else %>
-          <p style="text-align: center; padding: 32px; color: var(--impd-muted); font-size: 14px;">아직 문의가 없습니다.</p>
+          <p style="text-align: center; padding: 32px; color: var(--impd-muted); font-size: 14px;">아직 받은 문의가 없어요.</p>
         <% end %>
       </div>
     </div>
@@ -219,6 +230,9 @@
 </div>
 
 <style>
+  .dashboard-stat-value { font-family: var(--impd-font-display); font-size: 48px; font-weight: 800; line-height: 1; margin-top: 8px; color: var(--impd-accent); }
+  .dashboard-stat-pending { font-size: 22px; color: var(--impd-muted); line-height: 48px; }
+  .dashboard-stat-value a { display: inline-block; min-width: 44px; color: inherit; text-decoration: none; }
   .dashboard-grid, .dashboard-grid * { min-width: 0; overflow-wrap: anywhere; }
   @media (max-width: 900px) {
     .dashboard-grid { grid-template-columns: minmax(0, 1fr) !important; }

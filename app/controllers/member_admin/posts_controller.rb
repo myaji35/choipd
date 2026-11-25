@@ -10,7 +10,8 @@ class MemberAdmin::PostsController < MemberAdmin::BaseController
     post.published_at = Time.current if post.is_published.to_i == 1
 
     if post.save
-      redirect_to slug_admin_posts_path(slug: @member.slug), notice: "소식을 등록했습니다."
+      message = post.is_published.to_i == 1 ? "소식을 올렸어요. 내 페이지에 바로 보여요." : "소식을 저장했어요. 아직 나만 볼 수 있어요."
+      redirect_to slug_admin_posts_path(slug: @member.slug), notice: message
     else
       @posts = @member.member_posts.recent
       flash.now[:alert] = post.errors.full_messages.join(", ")
@@ -25,7 +26,7 @@ class MemberAdmin::PostsController < MemberAdmin::BaseController
     end
 
     if @post.update(attributes)
-      redirect_to slug_admin_posts_path(slug: @member.slug), notice: "소식을 수정했습니다."
+      redirect_to slug_admin_posts_path(slug: @member.slug), notice: "소식을 고쳤어요."
     else
       @posts = @member.member_posts.recent
       flash.now[:alert] = @post.errors.full_messages.join(", ")
@@ -39,13 +40,13 @@ class MemberAdmin::PostsController < MemberAdmin::BaseController
     attributes[:published_at] = Time.current if publishing
     @post.update!(attributes)
 
-    message = publishing ? "소식을 발행했습니다." : "소식을 비공개로 전환했습니다."
+    message = publishing ? "소식을 내 페이지에 보이게 했어요." : "소식을 내 페이지에서 숨겼어요."
     redirect_to slug_admin_posts_path(slug: @member.slug), notice: message, status: :see_other
   end
 
   def destroy
     @post.destroy!
-    redirect_to slug_admin_posts_path(slug: @member.slug), notice: "소식을 삭제했습니다.", status: :see_other
+    redirect_to slug_admin_posts_path(slug: @member.slug), notice: "소식을 지웠어요.", status: :see_other
   end
 
   private

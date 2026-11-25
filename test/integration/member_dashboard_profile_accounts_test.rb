@@ -20,7 +20,7 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
       assert_select "article h3", text: "LinkedIn 계정 등록 전"
       assert_select "article p", text: "네이버 계정을 등록하면 네이버 인물정보 등록·수정 요청을 대신 진행해요."
       assert_select "article p", text: "LinkedIn 계정을 등록하면 프로필 점검과 업데이트를 대신 진행해요."
-      assert_select "article p", text: "등록은 운영자·PD에게 요청해 주세요.", count: 2
+      assert_select "article p", text: "맡기려면 운영팀에 말씀해 주세요.", count: 2
       assert_select "article ol li", text: /○/, count: 6
       assert_select "article .impd-label-muted", count: 2 do |labels|
         assert_equal [ "네이버 인물정보", "LinkedIn" ], labels.map(&:text)
@@ -48,19 +48,19 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
     visit_dashboard
 
     assert_select "#profile-accounts-status article:first-child" do
-      assert_select "p", text: "등록 정보: 승인됨"
-      assert_select "p", text: "관리 계정: 아직 등록 안 됨"
-      assert_select "ol li", text: /✓ 계정 등록/
+      assert_select "p", text: "올릴 내용: 확정"
+      assert_select "p", text: "맡긴 계정: 아직 등록 안 됨"
+      assert_select "ol li", text: /✓ 계정 맡기기/
       assert_select "ol li", text: /○ 로그인 확인/
-      assert_select "ol li", text: "✓ 정보 관리"
-      assert_select "p", text: "최근 반영 요청: 제출함 · #{submission.created_at.strftime('%Y.%m.%d')}"
+      assert_select "ol li", text: "✓ 내용 손보기"
+      assert_select "p", text: "네이버에 고쳐 달라고 한 날: #{submission.created_at.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M")} (제출함)"
     end
     assert_select "#profile-accounts-status article:last-child" do
       assert_select "h3", text: linkedin.display_name
-      assert_select "p", text: "관리 계정: ka***@example.com"
+      assert_select "p", text: "맡긴 계정: ka***@example.com"
       assert_select "ol li", text: /✓/, count: 3
       assert_select "span", text: "로그인됨"
-      assert_select "p", text: "마지막 점검: 2일 전"
+      assert_select "p", text: "운영팀이 마지막으로 확인: 2일 전"
       assert_select "p", text: /\bdays\b/, count: 0
       assert_select "p", text: /프로필 완성도 \d+%/
       assert_select "progress[max='100'][value]"

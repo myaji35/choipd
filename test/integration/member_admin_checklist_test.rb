@@ -14,7 +14,7 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
     get @dashboard_path
     assert_response :success
     actions = {
-      "사진 올리기" => [ "profile-photo", "프로필 사진 업로드" ],
+      "사진 올리기" => [ "profile-photo", "프로필 사진 올리기" ],
       "자기소개 쓰기" => [ "bio", "자기소개 작성 (50자 이상)" ],
       "직업·지역 정하기" => [ "profession-region", "직업/지역 설정" ],
       "작업 사진 올리기" => [ "media", "작업 사진·사례 1개 이상" ],

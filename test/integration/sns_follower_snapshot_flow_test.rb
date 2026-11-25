@@ -68,8 +68,8 @@ class SnsFollowerSnapshotFlowTest < ActionDispatch::IntegrationTest
     post "#{@base}/#{@account.id}/follower_snapshots", params: { sns_follower_snapshot: { follower_count: 500 } }
     get "/#{@member.slug}/admin/dashboard"
     assert_response :success
-    assert_match "총 추종자", response.body
+    assert_match "SNS 팔로워", response.body
     assert_match "500", response.body
-    assert_match "1개 계정 미입력", response.body
+    assert_match "1개 계정은 아직 못 셌어요", response.body
   end
 end

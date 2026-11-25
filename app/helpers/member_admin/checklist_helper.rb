@@ -1,6 +1,6 @@
 module MemberAdmin::ChecklistHelper
   CHECKLIST_LABELS = {
-    "profile-photo" => "프로필 사진 업로드",
+    "profile-photo" => "프로필 사진 올리기",
     "bio" => "자기소개 작성 (50자 이상)",
     "profession-region" => "직업/지역 설정",
     "media" => "작업 사진·사례 1개 이상",
