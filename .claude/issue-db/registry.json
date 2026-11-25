@@ -5556,7 +5556,7 @@
       "id": "ISS-522",
       "title": "[Plan:브라우저QA] ISS-520 콘솔 에러 + 스크린샷 검증",
       "type": "BROWSER_QA",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "agent-harness",
       "depth": 2,
@@ -5585,9 +5585,54 @@
           "at": "2026-11-25T10:11:45+09:00"
         }
       },
-      "result": null,
+      "result": {
+        "commit": "fccd8f3",
+        "console_errors": 0,
+        "network_errors": 0,
+        "files_changed": [
+          "script/qa/layout_check.cjs"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "/, /inquiries/new 1280·390 콘솔 오류 0건",
+            "met": true,
+            "how": "console error·pageerror 수집 4조합 모두 0"
+          },
+          {
+            "criterion": "이 서버로 가는 요청 4xx/5xx 0건",
+            "met": true,
+            "how": "같은 origin 응답 status>=400 수집 4조합 모두 0"
+          },
+          {
+            "criterion": "스크린샷 저장, 가로 스크롤·잘림·바닥글 줄바꿈 0건",
+            "met": true,
+            "how": "tmp/qa/layout/*.png 4장(565008/486321/55426/46095 바이트), hScroll false·clipped 0·footerWrapped 0"
+          },
+          {
+            "criterion": "다시 돌릴 수 있는 저장소 안 명령",
+            "met": true,
+            "how": "node script/qa/layout_check.cjs (npm i --prefix script/qa, 서버 127.0.0.1:3008)"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "4조합 hScroll false clipped 0 footerWrapped 0 consoleErrors 0 badResponses 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "bin/rails test",
+            "exit_code": 0,
+            "output": "352 runs, 2364 assertions, 0 failures, 0 errors, 1 skips"
+          }
+        ],
+        "review": {
+          "gemini": "결함 없음"
+        }
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T10:11:45+09:00"
+      "updated_at": "2026-11-25T10:11:45+09:00",
+      "completed_at": "2026-11-25T10:15:53.590033"
     },
     {
       "id": "ISS-526",
@@ -5607,10 +5652,21 @@
           "total": 352,
           "coverage": null
         },
-        "source_issue": "ISS-523"
+        "source_issue": "ISS-523",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T01:15:55.995Z",
+            "by": "auto",
+            "reason": "「[Plan:품질평가] ISS-523 품질 점수 산출」(SCORE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T01:15:55.995Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
       },
       "result": null,
-      "spawn_rules": []
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T01:15:55.995Z"
     }
   ],
   "hooks": {
@@ -5820,6 +5876,12 @@
         "issue_type": "RUN_TESTS",
         "plan_created": 1,
         "timestamp": "2026-11-25T10:11:58.149226"
+      },
+      {
+        "issue_id": "ISS-522",
+        "issue_type": "BROWSER_QA",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T10:15:53.590033"
       }
     ],
     "on_fail": [],
@@ -9790,7 +9852,7 @@
   },
   "stats": {
     "total_issues": 526,
-    "completed": 34,
+    "completed": 35,
     "failed": 0,
     "evolved": 211
   },
@@ -9817,13 +9879,13 @@
   "opus_budget_state": {
     "daily": {
       "date": "2026-11-25",
-      "cost_usd": 0.98,
-      "calls": 1
+      "cost_usd": 1.96,
+      "calls": 2
     },
     "monthly": {
       "month": "2026-11",
-      "cost_usd": 0.98,
-      "calls": 1
+      "cost_usd": 1.96,
+      "calls": 2
     },
     "demotion_active": false
   }
