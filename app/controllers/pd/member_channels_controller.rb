@@ -4,7 +4,7 @@ class Pd::MemberChannelsController < Pd::BaseController
   before_action :set_member
   before_action :set_channel, only: [ :edit, :update ]
 
-  helper_method :remaining_channel_platforms
+  helper_method :remaining_channel_platforms, :next_channel_platform
 
   def new
     @lock_platform = CHANNEL_PLATFORMS.key?(params[:platform])
@@ -59,7 +59,9 @@ class Pd::MemberChannelsController < Pd::BaseController
   end
 
   def redirect_after_create
-    next_platform = remaining_channel_platforms.first if params[:next] == "1"
+    if params[:next] == "1"
+      next_platform = @lock_platform ? next_channel_platform(@brand_channel.platform) : remaining_channel_platforms.first
+    end
     if next_platform
       next_label = CHANNEL_PLATFORMS.fetch(next_platform)
       redirect_to new_pd_member_channel_path(@member, platform: next_platform),
@@ -67,6 +69,11 @@ class Pd::MemberChannelsController < Pd::BaseController
     else
       redirect_to pd_member_path(@member, anchor: "channels"), notice: "#{channel_label} 채널을 등록했습니다. 회원 화면에 바로 보입니다."
     end
+  end
+
+  def next_channel_platform(platform)
+    following_platforms = CHANNEL_PLATFORMS.keys.drop_while { |key| key != platform }.drop(1)
+    (following_platforms & remaining_channel_platforms).first
   end
 
   def remaining_channel_platforms

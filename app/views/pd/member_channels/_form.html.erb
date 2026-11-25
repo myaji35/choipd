@@ -56,19 +56,25 @@
       <%= form.text_area :notes, rows: 3, class: field_class, style: control_height, aria: { describedby: "channel-notes-help" } %>
       <p id="channel-notes-help" class="mt-1 text-xs text-gray-600">비밀번호는 여기에 적지 마세요.</p>
     </div>
+    <% next_platform = next_channel_platform(platform) if !editing && @lock_platform %>
     <div class="flex flex-wrap gap-3">
       <%= form.submit(editing ? "저장" : "등록", class: "rounded-lg bg-primary px-6 py-2 text-sm text-white cursor-pointer", style: control_height) %>
       <% unless editing %>
-        <% remaining = remaining_channel_platforms %>
-        <% next_platform = (remaining - [platform]).first if platform %>
-        <% if next_platform || (!platform && remaining.size > 1) %>
+        <% if next_platform || (!@lock_platform && remaining_channel_platforms.size > 1) %>
           <% next_label = next_platform ? "등록하고 다음: #{platforms.fetch(next_platform)}" : "등록하고 다음 채널" %>
           <%= form.button next_label, name: "next", value: "1",
               class: "rounded-lg border border-gray-300 bg-white px-6 py-2 text-sm text-gray-700 cursor-pointer", style: control_height %>
         <% end %>
       <% end %>
+      <% if next_platform %>
+        <%= link_to "건너뛰기 → #{platforms.fetch(next_platform)}", new_pd_member_channel_path(@member, platform: next_platform),
+            class: "inline-flex items-center px-2 text-sm text-primary hover:underline", style: control_height %>
+      <% end %>
       <%= link_to "취소", pd_member_path(@member), class: "inline-flex items-center rounded-lg bg-gray-100 px-6 py-2 text-sm text-gray-700", style: control_height %>
     </div>
+    <% if next_platform %>
+      <p class="text-xs text-gray-600">이 회원에게 없는 계정·채널이면 건너뛰세요. 나중에 대행 등록 화면에서 다시 등록할 수 있습니다.</p>
+    <% end %>
   <% end %>
   <p class="mt-4 text-xs text-gray-600">등록 뒤 회원 본인이 '내 채널'에서 운영 위탁에 동의해야 글을 올릴 수 있습니다. 동의 안내는 대행 등록 화면에서 복사할 수 있습니다.</p>
 </div>

@@ -29,6 +29,13 @@ class Pd::MembersController < Pd::BaseController
     @registration_complete = !registration_todo?(@registration_summary) && @registration_summary.fetch(:consent_waiting).zero?
     @accounts_by_platform = tenant_accounts.where(member_id: @member.id).includes(:naver_people_target)
       .order(:platform, :display_name).group_by(&:platform)
+    linked_accounts = @accounts_by_platform.values.flatten
+    @matching_names = [@member.name, *linked_accounts.map(&:display_name)]
+      .map { |name| normalized_account_name(name) }.select { |name| name.length >= 2 }.uniq
+    email = @member.email.to_s.downcase
+    @matching_login_ids = [email, email.split("@", 2).first, *linked_accounts.map(&:login_id)]
+      .filter_map { |login_id| login_id.presence&.downcase }.uniq
+
     unlinked_accounts = tenant_accounts.where(member_id: nil, tenant_id: @member.tenant_id)
       .order(:display_name, :id).group_by(&:platform)
     @unlinked_accounts_by_platform = unlinked_accounts.transform_values do |accounts|
@@ -55,14 +62,15 @@ class Pd::MembersController < Pd::BaseController
   private
 
   def matching_account?(account)
-    account_name = account.display_name.to_s.downcase.gsub(/[^[:alnum:]]/, "")
-    member_name = @member.name.to_s.downcase.gsub(/[^[:alnum:]]/, "")
-    if account_name.length >= 2 && member_name.length >= 2 &&
-        (account_name.include?(member_name) || member_name.include?(account_name))
+    account_name = normalized_account_name(account.display_name)
+    if account_name.length >= 2 && @matching_names.any? { |name| account_name.include?(name) || name.include?(account_name) }
       return true
     end
 
-    email = @member.email.to_s.downcase
-    account.login_id.present? && [ email, email.split("@", 2).first ].include?(account.login_id.downcase)
+    account.login_id.present? && @matching_login_ids.include?(account.login_id.downcase)
+  end
+
+  def normalized_account_name(name)
+    name.to_s.downcase.gsub(/[^[:alnum:]]/, "")
   end
 end

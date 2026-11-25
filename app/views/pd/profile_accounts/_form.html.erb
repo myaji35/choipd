@@ -69,12 +69,20 @@
     <% cancel_path = pd_profile_accounts_path %>
   <% end %>
   <% button_height = "min-height: 44px;" if member_registration %>
+  <% skip_step = next_registration_step if member_registration && @lock_platform && account.new_record? %>
   <div class="<%= member_registration ? "flex flex-wrap gap-3" : "flex gap-3" %>">
     <%= f.submit submit_label, class: "bg-primary text-white px-6 py-2 rounded-lg text-sm cursor-pointer", style: button_height %>
-    <% if member_registration && more_registrations? %>
+    <% if member_registration && account.new_record? && (@lock_platform ? skip_step.present? : more_registrations?) %>
       <%= button_tag "등록하고 다음", name: "next", value: "1",
           class: "rounded-lg border border-gray-300 px-6 py-2 text-sm text-primary cursor-pointer", style: button_height %>
     <% end %>
+    <% if skip_step %>
+      <%= link_to "건너뛰기 → #{skip_step.first}", skip_step.last,
+          class: "inline-flex items-center px-2 text-sm text-primary hover:underline", style: button_height %>
+    <% end %>
     <%= link_to "취소", cancel_path, class: "#{member_registration ? "inline-flex items-center " : ""}bg-gray-100 text-gray-700 px-6 py-2 rounded-lg text-sm", style: button_height %>
   </div>
+  <% if skip_step %>
+    <p class="text-xs text-gray-600">이 회원에게 없는 계정·채널이면 건너뛰세요. 나중에 대행 등록 화면에서 다시 등록할 수 있습니다.</p>
+  <% end %>
 <% end %>

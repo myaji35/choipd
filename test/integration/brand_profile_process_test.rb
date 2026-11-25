@@ -143,7 +143,7 @@ class BrandProfileProcessTest < ActionDispatch::IntegrationTest
     assert_select "select#profile_account_platform"
     assert_select "input[type=hidden][name='profile_account[member_id]'][value=?]", pending.id.to_s, count: 0
 
-    post pd_profile_accounts_path, params: { profile_account: { member_id: member.id, platform: "linkedin", display_name: "회원 프로필" } }
+    post pd_profile_accounts_path, params: { profile_account: { member_id: member.id, platform: "linkedin", display_name: "회원 프로필", login_id: "member-profile" } }
     assert_redirected_to pd_member_path(member, anchor: "accounts")
     get pd_profile_accounts_path
     assert_select "td", text: member.name

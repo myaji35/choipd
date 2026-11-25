@@ -221,6 +221,28 @@ class Pd::MemberChannelsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_admin_user_session_path
   end
 
+  test "블로그를 건너뛰고 페이스북을 등록하면 인스타그램으로 이동한다" do
+    sign_in @pd
+    facebook_path = new_pd_member_channel_path(@member, platform: "facebook_page")
+    insta_path = new_pd_member_channel_path(@member, platform: "instagram")
+
+    get new_pd_member_channel_path(@member, platform: "naver_blog")
+    assert_select "a[href=?]", facebook_path, text: "건너뛰기 → 페이스북"
+
+    assert_no_difference "BrandChannel.count" do
+      get facebook_path
+    end
+    assert_select "a[href=?]", insta_path, text: "건너뛰기 → 인스타그램"
+
+    post pd_member_channels_path(@member), params: {
+      next: "1", lock_platform: "1", brand_channel: { platform: "facebook_page", account_handle: "facebook-name" }
+    }
+    assert_redirected_to insta_path
+    follow_redirect!
+    assert_select "a", text: /건너뛰기 →/, count: 0
+    assert_select "button[name=next]", count: 0
+  end
+
   test "등록하고 다음 채널로 차례대로 이동하고 마지막 등록 뒤에는 회원 화면으로 돌아간다" do
     sign_in @pd
 

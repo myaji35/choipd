@@ -39,15 +39,45 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
     assert_select "#consent-request-text", count: 0
     assert_select "a", text: "회원 화면에서 보기", count: 0
-    assert_select "#accounts a.bg-primary", text: "계정 등록", count: 2
+    assert_select "main a.bg-primary", count: 1
+    assert_select "a#next-registration.bg-primary[href=?]",
+      new_pd_profile_account_path(member_id: @member.id, platform: "naver_people"), text: "이어서 등록: 네이버 인물정보"
     ProfileAccount::PLATFORMS.each_key do |platform|
       assert_select "a[href=?]", new_pd_profile_account_path(member_id: @member.id, platform: platform), text: "계정 등록"
     end
-    assert_select "#channels a.bg-primary", text: "채널 등록", count: 3
     MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS.each_key do |platform|
       assert_select "a[href=?]", new_pd_member_channel_path(@member, platform: platform), text: "채널 등록"
     end
     assert_select "a[href=?]", slug_admin_dashboard_path(slug: @member.slug, anchor: "profile-accounts-status"), text: "회원 화면에서 확인"
+  end
+
+  test "등록 상태에 따라 대행 등록 화면의 주 버튼을 바꾼다" do
+    sign_in @pd
+    ProfileAccount.create!(platform: "linkedin", display_name: @member.name)
+
+    get pd_member_path(@member)
+    assert_select "main a.bg-primary", count: 1
+    assert_select "a#next-registration.bg-primary[href='#accounts']", text: "찾은 계정부터 연결하기"
+
+    ProfileAccount::PLATFORMS.each_key do |platform|
+      @member.profile_accounts.create!(platform: platform, display_name: @member.name)
+    end
+
+    get pd_member_path(@member)
+    assert_select "main a.bg-primary", count: 1
+    assert_select "a#next-registration.bg-primary[href=?]",
+      new_pd_member_channel_path(@member, platform: "naver_blog"), text: "이어서 등록: 네이버 블로그"
+
+    brand = @member.ensure_personal_brand!
+    MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS.each_key do |platform|
+      brand.brand_channels.create!(platform: platform)
+    end
+
+    get pd_member_path(@member)
+    assert_select "#next-registration", count: 0
+    assert_select "main a.bg-primary", count: 1
+    assert_select "main a.bg-primary[href=?]", slug_admin_dashboard_path(slug: @member.slug, anchor: "profile-accounts-status"),
+      text: "회원 화면에서 확인"
   end
 
   test "대행 등록 화면 맨 위에 남은 등록 수를 요약한다" do
@@ -244,6 +274,28 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
       assert_select "#accounts form[action=?]", pd_profile_account_path(excluded), count: 0
     end
     assert_select "a[href^='/admin']", count: 0
+  end
+
+  test "연결된 계정의 표시 이름으로 찾은 계정의 바꾸기와 함께 연결을 안내한다" do
+    @member.update!(name: "Kang Seung Sig")
+    manual = @member.profile_accounts.create!(platform: "naver_people", display_name: "강승식")
+    found = ProfileAccount.create!(platform: "naver_people", display_name: "강 승식", external_id: "2840091")
+    foreign = ProfileAccount.create!(platform: "naver_people", display_name: "강승식", external_id: "2840091", tenant_id: 2)
+    sign_in @pd
+
+    get pd_member_path(@member)
+
+    assert_select "#accounts p", text: "점검이 찾은 계정이 따로 있습니다"
+    assert_select "#accounts form[action=?] button", pd_profile_account_path(found), text: "찾은 계정으로 바꾸기"
+    assert_select "#accounts details:not([open]) form[action=?]", pd_profile_account_path(found), count: 0
+
+    manual.profile_snapshots.create!(captured_at: Time.current)
+    get pd_member_path(@member)
+
+    assert_select "#accounts p", text: "점검이 찾은 같은 이름의 계정이 따로 있습니다"
+    assert_select "#accounts form[action=?] button", pd_profile_account_path(found), text: "이 회원에 함께 연결"
+    assert_select "#registration-summary", text: /확인할 찾은 계정 1개/
+    assert_select "#accounts form[action=?]", pd_profile_account_path(foreign), count: 0
   end
 
   test "등록 전 플랫폼에는 같은 테넌트의 미연결 계정만 표시한다" do

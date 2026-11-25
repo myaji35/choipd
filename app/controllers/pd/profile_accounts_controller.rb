@@ -3,7 +3,7 @@ class Pd::ProfileAccountsController < Pd::BaseController
 
   before_action :set_account, only: [ :show, :edit, :update, :destroy, :invitation_action, :search_queries ]
 
-  helper_method :more_registrations?
+  helper_method :more_registrations?, :next_registration_step
 
   def index
     @accounts = tenant_accounts.includes(:member).order(:platform, :display_name).group_by(&:platform)
@@ -55,6 +55,9 @@ class Pd::ProfileAccountsController < Pd::BaseController
     @lock_platform = params[:lock_platform] == "1"
     @account = tenant_accounts.new
     assign_account_attributes
+    if @member && @account.login_id.blank? && @account.profile_url.blank?
+      @account.errors.add(:base, "로그인 아이디나 프로필 링크 중 하나는 적어 주세요. 둘 다 없으면 점검과 이어지지 않아 회원 화면의 '계정 확인'이 채워지지 않습니다.")
+    end
     if @account.errors.empty? && @account.save
       if @member
         redirect_after_registration
@@ -132,16 +135,10 @@ class Pd::ProfileAccountsController < Pd::BaseController
   private
 
   def redirect_after_registration
-    if params[:next] == "1"
-      notice = "#{@account.platform_label} 계정을 등록했습니다."
-      if (platform = remaining_account_platforms.first)
-        return redirect_to new_pd_profile_account_path(member_id: @member.id, platform: platform),
-          notice: "#{notice} 이어서 #{ProfileAccount::PLATFORMS.fetch(platform)} 계정을 등록하세요."
-      end
-      if (platform = remaining_channel_platforms.first)
-        return redirect_to new_pd_member_channel_path(@member, platform: platform),
-          notice: "#{notice} 이어서 #{MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS.fetch(platform)} 채널을 등록하세요."
-      end
+    if params[:next] == "1" && (step = next_registration_step)
+      label, path = step
+      kind = ProfileAccount::PLATFORMS.value?(label) ? "계정을" : "채널을"
+      return redirect_to path, notice: "#{@account.platform_label} 계정을 등록했습니다. 이어서 #{label} #{kind} 등록하세요."
     end
 
     redirect_to pd_member_path(@member, anchor: "accounts"),
@@ -149,11 +146,26 @@ class Pd::ProfileAccountsController < Pd::BaseController
   end
 
   def more_registrations?
-    (remaining_account_platforms - [@account.platform]).any? || remaining_channel_platforms.any?
+    next_registration_step.present?
   end
 
-  def remaining_account_platforms
-    ProfileAccount::PLATFORMS.keys - @member.profile_accounts.distinct.pluck(:platform)
+  def next_registration_step
+    account_platforms = ProfileAccount::PLATFORMS
+    channel_platforms = MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS
+    current_platform = @account.platform
+    candidate_accounts = if @lock_platform
+      account_platforms.keys.drop_while { |platform| platform != current_platform }.drop(1)
+    else
+      account_platforms.keys - [ current_platform ]
+    end
+    registered_accounts = tenant_accounts.where(member_id: @member.id).distinct.pluck(:platform)
+    if (platform = (candidate_accounts - registered_accounts).first)
+      return [account_platforms.fetch(platform), new_pd_profile_account_path(member_id: @member.id, platform: platform)]
+    end
+
+    if (platform = remaining_channel_platforms.first)
+      [channel_platforms.fetch(platform), new_pd_member_channel_path(@member, platform: platform)]
+    end
   end
 
   def remaining_channel_platforms

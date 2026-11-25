@@ -60,10 +60,50 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_select 'nav a[href=?][class~="bg-primary/10"]', pd_profile_accounts_path, count: 0
   end
 
+  test "회원 계정은 로그인 아이디와 프로필 링크 없이 등록할 수 없다" do
+    member = Member.create!(name: "빈 계정 회원", email: "profile-empty@example.test", slug: "profile-empty")
+
+    assert_no_difference "ProfileAccount.count" do
+      post pd_profile_accounts_path, params: {
+        next: "1", lock_member: "1", lock_platform: "1",
+        profile_account: { member_id: member.id, platform: "naver_people", display_name: member.name, login_id: " ", profile_url: "" }
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select "p", text: "로그인 아이디나 프로필 링크 중 하나는 적어 주세요. 둘 다 없으면 점검과 이어지지 않아 회원 화면의 '계정 확인'이 채워지지 않습니다."
+    assert_select "p", text: "종류: 네이버 인물정보"
+    assert_select "p", text: "회원: #{member.name} (/#{member.slug})"
+  end
+
+  test "네이버를 건너뛰고 프로필 링크만으로 LinkedIn을 등록하면 첫 미등록 채널로 이동한다" do
+    member = Member.create!(name: "건너뛰기 회원", email: "profile-skip@example.test", slug: "profile-skip")
+    linkedin_path = new_pd_profile_account_path(member_id: member.id, platform: "linkedin")
+    blog_path = new_pd_member_channel_path(member, platform: "naver_blog")
+
+    get new_pd_profile_account_path(member_id: member.id, platform: "naver_people")
+    assert_select "a[href=?]", linkedin_path, text: "건너뛰기 → LinkedIn"
+
+    assert_no_difference "ProfileAccount.count" do
+      get linkedin_path
+    end
+    assert_select "a[href=?]", blog_path, text: "건너뛰기 → 네이버 블로그"
+
+    url = "https://www.linkedin.com/in/profile-skip"
+    assert_difference "ProfileAccount.count", 1 do
+      post pd_profile_accounts_path, params: {
+        next: "1", lock_member: "1", lock_platform: "1",
+        profile_account: { member_id: member.id, platform: "linkedin", display_name: member.name, profile_url: url }
+      }
+    end
+    assert_redirected_to blog_path
+    assert_equal url, member.profile_accounts.sole.profile_url
+  end
+
   test "회원 계정을 등록하면 대행 등록 화면으로 돌아간다" do
     member = Member.create!(name: "계정 등록 회원", email: "profile-create@example.test", slug: "profile-create")
     post pd_profile_accounts_path, params: {
-      profile_account: { member_id: member.id, platform: "linkedin", display_name: member.name }
+      profile_account: { member_id: member.id, platform: "linkedin", display_name: member.name, login_id: "registered-id" }
     }
 
     assert_redirected_to pd_member_path(member, anchor: "accounts")
@@ -76,7 +116,7 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     member = Member.create!(name: "이어 등록 회원", email: "profile-next@example.test", slug: "profile-next")
 
     post pd_profile_accounts_path, params: {
-      next: "1", profile_account: { member_id: member.id, platform: "naver_people", display_name: member.name }
+      next: "1", profile_account: { member_id: member.id, platform: "naver_people", display_name: member.name, login_id: "registered-id" }
     }
     assert_redirected_to new_pd_profile_account_path(member_id: member.id, platform: "linkedin")
     assert_equal "네이버 인물정보 계정을 등록했습니다. 이어서 LinkedIn 계정을 등록하세요.", flash[:notice]
@@ -84,12 +124,35 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: "LinkedIn 계정 등록"
 
     post pd_profile_accounts_path, params: {
-      next: "1", profile_account: { member_id: member.id, platform: "linkedin", display_name: member.name }
+      next: "1", profile_account: { member_id: member.id, platform: "linkedin", display_name: member.name, login_id: "registered-id" }
     }
     assert_redirected_to new_pd_member_channel_path(member, platform: "naver_blog")
     assert_equal "LinkedIn 계정을 등록했습니다. 이어서 네이버 블로그 채널을 등록하세요.", flash[:notice]
     follow_redirect!
     assert_response :success
+  end
+
+  test "플랫폼을 선택하는 폼은 채널을 모두 등록했어도 남은 계정을 이어서 등록할 수 있다" do
+    member = Member.create!(name: "플랫폼 선택 회원", email: "profile-platform-select@example.test", slug: "profile-platform-select")
+    brand = member.ensure_personal_brand!
+    MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS.each_key do |platform|
+      brand.brand_channels.create!(platform: platform)
+    end
+
+    get new_pd_profile_account_path(member_id: member.id)
+
+    assert_response :success
+    assert_select "select#profile_account_platform option[value=linkedin]"
+    assert_select "button[name=next][value='1']", text: "등록하고 다음"
+    assert_select "input[name=lock_platform][value='0']"
+
+    post pd_profile_accounts_path, params: {
+      next: "1", lock_member: "1", lock_platform: "0",
+      profile_account: { member_id: member.id, platform: "linkedin", display_name: member.name, login_id: "registered-id" }
+    }
+
+    assert_redirected_to new_pd_profile_account_path(member_id: member.id, platform: "naver_people")
+    assert_equal "linkedin", member.profile_accounts.sole.platform
   end
 
   test "남은 등록이 없으면 등록하고 다음 버튼을 숨기고 대행 등록 화면으로 돌아간다" do
@@ -105,7 +168,7 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_select "button[name=next]", count: 0
 
     post pd_profile_accounts_path, params: {
-      next: "1", profile_account: { member_id: member.id, platform: "linkedin", display_name: member.name }
+      next: "1", profile_account: { member_id: member.id, platform: "linkedin", display_name: member.name, login_id: "registered-id" }
     }
     assert_redirected_to pd_member_path(member, anchor: "accounts")
     assert_equal "LinkedIn 계정을 등록했습니다. 회원 대시보드 '내 프로필 관리 현황'에 바로 보입니다.", flash[:notice]
