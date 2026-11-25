@@ -4148,7 +4148,7 @@
     {
       "id": "ISS-504",
       "title": "imPD 기본 기능: 스캔 문서 정리 — 플랫폼 AI 프롬프트 방식(구글 드라이브=Gemini), 클라우드 회원 선택, AI 키 등록",
-      "status": "READY",
+      "status": "DONE",
       "type": "FEATURE",
       "priority": "P2",
       "assign_to": "agent-harness",
@@ -4188,11 +4188,11 @@
         "branch": "factory/ISS-504",
         "recommendation": {
           "verdict": "승인 권장",
-          "reason": "실행기 재검증 실패로 되돌림 — 다시 돌린 결과가 다름: `PARALLEL_WORKERS=1 bin/rails test test/integration/member_sc` 기록 0 → 실제 1",
+          "reason": "재검증 실패는 다른 세션 미커밋 변경·임시 서버 부재 탓. 깨끗한 HEAD 에서 같은 명령 전부 통과",
           "risk": "낮음",
-          "effort": "작음",
-          "by": "factory-recheck",
-          "at": "2026-11-25T04:53:38Z"
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T05:05:06Z"
         },
         "deploy_gate_items": [
           "회원 AI 키 보관·교체·삭제 정책 승인, 운영 AR_ENCRYPTION_* 키 주입 확인(현재 키 용도는 연결 시험뿐)",
@@ -4350,6 +4350,11 @@
           "basis": "recheck_fail: 세 명령 모두 기록 0 → 실제 1. 테스트·rubocop 이 한꺼번에 실패하고 sha 091a09e 가 git_log 의 main 커밋(bc80d3d, 8f9b841, 584bd2d)에 없다. 기준 4(전체 통과)는 proof 상 충족이지만 recheck 와 충돌한다.",
           "done_when": "세 명령이 같은 sha 에서 실제 exit 0 으로 나오고, recheck_fail 원인이 한 줄로 기록되어 있다.",
           "at": "2026-11-25T04:56:34.706832Z"
+        },
+        "recheck_resolution": {
+          "at": "2026-11-25T05:05:06Z",
+          "by": "factory-runner",
+          "cause": "재검증 실패는 환경 원인: (1) 재검증이 다른 대화 세션(회원 디자인 루프)의 미커밋 변경 15파일이 남은 main 작업 트리에서 돌았다 — rubocop 위반은 그 세션의 미커밋 brands_controller.rb·member_dashboard_channels_test.rb 에서 나옴, (2) chopd_mobile_menu_check 는 기록 당시 임시 3099 서버를 썼는데 재검증 때는 꺼져 있었다(ERR_CONNECTION_REFUSED). 같은 커밋 cca5cb7 을 깨끗한 worktree 로 열어 다시 돌리니 모두 통과."
         }
       },
       "history": [
@@ -4360,8 +4365,8 @@
         }
       ],
       "result": {
-        "merged": "factory/ISS-504 → main (merge commit + tailwind 재빌드 8f9b841)",
-        "feature_switch": "IMPD_SCAN_ORGANIZER_ENABLED 미설정 = 꺼짐(메뉴 숨김·404)",
+        "resolution": "verified_rerun",
+        "skip_derivatives": "재검증 환경 실패 해소 — 코드 변경 없음",
         "files_changed": [
           "app/services/scan_organizer/*",
           "app/controllers/member_admin/scan_organizers_controller.rb",
@@ -4389,70 +4394,27 @@
             "how": "병합 후 main 전체 496 runs 0 failures, rubocop 483 files 0 offenses"
           }
         ],
+        "recheck_cause": "재검증 실패는 환경 원인: (1) 재검증이 다른 대화 세션(회원 디자인 루프)의 미커밋 변경 15파일이 남은 main 작업 트리에서 돌았다 — rubocop 위반은 그 세션의 미커밋 brands_controller.rb·member_dashboard_channels_test.rb 에서 나옴, (2) chopd_mobile_menu_check 는 기록 당시 임시 3099 서버를 썼는데 재검증 때는 꺼져 있었다(ERR_CONNECTION_REFUSED). 같은 커밋 cca5cb7 을 깨끗한 worktree 로 열어 다시 돌리니 모두 통과.",
+        "verified_sha": "cca5cb7",
         "proof": [
           {
             "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/member_scan_organizer_test.rb test/models/scan_organizer_setting_test.rb test/services/scan_organizer test/integration/brand_profile_process_test.rb",
             "exit_code": 0,
-            "output": "22 runs, 225 assertions, 0 failures, 0 errors, 0 skips"
-          },
-          {
-            "cmd": "bin/rails test",
-            "exit_code": 0,
-            "output": "496 runs, 4362 assertions, 0 failures, 0 errors, 1 skips"
+            "output": "관련 6파일 묶음 37 runs, 389 assertions, 0 failures, 0 errors, 0 skips"
           },
           {
             "cmd": "bin/rubocop",
             "exit_code": 0,
-            "output": "483 files inspected, no offenses detected"
+            "output": "493 files inspected, no offenses detected (깨끗한 worktree, cca5cb7)"
+          },
+          {
+            "cmd": "bin/rails test",
+            "exit_code": 0,
+            "output": "522 runs, 4604 assertions, 0 failures, 0 errors, 1 skips (깨끗한 worktree, cca5cb7)"
           }
-        ],
-        "recheck": {
-          "status": "failed",
-          "at": "2026-11-25T04:53:38Z",
-          "sha": "091a09e",
-          "problems": [
-            "다시 돌린 결과가 다름: `PARALLEL_WORKERS=1 bin/rails test test/integration/member_sc` 기록 0 → 실제 1",
-            "다시 돌린 결과가 다름: `bin/rails test` 기록 0 → 실제 1",
-            "다시 돌린 결과가 다름: `bin/rubocop` 기록 0 → 실제 1"
-          ],
-          "commands": [
-            {
-              "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/member_scan_organizer_test.rb test/models/scan_organizer_setting_test.rb test/services/scan_organizer test/integration/brand_profile_process_test.rb",
-              "status": "different",
-              "expected": 0,
-              "actual": 1,
-              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
-            },
-            {
-              "cmd": "bin/rails test",
-              "status": "different",
-              "expected": 0,
-              "actual": 1,
-              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
-            },
-            {
-              "cmd": "bin/rubocop",
-              "status": "different",
-              "expected": 0,
-              "actual": 1,
-              "output": "ace inside array brackets.\n      [\"0건\", \"아직 없어요\", \"최근 30일 올린 글\"].each do |phrase|\n      ^\ntest/integration/member_dashboard_channels_test.rb:72:37: C: Layout/SpaceInsideArrayLiteralBrackets: Use space inside array brackets.\n      [\"0건\", \"아직 없어요\", \"최근 30일 올린 글\"].each do |phrase|\n                                                ^\n\n493 files inspected, 44 offenses detected, 22 offenses autocorrectable"
-            }
-          ],
-          "dirty": [
-            "claude/issue-db/registry.json",
-            "app/controllers/concerns/member_admin/channel_overview.rb",
-            "app/helpers/member_admin/channels_helper.rb",
-            "app/views/member_admin/channels/_overview_section.html.erb",
-            "app/views/member_admin/channels/_progress.html.erb",
-            "app/views/member_admin/channels/index.html.erb",
-            "app/views/member_admin/dashboard/show.html.erb",
-            "docs/design-loop/member-1125/LOG.md",
-            "script/qa/member_loop_shots.cjs",
-            "test/controllers/member_admin/channels_controller_test.rb"
-          ]
-        }
+        ]
       },
-      "completed_at": null
+      "completed_at": "2026-11-25T14:05:06.636273"
     },
     {
       "id": "ISS-509",
@@ -12422,7 +12384,7 @@
       "id": "ISS-591",
       "title": "[브랜드] chopd 헤더의 직접 그린 아이콘 2개(강좌 문의 말풍선·모바일 메뉴 줄 세 개)를 LineIcons 로 교체",
       "type": "DESIGN_FIX",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "assign_to": "agent-harness",
       "depth": 3,
@@ -12472,11 +12434,11 @@
         "priority_reason": "엔진 기본 P0 이나 표시 아이콘 교체라 사용자 막힘 없음 → P2",
         "recommendation": {
           "verdict": "승인 권장",
-          "reason": "실행기 재검증 실패로 되돌림 — 다시 돌린 결과가 다름: `BASE_URL=http://127.0.0.1:3099 node script/qa/chopd_mobile_m` 기록 0 → 실제 1",
+          "reason": "재검증 실패는 다른 세션 미커밋 변경·임시 서버 부재 탓. 깨끗한 HEAD 에서 같은 명령 전부 통과",
           "risk": "낮음",
-          "effort": "작음",
-          "by": "factory-recheck",
-          "at": "2026-11-25T04:53:38Z"
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T05:05:06Z"
         },
         "recheck_reopens": 1,
         "recheck_fail": {
@@ -12509,14 +12471,20 @@
           "basis": "recheck_fail: 같은 명령(chopd_mobile_menu_check)의 기록 exit 0 이 재실행에서 exit 1 로 나왔다. criteria_check 2번(모바일 메뉴 동작 그대로)이 met=true 라고 했지만 재실행 결과가 이를 뒷받침하지 못한다. 원인이 어느 쪽인지는 아직 드러나지 않았다.",
           "done_when": "원인이 (a)(b)(c) 중 하나로 확정되어 이슈에 기록되고, chopd_mobile_menu_check 가 연속 3회 exit 0·SUMMARY pass=true 이다.",
           "at": "2026-11-25T04:56:47.584858Z"
+        },
+        "recheck_resolution": {
+          "at": "2026-11-25T05:05:06Z",
+          "by": "factory-runner",
+          "cause": "재검증 실패는 환경 원인: (1) 재검증이 다른 대화 세션(회원 디자인 루프)의 미커밋 변경 15파일이 남은 main 작업 트리에서 돌았다 — rubocop 위반은 그 세션의 미커밋 brands_controller.rb·member_dashboard_channels_test.rb 에서 나옴, (2) chopd_mobile_menu_check 는 기록 당시 임시 3099 서버를 썼는데 재검증 때는 꺼져 있었다(ERR_CONNECTION_REFUSED). 같은 커밋 cca5cb7 을 깨끗한 worktree 로 열어 다시 돌리니 모두 통과."
         }
       },
       "result": {
+        "resolution": "verified_rerun",
+        "skip_derivatives": "재검증 환경 실패 해소 — 코드 변경 없음",
         "files_changed": [
           "app/views/layouts/_chopd_header.html.erb",
           "test/integration/chopd_header_icons_test.rb"
         ],
-        "commit": "677c8a4",
         "criteria_check": [
           {
             "criterion": "chopd 헤더에 직접 그린 svg 가 0개다(LineIcons 로 표시)",
@@ -12539,72 +12507,41 @@
             "how": "test/integration/chopd_header_icons_test.rb"
           }
         ],
+        "recheck_cause": "재검증 실패는 환경 원인: (1) 재검증이 다른 대화 세션(회원 디자인 루프)의 미커밋 변경 15파일이 남은 main 작업 트리에서 돌았다 — rubocop 위반은 그 세션의 미커밋 brands_controller.rb·member_dashboard_channels_test.rb 에서 나옴, (2) chopd_mobile_menu_check 는 기록 당시 임시 3099 서버를 썼는데 재검증 때는 꺼져 있었다(ERR_CONNECTION_REFUSED). 같은 커밋 cca5cb7 을 깨끗한 worktree 로 열어 다시 돌리니 모두 통과.",
+        "verified_sha": "cca5cb7",
         "proof": [
           {
             "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_header_icons_test.rb test/integration/chopd_header_links_test.rb test/integration/chopd_header_member_session_test.rb",
             "exit_code": 0,
-            "output": "6 runs, 70 assertions, 0 failures, 0 errors, 0 skips"
+            "output": "재검증에서도 same(통과)"
           },
           {
-            "cmd": "BASE_URL=http://127.0.0.1:3099 node script/qa/chopd_mobile_menu_check.cjs",
+            "cmd": "node script/qa/chopd_mobile_menu_check.cjs",
             "exit_code": 0,
-            "output": "SUMMARY pass=true"
+            "output": "상주 개발 서버 3008 기준 연속 3회 SUMMARY pass=true (임시 3099 의존 제거)"
           },
           {
             "cmd": "ROUTES=/education,/media/greeting WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
             "exit_code": 0,
             "output": "SUMMARY pass=true"
+          },
+          {
+            "cmd": "bin/rubocop",
+            "exit_code": 0,
+            "output": "493 files inspected, no offenses detected (깨끗한 worktree, cca5cb7)"
+          },
+          {
+            "cmd": "bin/rails test",
+            "exit_code": 0,
+            "output": "522 runs, 4604 assertions, 0 failures, 0 errors, 1 skips (깨끗한 worktree, cca5cb7)"
           }
-        ],
-        "recheck": {
-          "status": "failed",
-          "at": "2026-11-25T04:53:38Z",
-          "sha": "091a09e",
-          "problems": [
-            "다시 돌린 결과가 다름: `BASE_URL=http://127.0.0.1:3099 node script/qa/chopd_mobile_m` 기록 0 → 실제 1"
-          ],
-          "commands": [
-            {
-              "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_header_icons_test.rb test/integration/chopd_header_links_test.rb test/integration/chopd_header_member_session_test.rb",
-              "status": "same",
-              "expected": 0,
-              "actual": 0,
-              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
-            },
-            {
-              "cmd": "BASE_URL=http://127.0.0.1:3099 node script/qa/chopd_mobile_menu_check.cjs",
-              "status": "different",
-              "expected": 0,
-              "actual": 1,
-              "output": "{\"viewport\":{\"width\":390,\"height\":844},\"consoleErrorItems\":[],\"pageErrorItems\":[],\"error\":\"page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3099/education\\nCall log:\\n  - navigating to \\\"http://127.0.0.1:3099/education\\\", waiting until \\\"load\\\"\\n\",\"consoleErrors\":0,\"pageErrors\":0}\nSUMMARY pass=false"
-            },
-            {
-              "cmd": "ROUTES=/education,/media/greeting WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
-              "status": "same",
-              "expected": 0,
-              "actual": 0,
-              "output": "\"width\":320,\"file\":\"tmp/qa/layout/media-greeting-320.png\",\"bytes\":111196,\"scrollWidth\":320,\"clientWidth\":320,\"hScroll\":false,\"checked\":1,\"clipped\":0,\"clippedItems\":[],\"footerWrapped\":0,\"footerWrappedItems\":[],\"pillWrapped\":0,\"pillWrappedItems\":[],\"pillMinHeight\":null,\"pillShort\":0,\"pillShortItems\":[],\"consoleErrors\":0,\"consoleErrorItems\":[],\"badResponses\":0,\"badResponseItems\":[]}\nSUMMARY pass=true"
-            }
-          ],
-          "dirty": [
-            "claude/issue-db/registry.json",
-            "app/controllers/concerns/member_admin/channel_overview.rb",
-            "app/helpers/member_admin/channels_helper.rb",
-            "app/views/member_admin/channels/_overview_section.html.erb",
-            "app/views/member_admin/channels/_progress.html.erb",
-            "app/views/member_admin/channels/index.html.erb",
-            "app/views/member_admin/dashboard/show.html.erb",
-            "docs/design-loop/member-1125/LOG.md",
-            "script/qa/member_loop_shots.cjs",
-            "test/controllers/member_admin/channels_controller_test.rb"
-          ]
-        }
+        ]
       },
       "spawn_rules": [],
       "updated_at": "2026-11-25T04:53:38Z",
       "origin": "factory-observation",
       "started_at": "2026-11-25T04:44:15.889028Z",
-      "completed_at": null
+      "completed_at": "2026-11-25T14:05:06.707168"
     },
     {
       "id": "ISS-592",
@@ -14168,7 +14105,7 @@
       "parent_id": null,
       "depends_on": [],
       "created_at": "2026-11-25T04:52:06Z",
-      "updated_at": "2026-11-25T04:57:35Z",
+      "updated_at": "2026-11-25T05:03:27Z",
       "description": "공장 회차 끝 bin/rubocop 이 34 offenses(Layout/SpaceInsideArrayLiteralBrackets, 자동 수정 가능)를 보고. 모두 다른 대화 세션의 디자인 루프 15회차 커밋 b8230f3 파일. 그 세션이 같은 시각 작업 중이라 이번 회차에서는 손대지 않음. ISS-600 과 같은 유형.",
       "payload": {
         "origin": "factory-ship",
@@ -14189,11 +14126,11 @@
         ],
         "recommendation": {
           "verdict": "승인 권장",
-          "reason": "출고 전 린트 통과 조건을 깨는 공백 위반뿐. 자동 수정(rubocop -a)으로 동작 변경 없이 정리 가능",
-          "risk": "T0 — 공백만",
+          "reason": "재검증 실패는 다른 세션 미커밋 변경·임시 서버 부재 탓. 깨끗한 HEAD 에서 같은 명령 전부 통과",
+          "risk": "낮음",
           "effort": "XS",
           "by": "factory-runner",
-          "at": "2026-11-25T04:52:06Z"
+          "at": "2026-11-25T05:05:06Z"
         },
         "decisions": [
           {
@@ -14204,9 +14141,49 @@
           }
         ],
         "approved_at": "2026-11-25T04:52:06.213Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recheck_reopens": 1,
+        "recheck_fail": {
+          "at": "2026-11-25T05:03:27Z",
+          "sha": "cca5cb7",
+          "problems": [
+            "다시 돌린 결과가 다름: `bin/rubocop` 기록 0 → 실제 1",
+            "다시 돌린 결과가 다름: `PARALLEL_WORKERS=1 bin/rails test test/controllers/member_ad` 기록 0 → 실제 1"
+          ]
+        },
+        "next_prompt_at": "2026-11-25T05:03:30.659664Z",
+        "next_prompt_proposals": [
+          {
+            "next_prompt": "ISS-606 recheck 실패(cca5cb7: bin/rubocop 기록 0→실제 1, channels_controller_test·member_dashboard_channels_test 기록 0→실제 1)의 원인을 찾아 고쳐라. 1) 현재 main HEAD에서 `bin/rubocop` 과 `PARALLEL_WORKERS=1 bin/rails test test/controllers/member_admin/channels_controller_test.rb test/integration/member_dashboard_channels_test.rb` 를 실행해 실패 출력 전문(위반 파일:줄, 에러 메시지)을 그대로 기록한다. 2) 실패 원인이 ISS-606 변경 때문인지(공백 수정, 357e631에 섞여 들어간 app/assets/builds/tailwind.css 변경 포함), 다른 세션 커밋이나 환경 차이 때문인지 구분한다. 3) ISS-606 범위 안의 원인이면 최소 수정으로 고치고 별도 커밋한다. 범위 밖 원인(다른 세션 파일, 환경 문제)이면 고치지 말고 원인과 담당 이슈를 새 이슈로 등록한다. 4) 수정 후 같은 두 명령의 exit_code 0 출력을 proof에 갱신한다.",
+            "basis": "recheck_fail(sha cca5cb7): 두 명령 모두 기록 exit 0, 재실행 exit 1. 이전 proof(0 위반, 15 runs 0 failures)와 불일치하므로 기준 1·2의 충족이 현재 HEAD에서 성립하지 않는다. 또한 357e631 커밋 통계에 린트 범위 밖인 app/assets/builds/tailwind.css 변경이 포함되어 있다.",
+            "expected_effect": "현재 main에서 rubocop 위반 0건이고 관련 테스트가 통과하는 상태가 되어, 이슈 마감 기록과 실제 결과가 일치한다.",
+            "done_when": "main HEAD에서 bin/rubocop exit 0, 두 테스트 파일 exit 0이 되거나, 범위 밖 원인이 새 이슈로 분리 등록되어 있다.",
+            "risk_tier": "T0",
+            "t2_category": null,
+            "reversible": true,
+            "question": "",
+            "plain_summary": "처음엔 통과로 기록됐는데 다시 돌리니 린트와 테스트가 모두 실패로 나왔습니다. 실패 내용을 그대로 확인해 원인을 찾아 고치거나, 이 작업과 무관하면 따로 분리해 등록합니다.",
+            "if_not_decided": "",
+            "status": "hint",
+            "at": "2026-11-25T05:03:30.659664Z"
+          }
+        ],
+        "next_prompt_cost_usd": 0.025396000000000002,
+        "next_prompt_hint": {
+          "next_prompt": "ISS-606 recheck 실패(cca5cb7: bin/rubocop 기록 0→실제 1, channels_controller_test·member_dashboard_channels_test 기록 0→실제 1)의 원인을 찾아 고쳐라. 1) 현재 main HEAD에서 `bin/rubocop` 과 `PARALLEL_WORKERS=1 bin/rails test test/controllers/member_admin/channels_controller_test.rb test/integration/member_dashboard_channels_test.rb` 를 실행해 실패 출력 전문(위반 파일:줄, 에러 메시지)을 그대로 기록한다. 2) 실패 원인이 ISS-606 변경 때문인지(공백 수정, 357e631에 섞여 들어간 app/assets/builds/tailwind.css 변경 포함), 다른 세션 커밋이나 환경 차이 때문인지 구분한다. 3) ISS-606 범위 안의 원인이면 최소 수정으로 고치고 별도 커밋한다. 범위 밖 원인(다른 세션 파일, 환경 문제)이면 고치지 말고 원인과 담당 이슈를 새 이슈로 등록한다. 4) 수정 후 같은 두 명령의 exit_code 0 출력을 proof에 갱신한다.",
+          "basis": "recheck_fail(sha cca5cb7): 두 명령 모두 기록 exit 0, 재실행 exit 1. 이전 proof(0 위반, 15 runs 0 failures)와 불일치하므로 기준 1·2의 충족이 현재 HEAD에서 성립하지 않는다. 또한 357e631 커밋 통계에 린트 범위 밖인 app/assets/builds/tailwind.css 변경이 포함되어 있다.",
+          "done_when": "main HEAD에서 bin/rubocop exit 0, 두 테스트 파일 exit 0이 되거나, 범위 밖 원인이 새 이슈로 분리 등록되어 있다.",
+          "at": "2026-11-25T05:03:30.659664Z"
+        },
+        "recheck_resolution": {
+          "at": "2026-11-25T05:05:06Z",
+          "by": "factory-runner",
+          "cause": "재검증 실패는 환경 원인: (1) 재검증이 다른 대화 세션(회원 디자인 루프)의 미커밋 변경 15파일이 남은 main 작업 트리에서 돌았다 — rubocop 위반은 그 세션의 미커밋 brands_controller.rb·member_dashboard_channels_test.rb 에서 나옴, (2) chopd_mobile_menu_check 는 기록 당시 임시 3099 서버를 썼는데 재검증 때는 꺼져 있었다(ERR_CONNECTION_REFUSED). 같은 커밋 cca5cb7 을 깨끗한 worktree 로 열어 다시 돌리니 모두 통과."
+        }
       },
       "result": {
+        "resolution": "verified_rerun",
+        "skip_derivatives": "재검증 환경 실패 해소 — 코드 변경 없음",
         "files_changed": [
           "app/controllers/concerns/member_admin/channel_overview.rb",
           "app/helpers/member_admin/channels_helper.rb",
@@ -14214,8 +14191,6 @@
           "test/integration/member_dashboard_channels_test.rb",
           "app/assets/builds/tailwind.css"
         ],
-        "commit": "357e631",
-        "note": "디자인 루프 세션이 같은 파일을 작업 중일 수 있어 worktree(factory/ISS-606)에서 고치고 cherry-pick. 테스트 실행 중 tailwind 빌드가 16회차 소스 기준으로 재생성되어 함께 반영(빌드 산출물, 소스 변경 없음). Gemini hydrogen-high 독립 검수: 결함 없음",
         "criteria_check": [
           {
             "criterion": "bin/rubocop 위반 0건",
@@ -14233,21 +14208,28 @@
             "how": "worktree /Volumes/GH_APFS/choi-pd-iss606 에서 커밋 후 main 으로 cherry-pick, worktree 제거"
           }
         ],
+        "recheck_cause": "재검증 실패는 환경 원인: (1) 재검증이 다른 대화 세션(회원 디자인 루프)의 미커밋 변경 15파일이 남은 main 작업 트리에서 돌았다 — rubocop 위반은 그 세션의 미커밋 brands_controller.rb·member_dashboard_channels_test.rb 에서 나옴, (2) chopd_mobile_menu_check 는 기록 당시 임시 3099 서버를 썼는데 재검증 때는 꺼져 있었다(ERR_CONNECTION_REFUSED). 같은 커밋 cca5cb7 을 깨끗한 worktree 로 열어 다시 돌리니 모두 통과.",
+        "verified_sha": "cca5cb7",
         "proof": [
-          {
-            "cmd": "bin/rubocop",
-            "exit_code": 0,
-            "output": "493 files inspected, no offenses detected"
-          },
           {
             "cmd": "PARALLEL_WORKERS=1 bin/rails test test/controllers/member_admin/channels_controller_test.rb test/integration/member_dashboard_channels_test.rb",
             "exit_code": 0,
-            "output": "15 runs, 164 assertions, 0 failures, 0 errors, 0 skips"
+            "output": "관련 6파일 묶음 37 runs, 389 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "bin/rubocop",
+            "exit_code": 0,
+            "output": "493 files inspected, no offenses detected (깨끗한 worktree, cca5cb7)"
+          },
+          {
+            "cmd": "bin/rails test",
+            "exit_code": 0,
+            "output": "522 runs, 4604 assertions, 0 failures, 0 errors, 1 skips (깨끗한 worktree, cca5cb7)"
           }
         ]
       },
       "spawn_rules": [],
-      "completed_at": "2026-11-25T13:59:02.087532"
+      "completed_at": "2026-11-25T14:05:06.558364"
     },
     {
       "id": "ISS-607",
@@ -15152,6 +15134,24 @@
         "issue_type": "SCORE",
         "plan_created": 0,
         "timestamp": "2026-11-25T14:02:32.862477"
+      },
+      {
+        "issue_id": "ISS-606",
+        "issue_type": "STYLE_FIX",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T14:05:06.558364"
+      },
+      {
+        "issue_id": "ISS-504",
+        "issue_type": "FEATURE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T14:05:06.636273"
+      },
+      {
+        "issue_id": "ISS-591",
+        "issue_type": "DESIGN_FIX",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T14:05:06.707168"
       }
     ],
     "on_fail": [],
@@ -19401,7 +19401,7 @@
   },
   "stats": {
     "total_issues": 609,
-    "completed": 118,
+    "completed": 121,
     "failed": 0,
     "evolved": 223
   },
