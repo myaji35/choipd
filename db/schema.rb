@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_25_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_25_020000) do
   create_table "ab_test_participants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.datetime "assigned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -1116,6 +1116,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_010000) do
     t.index ["tenant_id"], name: "index_rfm_segments_on_tenant_id"
   end
 
+  create_table "scan_organizer_settings", force: :cascade do |t|
+    t.integer "member_id", null: false
+    t.string "cloud_provider", default: "google_drive", null: false
+    t.string "ai_provider"
+    t.text "ai_api_key"
+    t.string "ai_key_last4"
+    t.datetime "ai_key_verified_at"
+    t.string "receipts_sheet_name"
+    t.string "documents_folder_name"
+    t.string "review_folder_name"
+    t.string "run_frequency", default: "daily"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index [ "member_id" ], name: "index_scan_organizer_settings_on_member_id", unique: true
+  end
+
   create_table "settings", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "key"
@@ -1357,6 +1373,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_010000) do
   add_foreign_key "naver_people_targets", "profile_accounts"
   add_foreign_key "payments", "distributors"
   add_foreign_key "profile_snapshots", "profile_accounts"
+  add_foreign_key "scan_organizer_settings", "members"
   add_foreign_key "short_links", "members"
   add_foreign_key "sns_accounts", "members"
   add_foreign_key "sns_follower_snapshots", "sns_accounts"

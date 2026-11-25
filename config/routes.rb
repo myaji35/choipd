@@ -365,6 +365,9 @@ Rails.application.routes.draw do
         resources :brand_channels, path: "channels", only: [ :edit, :update ]
       end
       resource :brand_consents, path: "consents", only: [ :show, :update ]
+      resource :scan_organizer, path: "scan", only: [ :show, :update ] do
+        post :test_ai_key
+      end
       resources :sns_accounts, only: [ :index, :create, :update, :destroy ] do
         resources :follower_snapshots, controller: "sns_follower_snapshots", only: [ :create ]
       end

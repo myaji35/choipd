@@ -3,6 +3,7 @@ class Member < ApplicationRecord
 
   has_secure_password validations: false
 
+  has_one :scan_organizer_setting, dependent: :destroy
   has_many :member_portfolio_items, dependent: :destroy
   has_many :member_services,        dependent: :destroy
   has_many :member_faqs,            dependent: :destroy
