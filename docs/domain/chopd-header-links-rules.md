@@ -23,3 +23,15 @@ ISS-557 은 '소개'가 없는 `#identity` 를 가리키던 죽은 링크 수정
 - G1 (R4): 로그인한 회원의 chopd 헤더(내 페이지 링크 주소, 로그아웃 양식, 회원가입·로그인 숨김)를 확인하는 테스트가 없다. `public_pages_test` 는 홈(impd 레이아웃) 히어로 버튼만 본다 → 커버리지 카드.
 - G2 (R6): '강좌 문의' 버튼 흰 글자가 #ff4d1c 위 3.32:1(13px 굵게, 일반 글자 기준 4.5 미달). 문의 양식 제출 버튼은 이미 어두운 글자(#0a0e1a, 5.8:1)로 맞춰져 있다 → 디자인 수정 카드.
 - 관찰(카드 없음): '소개'가 가는 곳이 한국환경저널 발행인 인사말이다. 최범희 PD 개인 소개 전용 화면은 없다. 별도 소개 화면을 만들지는 콘텐츠 방향 문제라 이번에는 기록만 남긴다. 인사말 화면 글자 가독성은 ISS-571 에서 다룬다.
+
+## 검증 결과 (ISS-596, 2026-11-25)
+| 규칙 | 판정 | 근거 |
+|---|---|---|
+| R1 | 충족 | `chopd_header_links_test` — 데스크톱·모바일 '소개' href = `/media/greeting` 각 1개 |
+| R2 | 충족 | 같은 테스트 — `#` 대상 0개, 내부 링크 전부 200/3xx |
+| R3 | 충족 | `node script/qa/chopd_mobile_menu_check.cjs` introNav finalPath /media/greeting, menuDisplay none, expanded false |
+| R4 | 충족 | 갭 G1 해소: `test/integration/chopd_header_member_session_test.rb`(3da1d8e) 로그인 전·후·로그아웃 뒤 데스크톱·모바일 헤더 |
+| R5 | 충족 | 데스크톱 `.nav-cta`·모바일 메뉴 '강좌 문의' 모두 `new_inquiry_path`, R2 테스트에서 200 |
+| R6 | **미충족** | 메뉴 글자 통과, '강좌 문의' 흰 글자 / #ff4d1c 3.32:1 그대로 → ISS-593(P2) 에서 수정 |
+
+5/6 충족(83%). CRITICAL 0 · MAJOR 1(R6, 기존 카드 ISS-593).
