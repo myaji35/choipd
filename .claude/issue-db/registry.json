@@ -2035,7 +2035,35 @@
             "note": "관제 결정 기록 후 자동 READY 로 풀렸으나 결정 내용이 '보류'이고 SD ISS-521 미병합이라 BLOCKED(external_wait)로 되돌림"
           }
         ],
-        "blocked_reason": "외부 저장소 SocialDoctors 의 Townin 매체·브랜드 요약 API(SD 521번 카드)가 대표님 배포 검토 대기 — main 병합 전에는 성과 칸을 붙일 수 없음"
+        "blocked_reason": "외부 저장소 SocialDoctors 의 Townin 매체·브랜드 요약 API(SD 521번 카드)가 대표님 배포 검토 대기 — main 병합 전에는 성과 칸을 붙일 수 없음",
+        "question": "선행 API(SocialDoctors 521번 카드)가 배포 검토를 통과하기 전까지 이 시험 작업을 보류해 둘까요?",
+        "options": [
+          {
+            "key": "A",
+            "label": "보류 — 선행 API가 main에 병합된 뒤 착수",
+            "pros": "API 없이 시작해서 생기는 재작업·헛수고를 막습니다.",
+            "cons": "선행 카드 검토가 늦어지면 이 작업도 그만큼 밀립니다."
+          },
+          {
+            "key": "B",
+            "label": "성과 칸만 빼고 나머지 단계부터 먼저 진행",
+            "pros": "기다리는 동안에도 시험 준비와 일부 점수 확보가 가능합니다.",
+            "cons": "나중에 성과 칸을 붙이면서 전체를 다시 시험해야 해 일이 두 번 될 수 있습니다. (확인 필요: 12단계 중 성과 칸과 무관한 단계가 몇 개인지)"
+          },
+          {
+            "key": "C",
+            "label": "가짜(임시) 데이터로 성과 칸을 대신해 전체 진행",
+            "pros": "일정이 멈추지 않고 전체 흐름을 한 번 훑어볼 수 있습니다.",
+            "cons": "실제 API와 모양이 다르면 95% 판정이 믿을 수 없게 되고 재작업 위험이 큽니다."
+          }
+        ],
+        "recommended_option": "A",
+        "recommended_why": "카드의 기존 의견(보류 권장)과 대표님의 이전 결정(A)에 맞춥니다. 2026-11-25 확인 시 SocialDoctors 521번은 여전히 배포 검토 대기이고 factory 브랜치도 병합 전이라, 지금 시작하면 재작업 위험이 큽니다.",
+        "plain_summary": "보험설계사가 가입부터 성과 확인까지 거치는 12단계 여정을 로컬에서 통째로 시험하고, 95% 이상 통과하는지 점수표로 판정하는 작업입니다. 그런데 성과 칸에 필요한 Townin 매체·브랜드 요약 API가 다른 저장소(SocialDoctors) 521번 카드에 있고, 이것이 아직 대표님 배포 검토 대기 중이라 착수가 막혀 있습니다.",
+        "if_not_decided": "이 카드는 계속 막힌 상태로 남을 뿐 다른 카드가 이 때문에 기다리고 있지는 않아(대기 카드 0건) 당장 피해는 없습니다.",
+        "reversible": "쉽게 되돌릴 수 있습니다 — 보류는 선행 API가 병합되는 즉시 풀고 착수하면 되고, 비용은 그동안 일정이 밀리는 것뿐입니다.",
+        "explained_by": "decision-explain",
+        "explained_at": "2026-11-25T12:08:58.350805+09:00"
       },
       "updated_at": "2026-11-25T11:47:20+09:00",
       "blocked_reason": "12단계 중 6·7(SD→Townin 발행)·10(SD 성과 수집)·11(imPD 내 브랜드 Townin 성과)은 SocialDoctors ISS-521(Townin 매체·발행 어댑터·브랜드 요약 API)이 있어야 시험할 수 있다. SD 521번 카드 은 현재 AWAITING_USER, imPD ISS-476 도 같은 이유로 BLOCKED. 나머지 선행(imPD ISS-475, Townin ISS-722, SD ISS-522)은 DONE."
@@ -6537,14 +6565,14 @@
       "id": "ISS-532",
       "type": "FIX_BUG",
       "priority": "P2",
-      "status": "READY",
+      "status": "DONE",
       "origin": "factory-observation",
       "depth": 1,
       "retry_count": 0,
       "parent_id": "ISS-525",
       "depends_on": [],
       "created_at": "2026-11-25T10:33:35+09:00",
-      "updated_at": "2026-11-25T01:33:45.773Z",
+      "updated_at": "2026-11-25T02:55:29Z",
       "title": "[접근성] chopd 바닥글 저작권 줄·하단 링크·소제목 글자 대비 1.8~2.6:1 — 기준 4.5:1 미달",
       "description": "배경 #0a0e1a 위 rgba(255,255,255,.2) 저작권 줄 약 1.8:1, rgba(255,255,255,.3) 하단 링크(교육·미디어·작품)와 소제목(서비스·연락처) 약 2.6:1. 12~13px 글씨라 WCAG AA 4.5:1 필요. ISS-520 이전부터 있던 값(ISS-521 브랜드 검증 중 발견).",
       "payload": {
@@ -6581,8 +6609,66 @@
         "approved_at": "2026-11-25T01:33:45.773Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
-      "result": null,
-      "spawn_rules": []
+      "result": {
+        "commit": "ec66175",
+        "files_modified": [
+          "app/views/layouts/_chopd_footer.html.erb",
+          "script/qa/footer_readability_check.cjs"
+        ],
+        "contrast": {
+          "copyright": "1.85→5.30",
+          "bottom_links": "2.68→6.18",
+          "subheadings": "2.68→6.18",
+          "brand_intro": "3.21→7.14",
+          "service_links": "5.30→9.37",
+          "b2b_link": "7.12 유지"
+        },
+        "review": {
+          "gemini": "gemini-4-hydrogen-high 지적 5건 — 맞음 4건(글자별 top 반올림 오탐·조상 opacity 미반영·rgb 외 색 형식 오해석·응답 상태 미확인) Codex 재위임 수정, 범위 밖 1건(인라인 태그로 나뉜 단어 — 현재 대상 마크업에 없음)",
+          "opus": "수정 전 3008 에서 pass=false(대비 7건·줄바꿈 검출), 수정 후 3099·main 3008 pass=true 직접 확인"
+        },
+        "criteria_check": [
+          {
+            "criterion": "바닥글의 모든 글자 대비가 4.5:1 이상이다(계산 근거 남김)",
+            "met": true,
+            "how": "footer_readability_check 6조합(/education·/works × 1280·390·320) minContrast 5.30, 위반 0. 배경 #0a0e1a+footer rgba(.02) 합성 기준 계산"
+          },
+          {
+            "criterion": "저작권·하단 링크가 본문 링크보다 덜 강조되는 위계는 유지된다",
+            "met": true,
+            "how": "저작권 .5(5.30)·하단 링크 .55(6.18) < 서비스 링크 .7(9.37), 글자 크기 12px<13px 유지 — 390 캡처 육안 확인"
+          },
+          {
+            "criterion": "대비를 숫자로 확인하는 자동 테스트 또는 점검이 있다",
+            "met": true,
+            "how": "script/qa/footer_readability_check.cjs 신규 — 수정 전 코드에서 pass=false 로 결함 검출 확인"
+          },
+          {
+            "criterion": "1280/390 layout_check 통과",
+            "met": true,
+            "how": "chopd 6개 화면 × 1280·390·320 hScroll 0·clipped 0·오류 0"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/footer_readability_check.cjs",
+            "exit_code": 0,
+            "output": "/education·/works × 1280·390·320 minContrast 5.30, contrastItems 0, wordBreakItems 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "ROUTES=/education,/works WIDTHS=1280,390 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "SUMMARY pass=true"
+          },
+          {
+            "cmd": "bin/rails test test/integration/pd_layout_mobile_menu_test.rb test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "5 runs, 58 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "completed_at": "2026-11-25T12:10:18.456937"
     },
     {
       "id": "ISS-533",
@@ -8340,14 +8426,14 @@
       "title": "[가독성] chopd 바닥글 소개·교육 소개 문장이 '허/브.', '강좌/로'처럼 낱글자로 줄바꿈됨",
       "type": "FIX_BUG",
       "priority": "P2",
-      "status": "READY",
+      "status": "DONE",
       "origin": "factory-observation",
       "depth": 1,
       "retry_count": 0,
       "parent_id": "ISS-530",
       "depends_on": [],
       "created_at": "2026-11-25T11:25:22+09:00",
-      "updated_at": "2026-11-25T02:25:22.660Z",
+      "updated_at": "2026-11-25T02:55:29Z",
       "description": "한국어 문장이 글자 단위로 줄바꿈돼 마지막 한 글자가 다음 줄에 혼자 남는다. 바닥글 소개(max-width 280px) 1280·390 모두 '통합 브랜드 허 / 브.', 교육 히어로 소개 320px '맞춤 강좌 / 로'. word-break: keep-all 같은 단어 단위 줄바꿈이 없음.",
       "payload": {
         "origin": "factory-observation",
@@ -8386,8 +8472,55 @@
         "approved_at": "2026-11-25T02:25:22.660Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
-      "result": null,
-      "spawn_rules": []
+      "result": {
+        "commit": "ec66175",
+        "files_modified": [
+          "app/views/layouts/chopd.html.erb",
+          "app/views/layouts/_chopd_footer.html.erb",
+          "script/qa/footer_readability_check.cjs"
+        ],
+        "change": "chopd 레이아웃 body 에 word-break: keep-all; overflow-wrap: break-word, 바닥글 소개문 text-wrap: pretty. 교육 화면 파일은 전역 규칙으로 해결되어 수정 불필요",
+        "review": {
+          "gemini": "ISS-532 와 같은 diff 로 검수(레이아웃 변경 결함 없음)",
+          "opus": "수정 전 '허브.'(전 폭)·'강좌로'(320) 검출 → 수정 후 0"
+        },
+        "criteria_check": [
+          {
+            "criterion": "바닥글 소개 문장이 1280·390에서 단어 중간에서 끊기지 않는다",
+            "met": true,
+            "how": "footer_readability_check wordBreakItems 0 (수정 전 '허브.' 1280·390·320 모두 검출) — 390 캡처에서 '통합 / 브랜드 허브.' 확인"
+          },
+          {
+            "criterion": "교육 소개 문장이 320·390에서 단어 중간에서 끊기지 않는다",
+            "met": true,
+            "how": ".edu-hero-content p 검사 — 수정 전 320 '강좌로' 검출, 수정 후 0"
+          },
+          {
+            "criterion": "긴 영문·URL 때문에 가로 스크롤이 생기지 않는다(layout_check 통과)",
+            "met": true,
+            "how": "overflow-wrap: break-word 병행. layout_check /education·/works·/media·/media/greeting·/community·/inquiries/new × 1280·390·320 hScroll 0·clipped 0"
+          },
+          {
+            "criterion": "줄바꿈 규칙을 확인하는 자동 점검 또는 테스트가 있다",
+            "met": true,
+            "how": "script/qa/footer_readability_check.cjs 의 단어 중간 줄바꿈 검사(단어 첫 글자 기준 글자 높이 절반 이상 이동 시 줄바꿈 판정)"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/footer_readability_check.cjs",
+            "exit_code": 0,
+            "output": "wordBreakItems 0 (6조합), overflow null / SUMMARY pass=true"
+          },
+          {
+            "cmd": "ROUTES=/education,/works WIDTHS=1280,390 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "SUMMARY pass=true"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "completed_at": "2026-11-25T12:10:26.394737"
     },
     {
       "id": "ISS-552",
@@ -8902,6 +9035,285 @@
       },
       "result": null,
       "spawn_rules": []
+    },
+    {
+      "id": "ISS-558",
+      "title": "[Plan:테스트] ISS-532 변경사항 검증",
+      "type": "RUN_TESTS",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "test-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-532",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:10:18.456937",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-532",
+        "scope": "changed",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:10:21.515Z",
+            "by": "auto",
+            "reason": "「[Plan:테스트] ISS-532 변경사항 검증」(RUN_TESTS, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:10:21.515Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:10:21.515Z"
+    },
+    {
+      "id": "ISS-559",
+      "title": "[Plan:도메인분석] ISS-532 비즈니스 규칙/시나리오 도출",
+      "type": "DOMAIN_ANALYZE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "domain-analyst",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-532",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:10:18.456937",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-532",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:10:21.515Z",
+            "by": "auto",
+            "reason": "「[Plan:도메인분석] ISS-532 비즈니스 규칙/시나리오 도출」(DOMAIN_ANALYZE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:10:21.515Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:10:21.515Z"
+    },
+    {
+      "id": "ISS-560",
+      "title": "[Plan:UX리뷰] ISS-532 UI 변경 검증",
+      "type": "UI_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "ux-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-532",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:10:18.456937",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-532",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:10:21.515Z",
+            "by": "auto",
+            "reason": "「[Plan:UX리뷰] ISS-532 UI 변경 검증」(UI_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:10:21.515Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:10:21.515Z"
+    },
+    {
+      "id": "ISS-561",
+      "title": "[Plan:브랜드검증] ISS-532 아젠다 표현 + Action Clarity",
+      "type": "BRAND_GUARD",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "brand-guardian",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-532",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:10:18.456937",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-532",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:10:21.515Z",
+            "by": "auto",
+            "reason": "「[Plan:브랜드검증] ISS-532 아젠다 표현 + Action Clarity」(BRAND_GUARD, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:10:21.515Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:10:21.515Z"
+    },
+    {
+      "id": "ISS-562",
+      "title": "[Plan:브라우저QA] ISS-532 콘솔 에러 + 스크린샷 검증",
+      "type": "BROWSER_QA",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "agent-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-532",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:10:18.456937",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-532",
+        "action": "run_browse_qa",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:10:21.515Z",
+            "by": "auto",
+            "reason": "「[Plan:브라우저QA] ISS-532 콘솔 에러 + 스크린샷 검증」(BROWSER_QA, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:10:21.515Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:10:21.515Z"
+    },
+    {
+      "id": "ISS-563",
+      "title": "[Plan:테스트] ISS-551 변경사항 검증",
+      "type": "RUN_TESTS",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "test-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-551",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:10:26.394737",
+      "payload": {
+        "files": [
+          "app/views/layouts/chopd.html.erb",
+          "app/views/chopd/education/index.html.erb",
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-551",
+        "scope": "changed"
+      },
+      "result": null,
+      "spawn_rules": []
+    },
+    {
+      "id": "ISS-564",
+      "title": "[Plan:도메인분석] ISS-551 비즈니스 규칙/시나리오 도출",
+      "type": "DOMAIN_ANALYZE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "domain-analyst",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-551",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:10:26.394737",
+      "payload": {
+        "files": [
+          "app/views/layouts/chopd.html.erb",
+          "app/views/chopd/education/index.html.erb",
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-551"
+      },
+      "result": null,
+      "spawn_rules": []
+    },
+    {
+      "id": "ISS-565",
+      "title": "[Plan:UX리뷰] ISS-551 UI 변경 검증",
+      "type": "UI_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "ux-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-551",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:10:26.394737",
+      "payload": {
+        "files": [
+          "app/views/layouts/chopd.html.erb",
+          "app/views/chopd/education/index.html.erb",
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-551"
+      },
+      "result": null,
+      "spawn_rules": []
+    },
+    {
+      "id": "ISS-566",
+      "title": "[Plan:브랜드검증] ISS-551 아젠다 표현 + Action Clarity",
+      "type": "BRAND_GUARD",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "brand-guardian",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-551",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:10:26.394737",
+      "payload": {
+        "files": [
+          "app/views/layouts/chopd.html.erb",
+          "app/views/chopd/education/index.html.erb",
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-551"
+      },
+      "result": null,
+      "spawn_rules": []
+    },
+    {
+      "id": "ISS-567",
+      "title": "[Plan:브라우저QA] ISS-551 콘솔 에러 + 스크린샷 검증",
+      "type": "BROWSER_QA",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "agent-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-551",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:10:26.394737",
+      "payload": {
+        "files": [
+          "app/views/layouts/chopd.html.erb",
+          "app/views/chopd/education/index.html.erb",
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-551",
+        "action": "run_browse_qa"
+      },
+      "result": null,
+      "spawn_rules": []
     }
   ],
   "hooks": {
@@ -9297,6 +9709,18 @@
         "issue_type": "DESIGN_REVIEW",
         "plan_created": 0,
         "timestamp": "2026-11-25T11:55:15.988580"
+      },
+      {
+        "issue_id": "ISS-532",
+        "issue_type": "FIX_BUG",
+        "plan_created": 5,
+        "timestamp": "2026-11-25T12:10:18.456937"
+      },
+      {
+        "issue_id": "ISS-551",
+        "issue_type": "FIX_BUG",
+        "plan_created": 5,
+        "timestamp": "2026-11-25T12:10:26.394737"
       }
     ],
     "on_fail": [],
@@ -13539,8 +13963,8 @@
     ]
   },
   "stats": {
-    "total_issues": 556,
-    "completed": 65,
+    "total_issues": 566,
+    "completed": 67,
     "failed": 0,
     "evolved": 223
   },
