@@ -13195,7 +13195,7 @@
       "id": "ISS-600",
       "title": "[린트] 회원 디자인 루프 14회차 커밋(d0b74f3)의 RuboCop 배열 괄호 공백 위반 6건 정리",
       "type": "STYLE_FIX",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "agent-harness",
       "depth": 1,
@@ -13203,7 +13203,7 @@
       "parent_id": null,
       "depends_on": [],
       "created_at": "2026-11-25T04:35:42Z",
-      "updated_at": "2026-11-25T04:35:44.920Z",
+      "updated_at": "2026-11-25T04:36:16Z",
       "payload": {
         "origin": "factory-ship",
         "files": [
@@ -13235,8 +13235,46 @@
         "approved_at": "2026-11-25T04:35:44.920Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
-      "result": null,
-      "spawn_rules": []
+      "result": {
+        "passed": true,
+        "commit": "0242f2e",
+        "files_changed": [
+          "app/controllers/member_admin/brands_controller.rb",
+          "test/integration/member_admin_page_width_test.rb"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "bin/rubocop 전체가 no offenses detected",
+            "met": true,
+            "how": "main 에서 467 files inspected, no offenses detected"
+          },
+          {
+            "criterion": "회원 브랜드·페이지 폭 관련 테스트가 그대로 통과",
+            "met": true,
+            "how": "member_admin_page_width_test 2 runs 0 failures"
+          },
+          {
+            "criterion": "동작 변경 없이 공백만 고친다",
+            "met": true,
+            "how": "git diff -w 0줄(공백 외 변경 없음), worktree 에서 수정 후 cherry-pick"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rubocop",
+            "exit_code": 0,
+            "output": "467 files inspected, no offenses detected"
+          },
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/member_admin_page_width_test.rb",
+            "exit_code": 0,
+            "output": "2 runs, 57 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "started_at": "2026-11-25T04:36:16Z",
+      "completed_at": "2026-11-25T13:36:54.647934"
     }
   ],
   "hooks": {
@@ -13872,6 +13910,12 @@
         "issue_type": "BIZ_VALIDATE",
         "plan_created": 0,
         "timestamp": "2026-11-25T13:35:06.069286"
+      },
+      {
+        "issue_id": "ISS-600",
+        "issue_type": "STYLE_FIX",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T13:36:54.647934"
       }
     ],
     "on_fail": [],
@@ -18115,7 +18159,7 @@
   },
   "stats": {
     "total_issues": 599,
-    "completed": 105,
+    "completed": 106,
     "failed": 0,
     "evolved": 223
   },
