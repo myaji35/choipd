@@ -6665,7 +6665,48 @@
             "exit_code": 0,
             "output": "5 runs, 58 assertions, 0 failures, 0 errors, 0 skips"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T03:12:57Z",
+          "sha": "7d483c4",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "node script/qa/footer_readability_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "\"width\":390,\"minContrast\":\"5.30\",\"contrastItems\":[],\"wordBreakItems\":[],\"overflow\":null,\"consoleErrors\":0,\"consoleErrorItems\":[],\"files\":[\"tmp/qa/readability/footer-works-390.png\"]},{\"path\":\"/works\",\"width\":320,\"minContrast\":\"5.30\",\"contrastItems\":[],\"wordBreakItems\":[],\"overflow\":null,\"consoleErrors\":0,\"consoleErrorItems\":[],\"files\":[\"tmp/qa/readability/footer-works-320.png\"]}]}\nSUMMARY pass=true"
+            },
+            {
+              "cmd": "ROUTES=/education,/works WIDTHS=1280,390 node script/qa/layout_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "\"/works\",\"width\":390,\"file\":\"tmp/qa/layout/works-390.png\",\"bytes\":116591,\"scrollWidth\":390,\"clientWidth\":390,\"hScroll\":false,\"checked\":4,\"clipped\":0,\"clippedItems\":[],\"footerWrapped\":0,\"footerWrappedItems\":[],\"pillWrapped\":0,\"pillWrappedItems\":[],\"pillMinHeight\":null,\"pillShort\":0,\"pillShortItems\":[],\"consoleErrors\":0,\"consoleErrorItems\":[],\"badResponses\":0,\"badResponseItems\":[]}\nSUMMARY pass=true"
+            },
+            {
+              "cmd": "bin/rails test test/integration/pd_layout_mobile_menu_test.rb test/integration/education_filter_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json",
+            "app/controllers/concerns/member_admin/profile_checklist.rb",
+            "app/controllers/member_admin/dashboard_controller.rb",
+            "app/controllers/member_admin/documents_controller.rb",
+            "app/controllers/member_admin/editor_controller.rb",
+            "app/views/member_admin/editor/_dropzone.html.erb",
+            "app/views/member_admin/editor/_upload_hub.html.erb",
+            "app/views/member_admin/editor/show.html.erb",
+            "docs/design-loop/member-1125/LOG.md",
+            "test/integration/member_admin_editor_flow_test.rb"
+          ]
+        }
       },
       "spawn_rules": [],
       "completed_at": "2026-11-25T12:10:18.456937"
@@ -8517,7 +8558,41 @@
             "exit_code": 0,
             "output": "SUMMARY pass=true"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T03:12:57Z",
+          "sha": "7d483c4",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "node script/qa/footer_readability_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "\"width\":390,\"minContrast\":\"5.30\",\"contrastItems\":[],\"wordBreakItems\":[],\"overflow\":null,\"consoleErrors\":0,\"consoleErrorItems\":[],\"files\":[\"tmp/qa/readability/footer-works-390.png\"]},{\"path\":\"/works\",\"width\":320,\"minContrast\":\"5.30\",\"contrastItems\":[],\"wordBreakItems\":[],\"overflow\":null,\"consoleErrors\":0,\"consoleErrorItems\":[],\"files\":[\"tmp/qa/readability/footer-works-320.png\"]}]}\nSUMMARY pass=true"
+            },
+            {
+              "cmd": "ROUTES=/education,/works WIDTHS=1280,390 node script/qa/layout_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "\"/works\",\"width\":390,\"file\":\"tmp/qa/layout/works-390.png\",\"bytes\":116591,\"scrollWidth\":390,\"clientWidth\":390,\"hScroll\":false,\"checked\":4,\"clipped\":0,\"clippedItems\":[],\"footerWrapped\":0,\"footerWrappedItems\":[],\"pillWrapped\":0,\"pillWrappedItems\":[],\"pillMinHeight\":null,\"pillShort\":0,\"pillShortItems\":[],\"consoleErrors\":0,\"consoleErrorItems\":[],\"badResponses\":0,\"badResponseItems\":[]}\nSUMMARY pass=true"
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json",
+            "app/controllers/concerns/member_admin/profile_checklist.rb",
+            "app/controllers/member_admin/dashboard_controller.rb",
+            "app/controllers/member_admin/documents_controller.rb",
+            "app/controllers/member_admin/editor_controller.rb",
+            "app/views/member_admin/editor/_dropzone.html.erb",
+            "app/views/member_admin/editor/_upload_hub.html.erb",
+            "app/views/member_admin/editor/show.html.erb",
+            "docs/design-loop/member-1125/LOG.md",
+            "test/integration/member_admin_editor_flow_test.rb"
+          ]
+        }
       },
       "spawn_rules": [],
       "completed_at": "2026-11-25T12:10:26.394737"
@@ -9217,10 +9292,21 @@
           "app/views/layouts/_chopd_footer.html.erb"
         ],
         "source_issue": "ISS-551",
-        "scope": "changed"
+        "scope": "changed",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:11:33.630Z",
+            "by": "auto",
+            "reason": "「[Plan:테스트] ISS-551 변경사항 검증」(RUN_TESTS, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:11:33.630Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
       },
       "result": null,
-      "spawn_rules": []
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:11:33.630Z"
     },
     {
       "id": "ISS-564",
@@ -9240,10 +9326,21 @@
           "app/views/chopd/education/index.html.erb",
           "app/views/layouts/_chopd_footer.html.erb"
         ],
-        "source_issue": "ISS-551"
+        "source_issue": "ISS-551",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:11:33.630Z",
+            "by": "auto",
+            "reason": "「[Plan:도메인분석] ISS-551 비즈니스 규칙/시나리오 도출」(DOMAIN_ANALYZE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:11:33.630Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
       },
       "result": null,
-      "spawn_rules": []
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:11:33.630Z"
     },
     {
       "id": "ISS-565",
@@ -9263,10 +9360,21 @@
           "app/views/chopd/education/index.html.erb",
           "app/views/layouts/_chopd_footer.html.erb"
         ],
-        "source_issue": "ISS-551"
+        "source_issue": "ISS-551",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:11:33.630Z",
+            "by": "auto",
+            "reason": "「[Plan:UX리뷰] ISS-551 UI 변경 검증」(UI_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:11:33.630Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
       },
       "result": null,
-      "spawn_rules": []
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:11:33.630Z"
     },
     {
       "id": "ISS-566",
@@ -9286,10 +9394,21 @@
           "app/views/chopd/education/index.html.erb",
           "app/views/layouts/_chopd_footer.html.erb"
         ],
-        "source_issue": "ISS-551"
+        "source_issue": "ISS-551",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:11:33.630Z",
+            "by": "auto",
+            "reason": "「[Plan:브랜드검증] ISS-551 아젠다 표현 + Action Clarity」(BRAND_GUARD, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:11:33.630Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
       },
       "result": null,
-      "spawn_rules": []
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:11:33.630Z"
     },
     {
       "id": "ISS-567",
@@ -9310,10 +9429,21 @@
           "app/views/layouts/_chopd_footer.html.erb"
         ],
         "source_issue": "ISS-551",
-        "action": "run_browse_qa"
+        "action": "run_browse_qa",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:11:33.630Z",
+            "by": "auto",
+            "reason": "「[Plan:브라우저QA] ISS-551 콘솔 에러 + 스크린샷 검증」(BROWSER_QA, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:11:33.630Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
       },
       "result": null,
-      "spawn_rules": []
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:11:33.630Z"
     },
     {
       "id": "ISS-568",
@@ -9326,7 +9456,7 @@
       "retry_count": 0,
       "depends_on": [],
       "created_at": "2026-11-25T03:11:30Z",
-      "updated_at": "2026-11-25T03:11:30Z",
+      "updated_at": "2026-11-25T03:11:33.630Z",
       "description": "회차 끝 bin/rubocop 이 459 파일 중 6건(Layout/SpaceInsideArrayLiteralBrackets) 위반으로 실패. 대상: test/controllers/member_admin/brands_controller_test.rb:61, test/integration/member_admin_dashboard_ux_test.rb:56, test/integration/member_admin_editor_flow_test.rb:30. 회원 화면 디자인 루프(별도 대화 세션)가 커밋한 코드이며 작성 시점에 그 세션이 같은 파일을 편집 중이었다.",
       "payload": {
         "origin": "factory-ship",
@@ -9347,7 +9477,17 @@
           "effort": "XS",
           "by": "factory-runner",
           "at": "2026-11-25T03:11:30Z"
-        }
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:11:33.630Z",
+            "by": "auto",
+            "reason": "린트 실패가 main 출고를 막는다. 배열 괄호 안 공백만 고치는 기계적 수정(bin/rubocop -a 로 3건 자동, 나머지 3건 수동)"
+          }
+        ],
+        "approved_at": "2026-11-25T03:11:33.630Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
       },
       "result": null,
       "spawn_rules": []
