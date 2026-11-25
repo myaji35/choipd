@@ -34,7 +34,7 @@ class InquirySubmitContrastTest < ActionDispatch::IntegrationTest
   end
 
   def contrast_ratio(first, second)
-    darker, lighter = [relative_luminance(first), relative_luminance(second)].sort
+    darker, lighter = [ relative_luminance(first), relative_luminance(second) ].sort
     (lighter + 0.05) / (darker + 0.05)
   end
 
