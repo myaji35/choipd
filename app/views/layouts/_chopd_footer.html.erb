@@ -6,7 +6,7 @@
         <div style="font-family:'Black Han Sans',sans-serif;font-size:22px;margin-bottom:12px;">
           imPD<span style="color:#ff4d1c;">.</span>
         </div>
-        <p style="font-size:13px;color:rgba(255,255,255,.35);line-height:1.8;max-width:280px;">
+        <p style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.8;max-width:280px;text-wrap:pretty;">
           스마트폰 창업 전략가 최범희 PD의 통합 브랜드 허브.<br>
           교육, 미디어, 작품을 통해 가치를 나눕니다.
         </p>
@@ -14,31 +14,31 @@
 
       <!-- 서비스 -->
       <div>
-        <div style="font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:16px;">서비스</div>
+        <div style="font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:16px;">서비스</div>
         <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
-          <li><%= link_to "교육 과정", education_path, class: "whitespace-nowrap", style: "font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s;" %></li>
-          <li><%= link_to "한국환경저널", media_path, class: "whitespace-nowrap", style: "font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s;" %></li>
-          <li><%= link_to "작품 갤러리", works_path, class: "whitespace-nowrap", style: "font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s;" %></li>
-          <li><%= link_to "커뮤니티", community_path, class: "whitespace-nowrap", style: "font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s;" %></li>
+          <li><%= link_to "교육 과정", education_path, class: "whitespace-nowrap", style: "font-size:13px;color:rgba(255,255,255,.7);text-decoration:none;transition:color .2s;" %></li>
+          <li><%= link_to "한국환경저널", media_path, class: "whitespace-nowrap", style: "font-size:13px;color:rgba(255,255,255,.7);text-decoration:none;transition:color .2s;" %></li>
+          <li><%= link_to "작품 갤러리", works_path, class: "whitespace-nowrap", style: "font-size:13px;color:rgba(255,255,255,.7);text-decoration:none;transition:color .2s;" %></li>
+          <li><%= link_to "커뮤니티", community_path, class: "whitespace-nowrap", style: "font-size:13px;color:rgba(255,255,255,.7);text-decoration:none;transition:color .2s;" %></li>
         </ul>
       </div>
 
       <!-- 연락처 -->
       <div>
-        <div style="font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:16px;">연락처</div>
+        <div style="font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:16px;">연락처</div>
         <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
           <li><%= link_to "B2B/B2G 문의하기", new_inquiry_path, class: "whitespace-nowrap", style: "font-size:13px;color:#ff7850;text-decoration:none;" %></li>
-          <li><%= link_to "뉴스레터 구독", community_path, class: "whitespace-nowrap", style: "font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;" %></li>
+          <li><%= link_to "뉴스레터 구독", community_path, class: "whitespace-nowrap", style: "font-size:13px;color:rgba(255,255,255,.7);text-decoration:none;" %></li>
         </ul>
       </div>
     </div>
 
     <div class="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between md:gap-0" style="border-top:1px solid rgba(255,255,255,.06);padding-top:32px;">
-      <p style="font-size:12px;color:rgba(255,255,255,.2);">&copy; <%= Date.today.year %> imPD · 최범희 PD 퍼스널 브랜드 플랫폼</p>
+      <p style="font-size:12px;color:rgba(255,255,255,.5);">&copy; <%= Date.today.year %> imPD · 최범희 PD 퍼스널 브랜드 플랫폼</p>
       <div class="flex gap-5 md:gap-6">
-        <%= link_to "교육", education_path, class: "whitespace-nowrap", style: "font-size:12px;color:rgba(255,255,255,.3);text-decoration:none;" %>
-        <%= link_to "미디어", media_path, class: "whitespace-nowrap", style: "font-size:12px;color:rgba(255,255,255,.3);text-decoration:none;" %>
-        <%= link_to "작품", works_path, class: "whitespace-nowrap", style: "font-size:12px;color:rgba(255,255,255,.3);text-decoration:none;" %>
+        <%= link_to "교육", education_path, class: "whitespace-nowrap", style: "font-size:12px;color:rgba(255,255,255,.55);text-decoration:none;" %>
+        <%= link_to "미디어", media_path, class: "whitespace-nowrap", style: "font-size:12px;color:rgba(255,255,255,.55);text-decoration:none;" %>
+        <%= link_to "작품", works_path, class: "whitespace-nowrap", style: "font-size:12px;color:rgba(255,255,255,.55);text-decoration:none;" %>
       </div>
     </div>
   </div>
