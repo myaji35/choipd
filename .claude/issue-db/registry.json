@@ -8445,7 +8445,7 @@
       "id": "ISS-553",
       "title": "[Plan:비즈니스검증] chopd-layout-script 규칙 5개 정적 검증",
       "type": "BIZ_VALIDATE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "biz-validator",
       "depth": 3,
@@ -8500,17 +8500,89 @@
           }
         ],
         "approved_at": "2026-11-25T02:29:35.739Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-543 수정(1141a68)이 R1~R5를 실제로 지키는지 코드 정적 검토 + 기존 점검 스크립트 재실행으로 확인하는 검증 카드. 코드 변경 없이 마감 가능",
+          "risk": "T0 — 검증만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T02:52:22Z"
+        },
+        "acceptance_criteria": [
+          "R1~R5 규칙마다 담당 코드 위치와 자동 점검이 대응된다",
+          "turbo_reveal_check·chopd_mobile_menu_check 가 현재 main 에서 통과한다",
+          "규칙 위반(오류·리스너 중복·aria 누락)이 발견되면 개별 카드로 남긴다"
+        ]
       },
-      "result": null,
+      "result": {
+        "coverage_rate": 100,
+        "rules_checked": 5,
+        "gaps": [
+          {
+            "level": "MINOR",
+            "scenario": "헤더·모바일 메뉴 '소개' 링크가 존재하지 않는 #identity 를 가리킴 → ISS-557 로 분리"
+          }
+        ],
+        "static_review": {
+          "R1": "chopd.html.erb 인라인 스크립트 — 이전 IntersectionObserver disconnect 후 새 observer 로 현재 .reveal 관찰",
+          "R2": "window.__chopdScrollProgBound·__chopdNavScrollBound 가드로 scroll 리스너 1회만 등록",
+          "R3": "즉시실행 함수로 감싸 const 재선언 없음, Stimulus mobile-menu 연결 제거",
+          "R4": "Turbo 렌더마다 새 .nav-mobile-btn 에 click 1개 바인딩(body 교체로 이전 버튼 폐기)",
+          "R5": "토글 결과로 aria-expanded true/false 갱신"
+        },
+        "new_cards": [
+          "ISS-557"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "R1~R5 규칙마다 담당 코드 위치와 자동 점검이 대응된다",
+            "met": true,
+            "how": "static_review 에 규칙별 코드 위치, docs/domain/chopd-layout-script-rules.md 표의 점검 스크립트와 대조"
+          },
+          {
+            "criterion": "turbo_reveal_check·chopd_mobile_menu_check 가 현재 main 에서 통과한다",
+            "met": true,
+            "how": "8b98423 에서 turbo_reveal_check 1280·390, chopd_mobile_menu_check, footer_inquiry_flow 모두 SUMMARY pass=true"
+          },
+          {
+            "criterion": "규칙 위반이 발견되면 개별 카드로 남긴다",
+            "met": true,
+            "how": "R1~R5 위반 0. 인접 결함(죽은 '소개' 링크)은 ISS-557 FIX_BUG P2 로 등록"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/turbo_reveal_check.cjs",
+            "exit_code": 0,
+            "output": "revealTotal 6, revealHidden 0, scrollListenerGrowth 0, consoleErrors 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "WIDTH=390 node script/qa/turbo_reveal_check.cjs",
+            "exit_code": 0,
+            "output": "SUMMARY pass=true"
+          },
+          {
+            "cmd": "node script/qa/chopd_mobile_menu_check.cjs",
+            "exit_code": 0,
+            "output": "educationOpen flex/true, educationClosed none/false, worksOpen flex/true, consoleErrors 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "node script/qa/footer_inquiry_flow.cjs",
+            "exit_code": 0,
+            "output": "finalPath /inquiries/new status 200, consoleErrors 0 / SUMMARY pass=true"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T02:29:35.739Z"
+      "updated_at": "2026-11-25T02:52:22Z",
+      "completed_at": "2026-11-25T11:55:03.335201"
     },
     {
       "id": "ISS-554",
       "title": "[Plan:시나리오실행] chopd-layout-script 시나리오 1개 E2E 실행",
       "type": "SCENARIO_PLAY",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "scenario-player",
       "depth": 3,
@@ -8538,17 +8610,66 @@
           }
         ],
         "approved_at": "2026-11-25T02:29:35.739Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "S1 시나리오는 chopd_mobile_menu_check.cjs 가 그대로 재현한다. 현재 main 에서 다시 돌려 PASS/FAIL 기록",
+          "risk": "T0 — 검증만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T02:52:22Z"
+        },
+        "acceptance_criteria": [
+          "390px /education 에서 햄버거가 한 번에 열리고 닫힌다",
+          "Turbo 로 /works 이동 뒤에도 햄버거가 한 번에 열린다",
+          "시나리오 동안 콘솔 오류 0"
+        ]
       },
-      "result": null,
+      "result": {
+        "total_scenarios": 1,
+        "passed": 1,
+        "failed": 0,
+        "results": [
+          {
+            "name": "S1",
+            "status": "PASS",
+            "detail": "390px /education 햄버거 열림 display flex·aria-expanded true → 닫힘 none·false → Turbo 로 /works(같은 문서 유지) → 열림 flex·true, 콘솔·페이지 오류 0"
+          }
+        ],
+        "criteria_check": [
+          {
+            "criterion": "390px /education 에서 햄버거가 한 번에 열리고 닫힌다",
+            "met": true,
+            "how": "chopd_mobile_menu_check educationOpen flex/true, educationClosed none/false"
+          },
+          {
+            "criterion": "Turbo 로 /works 이동 뒤에도 햄버거가 한 번에 열린다",
+            "met": true,
+            "how": "worksSameDocument true(Turbo 이동), worksOpen flex/true"
+          },
+          {
+            "criterion": "시나리오 동안 콘솔 오류 0",
+            "met": true,
+            "how": "consoleErrors 0, pageErrors 0"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/chopd_mobile_menu_check.cjs",
+            "exit_code": 0,
+            "output": "{\"educationOpen\":{\"display\":\"flex\",\"expanded\":\"true\"},\"educationClosed\":{\"display\":\"none\",\"expanded\":\"false\"},\"worksSameDocument\":true,\"worksOpen\":{\"display\":\"flex\",\"expanded\":\"true\"},\"consoleErrors\":0,\"pageErrors\":0} SUMMARY pass=true"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T02:29:35.739Z"
+      "updated_at": "2026-11-25T02:52:22Z",
+      "completed_at": "2026-11-25T11:55:15.933731"
     },
     {
       "id": "ISS-555",
       "title": "[Plan:디자인리뷰] ISS-544 시각적 완성도 검증",
       "type": "DESIGN_REVIEW",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "design-critic",
       "depth": 3,
@@ -8584,9 +8705,43 @@
           "새로 생긴 시각 결함이 없다(기존 ISS-532·551·552 제외)"
         ]
       },
-      "result": null,
+      "result": {
+        "total_score": 56,
+        "critical_issues": [],
+        "ai_slop_detected": false,
+        "note": "ISS-539(82c315b)은 두 레이아웃의 <script> 블록만 변경 — CSS·마크업 diff 0줄이라 배치·색·글자 변화 없음. 남은 시각 결함(바닥글 대비 ISS-532, '허/브.' 줄바꿈 ISS-551, 교육 빈 목록 ISS-552)은 기존 카드로 처리 중",
+        "screenshots": [
+          "tmp/qa/ISS-553/works-1280.png",
+          "tmp/qa/ISS-555/"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "ISS-539 전후로 chopd 작품·교육 화면의 배치·색·글자가 달라지지 않았다",
+            "met": true,
+            "how": "git show 82c315b -- app/views/layouts/ 의 +/- 줄이 전부 <script> 안(즉시실행 함수·리스너 가드), style·HTML 변경 없음"
+          },
+          {
+            "criterion": "새로 생긴 시각 결함이 없다(기존 ISS-532·551·552 제외)",
+            "met": true,
+            "how": "layout_check 전 화면 1280·390 hScroll false·clipped 0·consoleErrors 0, works-1280 캡처 육안 확인 — 기존 카드 외 새 결함 없음"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "git show 82c315b --stat",
+            "exit_code": 0,
+            "output": "_chopd_header.html.erb 25, chopd.html.erb 34, turbo_reveal_check.cjs 143 — 레이아웃 변경은 스크립트 블록만"
+          },
+          {
+            "cmd": "node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "전 경로 1280/390 hScroll false, clipped 0, consoleErrors 0 / SUMMARY pass=true"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T02:46:42.555Z"
+      "updated_at": "2026-11-25T02:52:22Z",
+      "completed_at": "2026-11-25T11:55:15.988580"
     },
     {
       "id": "ISS-556",
@@ -8696,6 +8851,57 @@
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
       "completed_at": "2026-11-25T11:51:05.224662"
+    },
+    {
+      "id": "ISS-557",
+      "title": "[죽은 링크] chopd 헤더·모바일 메뉴 '소개'가 없는 #identity 를 가리켜 눌러도 아무 일 없음(모바일 메뉴도 안 닫힘)",
+      "type": "FIX_BUG",
+      "priority": "P2",
+      "status": "READY",
+      "origin": "factory-observation",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": "ISS-553",
+      "depends_on": [],
+      "created_at": "2026-11-25T02:54:53Z",
+      "updated_at": "2026-11-25T02:54:54.853Z",
+      "description": "chopd 레이아웃 헤더의 '소개' 링크(데스크톱 nav-link·모바일 mobile-nav-link)가 '#identity' 를 가리키는데, id=\"identity\" 는 쓰이지 않는 index_dark_legacy.html.erb 에만 있다. /education·/works·/media·/community 어디에서도 대상이 없어 눌러도 이동하지 않고, 모바일에서는 메뉴가 열린 채로 남는다.",
+      "payload": {
+        "origin": "factory-observation",
+        "files": [
+          "app/views/layouts/_chopd_header.html.erb"
+        ],
+        "evidence": [
+          "grep -rln 'id=\"identity\"' app/views → app/views/chopd/home/index_dark_legacy.html.erb 하나뿐",
+          "curl localhost:3008/ /education /works | grep -c 'id=\"identity\"' → 0 0 0",
+          "Chopd::HomeController 는 impd 레이아웃(chopd 헤더 미사용)"
+        ],
+        "acceptance_criteria": [
+          "'소개'를 누르면 최범희 PD 소개가 있는 실제 화면으로 이동한다(데스크톱·모바일 모두)",
+          "모바일 메뉴에서 '소개'를 누른 뒤 메뉴가 열린 채로 남지 않는다",
+          "chopd 헤더의 모든 링크 대상이 존재함을 확인하는 자동 점검 또는 테스트가 있다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "방문자가 '소개'를 눌러도 반응이 없어 고장 난 사이트로 보임. 링크 대상 1곳 교체 수준(예: 최PD 공개 페이지 /choipd 또는 인사말 /media/greeting — 내용 확인 후 선택)",
+          "risk": "T0 — 링크 대상만 변경, 데이터 영향 없음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T02:54:53Z"
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T02:54:54.853Z",
+            "by": "auto",
+            "reason": "방문자가 '소개'를 눌러도 반응이 없어 고장 난 사이트로 보임. 링크 대상 1곳 교체 수준(예: 최PD 공개 페이지 /choipd 또는 인사말 /media/greeting — 내용 확인 후 선택)"
+          }
+        ],
+        "approved_at": "2026-11-25T02:54:54.853Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": []
     }
   ],
   "hooks": {
@@ -9073,6 +9279,24 @@
         "issue_type": "STYLE_FIX",
         "plan_created": 0,
         "timestamp": "2026-11-25T11:51:05.224662"
+      },
+      {
+        "issue_id": "ISS-553",
+        "issue_type": "BIZ_VALIDATE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T11:55:03.335201"
+      },
+      {
+        "issue_id": "ISS-554",
+        "issue_type": "SCENARIO_PLAY",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T11:55:15.933731"
+      },
+      {
+        "issue_id": "ISS-555",
+        "issue_type": "DESIGN_REVIEW",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T11:55:15.988580"
       }
     ],
     "on_fail": [],
@@ -9085,6 +9309,18 @@
         "context": "ISS-549 full scenario coverage",
         "frequency": 1,
         "discovered_at": "2026-11-25T11:47:30.195348"
+      },
+      {
+        "pattern": "biz_coverage_100",
+        "context": "ISS-553 full scenario coverage",
+        "frequency": 1,
+        "discovered_at": "2026-11-25T11:55:03.335201"
+      },
+      {
+        "pattern": "e2e_all_pass_1",
+        "context": "ISS-554 all scenarios passed",
+        "frequency": 1,
+        "discovered_at": "2026-11-25T11:55:15.933731"
       }
     ],
     "failure_patterns": [],
@@ -13304,7 +13540,7 @@
   },
   "stats": {
     "total_issues": 556,
-    "completed": 62,
+    "completed": 65,
     "failed": 0,
     "evolved": 223
   },
@@ -13347,6 +13583,13 @@
     },
     {
       "source_issue": "ISS-549",
+      "source_type": "BIZ_VALIDATE",
+      "result": {
+        "biz_coverage": 100
+      }
+    },
+    {
+      "source_issue": "ISS-553",
       "source_type": "BIZ_VALIDATE",
       "result": {
         "biz_coverage": 100
