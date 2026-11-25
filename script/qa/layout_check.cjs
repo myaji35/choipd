@@ -4,10 +4,25 @@ const path = require('node:path');
 const root = fs.realpathSync(path.resolve(__dirname, '../..'));
 const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3008';
 const outDir = process.env.OUT_DIR || path.resolve(__dirname, '../../tmp/qa/layout');
-const routes = [{ name: 'home', path: '/' }, { name: 'inquiries-new', path: '/inquiries/new' }];
+const routes = process.env.ROUTES === undefined
+  ? [{ name: 'home', path: '/' }, { name: 'inquiries-new', path: '/inquiries/new' }]
+  : process.env.ROUTES.split(',')
+    .map(routePath => routePath.trim())
+    .filter(Boolean)
+    .map(routePath => ({
+      name: routePath.replace(/^\/+|\/+$/g, '').replace(/\//g, '-') || 'home',
+      path: routePath,
+    }));
 const viewports = [{ width: 1280, height: 900 }, { width: 390, height: 844 }];
 
 async function main() {
+  if (routes.length === 0) {
+    console.error('ROUTES 에 검사할 경로가 없습니다');
+    console.log('SUMMARY pass=false');
+    process.exitCode = 2;
+    return;
+  }
+
   const { chromium } = require(require.resolve('playwright', { paths: [__dirname] }));
   fs.mkdirSync(outDir, { recursive: true });
   const outputDir = fs.realpathSync(outDir);
