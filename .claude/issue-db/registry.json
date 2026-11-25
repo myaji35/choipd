@@ -14902,7 +14902,7 @@
       "id": "ISS-613",
       "title": "[Plan:도메인분석] ISS-611 비즈니스 규칙/시나리오 도출",
       "type": "DOMAIN_ANALYZE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "domain-analyst",
       "depth": 2,
@@ -14935,15 +14935,51 @@
           "at": "2026-11-25T05:39:38Z"
         }
       },
-      "result": null,
+      "result": {
+        "resolution": "no_change",
+        "skip_derivatives": "설정 파일(암호화 키 적용 시점) 수정이라 업무 규칙·사용자 시나리오 변화 없음 — 정적·동적 비즈니스 검증 파생 불필요",
+        "rules": [
+          {
+            "id": "ENC-1",
+            "rule": "암호화 키는 credentials(active_record_encryption.*) 값이 최우선이며 덮어쓰지 않는다"
+          },
+          {
+            "id": "ENC-2",
+            "rule": "credentials 가 없으면 환경변수 AR_ENCRYPTION_PRIMARY_KEY·DETERMINISTIC_KEY·SALT 를 쓴다"
+          },
+          {
+            "id": "ENC-3",
+            "rule": "둘 다 없으면 secret_key_base 파생값(primary:/deterministic:/salt: 접두 SHA-256)을 쓴다 — 공식 변경 금지(기존 암호문 호환)"
+          },
+          {
+            "id": "ENC-4",
+            "rule": "eager_load 켜짐(운영·CI)·꺼짐(개발) 모두 같은 키가 적용된다"
+          }
+        ],
+        "criteria_check": [
+          {
+            "criterion": "ISS-611 변경의 업무 규칙 도출",
+            "met": true,
+            "how": "ENC-1~4 규칙 4개 기록, 회원·운영자 화면 동작 변화 없음"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "CI=1 PARALLEL_WORKERS=1 bin/rails test test/initializers/active_record_encryption_test.rb",
+            "exit_code": 0,
+            "output": "3 runs, 9 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T05:38:40.500Z"
+      "updated_at": "2026-11-25T05:38:40.500Z",
+      "completed_at": "2026-11-25T14:40:40.012704"
     },
     {
       "id": "ISS-614",
       "title": "[Plan:품질평가] ISS-612 품질 점수 산출",
       "type": "SCORE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "eval-harness",
       "depth": 3,
@@ -14977,9 +15013,39 @@
           "at": "2026-11-25T05:39:38Z"
         }
       },
-      "result": null,
+      "result": {
+        "score": 88,
+        "prev_score": 86,
+        "breakdown": {
+          "quality": 90,
+          "coverage": 85,
+          "performance": 88,
+          "docs": 88
+        },
+        "skip_derivatives": "배포 준비 카드 ISS-491 이 이미 대기 중이라 DEPLOY_READY 중복 생성 안 함",
+        "criteria_check": [
+          {
+            "criterion": "ISS-612 결과 기반 품질 점수 산출",
+            "met": true,
+            "how": "전체 테스트 561건 실패·에러 0(CI=1), 린트 0건, 수정 전 실패를 잡는 회귀 테스트 추가, Gemini 지적 1건 반영 → 88점(직전 86)"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "CI=1 bin/rails test",
+            "exit_code": 0,
+            "output": "561 runs, 4849 assertions, 0 failures, 0 errors, 1 skips"
+          },
+          {
+            "cmd": "bin/rubocop",
+            "exit_code": 0,
+            "output": "495 files inspected, no offenses detected"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T05:39:28.501Z"
+      "updated_at": "2026-11-25T05:39:28.501Z",
+      "completed_at": "2026-11-25T14:40:40.080935"
     }
   ],
   "hooks": {
@@ -15759,6 +15825,18 @@
         "issue_type": "RUN_TESTS",
         "plan_created": 1,
         "timestamp": "2026-11-25T14:39:28.367287"
+      },
+      {
+        "issue_id": "ISS-613",
+        "issue_type": "DOMAIN_ANALYZE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T14:40:40.012704"
+      },
+      {
+        "issue_id": "ISS-614",
+        "issue_type": "SCORE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T14:40:40.080935"
       }
     ],
     "on_fail": [],
@@ -20008,7 +20086,7 @@
   },
   "stats": {
     "total_issues": 612,
-    "completed": 129,
+    "completed": 131,
     "failed": 0,
     "evolved": 223
   },
