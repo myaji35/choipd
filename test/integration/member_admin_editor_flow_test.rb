@@ -264,17 +264,23 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_select "button[type=submit]", text: "지금 공개하기"
   end
 
-  test "스타일 저장 전에는 기본 스타일을 안내하고 저장 후에는 마침을 표시한다" do
+  test "기본 스타일과 직접 고른 스타일 모두 마침을 표시한다" do
     @member.update!(theme_preset: nil)
     path = slug_admin_editor_path(slug: @member.slug, step: 4)
 
     get path
-    assert_select "a[href='?step=3'] p", text: "기본 그대로"
-    assert_not_includes response.body, "기본 스타일 사용 중"
+    assert_select "a[href='?step=3']" do
+      assert_select "p", text: "기본 스타일로 준비됐어요"
+      assert_select "p span", text: "(마침)"
+    end
+    assert_not_includes response.body, "기본 그대로"
 
-    @member.update!(theme_preset: "warm")
+    @member.update!(theme_preset: "clean")
     get path
-    assert_select "a[href='?step=3']", text: /스타일.*\(마침\)/
+    assert_select "a[href='?step=3']" do
+      assert_select "p", text: "깔끔한"
+      assert_select "p span", text: "(마침)"
+    end
     assert_not_includes response.body, "기본 그대로"
   end
 
@@ -340,7 +346,7 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_select "a.impd-btn-primary", text: /다음/, count: 0
     assert_select "a.editor-skip-link[href='?step=4']", text: /저장하지 않고 다음 단계 보기/
     assert_includes response.body, "골랐어요"
-    assert_includes response.body, "스타일과 구성을 고른 뒤 이 버튼을 한 번만 누르면 함께 저장돼요."
+    assert_select "p", text: "'✓ 골랐어요'가 붙은 카드는 아직 저장 전이에요. 이 버튼을 눌러야 내 페이지에 반영돼요."
     assert_select "form[action=?]", slug_admin_editor_update_style_path(slug: @member.slug), count: 1 do
       assert_select "button[type=submit]", count: 1
     end
@@ -350,6 +356,19 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "아직 고르지 않았어요"
     assert_includes response.body, "지금: 잡지형 (기본)"
     assert_not_includes response.body, "에디토리얼"
+  end
+
+  test "현재 스타일과 구성 카드에만 지금 내 페이지를 표시한다" do
+    @member.update!(theme_preset: "clean")
+    get slug_admin_editor_path(slug: @member.slug, step: 3)
+
+    assert_response :ok
+    assert_equal 2, response.body.scan("지금 내 페이지").size
+    assert_not_includes response.body, "사용 중"
+    assert_select ".is-saved", count: 2
+    assert_select ".theme-radio[checked] + .theme-card.is-saved", text: /지금 내 페이지/
+    assert_select ".layout-radio[checked] + .layout-card.is-saved", text: /지금 내 페이지/
+    assert_includes response.body, ".layout-radio:checked + .layout-card.is-saved::after { content: none; }"
   end
 
   test "스타일과 구성을 한 번에 저장한다" do

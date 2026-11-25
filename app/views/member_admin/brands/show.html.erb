@@ -11,13 +11,17 @@
     <h2>내 브랜드 운영 현황</h2>
     <p style="margin:12px 0;">최근 4주 활동과 그전 4주와의 차이예요.</p>
     <div class="ops-key-grid ops-owner-stats">
-      <% [[:visits, "방문", "회"], [:inquiries, "문의", "건"], [:posts, "게시", "건"], [:sns_posts, "SNS 발행", "건"]].each do |key, label, unit| %>
+      <% [[:visits, "방문", "회"], [:inquiries, "문의", "건"], [:posts, "올린 소식", "건"], [:sns_posts, "SNS에 올린 글", "건"]].each do |key, label, unit| %>
         <% stat = @four_week_stats[key]; delta = stat[:delta] %>
         <section class="ops-surface-card"><p><%= label %></p><strong><%= number_with_delimiter(stat[:value]) %><%= unit %></strong><p><%= delta.zero? ? "그전 4주와 같아요" : "그전 4주보다 #{number_with_delimiter(delta.abs)}#{unit} #{delta.positive? ? '늘었어요' : '줄었어요'}" %></p></section>
       <% end %>
     </div>
-    <p style="margin:12px 0;">아래 그래프는 최근 12주 동안의 흐름이에요.</p>
-    <%= ops_line_chart @series, keys: %i[visits inquiries posts sns_posts], labels: ["방문", "문의", "게시", "SNS 발행"] %>
+    <% current_week = @series.last %>
+    <p style="margin:12px 0;">아래 그래프는 최근 12주 동안의 흐름이에요.<% if current_week %> 맨 오른쪽(<%= current_week[:week_start].strftime("%-m/%-d") %> 주)은 이번 주라 아직 세는 중이에요. 낮게 보여도 괜찮아요.<% end %></p>
+    <%= ops_line_chart @series, keys: %i[visits inquiries posts sns_posts], labels: ["방문", "문의", "올린 소식", "SNS에 올린 글"] %>
+    <% if current_week %>
+      <p class="impd-label-muted" style="font-size: 13px;">이번 주(월요일부터 지금까지): 방문 <%= number_with_delimiter(current_week[:visits]) %>회 · 문의 <%= number_with_delimiter(current_week[:inquiries]) %>건 · 소식 <%= number_with_delimiter(current_week[:posts]) %>건</p>
+    <% end %>
     <details style="margin-top: 16px;">
       <summary style="cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--impd-accent); font-weight: 600;">이 숫자는 누가 볼 수 있나요?</summary>
       <p style="margin-top:12px;line-height:1.7;">공개 페이지(<%= member_brand_ops_path(slug: @member.slug) %>)에는 주간 방문·게시 그래프, 최근 4주 문의 수(1~2건은 '3건 미만'), 연결 매체, 최근 게시물 제목만 보여요. 문의 내용·연락처·방문자 정보는 공개하지 않아요.</p>
@@ -56,7 +60,7 @@
       <% end %>
       <section class="impd-card">
         <h3>이번 달 올린 글</h3>
-        <p style="margin-top: 12px;">이번 달 imPD 게시 <%= number_with_delimiter(@month_posts) %>건 · SNS 발행 <%= number_with_delimiter(@month_sns_posts) %>건</p>
+        <p style="margin-top: 12px;">이번 달 소식 <%= number_with_delimiter(@month_posts) %>건 · SNS에 올린 글 <%= number_with_delimiter(@month_sns_posts) %>건</p>
         <p class="impd-label-muted" style="margin: 8px 0 12px;">SNS 종류별 숫자는 준비되면 여기에 함께 보여요.</p>
         <%= link_to "소식 쓰러 가기", slug_admin_posts_path(slug: @member.slug), class: "impd-btn impd-btn-secondary" %>
       </section>
@@ -108,3 +112,9 @@
     <% if @brands.empty? %><p style="margin: 16px 0 32px;">브랜드는 운영팀이 등록을 도와드려요 — <%= link_to '문의하기', new_inquiry_path, style: inquiry_link_style %></p><% end %>
   </section>
 </div>
+
+<style>
+  .impd-admin .ops-surface-card { border-radius: 0; border-color: var(--impd-rule); }
+  .impd-admin .ops-surface-card > p:first-child { font-size: 13px; color: var(--impd-muted); }
+  .impd-admin .ops-surface-card > p:last-child { font-size: 13px; color: var(--impd-ink2); }
+</style>

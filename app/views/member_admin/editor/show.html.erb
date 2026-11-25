@@ -5,14 +5,14 @@
   <!-- 4단계 progress rail — 모두 클릭 가능. 각 단계별 완료 상태 표시. -->
   <%
     step1_done = @photos_count.to_i > 0 || @doc_count.to_i > 0
-    step3_done = @member.theme_preset.present? || @member.published_at.present?
+    style_name = ThemePreset.find(@member.theme_preset)&.dig(:name)
     step4_done = @member.published_at.present?
 
     editor_path = slug_admin_editor_path(slug: @member.slug) if @info_draft
     steps = [
       [1, "자료 올리기", "", step1_done],
       [2, "정보 확인", "", @can_publish],
-      [3, "스타일", step3_done ? "" : "기본 그대로", step3_done],
+      [3, "스타일", style_name || "기본 스타일로 준비됐어요", true],
       [4, "공개", "", step4_done],
     ]
   %>
@@ -248,10 +248,10 @@
         <% @presets.each do |p| %>
           <label style="cursor: pointer; display: block;">
             <input type="radio" name="theme_preset" value="<%= p[:key] %>" <%= "checked" if current_theme_key == p[:key] %> style="position: absolute; opacity: 0;" class="theme-radio">
-            <div class="theme-card" style="background: <%= p[:paper] %>; color: <%= p[:ink] %>; border: 1px solid var(--impd-rule); padding: 20px; min-height: 180px; display: flex; flex-direction: column; justify-content: space-between; transition: all .15s;">
+            <div class="theme-card<%= " is-saved" if current_theme_key == p[:key] %>" style="background: <%= p[:paper] %>; color: <%= p[:ink] %>; border: 1px solid var(--impd-rule); padding: 20px; min-height: 180px; display: flex; flex-direction: column; justify-content: space-between; transition: all .15s;">
               <div>
-                <div style="font-family: var(--impd-font-sans); font-size: 13px; color: <%= p[:accent] %>;">
-                  <%= "사용 중" if current_theme_key == p[:key] %>
+                <div style="font-family: var(--impd-font-sans); font-size: 13px; color: inherit; opacity: .75;">
+                  <%= "지금 내 페이지" if current_theme_key == p[:key] %>
                 </div>
                 <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 28px; letter-spacing: -0.5px; line-height: 1; margin-top: 8px;">
                   <%= p[:name] %>
@@ -280,10 +280,10 @@
         <% @layout_presets.each do |p| %>
           <label style="cursor: pointer; display: block;">
             <input type="radio" name="layout_preset" value="<%= p[:key] %>" <%= "checked" if current_layout_key == p[:key] %> style="position: absolute; opacity: 0;" class="layout-radio">
-            <div class="layout-card" style="background: var(--impd-card); color: var(--impd-ink); border: 1px solid var(--impd-rule); padding: 20px; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; transition: all .15s;">
+            <div class="layout-card<%= " is-saved" if current_layout_key == p[:key] %>" style="background: var(--impd-card); color: var(--impd-ink); border: 1px solid var(--impd-rule); padding: 20px; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; transition: all .15s;">
               <div>
-                <div style="font-family: var(--impd-font-sans); font-size: 13px; color: var(--impd-accent);">
-                  <%= "사용 중" if current_layout_key == p[:key] %>
+                <div style="font-family: var(--impd-font-sans); font-size: 13px; color: inherit; opacity: .75;">
+                  <%= "지금 내 페이지" if current_layout_key == p[:key] %>
                 </div>
                 <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 28px; letter-spacing: -0.5px; line-height: 1; margin-top: 8px;">
                   <%= p[:name] %>
@@ -302,7 +302,7 @@
       <button type="submit" class="impd-btn impd-btn-primary" style="margin-top: 28px; height: 52px; padding: 0 28px; font-size: 15px;">
         이 스타일로 저장하고 다음 →
       </button>
-      <p class="impd-label-muted" style="margin-top: 10px;">스타일과 구성을 고른 뒤 이 버튼을 한 번만 누르면 함께 저장돼요.</p>
+      <p class="impd-label-muted" style="margin-top: 10px;">'✓ 골랐어요'가 붙은 카드는 아직 저장 전이에요. 이 버튼을 눌러야 내 페이지에 반영돼요.</p>
     <% end %>
 
   <% else %>
@@ -514,5 +514,9 @@
   }
   .theme-radio:checked + .theme-card > :first-child,
   .layout-radio:checked + .layout-card > :first-child { padding-top: 22px; }
+  .theme-radio:checked + .theme-card.is-saved::after,
+  .layout-radio:checked + .layout-card.is-saved::after { content: none; }
+  .theme-radio:checked + .theme-card.is-saved > :first-child,
+  .layout-radio:checked + .layout-card.is-saved > :first-child { padding-top: 0; }
   .theme-radio:focus-visible + .theme-card, .layout-radio:focus-visible + .layout-card { outline: 3px solid var(--impd-accent); }
 </style>

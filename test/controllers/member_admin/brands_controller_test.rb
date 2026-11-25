@@ -46,9 +46,20 @@ class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".ops-owner-stats section", count: 4
     assert_select ".ops-owner-stats section", text: /방문.*4회.*4회 늘었어요/m
     assert_select ".ops-owner-stats section", text: /문의.*1건.*1건 늘었어요/m
-    assert_select ".ops-owner-stats section", text: /게시.*0건.*2건 줄었어요/m
-    assert_select ".ops-owner-stats section", text: /SNS 발행.*2건.*2건 늘었어요/m
-    assert_includes response.body, "이번 달 imPD 게시 0건 · SNS 발행 2건"
+    assert_select ".ops-owner-stats section", text: /올린 소식.*0건.*2건 줄었어요/m
+    assert_select ".ops-owner-stats section", text: /SNS에 올린 글.*2건.*2건 늘었어요/m
+    assert_includes response.body, "이번 달 소식 0건 · SNS에 올린 글 2건"
+  end
+
+  test "진행 중인 이번 주를 설명하고 현재까지의 숫자를 보여 준다" do
+    get slug_admin_brand_path(slug: @member.slug)
+
+    assert_response :ok
+    assert_includes response.body, "이번 주라 아직 세는 중이에요"
+    assert_select ".ops-chart-wrapper + p.impd-label-muted",
+      text: "이번 주(월요일부터 지금까지): 방문 0회 · 문의 0건 · 소식 0건"
+    assert_select ".ops-owner-stats .ops-surface-card > p:first-child", text: "올린 소식"
+    assert_select ".ops-owner-stats .ops-surface-card > p:first-child", text: "SNS에 올린 글"
   end
 
   test "화면 순서와 쉬운 말" do

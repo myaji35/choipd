@@ -45,11 +45,14 @@
       .impd-display { font-family: var(--impd-font-display); font-weight: 800; letter-spacing: -0.03em; word-spacing: 0.14em; line-height: 1.05; }
       .impd-section-header { display: flex; align-items: baseline; gap: 16px; border-top: 1px solid var(--impd-ink); padding-top: 14px; margin-bottom: 24px; }
       .impd-btn { display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; height: 44px; font-family: var(--impd-font-sans); font-size: 14px; font-weight: 600; letter-spacing: -0.2px; cursor: pointer; border: none; border-radius: 0; }
-      .impd-btn-primary { background: var(--impd-ink); color: var(--impd-paper); }
-      .impd-btn-primary:hover { background: var(--impd-accent); }
-      .impd-btn-accent { background: var(--impd-accent); color: white; }
+      .impd-admin .impd-btn-primary,
+      .impd-admin .impd-btn-accent { background: var(--impd-accent); color: #fff; }
+      .impd-admin .impd-btn-primary:hover,
+      .impd-admin .impd-btn-accent:hover { background: #005a39; color: #fff; }
+      .impd-admin .impd-btn:focus-visible { outline: 3px solid var(--impd-ink); outline-offset: 2px; }
       .impd-btn-secondary { background: transparent; color: var(--impd-ink); border: 1px solid var(--impd-ink); }
-      .impd-btn-danger { background: transparent; color: var(--impd-accent-2); border: 1px solid var(--impd-accent-2); }
+      .impd-admin .impd-btn-danger { color: #b42318; border: 1px solid rgba(180,35,24,0.45); background: transparent; }
+      .impd-admin .impd-btn-danger:hover { background: #b42318; color: #fff; border-color: #b42318; }
       .impd-btn-sm { height: 44px; padding: 0 12px; font-size: 13px; white-space: nowrap; }
       .impd-btn-quiet { background: transparent; color: var(--impd-ink2); border: 0; text-decoration: underline; text-underline-offset: 3px; padding: 0 8px; }
       .impd-example-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 8px 16px; }
