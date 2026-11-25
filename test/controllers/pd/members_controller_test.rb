@@ -65,10 +65,76 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     @member.profile_accounts.create!(platform: "linkedin", display_name: @member.name)
     channel.update!(delegation_consent_at: Time.current)
     (MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS.keys - [channel.platform]).each do |platform|
-      brand.brand_channels.create!(platform: platform, delegation_consent_at: Time.current)
+      brand.brand_channels.create!(platform: platform, delegation_consent_at: Time.current, session_status: "connected")
     end
     get pd_member_path(@member)
+    assert_select "#registration-summary", text: "등록을 모두 마쳤습니다. 연결 설정 남음 1개"
+
+    channel.update!(session_status: "connected")
+    get pd_member_path(@member)
     assert_select "#registration-summary", text: "등록을 모두 마쳤습니다."
+  end
+
+  test "연결이 남은 회원만 걸러 보고 검색할 수 있다" do
+    sign_in @pd
+    connected = Member.create!(name: "연결된 회원", email: "connected@example.test", slug: "connected")
+    waiting = Member.create!(name: "동의 대기 회원", email: "waiting@example.test", slug: "waiting")
+    @member.ensure_personal_brand!.brand_channels.create!(platform: "naver_blog", delegation_consent_at: Time.current)
+    connected.ensure_personal_brand!.brand_channels.create!(platform: "naver_blog",
+      delegation_consent_at: Time.current, session_status: "connected")
+    waiting.ensure_personal_brand!.brand_channels.create!(platform: "naver_blog")
+
+    get pd_members_path(filter: "connection")
+    assert_response :ok
+    assert_select "a[href=?]", pd_members_path(filter: "connection"), text: "연결 남음 1"
+    assert_select "li strong", count: 1, text: @member.name
+    assert_select "li strong", count: 1
+    assert_select "li span", text: "연결 남음 1"
+
+    get pd_members_path(filter: "connection", q: connected.email)
+    assert_select "p", text: "연결 설정이 남은 회원이 없습니다."
+
+    get pd_member_path(@member)
+    assert_select "#registration-summary", text: /연결 설정 남음 1개/
+    get pd_member_path(connected)
+    assert_select "#registration-summary", text: /연결 설정 남음/, count: 0
+  end
+
+  test "PD는 채널 동의 뒤 상태에 맞는 다음 할 일을 본다" do
+    sign_in @pd
+    channel = @member.ensure_personal_brand!.brand_channels.create!(platform: "naver_blog")
+
+    get pd_member_path(@member)
+    assert_select "#channels li p", text: /운영 위탁 동의 대기/
+    assert_select "#channels li p.text-gray-700", count: 0
+
+    channel.update!(delegation_consent_at: Time.current)
+    get pd_member_path(@member)
+    assert_select "#channels li", text: /동의까지 끝났습니다\. 다음은 연결 설정입니다.*운영자에게 요청해 주세요/m
+    assert_select "a[href^='/admin']", count: 0
+
+    channel.update!(session_status: "logged_out")
+    get pd_member_path(@member)
+    assert_select "#channels li", text: /연결에 문제가 있습니다\(로그인 필요\).*회원 화면에는 '확인 중'/m
+
+    channel.update!(session_status: "connected")
+    get pd_member_path(@member)
+    assert_select "#channels li", text: /연결까지 끝났습니다/
+
+    SnsScheduledPost.create!(brand_channel: channel, platform: "naver_blog", title: "제목", message: "글",
+      scheduled_at: Time.current, status: "published", published_at: Time.current)
+    get pd_member_path(@member)
+    assert_select "#channels li", text: /운영 중 — 회원 화면에도/
+  end
+
+  test "운영자는 동의한 채널의 연결 설정을 바로 열 수 있다" do
+    sign_in AdminUser.create!(email: "channel-setup-admin@example.test", password: "password123", role: "admin")
+    brand = @member.ensure_personal_brand!
+    channel = brand.brand_channels.create!(platform: "naver_blog", delegation_consent_at: Time.current)
+
+    get pd_member_path(@member)
+    assert_response :ok
+    assert_select "#channels a[href=?]", edit_admin_brand_brand_channel_path(brand, channel), text: "연결 설정 열기"
   end
 
   test "등록된 계정마다 다음에 할 일을 알려 준다" do
@@ -193,6 +259,23 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
       assert_select "a[href=?]", edit_pd_member_channel_path(@member, consented)
     end
     assert_select "#channels li:first-child", text: /consented/
+  end
+
+  test "같은 플랫폼의 두 브랜드 채널에 각각의 운영 상태를 표시한다" do
+    sign_in @pd
+    @member.ensure_personal_brand!.brand_channels.create!(platform: "naver_blog", account_handle: "personal",
+      delegation_consent_at: Time.current, session_status: "connected")
+    brand = @member.brands.create!(name: "다른 브랜드")
+    channel = brand.brand_channels.create!(platform: "naver_blog", account_handle: "other",
+      delegation_consent_at: Time.current, session_status: "connected")
+    SnsScheduledPost.create!(brand_channel: channel, platform: "naver_blog", title: "제목", message: "글",
+      scheduled_at: Time.current, status: "published", published_at: Time.current)
+
+    get pd_member_path(@member)
+
+    assert_response :ok
+    assert_select "#channels li", text: /네이버 블로그 · personal.*연결까지 끝났습니다/m
+    assert_select "#channels li", text: /네이버 블로그 · other.*운영 중 — 회원 화면에도/m
   end
 
   test "등록과 동의 상태로 검색 결과를 걸러 보고 각 회원 수를 표시한다" do

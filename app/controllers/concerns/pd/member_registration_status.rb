@@ -10,7 +10,8 @@ module Pd::MemberRegistrationStatus
         member: member,
         account_count: (member.profile_accounts.map(&:platform) & ProfileAccount::PLATFORMS.keys).size,
         channel_count: channels.map(&:platform).uniq.size,
-        consent_waiting: channels.count { |channel| !channel.delegated? }
+        consent_waiting: channels.count { |channel| !channel.delegated? },
+        connection_todo: channels.count { |channel| channel.delegated? && channel.session_status != "connected" }
       }
     end
   end

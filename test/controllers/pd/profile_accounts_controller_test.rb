@@ -311,6 +311,7 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     member = Member.create!(name: "요청 회원", email: "request@example.test", slug: "request")
     other = Member.create!(name: "기존 회원", email: "linked@example.test", slug: "linked")
     manual = member.profile_accounts.create!(platform: "linkedin", display_name: member.name)
+    channel = member.ensure_personal_brand!.brand_channels.create!(platform: "naver_blog", profile_account_id: manual.id)
     @account.update!(member: other)
 
     assert_no_difference "ProfileAccount.count" do
@@ -324,6 +325,44 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "이미 다른 회원에게 연결된 계정이에요.", flash[:alert]
     assert_equal other, @account.reload.member
     assert_equal member, manual.reload.member
+    assert_equal manual.id, channel.reload.profile_account_id
+  end
+
+  test "찾은 계정으로 바꾸면 손 등록 계정을 가리키던 채널 연결을 찾은 계정으로 옮긴다" do
+    member = Member.create!(name: "교체 회원", email: "replace-channel@example.test", slug: "replace-channel")
+    other = Member.create!(name: "다른 회원", email: "other-channel@example.test", slug: "other-channel")
+    manual = member.profile_accounts.create!(platform: "linkedin", display_name: member.name)
+    channel = member.ensure_personal_brand!.brand_channels.create!(platform: "naver_blog", profile_account_id: manual.id)
+    other_channel = other.ensure_personal_brand!.brand_channels.create!(platform: "naver_blog")
+    other_channel.update_column(:profile_account_id, manual.id)
+
+    patch pd_profile_account_path(@account), params: {
+      profile_account: { member_id: member.id }, link: "1", replace_id: manual.id
+    }
+
+    assert_response :see_other
+    assert_equal @account.id, channel.reload.profile_account_id
+    assert_predicate channel, :valid?
+    assert_nil other_channel.reload.profile_account_id
+    assert_not BrandChannel.exists?(profile_account_id: manual.id)
+  end
+
+  test "예약 글이 가리키는 손 등록 계정은 바꾸지 않는다" do
+    member = Member.create!(name: "예약 회원", email: "scheduled-replace@example.test", slug: "scheduled-replace")
+    manual = member.profile_accounts.create!(platform: "linkedin", display_name: member.name)
+    post = SnsScheduledPost.create!(profile_account: manual, platform: "linkedin", message: "글",
+      scheduled_at: 1.day.from_now, status: "scheduled")
+
+    assert_no_difference ["ProfileAccount.count", "SnsScheduledPost.count"] do
+      patch pd_profile_account_path(@account), params: {
+        profile_account: { member_id: member.id }, link: "1", replace_id: manual.id
+      }
+    end
+
+    assert_response :see_other
+    assert_equal "이 계정에는 이미 점검 기록이나 작성한 내용이 있어 바꿀 수 없어요.", flash[:alert]
+    assert_equal manual.id, post.reload.profile_account_id
+    assert_nil @account.reload.member_id
   end
 
   test "기존 계정을 연결하면 계정 수를 유지하고 회원 화면으로 돌아간다" do

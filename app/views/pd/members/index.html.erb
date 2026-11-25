@@ -13,7 +13,7 @@
 <% end %>
 
 <div class="mb-4 flex flex-wrap gap-3">
-  <% { nil => ["전체", :all], "progress" => ["등록 중", :progress], "todo" => ["등록 남음", :todo], "consent" => ["위탁 동의 대기", :consent] }.each do |filter, (label, count_key)| %>
+  <% { nil => ["전체", :all], "progress" => ["등록 중", :progress], "todo" => ["등록 남음", :todo], "consent" => ["위탁 동의 대기", :consent], "connection" => ["연결 남음", :connection] }.each do |filter, (label, count_key)| %>
     <% selected = @filter == filter %>
     <%= link_to "#{label} #{@counts.fetch(count_key)}", pd_members_path(q: params[:q].presence, filter: filter),
         aria: { current: ("true" if selected) }, style: "min-height: 44px;",
@@ -27,13 +27,14 @@
         when "progress" then "등록하다 만 회원이 없습니다."
         when "todo" then "등록이 남은 회원이 없습니다."
         when "consent" then "위탁 동의를 기다리는 회원이 없습니다."
+        when "connection" then "연결 설정이 남은 회원이 없습니다."
         else "조건에 맞는 회원이 없습니다."
         end %>
   </p>
 <% else %>
   <ul class="divide-y divide-gray-100 rounded-lg border border-gray-100 bg-white shadow-sm">
     <% @rows.each do |row| %>
-      <% member, account_count, channel_count, consent_waiting = row.values_at(:member, :account_count, :channel_count, :consent_waiting) %>
+      <% member, account_count, channel_count, consent_waiting, connection_todo = row.values_at(:member, :account_count, :channel_count, :consent_waiting, :connection_todo) %>
       <li class="flex flex-wrap items-center gap-x-2 gap-y-1 sm:gap-x-4 px-4 py-3 text-sm">
         <div class="w-full min-w-0 max-w-full grow break-words sm:w-auto">
           <strong class="text-navy"><%= member.name %></strong>
@@ -51,6 +52,9 @@
           <span class="text-gray-600">동의 대기 <%= consent_waiting %></span>
         <% elsif account_count == 2 && channel_count == 3 %>
           <span class="text-gray-600">등록 완료</span>
+        <% end %>
+        <% if connection_todo.positive? %>
+          <span class="text-gray-600">연결 남음 <%= connection_todo %></span>
         <% end %>
         <%= link_to "등록·확인", pd_member_path(member), class: "ml-auto inline-flex items-center text-primary hover:underline", style: "min-height: 44px;" %>
       </li>

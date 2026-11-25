@@ -244,6 +244,10 @@ class Pd::ProfileAccountsController < Pd::BaseController
         @account.notes = [@account.notes.presence, manual.notes].compact.join("\n")
       end
       @account.save!
+      BrandChannel.where(profile_account_id: manual.id, brand_id: @member.brands.select(:id))
+        .update_all(profile_account_id: @account.id, updated_at: Time.current)
+      BrandChannel.where(profile_account_id: manual.id)
+        .update_all(profile_account_id: nil, updated_at: Time.current)
       manual.destroy!
       alert = nil
     end

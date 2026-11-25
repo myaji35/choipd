@@ -22,6 +22,26 @@ module Pd::MembersHelper
     end
   end
 
+  def brand_channel_next_step(channel, state)
+    return [nil, nil, nil] unless channel.delegated?
+    return ["운영 중 — 회원 화면에도 '운영 중'으로 보입니다.", nil, nil] if state == :running
+
+    message = case channel.session_status
+    when "logged_out", "error"
+      "연결에 문제가 있습니다(#{BrandChannel::SESSION_STATUSES.fetch(channel.session_status)}). 회원 화면에는 '확인 중'으로 보입니다."
+    when "unknown"
+      "동의까지 끝났습니다. 다음은 연결 설정입니다. 연결해야 글을 올릴 수 있습니다."
+    when "connected"
+      return ["연결까지 끝났습니다. 첫 글을 올리면 회원 화면이 '운영 중'으로 바뀝니다.", nil, nil]
+    end
+
+    if current_admin_user.admin?
+      [message, "연결 설정 열기", edit_admin_brand_brand_channel_path(channel.brand_id, channel)]
+    else
+      ["#{message} 연결 설정은 운영자에게 요청해 주세요.", nil, nil]
+    end
+  end
+
   def member_login_status_label(member)
     member.withdrawn? ? "탈퇴" : member_status_label(member.status)
   end

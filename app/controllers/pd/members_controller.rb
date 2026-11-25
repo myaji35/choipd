@@ -1,9 +1,10 @@
 class Pd::MembersController < Pd::BaseController
   include Pd::MemberRegistrationStatus
-
-  helper_method :registration_in_progress?
+  include MemberAdmin::ChannelOverview
 
   CHANNEL_PLATFORMS = MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS
+
+  helper_method :registration_in_progress?
 
   def index
     members = Member.for_tenant.recent.search(params[:q]).includes(:profile_accounts, brands: :brand_channels)
@@ -13,11 +14,13 @@ class Pd::MembersController < Pd::BaseController
     filtered_rows = {
       "progress" => progress,
       "todo" => todo.sort_by.with_index { |row, index| [registration_in_progress?(row) ? 0 : 1, index] },
-      "consent" => rows.select { |row| row.fetch(:consent_waiting).positive? }
+      "consent" => rows.select { |row| row.fetch(:consent_waiting).positive? },
+      "connection" => rows.select { |row| row.fetch(:connection_todo).positive? }
     }
     @filter = params[:filter].presence_in(filtered_rows.keys)
     @rows = filtered_rows.fetch(@filter, rows)
-    @counts = { all: rows.size, progress: progress.size, todo: todo.size, consent: filtered_rows.fetch("consent").size }
+    @counts = { all: rows.size, progress: progress.size, todo: todo.size, consent: filtered_rows.fetch("consent").size,
+      connection: filtered_rows.fetch("connection").size }
   end
 
   def show
@@ -37,10 +40,8 @@ class Pd::MembersController < Pd::BaseController
 
       candidates[account.id] = groups.map { |group| group.select { |found| found.external_id.present? }.first(5) }
     end
-    @channels_by_platform = BrandChannel.joins(:brand)
-      .where(brands: { member_id: @member.id }, platform: CHANNEL_PLATFORMS.keys)
-      .order(brands: { personal: :desc }).order(:id)
-      .group_by(&:platform)
+    @channel_overview_by_platform = build_channel_overview.select { |item| item[:channel] }
+      .group_by { |item| item[:platform] }
   end
 
   private

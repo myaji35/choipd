@@ -29,7 +29,7 @@
 <section class="mb-8 rounded-lg border border-gray-100 bg-white p-4 shadow-sm">
   <h2 class="font-semibold text-navy">회원 대행 등록</h2>
   <% registration_link_class = "inline-flex items-center text-sm text-primary hover:underline" %>
-  <% if @registration_todo_count.zero? && @consent_waiting_count.zero? %>
+  <% if @registration_todo_count.zero? && @consent_waiting_count.zero? && @connection_todo_count.zero? %>
     <p class="mt-2 text-sm text-gray-600">지금 남은 대행 등록이 없습니다.</p>
     <%= link_to "회원 대행 등록 열기", pd_members_path, class: registration_link_class, style: "min-height: 44px;" %>
   <% else %>
@@ -39,6 +39,9 @@
       <% end %>
       <%= link_to "등록이 남은 회원 #{@registration_todo_count}명", pd_members_path(filter: "todo"), class: registration_link_class, style: "min-height: 44px;" %>
       <%= link_to "위탁 동의 대기 #{@consent_waiting_count}명", pd_members_path(filter: "consent"), class: registration_link_class, style: "min-height: 44px;" %>
+      <% if @connection_todo_count.positive? %>
+        <%= link_to "연결 설정 남은 회원 #{@connection_todo_count}명", pd_members_path(filter: "connection"), class: registration_link_class, style: "min-height: 44px;" %>
+      <% end %>
     </div>
   <% end %>
 </section>
