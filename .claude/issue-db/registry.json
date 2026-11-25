@@ -6038,7 +6038,7 @@
       "id": "ISS-528",
       "title": "[Plan:비즈니스검증] chopd-footer 규칙 3개 정적 검증",
       "type": "BIZ_VALIDATE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "biz-validator",
       "depth": 3,
@@ -6083,17 +6083,69 @@
           }
         ],
         "approved_at": "2026-11-25T01:31:40.074Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "risk": "T0 — 검증 작업, 코드·데이터 변경 없음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T01:47:44Z",
+          "reason": "바닥글 규칙 3개(문의 입구·서비스 링크 목적지·커뮤니티 제외)가 코드와 테스트로 지켜지는지 정적 검증"
+        },
+        "acceptance_criteria": [
+          "R1: chopd 레이아웃 바닥글에 /inquiries/new 문의 링크가 있다",
+          "R2: 서비스·하단 링크 목적지가 ISS-520 이전과 같다",
+          "R3: /community 는 chopd 바닥글을 렌더하지 않는다",
+          "규칙마다 근거 코드 위치 또는 테스트가 있다"
+        ]
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "coverage": 100,
+        "rules_total": 3,
+        "rules_covered": 3,
+        "critical_gaps": 0,
+        "gaps": [],
+        "commit": "3d216f4",
+        "criteria_check": [
+          {
+            "criterion": "R1: chopd 레이아웃 바닥글에 /inquiries/new 문의 링크가 있다",
+            "met": true,
+            "how": "chopd 레이아웃 5개 화면(교육·미디어·미디어 인사말·작품·문의) 모두 footer a[href=/inquiries/new] 'B2B/B2G 문의하기' assert_select 통과. chopd 레이아웃 사용 컨트롤러는 Chopd::BaseController 상속분뿐(home·community 는 impd)"
+          },
+          {
+            "criterion": "R2: 서비스·하단 링크 목적지가 ISS-520 이전과 같다",
+            "met": true,
+            "how": "교육 과정→/education, 한국환경저널→/media, 작품 갤러리→/works, 커뮤니티·뉴스레터 구독→/community, 하단 교육·미디어·작품 목적지 assert_select 통과"
+          },
+          {
+            "criterion": "R3: /community 는 chopd 바닥글을 렌더하지 않는다",
+            "met": true,
+            "how": "새 테스트 'impd layout pages do not render chopd footer' — / 와 /community 응답에 chopd 바닥글 고유 문구 없음"
+          },
+          {
+            "criterion": "규칙마다 근거 코드 위치 또는 테스트가 있다",
+            "met": true,
+            "how": "test/integration/public_pages_test.rb 두 테스트, app/controllers/chopd/{home,community}_controller.rb layout 'impd'"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/integration/public_pages_test.rb",
+            "exit_code": 0,
+            "output": "10 runs, 155 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T01:31:40.074Z"
+      "updated_at": "2026-11-25T01:47:44Z",
+      "completed_at": "2026-11-25T10:55:50.110871"
     },
     {
       "id": "ISS-529",
       "title": "[Plan:시나리오실행] chopd-footer 시나리오 1개 E2E 실행",
       "type": "SCENARIO_PLAY",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "scenario-player",
       "depth": 3,
@@ -6121,11 +6173,73 @@
           }
         ],
         "approved_at": "2026-11-25T01:31:40.074Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "risk": "T0 — 검증 작업, 코드·데이터 변경 없음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T01:47:44Z",
+          "reason": "390px 교육 화면 → 바닥글 문의하기 → 문의 폼 흐름을 실제 브라우저로 실행"
+        },
+        "acceptance_criteria": [
+          "390px 교육 화면 바닥글에 B2B/B2G 문의하기가 한 줄로 보인다",
+          "링크를 누르면 /inquiries/new 문의 폼이 200으로 열린다",
+          "흐름 중 콘솔 에러가 없다"
+        ]
       },
-      "result": null,
+      "result": {
+        "total_scenarios": 1,
+        "passed": 0,
+        "failed": 1,
+        "commit": "fb2e885",
+        "results": [
+          {
+            "id": "S1",
+            "name": "390px 교육 화면 바닥글 문의하기 → 문의 폼 (Turbo 이동 시 레이아웃 스크립트 오류)",
+            "status": "FAIL",
+            "failed_at": {
+              "step": "바닥글 'B2B/B2G 문의하기' 클릭 후 Turbo 로 문의 화면 표시",
+              "error": "pageerror: Failed to execute 'replaceWith' on 'Element': Identifier 'revealEls' has already been declared",
+              "file": "app/views/layouts/chopd.html.erb:116-132",
+              "cause": "레이아웃 body 의 인라인 <script> 가 최상위 const revealEls/observer 를 선언 — Turbo 가 화면을 바꿀 때 스크립트를 다시 실행해 재선언 오류로 중단, 새 화면의 .reveal 요소가 관찰되지 않음",
+              "impact": "chopd 화면 사이를 링크로 옮겨 다니면 .reveal 콘텐츠가 투명 상태로 남음 — /education→/works Turbo 이동 후 .reveal 20개 중 20개 opacity 0(첫 진입은 3/3 정상). 스크롤 진행바 리스너도 이동마다 중복 등록",
+              "reproduce": "node script/qa/footer_inquiry_flow.cjs (START=/education·/media·/works·/media/greeting·/inquiries/new 모두 동일 오류)"
+            }
+          }
+        ],
+        "criteria_check": [
+          {
+            "criterion": "390px 교육 화면 바닥글에 B2B/B2G 문의하기가 한 줄로 보인다",
+            "met": true,
+            "how": "linkFound true·linkVisible true·linkLines 1 (qa/ISS-529/footer-390.png)"
+          },
+          {
+            "criterion": "링크를 누르면 /inquiries/new 문의 폼이 200으로 열린다",
+            "met": true,
+            "how": "실제 클릭(Turbo fetch) 응답 200, finalPath /inquiries/new, form[action$=/inquiries] 표시"
+          },
+          {
+            "criterion": "흐름 중 콘솔 에러가 없다",
+            "met": false,
+            "how": "Turbo 이동 시 레이아웃 스크립트 재선언 오류 1건 — SCENARIO_FIX 로 분리"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/footer_inquiry_flow.cjs",
+            "exit_code": 1,
+            "output": "{\"start\":\"/education\",\"width\":390,\"linkFound\":true,\"linkVisible\":true,\"linkLines\":1,\"finalPath\":\"/inquiries/new\",\"status\":200,\"navigation\":\"fetch\",\"formFound\":true,\"consoleErrors\":1,\"consoleErrorItems\":[\"pageerror: Failed to execute 'replaceWith' on 'Element': Identifier 'revealEls' has already been declared\"],\"badResponses\":0}\nSUMMARY pass=false"
+          }
+        ],
+        "review": {
+          "gemini": "gemini-4-hydrogen-high 지적 2건(시작 경로가 이미 /inquiries/new 일 때 상태 누락 경쟁 조건, 이동 실패 시 결과 없이 종료) — 둘 다 코드상 맞음으로 판정, Codex 재위임 수정",
+          "opus": "Codex 1차안이 링크에 data-turbo=false 를 덧붙여 실제 사용자 길을 우회 — 제거 재위임. 실제 클릭으로 바꾸자 위 오류가 드러남"
+        }
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T01:31:40.074Z"
+      "updated_at": "2026-11-25T01:47:44Z",
+      "completed_at": "2026-11-25T10:56:07.603961"
     },
     {
       "id": "ISS-530",
@@ -6348,7 +6462,7 @@
       "id": "ISS-533",
       "title": "[Plan:테스트] ISS-531 변경사항 검증",
       "type": "RUN_TESTS",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "test-harness",
       "depth": 2,
@@ -6372,11 +6486,65 @@
           }
         ],
         "approved_at": "2026-11-25T01:41:46.751Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "risk": "T0 — 검증 작업, 코드·데이터 변경 없음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T01:47:44Z",
+          "reason": "ISS-531 교육 화면 분류 버튼 수정이 기존 테스트를 깨지 않았는지 확인하는 검증 카드"
+        },
+        "acceptance_criteria": [
+          "교육 화면 관련 통합 테스트(public_pages_test)가 통과한다",
+          "전체 Rails 테스트가 실패 0건이다",
+          "layout_check 분류 버튼 줄바꿈(pillWrapped) 지표가 /education 390·1280에서 0이다"
+        ]
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "total": 353,
+        "failed_count": 0,
+        "errors": 0,
+        "skips": 1,
+        "criteria_check": [
+          {
+            "criterion": "교육 화면 관련 통합 테스트(public_pages_test)가 통과한다",
+            "met": true,
+            "how": "10 runs, 155 assertions, 0 failures"
+          },
+          {
+            "criterion": "전체 Rails 테스트가 실패 0건이다",
+            "met": true,
+            "how": "353 runs, 2444 assertions, 0 failures, 0 errors, 1 skips (rbenv 3.3.14)"
+          },
+          {
+            "criterion": "layout_check 분류 버튼 줄바꿈(pillWrapped) 지표가 /education 390·1280에서 0이다",
+            "met": true,
+            "how": "ROUTES=/education layout_check — 1280·390 pillWrapped 0, SUMMARY pass=true"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test",
+            "exit_code": 0,
+            "output": "353 runs, 2444 assertions, 0 failures, 0 errors, 1 skips"
+          },
+          {
+            "cmd": "bin/rails test test/integration/public_pages_test.rb",
+            "exit_code": 0,
+            "output": "10 runs, 155 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "ROUTES=/education node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "/education 1280·390 hScroll false, pillWrapped 0, consoleErrors 0\nSUMMARY pass=true"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T01:41:46.751Z"
+      "updated_at": "2026-11-25T01:47:44Z",
+      "completed_at": "2026-11-25T10:56:36.750463"
     },
     {
       "id": "ISS-534",
@@ -6415,7 +6583,7 @@
       "id": "ISS-535",
       "title": "[Plan:UX리뷰] ISS-531 UI 변경 검증",
       "type": "UI_REVIEW",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "ux-harness",
       "depth": 2,
@@ -6437,11 +6605,59 @@
           }
         ],
         "approved_at": "2026-11-25T01:41:46.751Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "risk": "T0 — 검증 작업, 코드·데이터 변경 없음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T01:47:44Z",
+          "reason": "ISS-531 분류 버튼 변경이 모바일·좁은 폭에서 사용성을 해치지 않는지 UX 관점 확인"
+        },
+        "acceptance_criteria": [
+          "390px에서 분류 버튼 글자가 쪼개지지 않고 누를 수 있는 크기(높이 32px 이상)다",
+          "320px처럼 더 좁은 폭에서도 가로 스크롤 없이 줄 단위로 넘어간다",
+          "선택된 분류 버튼이 구분되어 보인다"
+        ]
       },
-      "result": null,
+      "result": {
+        "ux_pass": true,
+        "passed": true,
+        "issues": [],
+        "commit": "01a9b85",
+        "criteria_check": [
+          {
+            "criterion": "390px에서 분류 버튼 글자가 쪼개지지 않고 누를 수 있는 크기(높이 32px 이상)다",
+            "met": true,
+            "how": "layout_check 390: pillWrapped 0, pillMinHeight 37.5, pillShort 0"
+          },
+          {
+            "criterion": "320px처럼 더 좁은 폭에서도 가로 스크롤 없이 줄 단위로 넘어간다",
+            "met": true,
+            "how": "layout_check 320: hScroll false·clipped 0. 버튼 위치 측정 — 전체·온라인·오프라인 1줄(top 566), B2B/B2G 2줄(top 611), 글자 쪼개짐 없음"
+          },
+          {
+            "criterion": "선택된 분류 버튼이 구분되어 보인다",
+            "met": true,
+            "how": "선택 '전체' 배경 rgb(255,77,28)·흰 글자, 나머지 투명 배경·흰색 50% 글자(qa/ISS-535/education-320.png)"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "ROUTES=/education WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "{\"route\":\"/education\",\"width\":320,...,\"hScroll\":false,\"clipped\":0,\"pillWrapped\":0,\"pillMinHeight\":37.5,\"pillShort\":0,\"consoleErrors\":0,\"badResponses\":0}\nSUMMARY pass=true"
+          },
+          {
+            "cmd": "node --check script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "(출력 없음)"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T01:41:46.751Z"
+      "updated_at": "2026-11-25T01:47:44Z",
+      "completed_at": "2026-11-25T10:56:07.513512"
     },
     {
       "id": "ISS-536",
@@ -6479,7 +6695,7 @@
       "id": "ISS-537",
       "title": "[Plan:브라우저QA] ISS-531 콘솔 에러 + 스크린샷 검증",
       "type": "BROWSER_QA",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "agent-harness",
       "depth": 2,
@@ -6502,11 +6718,180 @@
           }
         ],
         "approved_at": "2026-11-25T01:41:46.751Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "risk": "T0 — 검증 작업, 코드·데이터 변경 없음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T01:47:44Z",
+          "reason": "ISS-531 화면에서 브라우저 콘솔 에러·깨진 응답이 없는지 실제 브라우저로 확인"
+        },
+        "acceptance_criteria": [
+          "/education 390·1280에서 콘솔 에러 0건, 4xx/5xx 응답 0건",
+          "분류 버튼이 한 줄 글자로 보이는 스크린샷이 남아 있다",
+          "가로 스크롤이 생기지 않는다"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "console_errors": 0,
+        "bad_responses": 0,
+        "criteria_check": [
+          {
+            "criterion": "/education 390·1280에서 콘솔 에러 0건, 4xx/5xx 응답 0건",
+            "met": true,
+            "how": "첫 진입 기준 consoleErrors 0·badResponses 0. (Turbo 로 다른 chopd 화면에서 들어올 때의 레이아웃 스크립트 오류는 ISS-531 변경과 무관한 기존 결함 — ISS-539 P0 로 분리)"
+          },
+          {
+            "criterion": "분류 버튼이 한 줄 글자로 보이는 스크린샷이 남아 있다",
+            "met": true,
+            "how": "qa/ISS-535/education-390.png·education-320.png (ISS-531 after 와 390·1280 바이트 동일), pillWrapped 0"
+          },
+          {
+            "criterion": "가로 스크롤이 생기지 않는다",
+            "met": true,
+            "how": "1280·390·320 모두 scrollWidth == clientWidth"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "ROUTES=/education node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "{\"route\":\"/education\",\"width\":390,...\"hScroll\":false,\"clipped\":0,\"pillWrapped\":0,\"consoleErrors\":0,\"badResponses\":0}\nSUMMARY pass=true"
+          }
+        ],
+        "related": [
+          "ISS-539"
+        ]
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T01:47:44Z",
+      "completed_at": "2026-11-25T10:56:36.835610"
+    },
+    {
+      "id": "ISS-538",
+      "title": "[Plan:디자인리뷰] ISS-535 시각적 완성도 검증",
+      "type": "DESIGN_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "design-critic",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-535",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:56:07.513512",
+      "payload": {
+        "files": [
+          "app/views/chopd/education/index.html.erb"
+        ],
+        "source_issue": "ISS-535",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-531 교육 화면 분류 버튼 변경의 시각 완성도 확인(UX 리뷰 ISS-535 통과 후속). 증거 이미지 qa/ISS-535 활용",
+          "risk": "T0 — 검증만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T10:56:25+09:00"
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T01:56:26.968Z",
+            "by": "auto",
+            "reason": "ISS-531 교육 화면 분류 버튼 변경의 시각 완성도 확인(UX 리뷰 ISS-535 통과 후속). 증거 이미지 qa/ISS-535 활용"
+          }
+        ],
+        "approved_at": "2026-11-25T01:56:26.968Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
       "result": null,
       "spawn_rules": [],
-      "updated_at": "2026-11-25T01:41:46.751Z"
+      "updated_at": "2026-11-25T01:56:26.968Z"
+    },
+    {
+      "id": "ISS-539",
+      "type": "FIX_BUG",
+      "priority": "P0",
+      "status": "READY",
+      "origin": "factory-observation",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": "ISS-529",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:56:25+09:00",
+      "updated_at": "2026-11-25T01:56:26.968Z",
+      "title": "[화면 깨짐] chopd 화면 사이를 링크로 이동하면 스크립트 오류로 콘텐츠(.reveal)가 투명하게 남음",
+      "description": "app/views/layouts/chopd.html.erb 하단 인라인 <script> 가 최상위 const revealEls·observer 를 선언한다. Turbo 가 화면을 바꿀 때 body 스크립트를 다시 실행해 'Identifier revealEls has already been declared' 로 중단되고, 새 화면의 .reveal 요소(opacity 0 시작)가 관찰되지 않아 안 보인 채 남는다. 스크롤 진행바 리스너도 이동마다 중복 등록된다. ISS-529 시나리오 실행 중 발견.",
+      "payload": {
+        "origin": "factory-observation",
+        "files": [
+          "app/views/layouts/chopd.html.erb"
+        ],
+        "scope_dir": "app/views/layouts",
+        "evidence": [
+          "node script/qa/footer_inquiry_flow.cjs → consoleErrorItems: pageerror ... Identifier 'revealEls' has already been declared (START /education·/media·/works·/media/greeting·/inquiries/new 모두 재현)",
+          "/education 첫 진입 .reveal 3/3 보임 → 바닥글 '작품 갤러리' Turbo 이동 후 /works .reveal 20개 중 20개 opacity 0 (끝까지 스크롤해도 그대로)"
+        ],
+        "acceptance_criteria": [
+          "chopd 화면 사이를 링크로 이동해도 콘솔 오류가 없다(footer_inquiry_flow.cjs SUMMARY pass=true)",
+          "Turbo 로 이동한 화면의 .reveal 콘텐츠가 스크롤하면 모두 보인다(투명으로 남는 요소 0개)",
+          "스크롤 진행바 리스너가 이동할 때마다 중복 등록되지 않는다",
+          "첫 진입 화면과 1280/390 layout_check 결과가 바뀌지 않는다",
+          "Turbo 이동 후 .reveal 표시를 확인하는 자동 점검이 있다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "작품·교육·미디어 화면을 메뉴나 바닥글 링크로 옮겨 가면 본문이 안 보이는 실사용 결함. 레이아웃 스크립트를 블록 범위로 감싸고 Turbo 이동 이벤트에 맞추는 작은 수정",
+          "risk": "T0 — 화면 스크립트만, 데이터 영향 없음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T10:56:25+09:00"
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T01:56:26.968Z",
+            "by": "auto",
+            "reason": "작품·교육·미디어 화면을 메뉴나 바닥글 링크로 옮겨 가면 본문이 안 보이는 실사용 결함. 레이아웃 스크립트를 블록 범위로 감싸고 Turbo 이동 이벤트에 맞추는 작은 수정"
+          }
+        ],
+        "approved_at": "2026-11-25T01:56:26.968Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": []
+    },
+    {
+      "id": "ISS-540",
+      "title": "[Plan:품질평가] ISS-533 품질 점수 산출",
+      "type": "SCORE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "eval-harness",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-533",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:56:36.750463",
+      "payload": {
+        "test_result": {
+          "passed": true,
+          "total": 353,
+          "coverage": null
+        },
+        "source_issue": "ISS-533",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-531 계열 테스트 통과(353건 실패 0) 후 품질 점수 산출 — 자동 후속",
+          "risk": "T0 — 평가만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T01:56:43Z"
+        }
+      },
+      "result": null,
+      "spawn_rules": []
     }
   ],
   "hooks": {
@@ -6752,6 +7137,36 @@
         "issue_type": "FIX_BUG",
         "plan_created": 5,
         "timestamp": "2026-11-25T10:41:46.027775"
+      },
+      {
+        "issue_id": "ISS-528",
+        "issue_type": "BIZ_VALIDATE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T10:55:50.110871"
+      },
+      {
+        "issue_id": "ISS-535",
+        "issue_type": "UI_REVIEW",
+        "plan_created": 1,
+        "timestamp": "2026-11-25T10:56:07.513512"
+      },
+      {
+        "issue_id": "ISS-529",
+        "issue_type": "SCENARIO_PLAY",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T10:56:07.603961"
+      },
+      {
+        "issue_id": "ISS-533",
+        "issue_type": "RUN_TESTS",
+        "plan_created": 1,
+        "timestamp": "2026-11-25T10:56:36.750463"
+      },
+      {
+        "issue_id": "ISS-537",
+        "issue_type": "BROWSER_QA",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T10:56:36.835610"
       }
     ],
     "on_fail": [],
@@ -10975,8 +11390,8 @@
     ]
   },
   "stats": {
-    "total_issues": 537,
-    "completed": 40,
+    "total_issues": 539,
+    "completed": 45,
     "failed": 0,
     "evolved": 223
   },
@@ -10998,18 +11413,27 @@
         "total": 352,
         "coverage": null
       }
+    },
+    {
+      "source_issue": "ISS-533",
+      "source_type": "RUN_TESTS",
+      "result": {
+        "passed": true,
+        "total": 353,
+        "coverage": null
+      }
     }
   ],
   "opus_budget_state": {
     "daily": {
       "date": "2026-11-25",
-      "cost_usd": 13.72,
-      "calls": 14
+      "cost_usd": 15.97,
+      "calls": 17
     },
     "monthly": {
       "month": "2026-11",
-      "cost_usd": 13.72,
-      "calls": 14
+      "cost_usd": 15.97,
+      "calls": 17
     },
     "demotion_active": false
   }
