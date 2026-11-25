@@ -12713,7 +12713,7 @@
       "id": "ISS-595",
       "title": "[문의] 교육 화면 문의 링크가 넘기는 유형(type=b2b)이 문의 양식에 반영되지 않아 '선택하세요'로 비어 있음",
       "type": "FIX_BUG",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P2",
       "assign_to": "agent-harness",
       "depth": 3,
@@ -12760,9 +12760,53 @@
         "approved_at": "2026-11-25T04:20:10.552Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
-      "result": null,
+      "result": {
+        "files_changed": [
+          "app/controllers/chopd/inquiries_controller.rb",
+          "app/views/chopd/education/index.html.erb",
+          "test/integration/education_filter_test.rb",
+          "test/integration/chopd_inquiry_type_prefill_test.rb"
+        ],
+        "commit": "fd10501",
+        "extra": "강좌 카드 문의하기도 B2B 강좌만 b2b, 개인 대상(온라인·오프라인) 강좌는 contact 로 — 같은 오분류라 함께",
+        "criteria_check": [
+          {
+            "criterion": "/inquiries/new?type=b2b 면 B2B/B2G 교육이 미리 선택",
+            "met": true,
+            "how": "curl 3099: <option selected value=b2b>B2B/B2G 교육"
+          },
+          {
+            "criterion": "type=contact 면 일반 문의, 없거나 알 수 없는 값이면 선택하세요",
+            "met": true,
+            "how": "curl: contact → 일반 문의 selected, hack·빈 값 → selected 없음"
+          },
+          {
+            "criterion": "교육 빈 안내 원하는 강좌 문의하기는 일반 문의(contact)로",
+            "met": true,
+            "how": "curl /education → href=/inquiries/new?type=contact 원하는 강좌 문의하기"
+          },
+          {
+            "criterion": "동작 확인 테스트가 있다",
+            "met": true,
+            "how": "chopd_inquiry_type_prefill_test.rb + education_filter_test 갱신"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_inquiry_type_prefill_test.rb test/integration/education_filter_test.rb test/integration/public_pages_test.rb",
+            "exit_code": 0,
+            "output": "20 runs, 226 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "curl -s http://127.0.0.1:3008/inquiries/new?type=b2b | grep selected",
+            "exit_code": 0,
+            "output": "<option selected=\"selected\" value=\"b2b\">B2B/B2G 교육 (worktree 3099 실측)"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "started_at": "2026-11-25T04:50:12.399807Z"
+      "started_at": "2026-11-25T04:50:12.399807Z",
+      "completed_at": "2026-11-25T13:51:30.577474"
     },
     {
       "id": "ISS-596",
@@ -13445,7 +13489,7 @@
       "id": "ISS-601",
       "title": "[Plan:테스트] ISS-571 변경사항 검증",
       "type": "RUN_TESTS",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "test-harness",
       "depth": 2,
@@ -13468,11 +13512,52 @@
           }
         ],
         "approved_at": "2026-11-25T04:43:54.027Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "회차 끝 전체 테스트로 ISS-571 변경 포함 검증 완료",
+          "risk": "T0",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:52:06Z"
+        },
+        "acceptance_criteria": [
+          "ISS-571 변경 후 관련 테스트 통과",
+          "전체 테스트 회귀 없음"
+        ]
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "total": 516,
+        "failed_count": 0,
+        "criteria_check": [
+          {
+            "criterion": "ISS-571 변경 후 관련 테스트 통과",
+            "met": true,
+            "how": "chopd_greeting_readability_test 등 12 runs 0 failures"
+          },
+          {
+            "criterion": "전체 테스트 회귀 없음",
+            "met": true,
+            "how": "main fd10501 bin/rails test 516 runs 0 failures"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test",
+            "exit_code": 0,
+            "output": "516 runs, 4553 assertions, 0 failures, 0 errors, 1 skips"
+          },
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_greeting_readability_test.rb",
+            "exit_code": 0,
+            "output": "0 failures, 0 errors"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T04:43:54.027Z"
+      "updated_at": "2026-11-25T04:43:54.027Z",
+      "completed_at": "2026-11-25T13:52:06.039262"
     },
     {
       "id": "ISS-602",
@@ -13640,6 +13725,94 @@
       "spawn_rules": [],
       "updated_at": "2026-11-25T04:43:54.027Z",
       "completed_at": "2026-11-25T13:44:12.156908"
+    },
+    {
+      "id": "ISS-606",
+      "title": "[린트] 디자인 루프 15회차(b8230f3) 내 채널 화면 파일 4개 RuboCop 배열 괄호 공백 위반 34건 정리",
+      "type": "STYLE_FIX",
+      "priority": "P1",
+      "status": "READY",
+      "assign_to": "agent-harness",
+      "origin": "factory-ship",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": null,
+      "depends_on": [],
+      "created_at": "2026-11-25T04:52:06Z",
+      "updated_at": "2026-11-25T04:52:06.213Z",
+      "description": "공장 회차 끝 bin/rubocop 이 34 offenses(Layout/SpaceInsideArrayLiteralBrackets, 자동 수정 가능)를 보고. 모두 다른 대화 세션의 디자인 루프 15회차 커밋 b8230f3 파일. 그 세션이 같은 시각 작업 중이라 이번 회차에서는 손대지 않음. ISS-600 과 같은 유형.",
+      "payload": {
+        "origin": "factory-ship",
+        "files": [
+          "app/controllers/concerns/member_admin/channel_overview.rb",
+          "app/helpers/member_admin/channels_helper.rb",
+          "test/controllers/member_admin/channels_controller_test.rb",
+          "test/integration/member_dashboard_channels_test.rb"
+        ],
+        "evidence": [
+          "bin/rubocop → 492 files inspected, 34 offenses detected, 17 offenses autocorrectable (2026-11-25 회차 끝)",
+          "git log -1 각 파일 → b8230f3 style(member-admin): 디자인 루프 15회차"
+        ],
+        "acceptance_criteria": [
+          "bin/rubocop 위반 0건",
+          "동작 변경 없음 — 관련 테스트(channels_controller_test, member_dashboard_channels_test) 통과",
+          "다른 세션이 같은 파일을 작업 중이면 worktree 에서 고치고 cherry-pick"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "출고 전 린트 통과 조건을 깨는 공백 위반뿐. 자동 수정(rubocop -a)으로 동작 변경 없이 정리 가능",
+          "risk": "T0 — 공백만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:52:06Z"
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T04:52:06.213Z",
+            "by": "auto",
+            "reason": "출고 전 린트 통과 조건을 깨는 공백 위반뿐. 자동 수정(rubocop -a)으로 동작 변경 없이 정리 가능"
+          }
+        ],
+        "approved_at": "2026-11-25T04:52:06.213Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": []
+    },
+    {
+      "id": "ISS-607",
+      "title": "[Plan:품질평가] ISS-601 품질 점수 산출",
+      "type": "SCORE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "eval-harness",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-601",
+      "depends_on": [],
+      "created_at": "2026-11-25T13:52:06.039262",
+      "payload": {
+        "test_result": {
+          "passed": true,
+          "total": 516,
+          "coverage": null
+        },
+        "source_issue": "ISS-601",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T04:52:06.213Z",
+            "by": "auto",
+            "reason": "「[Plan:품질평가] ISS-601 품질 점수 산출」(SCORE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T04:52:06.213Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T04:52:06.213Z"
     }
   ],
   "hooks": {
@@ -14311,6 +14484,18 @@
         "issue_type": "DESIGN_FIX",
         "plan_created": 0,
         "timestamp": "2026-11-25T13:50:12.339084"
+      },
+      {
+        "issue_id": "ISS-595",
+        "issue_type": "FIX_BUG",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T13:51:30.577474"
+      },
+      {
+        "issue_id": "ISS-601",
+        "issue_type": "RUN_TESTS",
+        "plan_created": 1,
+        "timestamp": "2026-11-25T13:52:06.039262"
       }
     ],
     "on_fail": [],
@@ -18553,8 +18738,8 @@
     ]
   },
   "stats": {
-    "total_issues": 604,
-    "completed": 111,
+    "total_issues": 607,
+    "completed": 113,
     "failed": 0,
     "evolved": 223
   },
@@ -18642,6 +18827,15 @@
       "result": {
         "passed": true,
         "total": 6,
+        "coverage": null
+      }
+    },
+    {
+      "source_issue": "ISS-601",
+      "source_type": "RUN_TESTS",
+      "result": {
+        "passed": true,
+        "total": 516,
         "coverage": null
       }
     }
