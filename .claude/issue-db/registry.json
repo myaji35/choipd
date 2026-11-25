@@ -5115,7 +5115,7 @@
       "priority": "P1",
       "origin": "next-prompt",
       "source_issue": "ISS-508",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "created_at": "2026-11-25T00:52:47.233054Z",
       "updated_at": "2026-11-25T09:58:13+09:00",
       "payload": {
@@ -5162,20 +5162,121 @@
           }
         ]
       },
-      "id": "ISS-519"
+      "id": "ISS-519",
+      "completed_at": "2026-11-25T10:01:35.715609",
+      "result": {
+        "commit": "4ea0ee9",
+        "files_created": [
+          "script/qa/layout_check.cjs",
+          "qa/ISS-508/home-1280.png",
+          "qa/ISS-508/home-390.png",
+          "qa/ISS-508/inquiries-new-1280.png",
+          "qa/ISS-508/inquiries-new-390.png"
+        ],
+        "measurements": [
+          {
+            "route": "/",
+            "width": 1280,
+            "file": "qa/ISS-508/home-1280.png",
+            "bytes": 574988,
+            "scrollWidth": 1280,
+            "clientWidth": 1280,
+            "hScroll": false,
+            "checked": 9,
+            "clipped": 0
+          },
+          {
+            "route": "/",
+            "width": 390,
+            "file": "qa/ISS-508/home-390.png",
+            "bytes": 486321,
+            "scrollWidth": 390,
+            "clientWidth": 390,
+            "hScroll": false,
+            "checked": 9,
+            "clipped": 0
+          },
+          {
+            "route": "/inquiries/new",
+            "width": 1280,
+            "file": "qa/ISS-508/inquiries-new-1280.png",
+            "bytes": 55426,
+            "scrollWidth": 1280,
+            "clientWidth": 1280,
+            "hScroll": false,
+            "checked": 6,
+            "clipped": 0
+          },
+          {
+            "route": "/inquiries/new",
+            "width": 390,
+            "file": "qa/ISS-508/inquiries-new-390.png",
+            "bytes": 46441,
+            "scrollWidth": 390,
+            "clientWidth": 390,
+            "hScroll": false,
+            "checked": 7,
+            "clipped": 0
+          }
+        ],
+        "criteria_check": [
+          {
+            "criterion": "4장의 스크린샷 파일이 존재하고 조합별 가로 스크롤·잘림 수치가 proof에 기록",
+            "met": true,
+            "how": "qa/ISS-508 에 4장 커밋, 조합별 scrollWidth/clientWidth/hScroll/checked/clipped 기록"
+          },
+          {
+            "criterion": "파일 경로·크기(바이트)가 proof에 있다",
+            "met": true,
+            "how": "home-1280 574988 / home-390 486321 / inquiries-new-1280 55426 / inquiries-new-390 46441"
+          },
+          {
+            "criterion": "네 조합 모두 가로 스크롤 없음",
+            "met": true,
+            "how": "scrollWidth == clientWidth (1280/1280, 390/390)"
+          },
+          {
+            "criterion": "주요 버튼·입력창이 화면 밖으로 잘리지 않음",
+            "met": true,
+            "how": "보이는 a.impd-btn·button·input·select·textarea 6~9개 검사, clipped 0"
+          },
+          {
+            "criterion": "다시 돌릴 수 있는 저장소 안 명령",
+            "met": true,
+            "how": "node script/qa/layout_check.cjs (npm i --prefix script/qa, 서버 127.0.0.1:3008)"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "/ 1280 bytes 574988 hScroll false checked 9 clipped 0 | / 390 bytes 486321 hScroll false checked 9 clipped 0 | /inquiries/new 1280 bytes 55426 hScroll false checked 6 clipped 0 | /inquiries/new 390 bytes 46441 hScroll false checked 7 clipped 0 | SUMMARY pass=true"
+          },
+          {
+            "cmd": "bin/rails test test/integration/inquiry_submit_contrast_test.rb test/integration/inquiries_form_test.rb",
+            "exit_code": 0,
+            "output": "3 runs, 40 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ],
+        "visual_review": "육안: 문의하기 390 폼·버튼 정상, 홈 390 첫 화면·하단 정상. chopd 바닥글 390px 비좁음(링크 글자 세로 쪼개짐) 발견 → ISS-520 분리 등록",
+        "followups": [
+          "ISS-520"
+        ],
+        "note": "chopd 레이아웃 body 에 overflow-x:hidden 이 있어 가로 스크롤 수치는 넘침을 가릴 수 있음 — 그래서 요소별 잘림 검사와 육안 확인을 함께 함"
+      }
     },
     {
       "id": "ISS-520",
       "type": "FIX_BUG",
       "priority": "P2",
-      "status": "READY",
+      "status": "IN_PROGRESS",
       "origin": "factory-observation",
       "depth": 1,
       "retry_count": 0,
       "parent_id": "ISS-519",
       "depends_on": [],
       "created_at": "2026-11-25T10:01:23+09:00",
-      "updated_at": "2026-11-25T10:01:23+09:00",
+      "updated_at": "2026-11-25T10:01:41+09:00",
       "title": "[모바일] 문의하기 등 chopd 화면 바닥글이 390px에서 비좁아 링크 글자가 세로로 쪼개짐",
       "description": "ISS-519 스크린샷(qa/ISS-508/inquiries-new-390.png) 육안 확인: chopd 레이아웃 바닥글이 390px 폭에서 3열을 유지해 '교육 과정'·'B2B/B2G 문의하기'가 줄바꿈되고, 맨 아래 줄 '교육/미디어/작품' 링크가 한 글자씩 세로로 쪼개진다. 가로 스크롤·화면 밖 잘림은 없음(수치 통과)이라 자동 점검으로는 안 잡힌다.",
       "payload": {
@@ -5200,7 +5301,24 @@
           "effort": "S",
           "by": "factory-runner",
           "at": "2026-11-25T10:01:23+09:00"
-        }
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T01:01:24.454Z",
+            "by": "auto",
+            "reason": "문의하기(B2B/B2G 매출 입구) 모바일 하단이 깨져 보여 신뢰감을 떨어뜨림. 바닥글 파셜의 반응형 클래스만 고치면 되는 작은 수정"
+          }
+        ],
+        "approved_at": "2026-11-25T01:01:24.454Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "factory_note": [
+          {
+            "at": "2026-11-25T10:01:41+09:00",
+            "by": "factory-runner",
+            "note": "착수. 원인: 바닥글 인라인 style grid 2fr 1fr 1fr / gap 48px 고정, 하단 링크 줄도 flex space-between 고정 — 모바일 분기 없음. Tailwind(CDN, chopd 레이아웃) 반응형 클래스로 전환."
+          }
+        ]
       }
     }
   ],
@@ -5393,6 +5511,12 @@
         "issue_type": "FEATURE",
         "plan_created": 0,
         "timestamp": "2026-11-25T09:58:04.381538"
+      },
+      {
+        "issue_id": "ISS-519",
+        "issue_type": "FEATURE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T10:01:35.715609"
       }
     ],
     "on_fail": [],
@@ -9363,7 +9487,7 @@
   },
   "stats": {
     "total_issues": 517,
-    "completed": 31,
+    "completed": 32,
     "failed": 0,
     "evolved": 211
   },
