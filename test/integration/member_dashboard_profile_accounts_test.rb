@@ -23,7 +23,7 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
       assert_select "article p", text: "등록은 운영자·PD에게 요청해 주세요.", count: 2
       assert_select "article ol li", text: /○/, count: 6
       assert_select "article .impd-label-muted", count: 2 do |labels|
-        assert_equal ["네이버 인물정보", "LinkedIn"], labels.map(&:text)
+        assert_equal [ "네이버 인물정보", "LinkedIn" ], labels.map(&:text)
       end
     end
     assert_select "a[href^='/pd/']", count: 0
@@ -89,7 +89,7 @@ class MemberDashboardProfileAccountsTest < ActionDispatch::IntegrationTest
     )
 
     sign_in_member
-    ["{", { experiences: 5 }].each do |data|
+    [ "{", { experiences: 5 } ].each do |data|
       account.profile_snapshots.create!(captured_at: Time.current, data: data)
       visit_dashboard
 

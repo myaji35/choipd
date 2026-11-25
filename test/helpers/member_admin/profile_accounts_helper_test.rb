@@ -21,7 +21,7 @@ class MemberAdmin::ProfileAccountsHelperTest < ActionView::TestCase
   end
 
   test "빈 아이디에는 마스킹 결과가 없다" do
-    [nil, "", "  "].each do |value|
+    [ nil, "", "  " ].each do |value|
       assert_nil masked_login_id(value)
     end
   end
