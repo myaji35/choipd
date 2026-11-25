@@ -1,6 +1,7 @@
 <% content_for :title, "에디터 — #{@member.name}" %>
 
 <div class="admin-page editor-page" style="--admin-page-max-width: 1200px;">
+  <%= render "member_admin/shared/checklist_arrival" %>
   <!-- 4단계 progress rail — 모두 클릭 가능. 각 단계별 완료 상태 표시. -->
   <%
     # 각 Step 완료 기준 (build_checklist 의 key 매핑)
@@ -77,11 +78,11 @@
 
     <div style="display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 40px;" class="editor-grid">
       <%# 좌: 기본 프로필 입력 폼 %>
-      <%= form_with url: slug_admin_editor_update_info_path(slug: @member.slug), method: :patch, local: true, data: { turbo: false, controller: "editor-info" } do %>
-        <fieldset class="editor-fields impd-card">
-          <legend class="impd-label" style="padding: 0 10px; color: var(--impd-accent);">기본 정보</legend>
-
-          <div style="margin-top: 16px;">
+      <section class="impd-card" aria-labelledby="basic-info-heading" data-controller="editor-info">
+        <h2 id="basic-info-heading" class="impd-label">기본 정보</h2>
+        <%= render "member_admin/editor/profile_photo" %>
+        <%= form_with url: slug_admin_editor_update_info_path(slug: @member.slug), method: :patch, local: true, class: "editor-fields", data: { turbo: false } do %>
+          <div id="bio" class="checklist-target" style="margin-top: 16px;">
             <label for="member_bio" class="impd-label-muted">자기소개</label>
             <textarea id="member_bio" name="member[bio]" rows="6" maxlength="200"
                       aria-describedby="member_bio_count" data-editor-info-target="bio" data-action="input->editor-info#updateBioCount"
@@ -89,7 +90,7 @@
             <p id="member_bio_count" class="impd-label-muted" style="margin-top: 6px;"><span data-editor-info-target="bioCount"><%= @member.bio.to_s.length %></span> / 200자 (50자 이상 권장)</p>
           </div>
 
-          <div style="margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+          <div id="profession-region" class="checklist-target" style="margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
             <div>
               <% preset_profession = Member::PROFESSIONS.include?(@member.profession) ? @member.profession : "custom" %>
               <label for="member_profession" class="impd-label-muted">직업</label>
@@ -137,12 +138,12 @@
 수상 - 방송대상 (2010)
 자격 - 사회복지사 2급"><%= @member.career_note %></textarea>
           </div>
-        </fieldset>
 
-        <button type="submit" class="impd-btn impd-btn-accent" style="margin-top: 20px; height: 52px; padding: 0 28px; font-size: 15px; width: 100%; justify-content: center;">
-          정보 저장하고 다음 →
-        </button>
-      <% end %>
+          <button type="submit" class="impd-btn impd-btn-accent" style="margin-top: 20px; height: 52px; padding: 0 28px; font-size: 15px; width: 100%; justify-content: center;">
+            정보 저장하고 다음 →
+          </button>
+        <% end %>
+      </section>
 
       <%# 우: AI 추출 달란트 요약 %>
       <div>
@@ -361,6 +362,17 @@
 </div>
 
 <style>
+  .profile-photo { margin-top: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--impd-rule); }
+  .profile-photo-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-block: 12px; }
+  .profile-photo-preview { width: 6rem; height: 6rem; border-radius: 50%; object-fit: cover; display: grid; place-items: center; background: var(--impd-paper); font-size: 2rem; }
+  .profile-photo-picker { position: relative; cursor: pointer; }
+  .profile-photo-picker input { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; }
+  .profile-photo-picker:focus-within, .profile-photo-choice:focus-visible { outline: 2px solid var(--impd-accent); outline-offset: 2px; }
+  #profile-photo-hint { margin-top: 6px; font-size: 13px; color: var(--impd-muted); }
+  .profile-photo-error { margin-top: 8px; font-weight: 600; }
+  .profile-photo-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .profile-photo-choice { padding: 0; border: 1px solid var(--impd-rule); background: var(--impd-paper); cursor: pointer; }
+  .profile-photo-choice img { display: block; width: 3.5rem; height: 3.5rem; object-fit: cover; }
   .editor-fields { min-inline-size: 0; }
   .editor-page select, .editor-fields :is(input, textarea) {
     max-width: 100%;

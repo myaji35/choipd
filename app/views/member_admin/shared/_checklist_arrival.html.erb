@@ -1,0 +1,8 @@
+<% if params[:from] == "checklist" %>
+  <aside class="checklist-arrival" aria-label="대시보드 할 일">
+    <% if (label = checklist_task_label) %>
+      <span>대시보드 할 일: <%= label %> · </span>
+    <% end %>
+    <%= link_to "대시보드로 돌아가기 ←", slug_admin_dashboard_path(slug: @member.slug) %>
+  </aside>
+<% end %>

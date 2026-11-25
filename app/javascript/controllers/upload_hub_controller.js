@@ -5,7 +5,13 @@ export default class extends Controller {
   static targets = ["tab", "panel"]
 
   connect() {
-    this.show("docs")
+    const hash = window.location.hash.slice(1)
+    const initialTab = new URLSearchParams(window.location.search).get("tab")
+    const id = [initialTab, hash].find(tab => tab === "media" || tab === "docs") || "docs"
+    const panel = this.panelTargets.find(target => target.dataset.panelId === id)
+    const scrollToPanel = hash === id && panel.hidden
+    this.show(id)
+    if (scrollToPanel) panel.scrollIntoView()
   }
 
   switch(event) {
@@ -16,6 +22,7 @@ export default class extends Controller {
   show(id) {
     this.tabTargets.forEach(btn => {
       const active = btn.dataset.tabId === id
+      btn.setAttribute("aria-pressed", active)
       btn.style.background = active ? "var(--impd-ink)" : "transparent"
       btn.style.color = active ? "var(--impd-paper)" : "var(--impd-ink)"
       btn.querySelectorAll(".impd-label").forEach(el => {
@@ -26,7 +33,7 @@ export default class extends Controller {
       })
     })
     this.panelTargets.forEach(panel => {
-      panel.style.display = panel.dataset.panelId === id ? "block" : "none"
+      panel.hidden = panel.dataset.panelId !== id
     })
   }
 }

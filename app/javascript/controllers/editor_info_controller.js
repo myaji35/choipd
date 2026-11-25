@@ -8,6 +8,11 @@ export default class extends Controller {
     this.toggleProfession()
   }
 
+  uploadProfilePhoto(event) {
+    const input = event.currentTarget
+    if (input.files.length > 0) input.form.requestSubmit()
+  }
+
   updateBioCount() {
     this.bioCountTarget.textContent = Array.from(this.bioTarget.value).length
   }

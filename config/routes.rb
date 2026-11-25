@@ -354,6 +354,7 @@ Rails.application.routes.draw do
       resources :documents, only: [ :create, :update, :destroy ] do
         member { post :reparse }
       end
+      patch "/profile_photo", to: "profile_photos#update", as: :profile_photo
       resources :photos, only: [ :create, :update, :destroy ]
       resources :services, controller: "services", only: [ :index, :create, :update, :destroy ] do
         collection { post :reorder }

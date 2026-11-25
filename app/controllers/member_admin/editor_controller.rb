@@ -6,6 +6,11 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
   # PATCH /<slug>/admin/editor/publish       (Step 4 발행)
   def show
     @step = (params[:step] || 1).to_i.clamp(1, 4)
+    if @step == 2
+      @profile_photo_choices = @member.member_photos.joins(image_attachment: :blob)
+        .where(active_storage_blobs: { content_type: MemberPhoto::IMAGE_TYPES })
+        .with_attached_image.order(uploaded_at: :desc, id: :desc).limit(8)
+    end
     @documents = @member.member_documents.order(uploaded_at: :desc)
     @portfolio_count = @member.member_portfolio_items.count
     @services_count  = @member.member_services.count

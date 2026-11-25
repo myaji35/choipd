@@ -1,22 +1,22 @@
 <%# 단일 업로드 허브 — 자료·사진·영상을 하나의 카드 UI에서 탭으로 전환 %>
 <% photo_categories = MemberPhoto::CATEGORIES %>
 <% photos = member.member_photos.ordered.limit(24) %>
-<% docs   = member.member_documents.order(uploaded_at: :desc).limit(8) %>
+<% initial_tab = params[:tab] == "media" ? "media" : "docs" %>
 
 <section data-controller="upload-hub"
          style="background: var(--impd-card); border: 1px solid var(--impd-rule);">
   <%# Tab bar %>
   <div style="display: flex; align-items: stretch; border-bottom: 1px solid var(--impd-ink);">
     <button type="button" data-action="click->upload-hub#switch" data-upload-hub-tab-param="docs"
-            data-upload-hub-target="tab" data-tab-id="docs"
-            style="flex: 1; padding: 18px 20px; background: var(--impd-ink); color: var(--impd-paper); border: 0; cursor: pointer; text-align: left; border-right: 1px solid var(--impd-ink);">
-      <div class="impd-label" style="color: rgba(255,255,255,0.55); margin-bottom: 4px;">자료</div>
+            data-upload-hub-target="tab" data-tab-id="docs" aria-controls="docs" aria-pressed="<%= initial_tab == "docs" %>"
+            style="flex: 1; padding: 18px 20px; background: <%= initial_tab == "docs" ? "var(--impd-ink)" : "transparent" %>; color: <%= initial_tab == "docs" ? "var(--impd-paper)" : "var(--impd-ink)" %>; border: 0; cursor: pointer; text-align: left; border-right: 1px solid var(--impd-ink);">
+      <div class="impd-label" style="margin-bottom: 4px;">자료</div>
       <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 18px; letter-spacing: -0.4px;">이력 · 수료증 · 포트폴리오</div>
-      <div style="font-size: 13px; color: rgba(255,255,255,0.55); margin-top: 6px;"><%= member.member_documents.count %>개 자료</div>
+      <div style="font-size: 13px; color: var(--impd-muted); margin-top: 6px;"><%= member.member_documents.count %>개 자료</div>
     </button>
     <button type="button" data-action="click->upload-hub#switch" data-upload-hub-tab-param="media"
-            data-upload-hub-target="tab" data-tab-id="media"
-            style="flex: 1; padding: 18px 20px; background: transparent; color: var(--impd-ink); border: 0; cursor: pointer; text-align: left;">
+            data-upload-hub-target="tab" data-tab-id="media" aria-controls="media" aria-pressed="<%= initial_tab == "media" %>"
+            style="flex: 1; padding: 18px 20px; background: <%= initial_tab == "media" ? "var(--impd-ink)" : "transparent" %>; color: <%= initial_tab == "media" ? "var(--impd-paper)" : "var(--impd-ink)" %>; border: 0; cursor: pointer; text-align: left;">
       <div class="impd-label" style="margin-bottom: 4px;">사진·영상</div>
       <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 18px; letter-spacing: -0.4px;">일상·작업·후기 장면</div>
       <div style="font-size: 13px; color: var(--impd-muted); margin-top: 6px;"><%= member.member_photos.count %>개 사진·영상</div>
@@ -24,11 +24,13 @@
   </div>
 
   <%# Tab panels %>
-  <div data-upload-hub-target="panel" data-panel-id="docs" style="padding: 28px 24px;">
+  <div id="docs" class="checklist-target" data-upload-hub-target="panel" data-panel-id="docs"
+       style="padding: 28px 24px;" <%= "hidden" unless initial_tab == "docs" %>>
     <%= render "member_admin/editor/dropzone", member: member %>
   </div>
 
-  <div data-upload-hub-target="panel" data-panel-id="media" style="padding: 28px 24px; display: none;">
+  <div id="media" class="checklist-target" data-upload-hub-target="panel" data-panel-id="media"
+       style="padding: 28px 24px;" <%= "hidden" unless initial_tab == "media" %>>
     <%= render "member_admin/editor/photo_dropzone", member: member, categories: photo_categories %>
 
     <% if photos.any? %>

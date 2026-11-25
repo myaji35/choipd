@@ -1,6 +1,7 @@
 <% content_for :title, "서비스 / 가격 관리 — #{@member.name}" %>
 
 <div class="impd-wrap" style="max-width: 1120px; margin: 0 auto; padding: 40px;">
+  <%= render "member_admin/shared/checklist_arrival" %>
   <header style="margin-bottom: 32px;">
     <p class="impd-label-muted">SERVICES · /<%= @member.slug %></p>
     <h1 class="impd-display" style="font-size: 44px; margin-top: 12px;">서비스 / 가격 관리</h1>
@@ -54,7 +55,7 @@
       <% end %>
     </section>
 
-    <section class="impd-card" style="position: sticky; top: 88px;">
+    <section id="new-service" class="impd-card checklist-target" style="position: sticky; top: 88px;">
       <div class="impd-section-header" style="margin-bottom: 20px;">
         <span class="impd-label">§02</span>
         <h2 class="impd-display" style="font-size: 24px;">신규 등록</h2>

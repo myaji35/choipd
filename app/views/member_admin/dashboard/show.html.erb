@@ -24,7 +24,7 @@
         <% if next_item %>
           <h2 style="font-size: 24px; margin-top: 10px;"><%= next_item[:label] %></h2>
           <p style="font-size: 14px; color: var(--impd-muted); margin: 8px 0 18px;"><%= next_item[:why] %></p>
-          <%= link_to "바로 하기", next_item[:path], class: "impd-btn impd-btn-accent" %>
+          <%= link_to next_item[:action], next_item[:path], class: "impd-btn impd-btn-accent" %>
         <% else %>
           <p style="margin-top: 10px;">체크리스트를 모두 완료했어요.</p>
         <% end %>
@@ -32,7 +32,12 @@
           <summary style="cursor: pointer;">전체 체크리스트 <%= @checklist.count { |item| item[:done] } %>/<%= @checklist.size %></summary>
           <ul style="list-style: none; padding: 8px 0 0;">
             <% @checklist.each do |item| %>
-              <li style="padding: 6px 0;"><%= lni_icon(item[:done] ? "check-circle-1" : "question-mark-circle") %> <%= item[:label] %></li>
+              <li style="padding: 6px 0;">
+                <%= lni_icon(item[:done] ? "check-circle-1" : "question-mark-circle") %> <%= item[:label] %>
+                <% unless item[:done] %>
+                  · <%= link_to item[:action], item[:path] %>
+                <% end %>
+              </li>
             <% end %>
           </ul>
         </details>

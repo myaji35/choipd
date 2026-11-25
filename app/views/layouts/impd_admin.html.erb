@@ -59,7 +59,19 @@
   <body class="impd-admin">
     <a class="skip-link" href="#main-content">본문 바로가기</a>
     <style>
+      .checklist-arrival { position: sticky; top: 0; z-index: 10; margin-bottom: 16px; padding: 8px 12px; border-inline-start: 3px solid var(--impd-accent); background: var(--impd-card); font-size: 13px; }
+      .checklist-arrival a { color: var(--impd-accent); }
+      .checklist-target { scroll-margin-top: 88px; }
+      .checklist-target:target { animation: checklist-highlight 2s ease-out; }
+      @keyframes checklist-highlight {
+        0%, 40% { outline: 2px solid var(--impd-accent); outline-offset: 3px; }
+        100% { outline: 2px solid transparent; outline-offset: 3px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .checklist-target:target { animation: none; outline: 2px solid var(--impd-accent); }
+      }
       .admin-header { width: 100%; position: sticky; top: 0; z-index: 20; }
+      .impd-admin:has(.checklist-arrival) .admin-header { position: relative; }
       .admin-impersonation-banner { padding: 10px 18px; background: var(--impd-ink); color: var(--impd-paper); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
       .admin-impersonation-banner a { display: inline-block; font-weight: 700; text-decoration: underline; }
       .admin-nav { background: var(--impd-paper); border-bottom: 1px solid var(--impd-rule); }
