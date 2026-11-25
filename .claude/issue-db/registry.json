@@ -12302,7 +12302,7 @@
       "id": "ISS-591",
       "title": "[브랜드] chopd 헤더의 직접 그린 아이콘 2개(강좌 문의 말풍선·모바일 메뉴 줄 세 개)를 LineIcons 로 교체",
       "type": "DESIGN_FIX",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "assign_to": "agent-harness",
       "depth": 3,
@@ -12359,10 +12359,57 @@
           "at": "2026-11-25T04:09:30Z"
         }
       },
-      "result": null,
+      "result": {
+        "files_changed": [
+          "app/views/layouts/_chopd_header.html.erb",
+          "test/integration/chopd_header_icons_test.rb"
+        ],
+        "commit": "677c8a4",
+        "criteria_check": [
+          {
+            "criterion": "chopd 헤더에 직접 그린 svg 가 0개다(LineIcons 로 표시)",
+            "met": true,
+            "how": "assert_select header#nav svg count 0, lni-chat-bubble-2·lni-menu-hamburger-1 존재. 브라우저에서 font-family Lineicons 확인"
+          },
+          {
+            "criterion": "모바일 메뉴 버튼 aria-label 메뉴·열고 닫기 동작 그대로(chopd_mobile_menu_check)",
+            "met": true,
+            "how": "BASE_URL=3099(worktree) chopd_mobile_menu_check SUMMARY pass=true — 열림 flex/expanded true, 닫힘 none/false"
+          },
+          {
+            "criterion": "1280·390·320 에서 아이콘이 보이고 버튼 크기·색 유지(layout_check)",
+            "met": true,
+            "how": "layout_check /education,/media/greeting 3폭 pass. 아이콘 14×14(1280 문의), 22px(390 메뉴), 메뉴 버튼 34.9×34(이전 34×34), 색 #fff/#f5f4f0 유지"
+          },
+          {
+            "criterion": "아이콘이 LineIcons 인지 확인하는 테스트",
+            "met": true,
+            "how": "test/integration/chopd_header_icons_test.rb"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_header_icons_test.rb test/integration/chopd_header_links_test.rb test/integration/chopd_header_member_session_test.rb",
+            "exit_code": 0,
+            "output": "6 runs, 70 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "BASE_URL=http://127.0.0.1:3099 node script/qa/chopd_mobile_menu_check.cjs",
+            "exit_code": 0,
+            "output": "SUMMARY pass=true"
+          },
+          {
+            "cmd": "ROUTES=/education,/media/greeting WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "SUMMARY pass=true"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T04:09:30Z",
-      "origin": "factory-observation"
+      "updated_at": "2026-11-25T04:44:15.889028Z",
+      "origin": "factory-observation",
+      "started_at": "2026-11-25T04:44:15.889028Z",
+      "completed_at": "2026-11-25T13:47:51.739879"
     },
     {
       "id": "ISS-592",
@@ -12479,7 +12526,7 @@
       "id": "ISS-593",
       "title": "[대비] chopd 헤더·모바일 메뉴 '강좌 문의' 버튼 흰 글자가 주황 배경 위 3.32:1 — 문의 양식 버튼처럼 어두운 글자로",
       "type": "DESIGN_FIX",
-      "status": "READY",
+      "status": "IN_PROGRESS",
       "priority": "P2",
       "assign_to": "agent-harness",
       "depth": 3,
@@ -12487,7 +12534,7 @@
       "parent_id": "ISS-589",
       "depends_on": [],
       "created_at": "2026-11-25T04:20:09Z",
-      "updated_at": "2026-11-25T04:20:10.552Z",
+      "updated_at": "2026-11-25T04:48:00.774618Z",
       "origin": "factory-observation",
       "payload": {
         "origin": "factory-observation",
@@ -12527,7 +12574,8 @@
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
       "result": null,
-      "spawn_rules": []
+      "spawn_rules": [],
+      "started_at": "2026-11-25T04:48:00.774618Z"
     },
     {
       "id": "ISS-594",
@@ -14206,6 +14254,12 @@
         "issue_type": "BROWSER_QA",
         "plan_created": 0,
         "timestamp": "2026-11-25T13:44:12.156908"
+      },
+      {
+        "issue_id": "ISS-591",
+        "issue_type": "DESIGN_FIX",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T13:47:51.739879"
       }
     ],
     "on_fail": [],
@@ -18449,7 +18503,7 @@
   },
   "stats": {
     "total_issues": 604,
-    "completed": 109,
+    "completed": 110,
     "failed": 0,
     "evolved": 223
   },
