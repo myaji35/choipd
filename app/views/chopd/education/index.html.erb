@@ -158,13 +158,17 @@
 <!-- ══ 필터 바 ═════════════════════════════════ -->
 <div class="filter-bar">
   <%= link_to "전체", education_path,
-      class: "filter-pill #{params[:type].blank? ? 'active' : ''}" %>
+      class: "filter-pill #{@course_type.nil? ? 'active' : ''}",
+      aria: { current: ("page" if @course_type.nil?) } %>
   <%= link_to "온라인", education_path(type: 'online'),
-      class: "filter-pill #{params[:type] == 'online' ? 'active-online active' : ''}" %>
+      class: "filter-pill #{@course_type == 'online' ? 'active-online active' : ''}",
+      aria: { current: ("page" if @course_type == 'online') } %>
   <%= link_to "오프라인", education_path(type: 'offline'),
-      class: "filter-pill #{params[:type] == 'offline' ? 'active-offline active' : ''}" %>
+      class: "filter-pill #{@course_type == 'offline' ? 'active-offline active' : ''}",
+      aria: { current: ("page" if @course_type == 'offline') } %>
   <%= link_to "B2B/B2G", education_path(type: 'b2b'),
-      class: "filter-pill #{params[:type] == 'b2b' ? 'active-b2b active' : ''}" %>
+      class: "filter-pill #{@course_type == 'b2b' ? 'active-b2b active' : ''}",
+      aria: { current: ("page" if @course_type == 'b2b') } %>
 </div>
 
 <!-- ══ 강좌 목록 ════════════════════════════════ -->
