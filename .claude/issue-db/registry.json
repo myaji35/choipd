@@ -2588,7 +2588,7 @@
       "id": "ISS-485",
       "type": "FIX_BUG",
       "priority": "P2",
-      "status": "READY",
+      "status": "BLOCKED",
       "parent": "ISS-480",
       "title": "[법적 고지] 개인정보처리방침 보호책임자 공개 이메일(또는 전화) 기입",
       "description": "ISS-480에서 성명·직책은 반영했고 이메일 칸 3곳은 임시로 '문의하기' 연결. 개인정보보호법상 보호책임자 연락처(전화·이메일 중 하나 이상) 공개가 필요하다.",
@@ -2604,12 +2604,12 @@
           "app/views/legal/privacy.html.erb"
         ],
         "recommendation": {
-          "verdict": "승인 권장",
-          "reason": "대표님 결정(D. 보류 — 지금은 정하지 않음) — 이 결정대로 진행",
-          "risk": "—",
-          "effort": "—",
-          "by": "관제실 결정",
-          "at": "2026-11-25T02:47:07.263Z"
+          "verdict": "보류 권장",
+          "reason": "대표님이 공개 연락처를 아직 정하지 않기로(보류) 결정. 값 없이 구현할 수 없고 추측해 공개하면 되돌릴 수 없음(공개 주소는 회수 불가). 값이 들어오면 privacy.html.erb 3곳 교체로 바로 끝남",
+          "risk": "T2 — 개인정보·공개 연락처",
+          "effort": "XS(값 입력 후)",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:23:19Z"
         },
         "recall_checked": {
           "at": "2026-11-24T10:41:13Z",
@@ -2669,7 +2669,7 @@
         "approved_at": "2026-11-25T02:47:07.263Z",
         "approved_by": "대표님(헤르메스)",
         "ask_kind": "provide_value",
-        "ask_prompt": "개인정보처리방침에 공개할 보호책임자 연락처(업무용 이메일 또는 전화) 하나를 정하시면 입력칸에 적어 주세요. 지금은 보류로 두셨으므로 다시 묻지 않고 기다립니다.",
+        "ask_prompt": "개인정보처리방침에 공개할 보호책임자 연락처(이메일 또는 전화) 하나가 정해지면 입력칸에 적어 주세요 — 지금은 대표님 \"보류\" 결정대로 멈춰 둡니다.",
         "recall_gate_note": "기억 검색이 찾았다고 판정했지만 실제 내용은 연락처 빈칸 + 재확인 컨펌 문서가 11-21~11-24 매일 대기 목록에 남아 있다는 기록뿐이다(값 없음). 컨펌/ 루트에 아직 필기 전 상태로 있음.",
         "question": "개인정보 보호책임자 문의용으로 공개할 이메일(또는 전화번호)은 무엇입니까?",
         "options": [
@@ -2726,9 +2726,10 @@
           "question": "개인정보 보호책임자 문의용으로 공개할 이메일(또는 전화번호)은 무엇입니까?",
           "by": "대표님(헤르메스)",
           "at": "2026-11-25T02:47:07.263Z"
-        }
+        },
+        "hold_reason": "대표님 결정 D(보류, 2026-11-25 02:47Z) — 재질문하지 않고 연락처 값이 들어올 때까지 이 카드만 멈춤. 방침 페이지는 현재 문의하기 연결로 동작 중."
       },
-      "updated_at": "2026-11-25T02:47:07.263Z",
+      "updated_at": "2026-11-25T03:23:19Z",
       "blocked_reason": "공개 연락처 값 대기(관제 결정 D 보류). 성명·직책은 ISS-480 에서 반영, 이메일 칸 3곳은 임시로 문의하기 연결."
     },
     {
@@ -8602,14 +8603,14 @@
       "title": "[접근성] 교육 화면 빈 목록 안내 글자 대비 부족(rgba .3, 약 2.6:1) — 다음 행동 안내 없음",
       "type": "FIX_BUG",
       "priority": "P3",
-      "status": "READY",
+      "status": "DONE",
       "origin": "factory-observation",
       "depth": 1,
       "retry_count": 0,
       "parent_id": "ISS-530",
       "depends_on": [],
       "created_at": "2026-11-25T11:25:22+09:00",
-      "updated_at": "2026-11-25T02:25:22.660Z",
+      "updated_at": "2026-11-25T03:23:19Z",
       "description": "강좌가 없을 때 '등록된 강좌가 없습니다 / 곧 새로운 강좌가 추가될 예정입니다' 안내가 rgba(255,255,255,.3) 이하라 4.5:1 미달, 문의로 이어지는 다음 행동도 없다(brand-dna 금지 패턴 '빈 구역 그대로 노출').",
       "payload": {
         "origin": "factory-observation",
@@ -8646,8 +8647,55 @@
         "approved_at": "2026-11-25T02:25:22.660Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
-      "result": null,
-      "spawn_rules": []
+      "result": {
+        "commit": "3704c35",
+        "files_modified": [
+          "app/views/chopd/education/index.html.erb",
+          "test/integration/education_filter_test.rb"
+        ],
+        "review": {
+          "gemini": "gemini-4-hydrogen-high — 결함 없음",
+          "opus": "diff 범위 확인(다른 세션의 member_admin 변경은 제외하고 두 파일만 커밋), 1280·390·320 브라우저 실측"
+        },
+        "contrast": {
+          "empty_title": "2.6→10.09",
+          "empty_sub": "≈1.8→7.24",
+          "cta": "9.03"
+        },
+        "criteria_check": [
+          {
+            "criterion": "빈 목록 안내 글자 대비가 4.5:1 이상이다",
+            "met": true,
+            "how": "playwright 실측(배경 #0a0e1a 합성) 1280·390·320 모두 첫 줄 10.09, 둘째 줄 7.24, 문의 링크 9.03"
+          },
+          {
+            "criterion": "빈 목록에서 강좌 문의(/inquiries/new)로 가는 링크가 하나 있다",
+            "met": true,
+            "how": "'원하는 강좌 문의하기' → /inquiries/new?type=b2b, 높이 44px, 통합 테스트로 1개 확인"
+          },
+          {
+            "criterion": "강좌가 있을 때 화면은 바뀌지 않는다",
+            "met": true,
+            "how": "공개 강좌 있을 때 .empty-state·.empty-state-cta 0개 테스트, 강좌 카드 마크업 diff 없음"
+          },
+          {
+            "criterion": "빈 목록 상태를 확인하는 테스트가 있다",
+            "met": true,
+            "how": "education_filter_test.rb 빈 상태·비노출 테스트 2개 추가"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "5 runs, 0 failures, 0 errors, 0 skips"
+          }
+        ],
+        "lint_fix_commit": "c9cdf49"
+      },
+      "spawn_rules": [],
+      "started_at": "2026-11-25T03:23:19Z",
+      "completed_at": "2026-11-25T12:27:30.445988"
     },
     {
       "id": "ISS-553",
@@ -9065,14 +9113,14 @@
       "title": "[죽은 링크] chopd 헤더·모바일 메뉴 '소개'가 없는 #identity 를 가리켜 눌러도 아무 일 없음(모바일 메뉴도 안 닫힘)",
       "type": "FIX_BUG",
       "priority": "P2",
-      "status": "READY",
+      "status": "DONE",
       "origin": "factory-observation",
       "depth": 1,
       "retry_count": 0,
       "parent_id": "ISS-553",
       "depends_on": [],
       "created_at": "2026-11-25T02:54:53Z",
-      "updated_at": "2026-11-25T02:54:54.853Z",
+      "updated_at": "2026-11-25T03:23:19Z",
       "description": "chopd 레이아웃 헤더의 '소개' 링크(데스크톱 nav-link·모바일 mobile-nav-link)가 '#identity' 를 가리키는데, id=\"identity\" 는 쓰이지 않는 index_dark_legacy.html.erb 에만 있다. /education·/works·/media·/community 어디에서도 대상이 없어 눌러도 이동하지 않고, 모바일에서는 메뉴가 열린 채로 남는다.",
       "payload": {
         "origin": "factory-observation",
@@ -9108,8 +9156,53 @@
         "approved_at": "2026-11-25T02:54:54.853Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
-      "result": null,
-      "spawn_rules": []
+      "result": {
+        "commit": "ff54c2c",
+        "files_modified": [
+          "app/views/layouts/_chopd_header.html.erb",
+          "test/integration/chopd_header_links_test.rb"
+        ],
+        "change": "'소개' 링크 #identity → /media/greeting(최범희 발행인 인사말, /choipd 는 플랫폼 소개라 제외). 모바일 메뉴 안 링크 클릭 시 메뉴 닫힘",
+        "review": {
+          "gemini": "gemini-4-hydrogen-high — 결함 없음",
+          "opus": "diff 범위 확인, 390·1280 브라우저 클릭 실측"
+        },
+        "followups": [
+          "ISS-571 인사말 화면 대비·겹침"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "'소개'를 누르면 최범희 PD 소개가 있는 실제 화면으로 이동한다(데스크톱·모바일 모두)",
+            "met": true,
+            "how": "playwright 1280 nav-link·390 모바일 메뉴 클릭 → URL /media/greeting, h1 '발행인 인사말', 콘솔 에러 0"
+          },
+          {
+            "criterion": "모바일 메뉴에서 '소개'를 누른 뒤 메뉴가 열린 채로 남지 않는다",
+            "met": true,
+            "how": "390 클릭 후 #mobile-nav.open=false, chopd_mobile_menu_check pass=true"
+          },
+          {
+            "criterion": "chopd 헤더의 모든 링크 대상이 존재함을 확인하는 자동 점검 또는 테스트가 있다",
+            "met": true,
+            "how": "test/integration/chopd_header_links_test.rb — # 앵커 0, '소개' 대상 확인, 내부 링크 전부 200/3xx"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/integration/chopd_header_links_test.rb test/integration/education_filter_test.rb",
+            "exit_code": 0,
+            "output": "4 runs, 46 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "node script/qa/chopd_mobile_menu_check.cjs",
+            "exit_code": 0,
+            "output": "educationClosed display none expanded false, consoleErrors 0 / SUMMARY pass=true"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "started_at": "2026-11-25T03:23:19Z",
+      "completed_at": "2026-11-25T12:25:27.072084"
     },
     {
       "id": "ISS-558",
@@ -9191,7 +9284,7 @@
       "id": "ISS-559",
       "title": "[Plan:도메인분석] ISS-532 비즈니스 규칙/시나리오 도출",
       "type": "DOMAIN_ANALYZE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "domain-analyst",
       "depth": 2,
@@ -9213,17 +9306,115 @@
           }
         ],
         "approved_at": "2026-11-25T03:10:21.515Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "acceptance_criteria": [
+          "바닥글 대비·줄바꿈 변경으로 지켜야 할 규칙과 역할별 시나리오가 문서로 남는다",
+          "규칙마다 자동 점검 명령이 연결된다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-532·ISS-551(같은 커밋 ec66175) 바닥글 대비·줄바꿈 수정의 후속 검증. 코드 변경 없이 점검·문서만",
+          "risk": "T0 — 검증·문서",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:28:06Z"
+        },
+        "files_changed": []
       },
-      "result": null,
+      "result": {
+        "domain": "chopd-footer-readability",
+        "commit": "7d5ab45",
+        "verified_commit": "ec66175",
+        "files_changed": [
+          "docs/domain/chopd-footer-readability-rules.md"
+        ],
+        "rules": [
+          {
+            "id": "R1",
+            "rule": "바닥글 모든 글자 대비 4.5:1 이상",
+            "role": "all"
+          },
+          {
+            "id": "R2",
+            "rule": "서비스·연락처 링크 > 소제목·하단·저작권 위계, 문의 링크만 주황",
+            "role": "all"
+          },
+          {
+            "id": "R3",
+            "rule": "한국어 단어 중간 줄바꿈 금지",
+            "role": "all"
+          },
+          {
+            "id": "R4",
+            "rule": "긴 영문·주소로 가로 스크롤 없음",
+            "role": "all"
+          },
+          {
+            "id": "R5",
+            "rule": "바닥글 문의 링크 항상 보임",
+            "role": "guest"
+          }
+        ],
+        "scenarios": [
+          {
+            "id": "S1",
+            "role": "guest",
+            "flow": "390 /works 바닥글 읽기",
+            "expect": "단어 단위 줄바꿈·대비 4.5 이상"
+          },
+          {
+            "id": "S2",
+            "role": "guest",
+            "flow": "/education 바닥글 B2B/B2G 문의하기",
+            "expect": "/inquiries/new 200, 콘솔 오류 0"
+          },
+          {
+            "id": "S3",
+            "role": "guest",
+            "flow": "320 /education 소개 문장",
+            "expect": "'강좌로' 유지, 가로 스크롤 없음"
+          }
+        ],
+        "merged": "ISS-564(ISS-551 도메인분석)는 같은 커밋 ec66175·같은 파일 검증이라 이 카드에 통합",
+        "criteria_check": [
+          {
+            "criterion": "바닥글 대비·줄바꿈 변경으로 지켜야 할 규칙과 역할별 시나리오가 문서로 남는다",
+            "met": true,
+            "how": "docs/domain/chopd-footer-readability-rules.md 규칙 5·시나리오 3, 역할 차이 없음 명시"
+          },
+          {
+            "criterion": "규칙마다 자동 점검 명령이 연결된다",
+            "met": true,
+            "how": "R1~R3 footer_readability_check, R4 layout_check, R5 footer_inquiry_flow·chopd_header_links_test"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/footer_readability_check.cjs",
+            "exit_code": 0,
+            "output": "6조합 minContrast 5.30, contrastItems [], wordBreakItems [], consoleErrors 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "node script/qa/footer_inquiry_flow.cjs",
+            "exit_code": 0,
+            "output": "finalPath /inquiries/new status 200 consoleErrors 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "bin/rails test test/integration/chopd_header_links_test.rb test/integration/education_filter_test.rb test/integration/pd_layout_mobile_menu_test.rb",
+            "exit_code": 0,
+            "output": "8 runs, 81 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:10:21.515Z"
+      "updated_at": "2026-11-25T03:28:06Z",
+      "completed_at": "2026-11-25T12:33:42.256603"
     },
     {
       "id": "ISS-560",
       "title": "[Plan:UX리뷰] ISS-532 UI 변경 검증",
       "type": "UI_REVIEW",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "ux-harness",
       "depth": 2,
@@ -9245,17 +9436,72 @@
           }
         ],
         "approved_at": "2026-11-25T03:10:21.515Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "acceptance_criteria": [
+          "바닥글이 1280·390·320에서 읽히고(대비 4.5:1 이상) 낱글자 줄바꿈이 없다",
+          "가로 넘침·글자 잘림·콘솔 오류가 없다",
+          "저작권·하단 링크가 본문 링크보다 약한 위계를 유지한다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-532·ISS-551(같은 커밋 ec66175) 바닥글 대비·줄바꿈 수정의 후속 검증. 코드 변경 없이 점검·문서만",
+          "risk": "T0 — 검증·문서",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:28:06Z"
+        }
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "issues": [],
+        "verified_commit": "ec66175",
+        "screenshots": [
+          "tmp/qa/readability/footer-works-390.png",
+          "tmp/qa/readability/footer-education-1280.png"
+        ],
+        "merged": "ISS-565(ISS-551 UX리뷰)는 같은 커밋·같은 화면이라 이 카드에 통합",
+        "notes": [
+          "발견: 헤더 '소개' 도착지 /media/greeting 의 남색 글씨 대비 문제는 ISS-571 로 별도 등록(이 커밋 범위 밖)"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "바닥글이 1280·390·320에서 읽히고(대비 4.5:1 이상) 낱글자 줄바꿈이 없다",
+            "met": true,
+            "how": "footer_readability_check 6조합 minContrast 5.30, wordBreakItems 0. 390 캡처 '통합 / 브랜드 허브.' 육안 확인"
+          },
+          {
+            "criterion": "가로 넘침·글자 잘림·콘솔 오류가 없다",
+            "met": true,
+            "how": "layout_check 15조합 hScroll false, clipped 0, consoleErrors 0"
+          },
+          {
+            "criterion": "저작권·하단 링크가 본문 링크보다 약한 위계를 유지한다",
+            "met": true,
+            "how": "서비스 링크 9.37 > 하단 링크 6.18 > 저작권 5.30, 1280·390 캡처에서 위계 확인"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/footer_readability_check.cjs",
+            "exit_code": 0,
+            "output": "6조합 minContrast 5.30, contrastItems [], wordBreakItems [] / SUMMARY pass=true"
+          },
+          {
+            "cmd": "ROUTES=/education,/works,/media,/community,/media/greeting WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "15조합 hScroll false, clipped 0, consoleErrors 0, badResponses 0 / SUMMARY pass=true"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:10:21.515Z"
+      "updated_at": "2026-11-25T03:28:06Z",
+      "completed_at": "2026-11-25T12:33:57.658175"
     },
     {
       "id": "ISS-561",
       "title": "[Plan:브랜드검증] ISS-532 아젠다 표현 + Action Clarity",
       "type": "BRAND_GUARD",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "brand-guardian",
       "depth": 2,
@@ -9277,11 +9523,55 @@
           }
         ],
         "approved_at": "2026-11-25T03:10:21.515Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "acceptance_criteria": [
+          "바닥글 변경 뒤에도 문의 CTA(B2B/B2G 문의하기)가 보인다",
+          "brand-dna 금지 패턴을 새로 어기지 않았다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-532·ISS-551(같은 커밋 ec66175) 바닥글 대비·줄바꿈 수정의 후속 검증. 코드 변경 없이 점검·문서만",
+          "risk": "T0 — 검증·문서",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:28:06Z"
+        }
       },
-      "result": null,
+      "result": {
+        "brand_score": 17,
+        "agenda_expression": 8,
+        "action_clarity": 9,
+        "anti_patterns_found": [],
+        "verified_commit": "ec66175",
+        "merged": "ISS-566(ISS-551 브랜드검증)는 같은 커밋·같은 화면이라 이 카드에 통합",
+        "criteria_check": [
+          {
+            "criterion": "바닥글 변경 뒤에도 문의 CTA(B2B/B2G 문의하기)가 보인다",
+            "met": true,
+            "how": "1280·390 캡처에 주황 'B2B/B2G 문의하기' 표시, footer_inquiry_flow 로 /inquiries/new 200 이동"
+          },
+          {
+            "criterion": "brand-dna 금지 패턴을 새로 어기지 않았다",
+            "met": true,
+            "how": "ec66175 는 색 값·줄바꿈 CSS 만 변경 — 9~10px 장식 글씨·색만으로 상태 구분·SVG 아이콘 신규 0. 헤더 직접 그린 SVG(햄버거·말풍선)는 이전부터 있던 것"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "git show ec66175 --stat",
+            "exit_code": 0,
+            "output": "_chopd_footer.html.erb·chopd.html.erb·footer_readability_check.cjs 만 변경"
+          },
+          {
+            "cmd": "node script/qa/footer_inquiry_flow.cjs",
+            "exit_code": 0,
+            "output": "linkVisible true, finalPath /inquiries/new, status 200 / SUMMARY pass=true"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:10:21.515Z"
+      "updated_at": "2026-11-25T03:28:06Z",
+      "completed_at": "2026-11-25T12:33:57.779451"
     },
     {
       "id": "ISS-562",
@@ -9448,7 +9738,7 @@
       "id": "ISS-564",
       "title": "[Plan:도메인분석] ISS-551 비즈니스 규칙/시나리오 도출",
       "type": "DOMAIN_ANALYZE",
-      "status": "READY",
+      "status": "CLOSED_SKIP",
       "priority": "P1",
       "assign_to": "domain-analyst",
       "depth": 2,
@@ -9474,15 +9764,19 @@
         "approved_at": "2026-11-25T03:11:33.630Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
-      "result": null,
+      "result": {
+        "skipped_reason": "ISS-551 과 ISS-532 는 같은 커밋 ec66175(바닥글·레이아웃 같은 파일)로 고쳐졌고, 같은 유형 검증 ISS-559 에서 ISS-551 기준(낱글자 줄바꿈 0)까지 함께 확인해 중복 카드로 정리",
+        "merged_into": "ISS-559"
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:11:33.630Z"
+      "updated_at": "2026-11-25T03:33:57Z",
+      "completed_at": "2026-11-25T03:33:57Z"
     },
     {
       "id": "ISS-565",
       "title": "[Plan:UX리뷰] ISS-551 UI 변경 검증",
       "type": "UI_REVIEW",
-      "status": "READY",
+      "status": "CLOSED_SKIP",
       "priority": "P1",
       "assign_to": "ux-harness",
       "depth": 2,
@@ -9508,15 +9802,19 @@
         "approved_at": "2026-11-25T03:11:33.630Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
-      "result": null,
+      "result": {
+        "skipped_reason": "ISS-551 과 ISS-532 는 같은 커밋 ec66175(바닥글·레이아웃 같은 파일)로 고쳐졌고, 같은 유형 검증 ISS-560 에서 ISS-551 기준(낱글자 줄바꿈 0)까지 함께 확인해 중복 카드로 정리",
+        "merged_into": "ISS-560"
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:11:33.630Z"
+      "updated_at": "2026-11-25T03:33:57Z",
+      "completed_at": "2026-11-25T03:33:57Z"
     },
     {
       "id": "ISS-566",
       "title": "[Plan:브랜드검증] ISS-551 아젠다 표현 + Action Clarity",
       "type": "BRAND_GUARD",
-      "status": "READY",
+      "status": "CLOSED_SKIP",
       "priority": "P1",
       "assign_to": "brand-guardian",
       "depth": 2,
@@ -9542,9 +9840,13 @@
         "approved_at": "2026-11-25T03:11:33.630Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
-      "result": null,
+      "result": {
+        "skipped_reason": "ISS-551 과 ISS-532 는 같은 커밋 ec66175(바닥글·레이아웃 같은 파일)로 고쳐졌고, 같은 유형 검증 ISS-561 에서 ISS-551 기준(낱글자 줄바꿈 0)까지 함께 확인해 중복 카드로 정리",
+        "merged_into": "ISS-561"
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T03:11:33.630Z"
+      "updated_at": "2026-11-25T03:33:57Z",
+      "completed_at": "2026-11-25T03:33:57Z"
     },
     {
       "id": "ISS-567",
@@ -9806,6 +10108,540 @@
       "result": null,
       "spawn_rules": [],
       "updated_at": "2026-11-25T03:21:16.541Z"
+    },
+    {
+      "id": "ISS-571",
+      "title": "[가독성] 발행인 인사말(/media/greeting) 이름·첫 인사·서명이 어두운 배경 위 남색 글씨라 거의 안 보이고, 이동 경로가 헤더와 겹침",
+      "type": "FIX_BUG",
+      "priority": "P2",
+      "status": "READY",
+      "origin": "factory-observation",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": "ISS-557",
+      "depends_on": [],
+      "created_at": "2026-11-25T03:25:27Z",
+      "updated_at": "2026-11-25T03:25:28.924Z",
+      "description": "ISS-557로 헤더 '소개'가 /media/greeting 으로 이어지면서 방문자가 처음 보는 소개 화면이 됐다. chopd 레이아웃(어두운 배경 #0a0e1a) 위에 라이트 테마용 클래스(text-navy·text-gray-700·text-gray-500)가 그대로 쓰여 '최범희' 이름, '안녕하십니까…' 첫 문장, 끝 서명이 배경과 거의 같은 색이다. 390px 에서 '미디어 / 발행인 인사말' 이동 경로가 고정 헤더 로고 바로 아래에 붙어 겹쳐 보인다.",
+      "payload": {
+        "origin": "factory-observation",
+        "files": [
+          "app/views/chopd/media/greeting.html.erb"
+        ],
+        "evidence": [
+          "tmp/qa/iss557-greeting-390.png (390 캡처: 이름·첫 인사 거의 안 보임, 이동 경로가 로고 아래 붙음)",
+          "greeting.html.erb 23·29·54행 text-navy, 24행 text-gray-500, 28행 text-gray-700 — chopd 레이아웃 배경 어두움"
+        ],
+        "acceptance_criteria": [
+          "인사말 화면의 모든 본문·이름·서명 글자 대비가 4.5:1 이상이다(수치 근거 남김)",
+          "390·1280 에서 이동 경로가 헤더와 겹치지 않는다",
+          "layout_check(/media/greeting, 1280·390·320) 통과",
+          "대비·겹침을 확인하는 자동 점검 또는 테스트가 있다"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "헤더 '소개'의 도착지가 된 화면인데 PD 이름과 첫 인사가 안 보여 소개 역할을 못 함. 색 클래스 몇 개와 상단 여백 수정 수준",
+          "risk": "T0 — 화면 표시만, 데이터 영향 없음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T03:25:27Z"
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:25:28.924Z",
+            "by": "auto",
+            "reason": "헤더 '소개'의 도착지가 된 화면인데 PD 이름과 첫 인사가 안 보여 소개 역할을 못 함. 색 클래스 몇 개와 상단 여백 수정 수준"
+          }
+        ],
+        "approved_at": "2026-11-25T03:25:28.924Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": []
+    },
+    {
+      "id": "ISS-572",
+      "title": "[Plan:테스트] ISS-557 변경사항 검증",
+      "type": "RUN_TESTS",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "test-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-557",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:25:27.072084",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_header.html.erb"
+        ],
+        "source_issue": "ISS-557",
+        "scope": "changed",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:25:28.924Z",
+            "by": "auto",
+            "reason": "「[Plan:테스트] ISS-557 변경사항 검증」(RUN_TESTS, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:25:28.924Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:25:28.924Z"
+    },
+    {
+      "id": "ISS-573",
+      "title": "[Plan:도메인분석] ISS-557 비즈니스 규칙/시나리오 도출",
+      "type": "DOMAIN_ANALYZE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "domain-analyst",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-557",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:25:27.072084",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_header.html.erb"
+        ],
+        "source_issue": "ISS-557",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:25:28.924Z",
+            "by": "auto",
+            "reason": "「[Plan:도메인분석] ISS-557 비즈니스 규칙/시나리오 도출」(DOMAIN_ANALYZE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:25:28.924Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:25:28.924Z"
+    },
+    {
+      "id": "ISS-574",
+      "title": "[Plan:UX리뷰] ISS-557 UI 변경 검증",
+      "type": "UI_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "ux-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-557",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:25:27.072084",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_header.html.erb"
+        ],
+        "source_issue": "ISS-557",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:25:28.924Z",
+            "by": "auto",
+            "reason": "「[Plan:UX리뷰] ISS-557 UI 변경 검증」(UI_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:25:28.924Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:25:28.924Z"
+    },
+    {
+      "id": "ISS-575",
+      "title": "[Plan:브랜드검증] ISS-557 아젠다 표현 + Action Clarity",
+      "type": "BRAND_GUARD",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "brand-guardian",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-557",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:25:27.072084",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_header.html.erb"
+        ],
+        "source_issue": "ISS-557",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:25:28.924Z",
+            "by": "auto",
+            "reason": "「[Plan:브랜드검증] ISS-557 아젠다 표현 + Action Clarity」(BRAND_GUARD, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:25:28.924Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:25:28.924Z"
+    },
+    {
+      "id": "ISS-576",
+      "title": "[Plan:브라우저QA] ISS-557 콘솔 에러 + 스크린샷 검증",
+      "type": "BROWSER_QA",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "agent-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-557",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:25:27.072084",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_header.html.erb"
+        ],
+        "source_issue": "ISS-557",
+        "action": "run_browse_qa",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:25:28.924Z",
+            "by": "auto",
+            "reason": "「[Plan:브라우저QA] ISS-557 콘솔 에러 + 스크린샷 검증」(BROWSER_QA, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:25:28.924Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:25:28.924Z"
+    },
+    {
+      "id": "ISS-577",
+      "title": "[Plan:테스트] ISS-552 변경사항 검증",
+      "type": "RUN_TESTS",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "test-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-552",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:27:30.445988",
+      "payload": {
+        "files": [
+          "app/views/chopd/education/index.html.erb"
+        ],
+        "source_issue": "ISS-552",
+        "scope": "changed",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:27:32.237Z",
+            "by": "auto",
+            "reason": "「[Plan:테스트] ISS-552 변경사항 검증」(RUN_TESTS, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:27:32.237Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:27:32.237Z"
+    },
+    {
+      "id": "ISS-578",
+      "title": "[Plan:도메인분석] ISS-552 비즈니스 규칙/시나리오 도출",
+      "type": "DOMAIN_ANALYZE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "domain-analyst",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-552",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:27:30.445988",
+      "payload": {
+        "files": [
+          "app/views/chopd/education/index.html.erb"
+        ],
+        "source_issue": "ISS-552",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:27:32.237Z",
+            "by": "auto",
+            "reason": "「[Plan:도메인분석] ISS-552 비즈니스 규칙/시나리오 도출」(DOMAIN_ANALYZE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:27:32.237Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:27:32.237Z"
+    },
+    {
+      "id": "ISS-579",
+      "title": "[Plan:UX리뷰] ISS-552 UI 변경 검증",
+      "type": "UI_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "ux-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-552",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:27:30.445988",
+      "payload": {
+        "files": [
+          "app/views/chopd/education/index.html.erb"
+        ],
+        "source_issue": "ISS-552",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:27:32.237Z",
+            "by": "auto",
+            "reason": "「[Plan:UX리뷰] ISS-552 UI 변경 검증」(UI_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:27:32.237Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:27:32.237Z"
+    },
+    {
+      "id": "ISS-580",
+      "title": "[Plan:브랜드검증] ISS-552 아젠다 표현 + Action Clarity",
+      "type": "BRAND_GUARD",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "brand-guardian",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-552",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:27:30.445988",
+      "payload": {
+        "files": [
+          "app/views/chopd/education/index.html.erb"
+        ],
+        "source_issue": "ISS-552",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:27:32.237Z",
+            "by": "auto",
+            "reason": "「[Plan:브랜드검증] ISS-552 아젠다 표현 + Action Clarity」(BRAND_GUARD, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:27:32.237Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:27:32.237Z"
+    },
+    {
+      "id": "ISS-581",
+      "title": "[Plan:브라우저QA] ISS-552 콘솔 에러 + 스크린샷 검증",
+      "type": "BROWSER_QA",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "agent-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-552",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:27:30.445988",
+      "payload": {
+        "files": [
+          "app/views/chopd/education/index.html.erb"
+        ],
+        "source_issue": "ISS-552",
+        "action": "run_browse_qa",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:27:32.237Z",
+            "by": "auto",
+            "reason": "「[Plan:브라우저QA] ISS-552 콘솔 에러 + 스크린샷 검증」(BROWSER_QA, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:27:32.237Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:27:32.237Z"
+    },
+    {
+      "id": "ISS-582",
+      "title": "[Plan:비즈니스검증] chopd-footer-readability 규칙 5개 정적 검증",
+      "type": "BIZ_VALIDATE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "biz-validator",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-559",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:33:42.256603",
+      "payload": {
+        "rules": [
+          {
+            "id": "R1",
+            "rule": "바닥글 모든 글자 대비 4.5:1 이상",
+            "role": "all"
+          },
+          {
+            "id": "R2",
+            "rule": "서비스·연락처 링크 > 소제목·하단·저작권 위계, 문의 링크만 주황",
+            "role": "all"
+          },
+          {
+            "id": "R3",
+            "rule": "한국어 단어 중간 줄바꿈 금지",
+            "role": "all"
+          },
+          {
+            "id": "R4",
+            "rule": "긴 영문·주소로 가로 스크롤 없음",
+            "role": "all"
+          },
+          {
+            "id": "R5",
+            "rule": "바닥글 문의 링크 항상 보임",
+            "role": "guest"
+          }
+        ],
+        "scenarios": [
+          {
+            "id": "S1",
+            "role": "guest",
+            "flow": "390 /works 바닥글 읽기",
+            "expect": "단어 단위 줄바꿈·대비 4.5 이상"
+          },
+          {
+            "id": "S2",
+            "role": "guest",
+            "flow": "/education 바닥글 B2B/B2G 문의하기",
+            "expect": "/inquiries/new 200, 콘솔 오류 0"
+          },
+          {
+            "id": "S3",
+            "role": "guest",
+            "flow": "320 /education 소개 문장",
+            "expect": "'강좌로' 유지, 가로 스크롤 없음"
+          }
+        ],
+        "domain": "chopd-footer-readability",
+        "source_issue": "ISS-559",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:33:59.745Z",
+            "by": "auto",
+            "reason": "「[Plan:비즈니스검증] chopd-footer-readability 규칙 5개 정적 검증」(BIZ_VALIDATE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:33:59.745Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:33:59.745Z"
+    },
+    {
+      "id": "ISS-583",
+      "title": "[Plan:시나리오실행] chopd-footer-readability 시나리오 3개 E2E 실행",
+      "type": "SCENARIO_PLAY",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "scenario-player",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-559",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:33:42.256603",
+      "payload": {
+        "scenarios": [
+          {
+            "id": "S1",
+            "role": "guest",
+            "flow": "390 /works 바닥글 읽기",
+            "expect": "단어 단위 줄바꿈·대비 4.5 이상"
+          },
+          {
+            "id": "S2",
+            "role": "guest",
+            "flow": "/education 바닥글 B2B/B2G 문의하기",
+            "expect": "/inquiries/new 200, 콘솔 오류 0"
+          },
+          {
+            "id": "S3",
+            "role": "guest",
+            "flow": "320 /education 소개 문장",
+            "expect": "'강좌로' 유지, 가로 스크롤 없음"
+          }
+        ],
+        "domain": "chopd-footer-readability",
+        "source_issue": "ISS-559",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:33:59.745Z",
+            "by": "auto",
+            "reason": "「[Plan:시나리오실행] chopd-footer-readability 시나리오 3개 E2E 실행」(SCENARIO_PLAY, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:33:59.745Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:33:59.745Z"
+    },
+    {
+      "id": "ISS-584",
+      "title": "[Plan:디자인리뷰] ISS-560 시각적 완성도 검증",
+      "type": "DESIGN_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "design-critic",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-560",
+      "depends_on": [],
+      "created_at": "2026-11-25T12:33:57.658175",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-560",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T03:33:59.745Z",
+            "by": "auto",
+            "reason": "「[Plan:디자인리뷰] ISS-560 시각적 완성도 검증」(DESIGN_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T03:33:59.745Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T03:33:59.745Z"
     }
   ],
   "hooks": {
@@ -10243,6 +11079,36 @@
         "issue_type": "BROWSER_QA",
         "plan_created": 0,
         "timestamp": "2026-11-25T12:21:16.498757"
+      },
+      {
+        "issue_id": "ISS-557",
+        "issue_type": "FIX_BUG",
+        "plan_created": 5,
+        "timestamp": "2026-11-25T12:25:27.072084"
+      },
+      {
+        "issue_id": "ISS-552",
+        "issue_type": "FIX_BUG",
+        "plan_created": 5,
+        "timestamp": "2026-11-25T12:27:30.445988"
+      },
+      {
+        "issue_id": "ISS-559",
+        "issue_type": "DOMAIN_ANALYZE",
+        "plan_created": 2,
+        "timestamp": "2026-11-25T12:33:42.256603"
+      },
+      {
+        "issue_id": "ISS-560",
+        "issue_type": "UI_REVIEW",
+        "plan_created": 1,
+        "timestamp": "2026-11-25T12:33:57.658175"
+      },
+      {
+        "issue_id": "ISS-561",
+        "issue_type": "BRAND_GUARD",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T12:33:57.779451"
       }
     ],
     "on_fail": [],
@@ -14485,8 +15351,8 @@
     ]
   },
   "stats": {
-    "total_issues": 568,
-    "completed": 72,
+    "total_issues": 581,
+    "completed": 77,
     "failed": 0,
     "evolved": 223
   },
