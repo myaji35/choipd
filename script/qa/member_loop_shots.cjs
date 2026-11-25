@@ -7,7 +7,7 @@ const pages = [
  ['dashboard', '/'+slug+'/admin/dashboard'], ['editor1','/'+slug+'/admin/editor?step=1'], ['editor2','/'+slug+'/admin/editor?step=2'],
  ['editor3','/'+slug+'/admin/editor?step=3'], ['editor4','/'+slug+'/admin/editor?step=4'], ['services','/'+slug+'/admin/services'],
  ['faqs','/'+slug+'/admin/faqs'], ['posts','/'+slug+'/admin/posts'], ['inquiries','/'+slug+'/admin/inquiries'],
- ['reviews','/'+slug+'/admin/reviews'], ['bookings','/'+slug+'/admin/bookings'], ['brand','/'+slug+'/admin/brand'],
+ ['reviews','/'+slug+'/admin/reviews'], ['bookings','/'+slug+'/admin/bookings'], ['brand','/'+slug+'/admin/brand'], ['channels','/'+slug+'/admin/channels'],
  ['public','/'+slug]
 ];
 (async () => {
