@@ -8590,7 +8590,7 @@
     },
     {
       "id": "ISS-556",
-      "title": "[린트] member_admin_checklist_test 따옴표 스타일 위반 2건 — 전체 rubocop 실패",
+      "title": "[린트] 회원 관리 테스트 3개 파일 rubocop 위반 10건(따옴표·배열 괄호 공백) — 전체 rubocop 실패",
       "type": "STYLE_FIX",
       "status": "READY",
       "priority": "P1",
@@ -8600,30 +8600,33 @@
       "parent_id": "ISS-547",
       "depends_on": [],
       "created_at": "2026-11-25T11:48:22+09:00",
-      "updated_at": "2026-11-25T11:48:22+09:00",
+      "updated_at": "2026-11-25T11:48:48+09:00",
       "result": null,
       "spawn_rules": [],
       "payload": {
         "origin": "factory-run-end",
         "files": [
-          "test/integration/member_admin_checklist_test.rb"
+          "test/integration/member_admin_checklist_test.rb",
+          "test/integration/member_admin_dashboard_ux_test.rb",
+          "test/integration/member_admin_plain_words_test.rb"
         ],
         "errors": [
-          "39:23 Style/StringLiterals",
-          "72:19 Style/StringLiterals"
+          "checklist_test 39:23·72:19 Style/StringLiterals",
+          "dashboard_ux_test 25·28 Layout/SpaceInsideArrayLiteralBrackets",
+          "plain_words_test 23·53 Layout/SpaceInsideArrayLiteralBrackets"
         ],
-        "source_commit": "75fab8e",
+        "source_commit": "75fab8e, 99bb539 (회원 디자인 루프 0·2회차)",
         "acceptance_criteria": [
           "bin/rubocop 전체가 위반 0으로 끝난다",
           "member_admin_checklist_test 가 그대로 통과한다"
         ],
         "recommendation": {
           "verdict": "승인 권장",
-          "reason": "자동 교정 가능한 따옴표 2곳. 단 2026-11-25 회원 디자인 루프 세션이 같은 파일을 작업 중이라 그 세션 커밋 뒤에 처리(이미 고쳐졌으면 rubocop 확인 후 DONE)",
+          "reason": "모두 bin/rubocop -a 로 고칠 수 있는 서식 위반. 2026-11-25 회원 디자인 루프 세션이 이 파일들을 계속 고치는 중이라 그 루프가 끝난 뒤 처리(이미 고쳐졌으면 rubocop 0 확인 후 DONE). 테스트 387건은 통과",
           "risk": "낮음",
           "effort": "XS",
           "by": "factory-runner",
-          "at": "2026-11-25T11:48:22+09:00"
+          "at": "2026-11-25T11:48:48+09:00"
         }
       }
     }
