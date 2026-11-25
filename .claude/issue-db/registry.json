@@ -1906,6 +1906,11 @@
         "explained_at": "2026-11-24T20:07:51.752693+09:00",
         "rechecked": [
           {
+            "at": "2026-11-25T10:33:18+09:00",
+            "by": "factory-runner",
+            "result": "SD ISS-521 AWAITING_USER(deploy-review) 그대로 — 막힘 유지. 이 저장소 ISS-521(브랜드 검증, DONE)과 번호가 같아 관제실이 오해제하지 않도록 blocked_reason 명시"
+          },
+          {
             "at": "2026-11-25T09:41:56+09:00",
             "by": "factory-runner",
             "result": "SD ISS-521 여전히 AWAITING_USER(deploy-review, factory/ISS-521 main 미병합). 막힘 사유 유효 — 유지."
@@ -1928,7 +1933,8 @@
           "question": "약속(요약 데이터 형식)이 정해질 때까지 남은 Townin 성과 부분을 멈춰 둘까요?",
           "by": "대표님(헤르메스)",
           "at": "2026-11-24T12:59:59.469Z"
-        }
+        },
+        "blocked_reason": "외부 저장소 0017_SocialDoctors 의 Townin 매체·브랜드 요약 API 카드(SD 쪽 521번)가 대표님 배포 검토 대기 — 그 API 없이는 화면에 실제 성과를 못 붙임"
       },
       "updated_at": "2026-11-24T23:30:00+09:00",
       "blocked_reason": "성과 칸(매체별 발행 수·Townin 읽음·사용 포인트)은 SocialDoctors 브랜드 요약 API(0017 ISS-521, 현재 AWAITING_USER)가 있어야 붙일 수 있다. 브랜드·동의 상태·imPD 콘텐츠 수·4주 운영 그래프는 ac54dd2·ISS-481 에서 이미 한 화면에 들어갔다."
@@ -1972,6 +1978,11 @@
         ],
         "rechecked": [
           {
+            "at": "2026-11-25T10:33:10+09:00",
+            "by": "factory-runner",
+            "result": "관제실이 '선행 카드(ISS-521)가 모두 끝나 자동으로 착수대기'로 자동 해제했으나 오인 — 이 저장소 ISS-521(브랜드 검증)과 SD ISS-521 번호 충돌. SD ISS-521 AWAITING_USER(deploy-review), ISS-476 BLOCKED 그대로라 막힘 복귀."
+          },
+          {
             "at": "2026-11-25T09:41:56+09:00",
             "by": "factory-runner",
             "result": "SD ISS-521 여전히 AWAITING_USER(deploy-review, factory/ISS-521 main 미병합). 막힘 사유 유효 — 유지."
@@ -1986,9 +1997,10 @@
             "by": "factory-runner",
             "note": "SD ISS-521 여전히 AWAITING_USER(0017_SocialDoctors registry) — 선행 미완료, 막힘 유지"
           }
-        ]
+        ],
+        "blocked_reason": "외부 저장소 0017_SocialDoctors 의 Townin 매체 카드(SD 쪽 521번, 대표님 배포 검토 대기)와 이 저장소 ISS-476 이 끝나야 시험 가능"
       },
-      "updated_at": "2026-11-24T12:06:43Z",
+      "updated_at": "2026-11-25T10:33:10+09:00",
       "blocked_reason": "12단계 중 6·7(SD→Townin 발행)·10(SD 성과 수집)·11(imPD 내 브랜드 Townin 성과)은 SocialDoctors ISS-521(Townin 매체·발행 어댑터·브랜드 요약 API)이 있어야 시험할 수 있다. SD ISS-521 은 현재 AWAITING_USER, imPD ISS-476 도 같은 이유로 BLOCKED. 나머지 선행(imPD ISS-475, Townin ISS-722, SD ISS-522)은 DONE."
     },
     {
@@ -5106,7 +5118,35 @@
           "gemini": "gemini-4-hydrogen-high 결함 없음",
           "opus": "범위 6파일, 다른 화면에 흰 글자 coral 버튼 0건 확인"
         },
-        "note": "node 스크립트는 npm i --prefix script/qa 후 실행(playwright 1.64.0, 캐시 chromium 1248), 서버 http://127.0.0.1:3008 필요"
+        "note": "node 스크립트는 npm i --prefix script/qa 후 실행(playwright 1.64.0, 캐시 chromium 1248), 서버 http://127.0.0.1:3008 필요",
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T01:17:47Z",
+          "sha": "419f2d9",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "bin/rails test test/integration/inquiry_submit_contrast_test.rb test/integration/inquiries_form_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "node script/qa/button_contrast.cjs",
+              "status": "skipped",
+              "why": "검사 명령 아님: node script/qa/button_contrast.cjs"
+            },
+            {
+              "cmd": "node script/qa/button_contrast.cjs (변경 전, git f392c1f^ 뷰)",
+              "status": "skipped",
+              "why": "허용 안 되는 연산자 ("
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json"
+          ]
+        }
       }
     },
     {
@@ -5262,7 +5302,32 @@
         "followups": [
           "ISS-520"
         ],
-        "note": "chopd 레이아웃 body 에 overflow-x:hidden 이 있어 가로 스크롤 수치는 넘침을 가릴 수 있음 — 그래서 요소별 잘림 검사와 육안 확인을 함께 함"
+        "note": "chopd 레이아웃 body 에 overflow-x:hidden 이 있어 가로 스크롤 수치는 넘침을 가릴 수 있음 — 그래서 요소별 잘림 검사와 육안 확인을 함께 함",
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T01:17:47Z",
+          "sha": "419f2d9",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "node script/qa/layout_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "rs\":0,\"consoleErrorItems\":[],\"badResponses\":0,\"badResponseItems\":[]}\n{\"route\":\"/inquiries/new\",\"width\":390,\"file\":\"tmp/qa/layout/inquiries-new-390.png\",\"bytes\":46095,\"scrollWidth\":390,\"clientWidth\":390,\"hScroll\":false,\"checked\":7,\"clipped\":0,\"clippedItems\":[],\"footerWrapped\":0,\"footerWrappedItems\":[],\"consoleErrors\":0,\"consoleErrorItems\":[],\"badResponses\":0,\"badResponseItems\":[]}\nSUMMARY pass=true"
+            },
+            {
+              "cmd": "bin/rails test test/integration/inquiry_submit_contrast_test.rb test/integration/inquiries_form_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json"
+          ]
+        }
       }
     },
     {
@@ -5383,6 +5448,43 @@
         "review": {
           "gemini": "gemini-4-hydrogen-high 결함 없음",
           "opus": "줄바꿈 판정 1차안이 터치영역 44px 링크를 오탐 → 글자 줄 수 판정으로 재위임 후 오탐 0 확인"
+        },
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T01:17:47Z",
+          "sha": "419f2d9",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "node script/qa/layout_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "rs\":0,\"consoleErrorItems\":[],\"badResponses\":0,\"badResponseItems\":[]}\n{\"route\":\"/inquiries/new\",\"width\":390,\"file\":\"tmp/qa/layout/inquiries-new-390.png\",\"bytes\":46095,\"scrollWidth\":390,\"clientWidth\":390,\"hScroll\":false,\"checked\":7,\"clipped\":0,\"clippedItems\":[],\"footerWrapped\":0,\"footerWrappedItems\":[],\"consoleErrors\":0,\"consoleErrorItems\":[],\"badResponses\":0,\"badResponseItems\":[]}\nSUMMARY pass=true"
+            },
+            {
+              "cmd": "node script/qa/layout_check.cjs (수정 전 바닥글, OUT_DIR=qa/ISS-520/before)",
+              "status": "skipped",
+              "why": "허용 안 되는 연산자 ("
+            },
+            {
+              "cmd": "bin/rails test",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "bin/rubocop",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": ".....................................................................................................................................................................................................................................................................................................................................................................\n\n445 files inspected, no offenses detected"
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json"
+          ]
         }
       }
     },
@@ -5458,7 +5560,7 @@
       "id": "ISS-524",
       "title": "[Plan:도메인분석] ISS-520 비즈니스 규칙/시나리오 도출",
       "type": "DOMAIN_ANALYZE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "domain-analyst",
       "depth": 2,
@@ -5481,17 +5583,91 @@
           }
         ],
         "approved_at": "2026-11-25T01:11:47.404Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "바닥글 링크 배치만 바뀐 변경이라 비즈니스 규칙 영향은 '바닥글의 매출 입구(B2B/B2G 문의) 노출 유지' 하나로 좁혀 확인",
+          "risk": "T0 — 검증 전용",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T10:20:58+09:00"
+        },
+        "acceptance_criteria": [
+          "바닥글의 모든 링크가 수정 전과 같은 목적지로 간다(링크 누락·변경 없음)",
+          "B2B/B2G 문의하기 링크가 390/1280 모두 보이고 /inquiries/new 로 간다",
+          "관련 컨트롤러·라우트 테스트가 통과한다"
+        ]
       },
-      "result": null,
+      "result": {
+        "domain": "chopd-footer",
+        "commit": "ccc840d",
+        "files_changed": [
+          "test/integration/public_pages_test.rb"
+        ],
+        "rules": [
+          {
+            "id": "R1",
+            "rule": "chopd 레이아웃 모든 화면 바닥글에 B2B/B2G 문의하기(→/inquiries/new)가 보여야 한다 — B2B/B2G 매출 입구",
+            "role": "guest"
+          },
+          {
+            "id": "R2",
+            "rule": "바닥글 서비스 링크(교육 과정·한국환경저널·작품 갤러리·커뮤니티·뉴스레터 구독)와 하단 줄(교육·미디어·작품)의 목적지는 ISS-520 전과 같다",
+            "role": "guest"
+          },
+          {
+            "id": "R3",
+            "rule": "/community 는 impd 레이아웃이라 chopd 바닥글 대상이 아니다",
+            "role": "guest"
+          }
+        ],
+        "scenarios": [
+          {
+            "id": "S1",
+            "role": "guest",
+            "flow": "390px 교육 화면 → 바닥글 B2B/B2G 문의하기 → 문의 폼",
+            "expect": "링크 한 줄 표시·/inquiries/new 이동"
+          }
+        ],
+        "criteria_check": [
+          {
+            "criterion": "바닥글의 모든 링크가 수정 전과 같은 목적지로 간다",
+            "met": true,
+            "how": "git show 373e8d1 diff: link_to 경로 변경 없음(class 만 추가). 새 테스트가 4개 chopd 화면에서 링크 9개 href·문구 고정"
+          },
+          {
+            "criterion": "B2B/B2G 문의하기 링크가 390/1280 모두 보이고 /inquiries/new 로 간다",
+            "met": true,
+            "how": "layout_check ROUTES 8화면 × 2폭 footerWrapped 0, 테스트 assert_select footer a[href=/inquiries/new]"
+          },
+          {
+            "criterion": "관련 컨트롤러·라우트 테스트가 통과한다",
+            "met": true,
+            "how": "public_pages_test 9 runs 0 failures; 문의 문구 삭제 시 실패 확인(돌연변이)"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/integration/public_pages_test.rb",
+            "exit_code": 0,
+            "output": "9 runs, 128 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "bin/rubocop test/integration/public_pages_test.rb",
+            "exit_code": 0,
+            "output": "1 file inspected, no offenses detected"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T01:11:47.404Z"
+      "updated_at": "2026-11-25T10:20:58+09:00",
+      "completed_at": "2026-11-25T10:31:38.069072"
     },
     {
       "id": "ISS-525",
       "title": "[Plan:UX리뷰] ISS-520 UI 변경 검증",
       "type": "UI_REVIEW",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "ux-harness",
       "depth": 2,
@@ -5514,17 +5690,71 @@
           }
         ],
         "approved_at": "2026-11-25T01:11:47.404Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "390px 바닥글 수정의 실제 화면을 chopd 레이아웃을 쓰는 공개 화면 전체에서 확인해 다른 화면 회귀를 막음",
+          "risk": "T0 — 검증 전용",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T10:20:58+09:00"
+        },
+        "acceptance_criteria": [
+          "chopd 레이아웃 공개 화면들에서 390px 바닥글 링크가 한 글자씩 쪼개지지 않는다",
+          "가로 스크롤·화면 밖 잘림·콘솔 오류·4xx/5xx 0",
+          "1280px 바닥글 배치가 수정 전과 같다"
+        ]
       },
-      "result": null,
+      "result": {
+        "passed": true,
+        "issues": [],
+        "commit": "3764ac2",
+        "files_changed": [
+          "script/qa/layout_check.cjs"
+        ],
+        "observations_out_of_scope": [
+          "/education 390px 분류 버튼(전체·온라인·오프라인) 글자 쪼개짐 — 별도 FIX_BUG 카드",
+          "chopd 바닥글 저작권·하단 링크·소제목 대비 1.8~2.6:1 — 별도 FIX_BUG 카드"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "chopd 레이아웃 공개 화면들에서 390px 바닥글 링크가 한 글자씩 쪼개지지 않는다",
+            "met": true,
+            "how": "layout_check ROUTES=/education,/media,/media/greeting,/works,/community,/choipd,/inquiries/new,/ — 390 전부 footerWrapped 0, education-390 바닥글 육안 확인"
+          },
+          {
+            "criterion": "가로 스크롤·화면 밖 잘림·콘솔 오류·4xx/5xx 0",
+            "met": true,
+            "how": "16개 측정 모두 hScroll false, clipped 0, console 0, bad 0"
+          },
+          {
+            "criterion": "1280px 바닥글 배치가 수정 전과 같다",
+            "met": true,
+            "how": "ISS-520 before/after 1280 스크린샷 바이트 동일(55426), 1280 측정 8건 통과"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "ROUTES=/education,/media,/media/greeting,/works,/community,/choipd,/inquiries/new,/ node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "16줄 모두 hScroll false clipped 0 footerWrapped 0 consoleErrors 0 badResponses 0 / SUMMARY pass=true"
+          },
+          {
+            "cmd": "ROUTES=, node script/qa/layout_check.cjs",
+            "exit_code": 2,
+            "output": "ROUTES 에 검사할 경로가 없습니다 / SUMMARY pass=false"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T01:11:47.404Z"
+      "updated_at": "2026-11-25T10:20:58+09:00",
+      "completed_at": "2026-11-25T10:31:51.927322"
     },
     {
       "id": "ISS-521",
       "title": "[Plan:브랜드검증] ISS-520 아젠다 표현 + Action Clarity",
       "type": "BRAND_GUARD",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "brand-guardian",
       "depth": 2,
@@ -5546,11 +5776,59 @@
           }
         ],
         "approved_at": "2026-11-25T01:11:47.404Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "바닥글 변경이 브랜드 금지 패턴(작은 장식 글씨·색만으로 구분 등)을 새로 만들지 않았는지 확인",
+          "risk": "T0 — 검증 전용",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T10:20:58+09:00"
+        },
+        "acceptance_criteria": [
+          "이번 변경이 brand-dna anti_patterns 를 새로 어기지 않는다",
+          "바닥글의 주요 행동(B2B/B2G 문의하기)이 모바일에서 식별된다"
+        ]
       },
-      "result": null,
+      "result": {
+        "brand_score": 16,
+        "agenda_expression": 7,
+        "action_clarity": 8,
+        "anti_patterns_found": [],
+        "scope": "ISS-520 바닥글 반응형 변경(373e8d1)",
+        "notes": [
+          "색·글꼴·문구는 그대로이고 배치 클래스만 바뀜 — 새 금지 패턴 없음",
+          "B2B/B2G 문의하기는 바닥글에서 유일한 강조색(#ff7850) 링크라 모바일에서도 주요 행동으로 식별됨",
+          "기존 결함(범위 밖): 저작권 줄·하단 링크·소제목 글자 대비 1.8~2.6:1 → 별도 FIX_BUG 카드"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "이번 변경이 brand-dna anti_patterns 를 새로 어기지 않는다",
+            "met": true,
+            "how": "373e8d1 diff 검토: 추가된 것은 Tailwind 배치 클래스·whitespace-nowrap 뿐, 글씨 크기(12/13px ≥ min_label 12)·색·문구 변경 없음"
+          },
+          {
+            "criterion": "바닥글의 주요 행동(B2B/B2G 문의하기)이 모바일에서 식별된다",
+            "met": true,
+            "how": "tmp/qa/iss525/education-390.png 바닥글 육안: 연락처 열 첫 줄 강조색 한 줄 표시, 테스트로 링크 존재 고정"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test test/integration/public_pages_test.rb -n /chopd/",
+            "exit_code": 0,
+            "output": "1 runs, 0 failures"
+          },
+          {
+            "cmd": "git diff 373e8d1^ 373e8d1 -- app/views/layouts/_chopd_footer.html.erb | grep -E '^[-+] ' | grep -oE 'font-size:[0-9]+px|color:[^;]+' | sort | uniq -c",
+            "exit_code": 0,
+            "output": "2 color:#ff7850    6 color:rgba(255,255,255,.3)   10 color:rgba(255,255,255,.5)    6 font-size:12px   12 font-size:13px (모두 짝수 개 = 빠진 줄과 더한 줄이 같은 값, 글씨 크기·색 변경 없음)"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T01:11:47.404Z"
+      "updated_at": "2026-11-25T10:20:58+09:00",
+      "completed_at": "2026-11-25T10:32:04.181793"
     },
     {
       "id": "ISS-522",
@@ -5638,7 +5916,7 @@
       "id": "ISS-526",
       "title": "[Plan:품질평가] ISS-523 품질 점수 산출",
       "type": "SCORE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "eval-harness",
       "depth": 3,
@@ -5662,11 +5940,58 @@
           }
         ],
         "approved_at": "2026-11-25T01:15:55.995Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-523 테스트 352건 통과·RuboCop 0 결과와 화면 점검으로 품질 점수 산출",
+          "risk": "T0 — 검증 전용",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T10:20:58+09:00"
+        },
+        "acceptance_criteria": [
+          "전체 테스트·린트를 다시 돌려 점수 근거를 남긴다",
+          "점수와 영역별 내역을 result 에 기록한다"
+        ]
       },
-      "result": null,
+      "result": {
+        "score": 87,
+        "prev_score": 86,
+        "breakdown": {
+          "quality": 92,
+          "tests": 90,
+          "ux": 84,
+          "docs": 80
+        },
+        "basis": "quality: RuboCop 445파일 위반 0 / tests: 353건 실패 0·스킵 1, 바닥글 회귀 테스트 추가 / ux: chopd 8화면×2폭 점검 통과, 단 교육 화면 분류 버튼 쪼개짐·바닥글 대비 부족(별도 카드) 감점 / docs: 커밋 메시지·qa 스크린샷 근거 있음. 커버리지 도구 미설정(null)",
+        "criteria_check": [
+          {
+            "criterion": "전체 테스트·린트를 다시 돌려 점수 근거를 남긴다",
+            "met": true,
+            "how": "bin/rails test 353 runs 0 failures 0 errors 1 skip, bin/rubocop 445 files no offenses"
+          },
+          {
+            "criterion": "점수와 영역별 내역을 result 에 기록한다",
+            "met": true,
+            "how": "score 87, breakdown 4영역, 이전 ISS-487 86점 대비 +1"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test",
+            "exit_code": 0,
+            "output": "353 runs, 2444 assertions, 0 failures, 0 errors, 1 skips"
+          },
+          {
+            "cmd": "bin/rubocop",
+            "exit_code": 0,
+            "output": "445 files inspected, no offenses detected"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T01:15:55.995Z"
+      "updated_at": "2026-11-25T10:20:58+09:00",
+      "completed_at": "2026-11-25T10:32:26.219749"
     },
     {
       "id": "ISS-527",
@@ -5708,6 +6033,221 @@
       "spawn_rules": [],
       "updated_at": "2026-11-25T10:16:52+09:00",
       "completed_at": "2026-11-25T10:16:52+09:00"
+    },
+    {
+      "id": "ISS-528",
+      "title": "[Plan:비즈니스검증] chopd-footer 규칙 3개 정적 검증",
+      "type": "BIZ_VALIDATE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "biz-validator",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-524",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:31:38.069072",
+      "payload": {
+        "rules": [
+          {
+            "id": "R1",
+            "rule": "chopd 레이아웃 모든 화면 바닥글에 B2B/B2G 문의하기(→/inquiries/new)가 보여야 한다 — B2B/B2G 매출 입구",
+            "role": "guest"
+          },
+          {
+            "id": "R2",
+            "rule": "바닥글 서비스 링크(교육 과정·한국환경저널·작품 갤러리·커뮤니티·뉴스레터 구독)와 하단 줄(교육·미디어·작품)의 목적지는 ISS-520 전과 같다",
+            "role": "guest"
+          },
+          {
+            "id": "R3",
+            "rule": "/community 는 impd 레이아웃이라 chopd 바닥글 대상이 아니다",
+            "role": "guest"
+          }
+        ],
+        "scenarios": [
+          {
+            "id": "S1",
+            "role": "guest",
+            "flow": "390px 교육 화면 → 바닥글 B2B/B2G 문의하기 → 문의 폼",
+            "expect": "링크 한 줄 표시·/inquiries/new 이동"
+          }
+        ],
+        "domain": "chopd-footer",
+        "source_issue": "ISS-524",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T01:31:40.074Z",
+            "by": "auto",
+            "reason": "「[Plan:비즈니스검증] chopd-footer 규칙 3개 정적 검증」(BIZ_VALIDATE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T01:31:40.074Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T01:31:40.074Z"
+    },
+    {
+      "id": "ISS-529",
+      "title": "[Plan:시나리오실행] chopd-footer 시나리오 1개 E2E 실행",
+      "type": "SCENARIO_PLAY",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "scenario-player",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-524",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:31:38.069072",
+      "payload": {
+        "scenarios": [
+          {
+            "id": "S1",
+            "role": "guest",
+            "flow": "390px 교육 화면 → 바닥글 B2B/B2G 문의하기 → 문의 폼",
+            "expect": "링크 한 줄 표시·/inquiries/new 이동"
+          }
+        ],
+        "domain": "chopd-footer",
+        "source_issue": "ISS-524",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T01:31:40.074Z",
+            "by": "auto",
+            "reason": "「[Plan:시나리오실행] chopd-footer 시나리오 1개 E2E 실행」(SCENARIO_PLAY, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T01:31:40.074Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T01:31:40.074Z"
+    },
+    {
+      "id": "ISS-530",
+      "title": "[Plan:디자인리뷰] ISS-525 시각적 완성도 검증",
+      "type": "DESIGN_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "design-critic",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-525",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:31:51.927322",
+      "payload": {
+        "files": [
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "source_issue": "ISS-525",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T01:32:21.582Z",
+            "by": "auto",
+            "reason": "「[Plan:디자인리뷰] ISS-525 시각적 완성도 검증」(DESIGN_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T01:32:21.582Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T01:32:21.582Z"
+    },
+    {
+      "id": "ISS-531",
+      "type": "FIX_BUG",
+      "priority": "P2",
+      "status": "IN_PROGRESS",
+      "origin": "factory-observation",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": "ISS-525",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:33:35+09:00",
+      "updated_at": "2026-11-25T10:33:42+09:00",
+      "title": "[모바일] 교육 화면 분류 버튼(전체·온라인·오프라인)이 390px에서 '전/체'처럼 글자 단위로 쪼개짐",
+      "description": "ISS-525 점검 중 tmp/qa/iss525/education-390.png 육안 확인: /education 필터 바(.filter-pill) 4개가 390px 폭에 다 들어가지 못해 버튼 안 글자가 '전/체', '온라/인', '오프라/인'으로 줄바꿈된다. 가로 스크롤·잘림 수치는 통과라 자동 점검에서 안 잡힘.",
+      "payload": {
+        "origin": "factory-observation",
+        "files": [
+          "app/views/chopd/education/index.html.erb",
+          "script/qa/layout_check.cjs"
+        ],
+        "evidence": [
+          "tmp/qa/iss525/education-390.png 상단 필터 바",
+          "ROUTES=/education node script/qa/layout_check.cjs — hScroll false, clipped 0"
+        ],
+        "acceptance_criteria": [
+          "390px 교육 화면에서 분류 버튼 글자가 한 줄로 보인다(버튼 안 줄바꿈 없음)",
+          "1280px 분류 버튼 배치는 지금과 같다",
+          "layout_check 가 버튼 안 글자 줄바꿈을 숫자로 잡아낸다(수정 전 검출, 수정 후 0)",
+          "ROUTES=/education,/works,/media node script/qa/layout_check.cjs 통과"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "교육 과정 고르기(매출 입구) 첫 조작 버튼이 모바일에서 깨져 보임. 필터 바 CSS(가로 스크롤 또는 nowrap)만 고치면 되는 작은 수정",
+          "risk": "T0 — 화면 표시만, 데이터 영향 없음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T10:33:35+09:00"
+        },
+        "factory_note": [
+          {
+            "at": "2026-11-25T10:33:42+09:00",
+            "by": "factory-runner",
+            "note": "착수. .filter-pill 정의 확인 후 Codex 위임"
+          }
+        ]
+      },
+      "result": null,
+      "spawn_rules": []
+    },
+    {
+      "id": "ISS-532",
+      "type": "FIX_BUG",
+      "priority": "P2",
+      "status": "READY",
+      "origin": "factory-observation",
+      "depth": 1,
+      "retry_count": 0,
+      "parent_id": "ISS-525",
+      "depends_on": [],
+      "created_at": "2026-11-25T10:33:35+09:00",
+      "updated_at": "2026-11-25T10:33:35+09:00",
+      "title": "[접근성] chopd 바닥글 저작권 줄·하단 링크·소제목 글자 대비 1.8~2.6:1 — 기준 4.5:1 미달",
+      "description": "배경 #0a0e1a 위 rgba(255,255,255,.2) 저작권 줄 약 1.8:1, rgba(255,255,255,.3) 하단 링크(교육·미디어·작품)와 소제목(서비스·연락처) 약 2.6:1. 12~13px 글씨라 WCAG AA 4.5:1 필요. ISS-520 이전부터 있던 값(ISS-521 브랜드 검증 중 발견).",
+      "payload": {
+        "origin": "factory-observation",
+        "files": [
+          "app/views/layouts/_chopd_footer.html.erb"
+        ],
+        "evidence": [
+          "app/views/layouts/_chopd_footer.html.erb style color 값",
+          "대비 계산: .2→1.79, .3→2.65, .5→5.34 (배경 #0a0e1a)"
+        ],
+        "acceptance_criteria": [
+          "바닥글의 모든 글자 대비가 4.5:1 이상이다(계산 근거 남김)",
+          "저작권·하단 링크가 본문 링크보다 덜 강조되는 위계는 유지된다",
+          "대비를 숫자로 확인하는 자동 테스트 또는 점검이 있다",
+          "1280/390 layout_check 통과"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "글씨가 거의 안 보여 저작권·보조 링크를 못 읽는 사용자가 생김. 색 값 몇 개만 올리면 되는 작은 수정(ISS-518 대비 수정과 같은 유형)",
+          "risk": "T0 — 화면 표시만, 데이터 영향 없음",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T10:33:35+09:00"
+        }
+      },
+      "result": null,
+      "spawn_rules": []
     }
   ],
   "hooks": {
@@ -5923,6 +6463,30 @@
         "issue_type": "BROWSER_QA",
         "plan_created": 0,
         "timestamp": "2026-11-25T10:15:53.590033"
+      },
+      {
+        "issue_id": "ISS-524",
+        "issue_type": "DOMAIN_ANALYZE",
+        "plan_created": 2,
+        "timestamp": "2026-11-25T10:31:38.069072"
+      },
+      {
+        "issue_id": "ISS-525",
+        "issue_type": "UI_REVIEW",
+        "plan_created": 1,
+        "timestamp": "2026-11-25T10:31:51.927322"
+      },
+      {
+        "issue_id": "ISS-521",
+        "issue_type": "BRAND_GUARD",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T10:32:04.181793"
+      },
+      {
+        "issue_id": "ISS-526",
+        "issue_type": "SCORE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T10:32:26.219749"
       }
     ],
     "on_fail": [],
@@ -9953,14 +10517,203 @@
           "failed": 0,
           "escalated": 0
         }
+      },
+      {
+        "cycle": 215,
+        "timestamp": "2026-11-25T10:17:31.662548",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (agent-harness, brand-guardian, test-harness, domain-analyst, ux-harness)",
+          "🟠 핑퐁 감지: ISS-502 → 5회 파생 (agent-harness, brand-guardian, test-harness, domain-analyst, ux-harness)",
+          "🟠 핑퐁 감지: ISS-503 → 5회 파생 (agent-harness, brand-guardian, test-harness, domain-analyst, ux-harness)",
+          "🟠 핑퐁 감지: ISS-520 → 5회 파생 (agent-harness, brand-guardian, test-harness, domain-analyst, ux-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 14시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 73,
+          "done": 50,
+          "in_progress": 0,
+          "ready": 5,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 216,
+        "timestamp": "2026-11-25T10:17:35.647973",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (domain-analyst, test-harness, ux-harness, agent-harness, brand-guardian)",
+          "🟠 핑퐁 감지: ISS-502 → 5회 파생 (domain-analyst, test-harness, ux-harness, agent-harness, brand-guardian)",
+          "🟠 핑퐁 감지: ISS-503 → 5회 파생 (domain-analyst, test-harness, ux-harness, agent-harness, brand-guardian)",
+          "🟠 핑퐁 감지: ISS-520 → 5회 파생 (domain-analyst, test-harness, ux-harness, agent-harness, brand-guardian)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 14시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 73,
+          "done": 50,
+          "in_progress": 0,
+          "ready": 5,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 217,
+        "timestamp": "2026-11-25T10:17:37.804569",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (ux-harness, domain-analyst, test-harness, brand-guardian, agent-harness)",
+          "🟠 핑퐁 감지: ISS-502 → 5회 파생 (ux-harness, domain-analyst, test-harness, brand-guardian, agent-harness)",
+          "🟠 핑퐁 감지: ISS-503 → 5회 파생 (ux-harness, domain-analyst, test-harness, brand-guardian, agent-harness)",
+          "🟠 핑퐁 감지: ISS-520 → 5회 파생 (ux-harness, domain-analyst, test-harness, brand-guardian, agent-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 14시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 73,
+          "done": 50,
+          "in_progress": 0,
+          "ready": 5,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 218,
+        "timestamp": "2026-11-25T10:17:39.728854",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (domain-analyst, ux-harness, brand-guardian, agent-harness, test-harness)",
+          "🟠 핑퐁 감지: ISS-502 → 5회 파생 (domain-analyst, ux-harness, brand-guardian, agent-harness, test-harness)",
+          "🟠 핑퐁 감지: ISS-503 → 5회 파생 (domain-analyst, ux-harness, brand-guardian, agent-harness, test-harness)",
+          "🟠 핑퐁 감지: ISS-520 → 5회 파생 (domain-analyst, ux-harness, brand-guardian, agent-harness, test-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 14시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 73,
+          "done": 50,
+          "in_progress": 0,
+          "ready": 5,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 219,
+        "timestamp": "2026-11-25T10:17:40.717931",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (domain-analyst, agent-harness, ux-harness, test-harness, brand-guardian)",
+          "🟠 핑퐁 감지: ISS-502 → 5회 파생 (domain-analyst, agent-harness, ux-harness, test-harness, brand-guardian)",
+          "🟠 핑퐁 감지: ISS-503 → 5회 파생 (domain-analyst, agent-harness, ux-harness, test-harness, brand-guardian)",
+          "🟠 핑퐁 감지: ISS-520 → 5회 파생 (domain-analyst, agent-harness, ux-harness, test-harness, brand-guardian)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 14시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 73,
+          "done": 50,
+          "in_progress": 0,
+          "ready": 5,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 220,
+        "timestamp": "2026-11-25T10:17:42.246061",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (test-harness, brand-guardian, domain-analyst, ux-harness, agent-harness)",
+          "🟠 핑퐁 감지: ISS-502 → 5회 파생 (test-harness, brand-guardian, domain-analyst, ux-harness, agent-harness)",
+          "🟠 핑퐁 감지: ISS-503 → 5회 파생 (test-harness, brand-guardian, domain-analyst, ux-harness, agent-harness)",
+          "🟠 핑퐁 감지: ISS-520 → 5회 파생 (test-harness, brand-guardian, domain-analyst, ux-harness, agent-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 14시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 73,
+          "done": 50,
+          "in_progress": 0,
+          "ready": 5,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 221,
+        "timestamp": "2026-11-25T10:17:43.572107",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (test-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (ux-harness, domain-analyst, brand-guardian, test-harness, agent-harness)",
+          "🟠 핑퐁 감지: ISS-502 → 5회 파생 (ux-harness, domain-analyst, brand-guardian, test-harness, agent-harness)",
+          "🟠 핑퐁 감지: ISS-503 → 5회 파생 (ux-harness, domain-analyst, brand-guardian, test-harness, agent-harness)",
+          "🟠 핑퐁 감지: ISS-520 → 5회 파생 (ux-harness, domain-analyst, brand-guardian, test-harness, agent-harness)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 14시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 73,
+          "done": 50,
+          "in_progress": 0,
+          "ready": 5,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 222,
+        "timestamp": "2026-11-25T10:17:44.832417",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (test-harness, brand-guardian, agent-harness, ux-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-502 → 5회 파생 (test-harness, brand-guardian, agent-harness, ux-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-503 → 5회 파생 (test-harness, brand-guardian, agent-harness, ux-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-520 → 5회 파생 (test-harness, brand-guardian, agent-harness, ux-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 14시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 73,
+          "done": 50,
+          "in_progress": 0,
+          "ready": 5,
+          "failed": 0,
+          "escalated": 0
+        }
+      },
+      {
+        "cycle": 223,
+        "timestamp": "2026-11-25T10:17:46.069180",
+        "findings": [
+          "🟠 핑퐁 감지: ISS-480 → 4회 파생 (domain-analyst, test-harness)",
+          "🟠 핑퐁 감지: ISS-493 → 5회 파생 (brand-guardian, test-harness, agent-harness, ux-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-502 → 5회 파생 (brand-guardian, test-harness, agent-harness, ux-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-503 → 5회 파생 (brand-guardian, test-harness, agent-harness, ux-harness, domain-analyst)",
+          "🟠 핑퐁 감지: ISS-520 → 5회 파생 (brand-guardian, test-harness, agent-harness, ux-harness, domain-analyst)",
+          "🟡 장기 대기: ISS-491 (DEPLOY_READY) — 14시간"
+        ],
+        "issues_created": [],
+        "stats_snapshot": {
+          "total": 73,
+          "done": 50,
+          "in_progress": 0,
+          "ready": 5,
+          "failed": 0,
+          "escalated": 0
+        }
       }
     ]
   },
   "stats": {
-    "total_issues": 527,
-    "completed": 35,
+    "total_issues": 532,
+    "completed": 39,
     "failed": 0,
-    "evolved": 214
+    "evolved": 223
   },
   "pending_opportunity_signals": [
     {
@@ -9985,13 +10738,13 @@
   "opus_budget_state": {
     "daily": {
       "date": "2026-11-25",
-      "cost_usd": 4.9,
-      "calls": 5
+      "cost_usd": 13.72,
+      "calls": 14
     },
     "monthly": {
       "month": "2026-11",
-      "cost_usd": 4.9,
-      "calls": 5
+      "cost_usd": 13.72,
+      "calls": 14
     },
     "demotion_active": false
   }
