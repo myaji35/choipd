@@ -37,6 +37,94 @@
           </ul>
         </details>
       </section>
+      <section id="profile-accounts-status" aria-labelledby="profile-accounts-title" style="background: #fff; border: 1px solid var(--impd-rule); padding: 24px; margin-bottom: 24px;">
+        <p class="impd-label">내 프로필 관리 현황</p>
+        <h2 id="profile-accounts-title" style="font-size: 24px; margin-top: 10px;">네이버 인물정보 · LinkedIn</h2>
+        <p style="font-size: 14px; color: var(--impd-muted); margin: 8px 0 18px;">네이버·LinkedIn 계정을 등록해 두면 운영자·PD가 그 계정으로 인물정보와 프로필을 대신 관리해요. 상태는 여기서 확인할 수 있어요.</p>
+
+        <% accounts_by_platform = @profile_accounts.group_by(&:platform) %>
+        <% show_management_links = respond_to?(:impersonating_admin_user) && impersonating_admin_user.present? %>
+        <div class="profile-accounts-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+          <% ProfileAccount::PLATFORMS.each do |platform, label| %>
+            <% naver = platform == "naver_people" %>
+            <% registration_label = naver ? "네이버 계정 등록" : "LinkedIn 계정 등록" %>
+            <% accounts_by_platform.fetch(platform, [nil]).each do |account| %>
+              <% target = account&.naver_people_target %>
+              <% latest_snapshot = account&.profile_snapshots&.max_by { |snapshot| [snapshot.captured_at || snapshot.created_at, snapshot.id] } %>
+              <article style="border: 1px solid var(--impd-rule); padding: 16px; font-size: 14px;">
+                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;">
+                  <p class="impd-label-muted"><%= account&.platform_label || label %></p>
+                  <% if account %>
+                    <% status_color = { "logged_in" => "var(--impd-accent)", "error" => "#b42318" }.fetch(account.session_status, "var(--impd-muted)") %>
+                    <span style="border: 1px solid currentColor; color: <%= status_color %>; padding: 2px 6px; font-size: 12px;"><%= account.session_status_label %></span>
+                  <% end %>
+                </div>
+
+                <% if account %>
+                  <h3 style="font-size: 16px; margin-top: 8px;"><%= account.display_name %></h3>
+                  <p style="color: var(--impd-muted);">관리 계정: <%= masked_login_id(account.login_id) || "아직 등록 안 됨" %></p>
+                  <% if account.headline.present? %>
+                    <p style="color: var(--impd-ink2);"><%= account.headline %></p>
+                  <% end %>
+                  <div style="display: grid; gap: 4px; margin-top: 8px; color: var(--impd-muted); font-size: 13px;">
+                    <p>마지막 점검: <%= account.last_checked_at ? korean_time_ago(account.last_checked_at) : "아직 점검 전" %></p>
+                    <% if latest_snapshot %>
+                      <p>최근 수집: <%= (latest_snapshot.captured_at || latest_snapshot.created_at).strftime("%Y.%m.%d") %></p>
+                    <% end %>
+                    <% if platform == "linkedin" %>
+                      <% score = linkedin_completeness_score(latest_snapshot) %>
+                      <% unless score.nil? %>
+                        <p>프로필 완성도 <%= score %>%</p>
+                        <progress max="100" value="<%= score %>" aria-label="프로필 완성도" style="width: 100%; accent-color: var(--impd-accent);"></progress>
+                      <% end %>
+                    <% elsif platform == "naver_people" %>
+                      <% if target %>
+                        <p>등록 정보: <%= target.status == "approved" ? "승인됨" : "초안" %></p>
+                      <% end %>
+                      <% if (submission = account.naver_people_submissions.max_by { |item| [item.created_at, item.id] }) %>
+                        <p>최근 반영 요청: <%= NaverPeopleSubmission::STATUS_LABELS[submission.status] %> · <%= submission.created_at.strftime("%Y.%m.%d") %></p>
+                      <% end %>
+                    <% end %>
+                    <% if account.session_status == "error" %>
+                      <p style="color: #b42318;">운영자가 확인 중이에요</p>
+                    <% end %>
+                  </div>
+                  <% if (url = http_url(account.profile_url)) %>
+                    <p style="margin-top: 8px;"><%= link_to "프로필 열기 ↗", url, target: "_blank", rel: "noopener", style: "color: var(--impd-accent);" %></p>
+                  <% end %>
+                <% else %>
+                  <h3 style="font-size: 16px; margin-top: 8px;"><%= registration_label %> 전</h3>
+                  <p style="color: var(--impd-muted); margin-top: 4px;">
+                    <%= naver ? "네이버 계정을 등록하면 네이버 인물정보 등록·수정 요청을 대신 진행해요." : "LinkedIn 계정을 등록하면 프로필 점검과 업데이트를 대신 진행해요." %>
+                  </p>
+                  <p style="color: var(--impd-muted); margin-top: 4px;">등록은 운영자·PD에게 요청해 주세요.</p>
+                <% end %>
+
+                <% if show_management_links %>
+                  <% management_path = account ? pd_profile_account_path(account) : new_pd_profile_account_path(member_id: @member.id) %>
+                  <p style="margin-top: 8px;"><%= link_to "관리 화면에서 열기", management_path, style: "color: var(--impd-accent); font-size: 12px;" %></p>
+                <% end %>
+                <% steps = [
+                  ["계정 등록", account.present?],
+                  ["로그인 확인", account&.session_status == "logged_in"],
+                  ["정보 관리", (naver ? target : latest_snapshot).present?]
+                ] %>
+                <ol aria-label="<%= registration_label %> 진행 상태" style="display: flex; flex-wrap: wrap; gap: 4px 8px; list-style: none; padding: 0; margin: 12px 0 0; font-size: 12px; color: var(--impd-muted);">
+                  <% steps.each_with_index do |(step, complete), index| %>
+                    <li style="white-space: nowrap; color: var(<%= complete ? '--impd-accent' : '--impd-muted' %>);">
+                      <%= complete ? "✓" : "○" %> <%= step %>
+                      <% if index < steps.size - 1 %>
+                        <span aria-hidden="true" style="color: var(--impd-muted); margin-left: 4px;">→</span>
+                      <% end %>
+                    </li>
+                  <% end %>
+                </ol>
+              </article>
+            <% end %>
+          <% end %>
+        </div>
+      </section>
+
       <!-- Stats 5 카드 -->
       <div class="dashboard-stats" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--impd-ink); margin-bottom: 40px;">
         <% [
@@ -130,6 +218,7 @@
   .dashboard-grid, .dashboard-grid * { min-width: 0; overflow-wrap: anywhere; }
   @media (max-width: 900px) {
     .dashboard-grid { grid-template-columns: minmax(0, 1fr) !important; }
+    .profile-accounts-grid { grid-template-columns: minmax(0, 1fr) !important; }
     .dashboard-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
     .dashboard-chart { gap: 2px !important; }
     .dashboard-chart span { font-size: 8px !important; }

@@ -27,11 +27,32 @@ class MemberAdmin::DashboardController < MemberAdmin::BaseController
 
     @recent_inquiries = @member.member_inquiries.recent.limit(4)
 
+    @profile_accounts = @member.profile_accounts.active.includes(:profile_snapshots, :naver_people_target, :naver_people_submissions).order(:platform, :id).to_a
+
     @checklist = build_checklist
     @completion_pct = (@checklist.count { |c| c[:done] } * 100 / @checklist.size)
   end
 
   private
+
+  helper_method :linkedin_completeness_score
+
+  def linkedin_completeness_score(snapshot)
+    data = snapshot&.data
+    return if data.blank?
+
+    data = JSON.parse(data) unless data.is_a?(Hash)
+    return unless data.is_a?(Hash)
+
+    profile = if data["pages"].is_a?(Hash)
+      Linkedin::ProfileParser.new(data["pages"]).to_h
+    else
+      data.deep_symbolize_keys
+    end
+    Linkedin::ProfilePresenter.new(profile).completeness_score
+  rescue StandardError
+    nil
+  end
 
   def build_checklist
     [
