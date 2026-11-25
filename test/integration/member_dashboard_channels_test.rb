@@ -21,7 +21,7 @@ class MemberDashboardChannelsTest < ActionDispatch::IntegrationTest
     assert_select "#channel-status" do
       assert_select "article", count: 3
       assert_select "article h3", count: 3 do |headings|
-        assert_equal ["네이버 블로그 등록 전", "페이스북 등록 전", "인스타그램 등록 전"], headings.map(&:text)
+        assert_equal [ "네이버 블로그 등록 전", "페이스북 등록 전", "인스타그램 등록 전" ], headings.map(&:text)
       end
       assert_select "article p", text: /등록은 운영자·PD에게 요청해 주세요\./, count: 3
       assert_select "a[href=?]", slug_admin_channels_path(slug: @member.slug), text: "올린 글·예약된 글 모두 보기 →", count: 1
@@ -36,7 +36,7 @@ class MemberDashboardChannelsTest < ActionDispatch::IntegrationTest
   test "운영 중인 채널의 최근 게시 건수와 예약 건수를 보여 준다" do
     brand = @member.brands.create!(name: "개인 브랜드", personal: true)
     channel = brand.brand_channels.create!(platform: "naver_blog", delegation_consent_at: 45.days.ago)
-    [5.days.ago, 40.days.ago].each do |posted_at|
+    [ 5.days.ago, 40.days.ago ].each do |posted_at|
       SnsScheduledPost.create!(brand_channel: channel, platform: "naver_blog", title: "올린 글", message: "본문",
         status: "published", scheduled_at: posted_at, published_at: posted_at)
     end
@@ -69,7 +69,7 @@ class MemberDashboardChannelsTest < ActionDispatch::IntegrationTest
     assert_select "#channel-status" do |section|
       assert_select "article p", text: /운영팀이 첫 글을 준비하고 있어요/
       assert_select "dl div", text: /팔로워\s*142명/, count: 1
-      ["0건", "아직 없어요", "최근 30일 올린 글"].each do |phrase|
+      [ "0건", "아직 없어요", "최근 30일 올린 글" ].each do |phrase|
         assert_not_includes section.first.text, phrase
       end
     end

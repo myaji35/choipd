@@ -47,25 +47,25 @@ module MemberAdmin::ChannelsHelper
   def channel_overview_facts(item)
     facts = []
     if item[:ever_posted]
-      facts << ["최근 30일 올린 글", "#{number_with_delimiter(item[:posted_30d])}건"]
-      facts << ["마지막 글", channel_short_date(item[:last_posted_at])]
+      facts << [ "최근 30일 올린 글", "#{number_with_delimiter(item[:posted_30d])}건" ]
+      facts << [ "마지막 글", channel_short_date(item[:last_posted_at]) ]
     end
     if item[:scheduled_count].positive?
       value = "#{number_with_delimiter(item[:scheduled_count])}건"
       next_post = item[:next_scheduled_at]
       value += " · 다음 글 #{channel_short_date(next_post)}" if next_post&.future?
-      facts << ["예약된 글", value]
+      facts << [ "예약된 글", value ]
     end
-    facts << ["팔로워", "#{number_with_delimiter(item[:followers])}명"] unless item[:followers].nil?
+    facts << [ "팔로워", "#{number_with_delimiter(item[:followers])}명" ] unless item[:followers].nil?
     facts.reject { |_label, value| value.nil? }
   end
 
   def channel_summary(item)
     [
-      ["최근 30일 올린 글", "#{number_with_delimiter(item[:posted_30d])}건"],
-      ["마지막 글", channel_short_date(item[:last_posted_at]) || "아직 없어요"],
-      ["예약된 글", item[:scheduled_count].zero? ? "없어요" : "#{number_with_delimiter(item[:scheduled_count])}건"],
-      ["팔로워", ("#{number_with_delimiter(item[:followers])}명" unless item[:followers].nil?)]
+      [ "최근 30일 올린 글", "#{number_with_delimiter(item[:posted_30d])}건" ],
+      [ "마지막 글", channel_short_date(item[:last_posted_at]) || "아직 없어요" ],
+      [ "예약된 글", item[:scheduled_count].zero? ? "없어요" : "#{number_with_delimiter(item[:scheduled_count])}건" ],
+      [ "팔로워", ("#{number_with_delimiter(item[:followers])}명" unless item[:followers].nil?) ]
     ]
   end
 

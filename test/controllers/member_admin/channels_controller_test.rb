@@ -16,7 +16,7 @@ class MemberAdmin::ChannelsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :ok
     assert_select "section.impd-card h2", count: 3 do |headings|
-      assert_equal ["네이버 블로그 등록 전", "페이스북 등록 전", "인스타그램 등록 전"], headings.map(&:text)
+      assert_equal [ "네이버 블로그 등록 전", "페이스북 등록 전", "인스타그램 등록 전" ], headings.map(&:text)
     end
     assert_select "section.impd-card p", text: "등록은 운영자·PD에게 요청해 주세요.", count: 3
     assert_select "a[href^='/admin/brands']", count: 0
@@ -40,12 +40,12 @@ class MemberAdmin::ChannelsControllerTest < ActionDispatch::IntegrationTest
     get @path
 
     assert_response :ok
-    ["운영 중", "myblog", "가을 보험 점검", "2026.11.20 09:30에 올림", "2026.11.27 10:00에 올릴 예정", "✓ 동의함 · 2026.10.03"].each do |phrase|
+    [ "운영 중", "myblog", "가을 보험 점검", "2026.11.20 09:30에 올림", "2026.11.27 10:00에 올릴 예정", "✓ 동의함 · 2026.10.03" ].each do |phrase|
       assert_includes response.body, phrase
     end
     assert_select "a[href=?]", published_url, text: "올라간 글 보기 ↗"
     assert_select "a[href=?]", edit_slug_admin_brand_brand_channel_path(slug: @member.slug, id: channel.id), text: "동의 내용 보기·바꾸기"
-    ["운영자용 오류", "secret-label", "ego-private", "내부 결과", "관리 메모", "미점검", "로그인 필요", "ego", "숨길 글"].each do |phrase|
+    [ "운영자용 오류", "secret-label", "ego-private", "내부 결과", "관리 메모", "미점검", "로그인 필요", "ego", "숨길 글" ].each do |phrase|
       assert_not_includes response.body, phrase
     end
     assert_select "a[href^='/admin/brands']", count: 0

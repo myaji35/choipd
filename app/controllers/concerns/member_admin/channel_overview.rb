@@ -12,13 +12,13 @@ module MemberAdmin::ChannelOverview
   def build_channel_overview(detail: false)
     brands = @member.brands.personal_first.includes(brand_channels: :sns_account).to_a
     channels_by_platform = brands.flat_map do |brand|
-      brand.brand_channels.filter_map { |channel| [channel, brand] if CHANNEL_PLATFORMS.key?(channel.platform) }
-    end.sort_by { |channel, brand| [brand.personal? ? 0 : 1, channel.id] }
+      brand.brand_channels.filter_map { |channel| [ channel, brand ] if CHANNEL_PLATFORMS.key?(channel.platform) }
+    end.sort_by { |channel, brand| [ brand.personal? ? 0 : 1, channel.id ] }
       .group_by { |channel, _brand| channel.platform }
     now = Time.current.in_time_zone("Asia/Seoul")
 
     CHANNEL_PLATFORMS.flat_map do |platform, label|
-      channels_by_platform.fetch(platform) { [[nil, brands.first]] }.map do |channel, brand|
+      channels_by_platform.fetch(platform) { [ [ nil, brands.first ] ] }.map do |channel, brand|
         item = { platform: platform, label: label, channel: channel, brand: brand }
         populate_channel_overview(item, now: now, detail: detail)
       end
@@ -34,7 +34,7 @@ module MemberAdmin::ChannelOverview
     posted = posted.order(Arel.sql("COALESCE(published_at, scheduled_at) DESC"))
     scheduled = posts.where(status: "scheduled", published_at: nil)
     last_post = posted.first
-    steps = [["채널 등록", channel.present?], ["운영 위탁 동의", channel&.delegated? || false], ["글 올리는 중", last_post.present?]]
+    steps = [ [ "채널 등록", channel.present? ], [ "운영 위탁 동의", channel&.delegated? || false ], [ "글 올리는 중", last_post.present? ] ]
 
     item.merge!(
       posted_30d: posted.where("COALESCE(published_at, scheduled_at) BETWEEN ? AND ?", now - 30.days, now).count,
