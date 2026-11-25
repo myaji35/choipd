@@ -29,27 +29,36 @@
             <%= link_to "프로필 열기 ↗", profile_url, target: "_blank", rel: "noopener", style: channel_link_style %>
           <% end %>
         </div>
-        <%= render "member_admin/channels/state_note", item: item %>
         <%= render "member_admin/channels/progress", item: item %>
+        <%= render "member_admin/channels/state_note", item: item %>
 
-        <dl style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 12px; margin-top: 16px;">
-          <% channel_summary(item).each do |label, value| %>
-            <div style="border: 1px solid var(--impd-rule); padding: 12px; background: #fff;">
-              <dt style="color: var(--impd-muted); font-size: 13px;"><%= label %></dt>
-              <% if value %>
-                <dd style="font-size: 22px; font-weight: 700;"><%= value %></dd>
-              <% else %>
-                <dd style="font-size: 14px; color: var(--impd-muted);">아직 기록이 없어요</dd>
-              <% end %>
-            </div>
-          <% end %>
-        </dl>
+        <% no_posts = item[:recent_posts].empty? && item[:scheduled_posts].empty? %>
+        <% stats = channel_summary(item) %>
+        <% stats = stats.select { |label, value| label == "팔로워" && value } if no_posts %>
+        <% if stats.any? %>
+          <dl class="channel-stat-grid">
+            <% stats.each do |label, value| %>
+              <div style="border: 1px solid var(--impd-rule); padding: 12px; background: var(--impd-card);">
+                <dt style="color: var(--impd-muted); font-size: 13px;"><%= label %></dt>
+                <%= tag.dd(value || "—", title: (channel_date(item[:last_posted_at]) if label == "마지막 글")) %>
+                <% if value.nil? %>
+                  <dd class="channel-stat-note">아직 못 셌어요</dd>
+                <% end %>
+              </div>
+            <% end %>
+          </dl>
+        <% end %>
 
-        <h3 style="font-size: 17px; margin-top: 24px;">최근 올린 글</h3>
-        <%= render "member_admin/channels/post_list", posts: item[:recent_posts], published: true %>
+        <% if no_posts %>
+          <h3 style="font-size: 17px; margin-top: 24px;">올린 글·예약된 글</h3>
+          <p style="margin-top: 8px; color: var(--impd-muted);">아직 없어요. 운영팀이 첫 글을 올리거나 예약하면 여기에 보여요.</p>
+        <% else %>
+          <h3 style="font-size: 17px; margin-top: 24px;">최근 올린 글</h3>
+          <%= render "member_admin/channels/post_list", posts: item[:recent_posts], published: true %>
 
-        <h3 style="font-size: 17px; margin-top: 24px;">예약된 글</h3>
-        <%= render "member_admin/channels/post_list", posts: item[:scheduled_posts], published: false %>
+          <h3 style="font-size: 17px; margin-top: 24px;">예약된 글</h3>
+          <%= render "member_admin/channels/post_list", posts: item[:scheduled_posts], published: false %>
+        <% end %>
 
         <h3 style="font-size: 17px; margin-top: 24px;">팔로워 변화</h3>
         <% if item[:follower_snapshots].any? %>
@@ -101,7 +110,13 @@
 
 <style>
   .impd-wrap, .impd-wrap * { min-width: 0; overflow-wrap: anywhere; }
+  .channel-stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+  .channel-stat-grid dd { white-space: nowrap; overflow-wrap: normal; }
+  .channel-stat-grid dd:first-of-type { font-size: 22px; font-weight: 700; }
+  .channel-stat-grid .channel-stat-note { font-size: 12px; color: var(--impd-muted); }
   @media (max-width: 768px) {
+    .channel-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .channel-stat-grid dd:first-of-type { font-size: 20px; }
     .impd-wrap { padding: 20px 16px !important; }
     .impd-wrap h1 { font-size: 32px !important; }
   }

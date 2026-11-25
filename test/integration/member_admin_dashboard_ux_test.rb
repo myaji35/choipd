@@ -41,6 +41,22 @@ class MemberAdminDashboardUxTest < ActionDispatch::IntegrationTest
     end
     assert_select ".dashboard-stats a[href=?]", slug_admin_inquiries_path(slug: slug), text: "0"
     assert_select ".dashboard-stats .dashboard-stat", count: 4
+    assert_select ".dashboard-stat-value a[href=?]", slug_admin_channels_path(slug: slug), count: 0
+  end
+
+  test "SNS 팔로워 숫자를 누르면 내 채널로 이동한다" do
+    member = create_overview_member
+    { "facebook" => 142, "instagram" => 222 }.each do |platform, count|
+      account = member.sns_accounts.create!(platform: platform, account_name: platform)
+      account.sns_follower_snapshots.create!(follower_count: count, captured_at: Time.current, source: "manual")
+    end
+
+    get slug_admin_dashboard_path(slug: member.slug)
+
+    assert_response :ok
+    assert_select ".dashboard-stat-value a[href=?][aria-label='SNS 팔로워 364']",
+      slug_admin_channels_path(slug: member.slug), text: "364", count: 1
+    assert_select ".dashboard-stats p", text: "연결된 계정 합계 · 눌러서 채널별로 보기"
   end
 
   test "숫자와 최근 문의를 프로필 관리보다 먼저 보여 준다" do

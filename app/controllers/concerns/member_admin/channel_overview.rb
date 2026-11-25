@@ -40,6 +40,7 @@ module MemberAdmin::ChannelOverview
       posted_30d: posted.where("COALESCE(published_at, scheduled_at) BETWEEN ? AND ?", now - 30.days, now).count,
       last_posted_at: last_post&.published_at || last_post&.scheduled_at,
       scheduled_count: scheduled.count,
+      next_scheduled_at: scheduled.minimum(:scheduled_at),
       ever_posted: last_post.present?,
       followers: account&.follower_count,
       follower_delta: account&.follower_delta,

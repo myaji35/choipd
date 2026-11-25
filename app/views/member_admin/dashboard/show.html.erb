@@ -52,13 +52,13 @@
         elsif @followers_missing_count.positive?
           "#{@followers_missing_count}개 계정은 아직 못 셌어요"
         else
-          "연결된 계정 합계"
+          "연결된 계정 합계 · 눌러서 채널별로 보기"
         end %>
         <% [
           ["방문", "#{number_with_delimiter(@week_visits)}회", "최근 7일 · 내 페이지가 열린 횟수"],
           ["문의", @inquiries_count, inquiry_note, slug_admin_inquiries_path(slug: @member.slug)],
           ["링크 열림", @link_clicks, "QR·공유 링크로 들어온 횟수"],
-          ["SNS 팔로워", @total_followers && number_with_delimiter(@total_followers), follower_note]
+          ["SNS 팔로워", @total_followers && number_with_delimiter(@total_followers), follower_note, @total_followers && slug_admin_channels_path(slug: @member.slug)]
         ].each do |label, value, note, path| %>
           <div class="dashboard-stat">
             <p class="impd-label-muted"><%= label %></p>
@@ -302,7 +302,13 @@
   .dashboard-overview-value.needs-attention { color: var(--impd-accent); }
   .dashboard-overview-links { display: flex; flex-wrap: wrap; column-gap: 12px; margin-top: 8px; color: var(--impd-muted); font-size: 13px; }
   .dashboard-overview-links a { display: inline-flex; align-items: center; min-height: 44px; }
-  .channel-overview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
+  .channel-overview-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .channel-overview-row { border-top: 1px solid var(--impd-rule); padding: 14px 0; font-size: 13px; }
+  .channel-overview-facts { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; }
+  .channel-overview-facts > div { white-space: nowrap; }
+  .channel-overview-facts dt { display: inline; font-size: 13px; color: var(--impd-muted); }
+  .channel-overview-facts dd { display: inline; font-size: 14px; font-weight: 700; }
+  .dashboard-grid .channel-overview-facts dd, .dashboard-grid .channel-overview-facts dt { overflow-wrap: normal; }
   .profile-accounts-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
   .profile-account-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; margin-top: 8px; }
   .profile-account-actions details[open] { flex-basis: 100%; }
@@ -320,7 +326,6 @@
     .dashboard-main > * { order: 3; }
     .dashboard-main > .dashboard-next { order: 1; }
     .dashboard-overview { order: 2; margin-bottom: 24px; }
-    .channel-overview-grid { grid-template-columns: minmax(0, 1fr); }
     .profile-accounts-grid { grid-template-columns: minmax(0, 1fr); }
     .dashboard-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .dashboard-stat { padding: 16px 12px; }

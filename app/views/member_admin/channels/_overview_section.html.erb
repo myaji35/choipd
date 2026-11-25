@@ -5,39 +5,41 @@
   <div class="channel-overview-grid">
     <% items.each do |item| %>
       <% channel = item[:channel] %>
-      <article style="border: 1px solid var(--impd-rule); padding: 16px; font-size: 14px; min-width: 0; overflow-wrap: anywhere;">
-        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;">
-          <p class="impd-label-muted"><%= item[:label] %></p>
-          <%= render "member_admin/channels/state_badge", item: item if channel %>
-        </div>
+      <article class="channel-overview-row">
         <% if channel %>
-          <p class="impd-label-muted" style="margin-top: 8px;">운영 계정</p>
-          <h3 style="font-size: 16px; margin-top: 8px;"><%= channel.account_handle.presence || "이름을 아직 적지 않았어요" %></h3>
-          <%= render "member_admin/channels/progress", item: item %>
-          <%= render "member_admin/channels/state_note", item: item %>
-          <dl style="margin-top: 8px;">
-            <% channel_summary(item).each do |label, value| %>
-              <% next if value.nil? %>
-              <div style="display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-top: 1px solid var(--impd-rule);">
-                <dt style="color: var(--impd-muted); font-size: 13px;"><%= label %></dt>
-                <dd style="font-weight: 700; text-align: right;"><%= value %></dd>
-              </div>
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px;">
+            <h3 style="font-size: 16px; font-weight: 700;"><%= item[:label] %></h3>
+            <%= render "member_admin/channels/state_badge", item: item %>
+            <% if channel.account_handle.present? %>
+              <span style="font-size: 13px; color: var(--impd-muted); overflow-wrap: anywhere;">계정 <%= channel.account_handle %></span>
             <% end %>
-          </dl>
-          <div style="display: flex; flex-wrap: wrap; gap: 0 16px; margin-top: 8px;">
-            <% if (profile_url = http_url(channel.profile_url)) %>
-              <%= link_to "프로필 열기 ↗", profile_url, target: "_blank", rel: "noopener", style: channel_link_style %>
-            <% end %>
-            <%= link_to "자세히 보기", slug_admin_channels_path(slug: @member.slug, anchor: "channel-#{channel.id}"), style: channel_link_style %>
           </div>
+          <%= render "member_admin/channels/state_note", item: item unless item[:state] == :running %>
+          <%= render "member_admin/channels/progress", item: item, compact: true %>
+          <% facts = channel_overview_facts(item) %>
+          <% if facts.any? %>
+            <dl class="channel-overview-facts">
+              <% facts.each do |label, value| %>
+                <div><dt><%= label %></dt> <dd><%= value %></dd></div>
+              <% end %>
+            </dl>
+          <% end %>
         <% else %>
-          <h3 style="font-size: 16px; margin-top: 8px;"><%= item[:label] %> 등록 전</h3>
-          <p style="color: var(--impd-muted); margin-top: 4px;">등록하면 운영팀이 글을 대신 올려 드려요.</p>
-          <p style="color: var(--impd-muted); margin-top: 4px;">등록은 운영자·PD에게 요청해 주세요.</p>
-          <%= render "member_admin/channels/progress", item: item %>
+          <h3 style="font-size: 16px; font-weight: 700;"><%= item[:label] %> 등록 전</h3>
+          <p style="color: var(--impd-muted); margin-top: 4px;">등록하면 운영팀이 글을 대신 올려 드려요. 등록은 운영자·PD에게 요청해 주세요.</p>
         <% end %>
-        <% if impersonating_admin_user&.admin? %>
-          <%= link_to "관리 화면에서 열기", channel_management_path(item), style: "#{channel_link_style} font-size: 12px;" %>
+        <% if channel || impersonating_admin_user&.admin? %>
+          <div style="display: flex; flex-wrap: wrap; gap: 0 16px;">
+            <% if channel %>
+              <%= link_to "자세히 보기", slug_admin_channels_path(slug: @member.slug, anchor: "channel-#{channel.id}"), style: channel_link_style %>
+              <% if (profile_url = http_url(channel.profile_url)) %>
+                <%= link_to "프로필 열기 ↗", profile_url, target: "_blank", rel: "noopener", style: channel_link_style %>
+              <% end %>
+            <% end %>
+            <% if impersonating_admin_user&.admin? %>
+              <%= link_to "관리 화면에서 열기", channel_management_path(item), style: "#{channel_link_style} font-size: 12px; margin-left: auto;" %>
+            <% end %>
+          </div>
         <% end %>
       </article>
     <% end %>

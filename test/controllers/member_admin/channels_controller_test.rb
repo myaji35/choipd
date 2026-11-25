@@ -78,10 +78,49 @@ class MemberAdmin::ChannelsControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
     assert_select "#channel-#{channel.id}" do
       assert_select "span", text: "준비 중"
+      assert_select "p", text: "아직 없어요. 운영팀이 첫 글을 올리거나 예약하면 여기에 보여요."
+      assert_select "dl.channel-stat-grid", count: 0
       assert_select "p", text: "○ 아직 동의하지 않았어요"
       assert_select "p", text: "운영 위탁에 동의하면 운영팀이 글을 올리기 시작해요."
       assert_select "a[href=?]", edit_slug_admin_brand_brand_channel_path(slug: @member.slug, id: channel.id), text: "동의하러 가기"
     end
+  end
+
+  test "글이 없는 준비 중 채널은 빈 숫자 상자 없이 한 문장으로 안내한다" do
+    account = @member.sns_accounts.create!(platform: "instagram", account_name: "내 인스타그램")
+    account.sns_follower_snapshots.create!(follower_count: 222, captured_at: seoul_time(11, 20), source: "manual")
+    channel = create_channel("instagram", sns_account: account, delegation_consent_at: seoul_time(10, 3))
+
+    get @path
+
+    assert_response :ok
+    assert_select "#channel-#{channel.id}" do |section|
+      assert_select "h3", text: "올린 글·예약된 글", count: 1
+      assert_select "p", text: "아직 없어요. 운영팀이 첫 글을 올리거나 예약하면 여기에 보여요.", count: 1
+      assert_select "dl.channel-stat-grid div", count: 1 do
+        assert_select "dt", text: "팔로워"
+        assert_select "dd", text: "222명"
+      end
+      assert_not_includes section.first.text, "0건"
+    end
+  end
+
+  test "운영 중 채널 숫자 상자는 네 개이고 마지막 글은 짧은 날짜로 보여 준다" do
+    channel = create_channel("naver_blog", delegation_consent_at: seoul_time(10, 3))
+    posted_at = seoul_time(11, 20, 9, 30)
+    SnsScheduledPost.create!(brand_channel: channel, platform: "naver_blog", title: "올린 글", message: "본문",
+      status: "published", scheduled_at: posted_at, published_at: posted_at)
+
+    get @path
+
+    assert_response :ok
+    assert_select "#channel-#{channel.id} dl.channel-stat-grid" do
+      assert_select "div", count: 4
+      assert_select "dd[title='2026.11.20']", text: "11.20"
+      assert_select "dd", text: "—"
+      assert_select "dd", text: "아직 못 셌어요"
+    end
+    assert_match(/@media \(max-width: 768px\) \{\s*\.channel-stat-grid \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/, response.body)
   end
 
   test "연결에 문제가 있으면 확인 중으로만 알린다" do

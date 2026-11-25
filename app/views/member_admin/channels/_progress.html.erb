@@ -1,7 +1,8 @@
+<% compact = local_assigns.fetch(:compact, false) %>
 <% unless item[:steps].all?(&:last) %>
-  <ol aria-label="<%= item[:label] %> 진행 상태" style="display: flex; flex-wrap: wrap; gap: 4px 8px; list-style: none; padding: 0; margin: 10px 0 0; font-size: 12px; color: var(--impd-muted);">
+  <ol aria-label="<%= item[:label] %> 진행 상태" style="display: flex; flex-wrap: wrap; gap: 6px 10px; list-style: none; padding: 0; margin: 10px 0 0; font-size: <%= compact ? 13 : 14 %>px;">
     <% item[:steps].each_with_index do |(step, complete), index| %>
-      <li style="color: var(<%= complete ? '--impd-accent' : '--impd-muted' %>);">
+      <li style="<%= complete ? 'color: var(--impd-accent); font-weight: 600;' : 'color: var(--impd-ink2);' %>">
         <%= complete ? "✓" : "○" %> <%= step %>
         <% if index < item[:steps].size - 1 %>
           <span aria-hidden="true" style="color: var(--impd-muted); margin-left: 4px;">→</span>
