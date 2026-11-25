@@ -2,5 +2,6 @@
   "deploy": "batch-auto",
   "mode": "develop",
   "at": "2026-11-24T10:10:51.418Z",
-  "by": "대표님(관제실 버튼)"
+  "by": "대표님(관제실 버튼)",
+  "recheck_block": "실행기 재검증 실패 카드 미해결: ISS-504, ISS-591, ISS-606"
 }
