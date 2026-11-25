@@ -53,7 +53,7 @@ class MemberAdminDashboardUxTest < ActionDispatch::IntegrationTest
   test "내 페이지 한눈에에서 항목별 개수와 확인할 건수를 보여 준다" do
     member = create_overview_member
     slug = member.slug
-    member.member_services.create!([{ title: "상담" }, { title: "강의" }])
+    member.member_services.create!([ { title: "상담" }, { title: "강의" } ])
     member.member_faqs.create!(question: "상담 시간은?", answer: "오전 10시부터입니다.")
     visible_post = member.member_posts.create!(title: "상담 안내", content: "상담 일정", is_published: 1)
     member.member_posts.create!(title: "준비 중", content: "다음 주 일정", is_published: 0)

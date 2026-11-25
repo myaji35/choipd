@@ -27,7 +27,7 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_response :ok
     assert_select "a.impd-btn-primary", text: /다음/, count: 0
     assert_select "a.editor-skip-link[href='?step=3']", text: /저장하지 않고 다음 단계 보기/
-    ["역량", "포트폴리오", "자동 추출"].each { |phrase| assert_not_includes response.body, phrase }
+    [ "역량", "포트폴리오", "자동 추출" ].each { |phrase| assert_not_includes response.body, phrase }
     assert_includes response.body, "작업 사진·사례"
     assert_select ".editor-pair", count: 2
   end

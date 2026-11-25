@@ -58,7 +58,7 @@ class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
     assert_operator headings.index("내 브랜드 운영 현황"), :<, headings.index("내 정보가 실리는 곳")
     assert_operator headings.index("내 정보가 실리는 곳"), :<, headings.index("내 브랜드 정보")
     assert_select "details summary", text: "이 숫자는 누가 볼 수 있나요?"
-    ["연결 상태", "동의 상태 확인", "콘텐츠·성과"].each { |phrase| assert_not_includes response.body, phrase }
+    [ "연결 상태", "동의 상태 확인", "콘텐츠·성과" ].each { |phrase| assert_not_includes response.body, phrase }
     assert_select "p.impd-label-muted", text: "홍보 › 내 브랜드"
   end
 
