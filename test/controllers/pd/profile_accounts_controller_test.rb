@@ -382,6 +382,25 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#accounts a[href=?]", pd_profile_account_path(@account), text: "계정 상세"
   end
 
+  test "같은 종류의 기록 있는 계정이 있어도 찾은 계정을 함께 연결할 수 있다" do
+    member = Member.create!(name: @account.display_name, email: "profile-extra@example.test", slug: "profile-extra")
+    manual = member.profile_accounts.create!(platform: @account.platform, display_name: member.name)
+    manual.profile_snapshots.create!(captured_at: Time.current)
+
+    assert_difference -> { member.profile_accounts.where(platform: @account.platform).count }, 1 do
+      patch pd_profile_account_path(@account), params: {
+        profile_account: { member_id: member.id }, link: "1"
+      }
+    end
+
+    assert_response :see_other
+    assert_redirected_to pd_member_path(member, anchor: "accounts")
+    follow_redirect!
+    assert_select "#accounts a", text: "계정 상세", count: 2
+    assert_select "#accounts p", text: "점검이 찾은 같은 이름의 계정이 따로 있습니다", count: 0
+    assert_select "#registration-summary", text: /확인할 찾은 계정/, count: 0
+  end
+
   test "대행 등록 복귀값 없이 계정을 수정하면 계정 상세로 이동한다" do
     patch pd_profile_account_path(@account), params: { profile_account: { display_name: "수정한 계정" } }
 

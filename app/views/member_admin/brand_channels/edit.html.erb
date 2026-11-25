@@ -11,9 +11,10 @@
       </ul>
     <% end %>
     <p style="margin: 12px 0;">
-      <%= f.label :account_handle, "계정 핸들" %>
-      <%= f.text_field :account_handle, class: "border border-gray-300 rounded-lg px-3 py-2 w-full" %>
+      <%= f.label :account_handle, "계정 이름" %>
+      <%= f.text_field :account_handle, class: "border border-gray-300 rounded-lg px-3 py-2 w-full", style: "min-height: 44px;", aria: { describedby: "channel-handle-help" } %>
     </p>
+    <p id="channel-handle-help" class="text-sm text-gray-600">'@'나 주소를 통째로 붙여 넣어도 계정 이름만 남깁니다.</p>
     <p style="margin: 12px 0;">
       <%= f.label :profile_url, "채널 주소" %>
       <%= f.url_field :profile_url, class: "border border-gray-300 rounded-lg px-3 py-2 w-full" %>

@@ -54,32 +54,8 @@ class Pd::MemberChannelsController < Pd::BaseController
 
   private
 
-  def normalized_attributes(attributes)
-    platform = @brand_channel.platform
-    handle = attributes.fetch(:account_handle, @brand_channel.account_handle)
-    profile_url = attributes.fetch(:profile_url, @brand_channel.profile_url).to_s.strip
-    if @brand_channel.persisted? && profile_url == BrandChannels::HandleNormalizer.canonical_url(platform, @brand_channel.account_handle)
-      profile_url = ""
-    end
-
-    normalized = BrandChannels::HandleNormalizer.call(platform: platform, handle: handle, profile_url: profile_url)
-    attributes.merge(account_handle: normalized.fetch(:handle), profile_url: normalized.fetch(:profile_url))
-  end
-
   def save_channel(attributes)
-    submitted_url = attributes.fetch(:profile_url, @brand_channel.profile_url)
-    @brand_channel.assign_attributes(normalized_attributes(attributes))
-    @brand_channel.validate
-    handle = @brand_channel.account_handle
-    if handle.blank?
-      @brand_channel.errors.add(:account_handle, "계정 이름을 적어 주세요. 채널 주소만 붙여 넣어도 됩니다.")
-    elsif handle.match?(%r{[[:space:]/@]})
-      @brand_channel.errors.add(:account_handle, "계정 이름에는 빈칸이나 주소를 넣을 수 없습니다. 예: gagahoho_kang")
-    end
-    return true if @brand_channel.errors.empty? && @brand_channel.save(validate: false)
-
-    @brand_channel.profile_url = submitted_url
-    false
+    BrandChannels::HandleNormalizer.save(@brand_channel, attributes)
   end
 
   def redirect_after_create

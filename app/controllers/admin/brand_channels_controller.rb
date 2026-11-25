@@ -7,8 +7,8 @@ class Admin::BrandChannelsController < Admin::BaseController
   end
 
   def create
-    @brand_channel = @brand.brand_channels.build(brand_channel_params.merge(tenant_id: @brand.tenant_id))
-    if @brand_channel.save
+    @brand_channel = @brand.brand_channels.build(tenant_id: @brand.tenant_id)
+    if save_with_normalized_handle(brand_channel_params)
       redirect_to admin_brand_path(@brand), notice: "채널을 등록했습니다."
     else
       render :new, status: :unprocessable_entity
@@ -18,7 +18,14 @@ class Admin::BrandChannelsController < Admin::BaseController
   def edit; end
 
   def update
-    if @brand_channel.update(brand_channel_params)
+    attributes = brand_channel_params
+    saved = if attributes.key?(:account_handle) || attributes.key?(:profile_url)
+      save_with_normalized_handle(attributes)
+    else
+      @brand_channel.update(attributes)
+    end
+
+    if saved
       redirect_to admin_brand_path(@brand), notice: "채널을 수정했습니다."
     else
       render :edit, status: :unprocessable_entity
@@ -31,6 +38,11 @@ class Admin::BrandChannelsController < Admin::BaseController
   end
 
   private
+
+  def save_with_normalized_handle(attributes)
+    @brand_channel.platform = attributes[:platform] if attributes.key?(:platform)
+    BrandChannels::HandleNormalizer.save(@brand_channel, attributes)
+  end
 
   def set_brand
     @brand = Brand.find(params[:brand_id])

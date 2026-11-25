@@ -33,11 +33,12 @@
     <div>
       <%= f.label :account_handle, "계정 이름(핸들)", class: label_class %>
       <%= f.text_field :account_handle, class: input_class, style: control_height, aria: { describedby: "channel-handle-help" } %>
-      <p id="channel-handle-help" class="mt-1 text-xs text-gray-500">예: 블로그 아이디, 인스타그램 @ 뒤 이름</p>
+      <p id="channel-handle-help" class="mt-1 text-xs text-gray-500">블로그 아이디나 인스타그램 이름. '@'나 주소를 통째로 붙여 넣어도 계정 이름만 남깁니다.</p>
     </div>
     <div>
       <%= f.label :profile_url, "채널 주소", class: label_class %>
-      <%= f.url_field :profile_url, placeholder: "https://", class: input_class, style: control_height %>
+      <%= f.url_field :profile_url, placeholder: "https://", class: input_class, style: control_height, aria: { describedby: "channel-url-help" } %>
+      <p id="channel-url-help" class="mt-1 text-xs text-gray-500">네이버 블로그·페이스북·인스타그램은 비워 두면 계정 이름으로 자동으로 채워집니다.</p>
     </div>
     <div>
       <%= f.label :notes, "메모", class: label_class %>

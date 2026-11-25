@@ -107,11 +107,19 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     get pd_member_path(@member)
     assert_select "#channels li p", text: /운영 위탁 동의 대기/
     assert_select "#channels li p.text-gray-700", count: 0
+    assert_select "#connection-request-text", count: 0
 
     channel.update!(delegation_consent_at: Time.current)
     get pd_member_path(@member)
     assert_select "#channels li", text: /동의까지 끝났습니다\. 다음은 연결 설정입니다.*운영자에게 요청해 주세요/m
     assert_select "a[href^='/admin']", count: 0
+    assert_select "textarea#connection-request-text[readonly][rows=5]" do |elements|
+      request = elements.first.text
+      assert_includes request, "#{@member.name} 회원(/#{@member.slug}) 채널 연결 설정을 부탁드립니다."
+      assert_includes request, "- 네이버 블로그 · blog (미점검)"
+      assert_includes request, pd_member_url(@member, anchor: "channels")
+    end
+    assert_select "#channels button", text: "요청 복사"
 
     channel.update!(session_status: "logged_out")
     get pd_member_path(@member)
@@ -120,6 +128,7 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     channel.update!(session_status: "connected")
     get pd_member_path(@member)
     assert_select "#channels li", text: /연결까지 끝났습니다/
+    assert_select "#connection-request-text", count: 0
 
     SnsScheduledPost.create!(brand_channel: channel, platform: "naver_blog", title: "제목", message: "글",
       scheduled_at: Time.current, status: "published", published_at: Time.current)
@@ -134,6 +143,7 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
 
     get pd_member_path(@member)
     assert_response :ok
+    assert_select "#connection-request-text", count: 0
     assert_select "#channels a[href=?]", edit_admin_brand_brand_channel_path(brand, channel), text: "연결 설정 열기"
   end
 
@@ -149,6 +159,7 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     [waiting, consented].each do |channel|
       assert_select "#channels a[href=?]", edit_pd_member_channel_path(@member, channel), text: "계정 이름 적기"
     end
+    assert_select "#connection-request-text", count: 0
     assert_select "#channels li p", text: /계정 이름이 비어 있어 연결 점검과 글 올리기를 할 수 없습니다\./, count: 2
     assert_select "a", text: "채널 지우기(운영자)", count: 0
     assert_select "a[href^='/admin/']", count: 0
@@ -185,6 +196,16 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     account.profile_snapshots.create!(captured_at: Time.current)
     get pd_member_path(@member)
     assert_select "#accounts li p", text: "관리 중 — 회원 화면에도 '관리 중'으로 보입니다."
+
+    account.update!(is_active: false)
+    get pd_member_path(@member)
+    assert_select "#accounts > ul > li" do |rows|
+      row = rows.find { |item| item.at_css("a[href='#{pd_profile_account_path(account)}']") }
+      assert row
+      assert_select row, "p", text: "LinkedIn · #{@member.name} · 회원 화면에서 감춤"
+      assert_select row, "a", text: "회원 화면에서 보기", count: 0
+      assert_select row, "p", text: /회원 화면에도/, count: 0
+    end
   end
 
   test "손으로 등록한 계정에 점검이 찾은 계정이 있으면 바꾸기를 안내한다" do
@@ -193,9 +214,11 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     found = ProfileAccount.create!(platform: "linkedin", display_name: @member.name, external_id: "checked", login_id: "checked-id")
     other = ProfileAccount.create!(platform: "linkedin", display_name: "다른 이름", external_id: "other")
     unchecked = ProfileAccount.create!(platform: "linkedin", display_name: @member.name)
+    foreign = ProfileAccount.create!(platform: "linkedin", display_name: @member.name, external_id: "foreign", tenant_id: 2)
 
     get pd_member_path(@member)
 
+    assert_select "#accounts p", text: "점검이 찾은 같은 이름의 계정이 따로 있습니다", count: 0
     assert_select "#accounts p", text: "점검이 찾은 계정이 따로 있습니다"
     assert_select "#accounts form[action=?]", pd_profile_account_path(found) do
       assert_select "button", text: "찾은 계정으로 바꾸기"
@@ -213,6 +236,14 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     manual.profile_snapshots.create!(captured_at: Time.current)
     get pd_member_path(@member)
     assert_select "#accounts button", text: "찾은 계정으로 바꾸기", count: 0
+    assert_select "#accounts p", text: "점검이 찾은 같은 이름의 계정이 따로 있습니다", count: 1
+    assert_select "#accounts form[action=?] button", pd_profile_account_path(found), text: "이 회원에 함께 연결", count: 1
+    assert_select "#accounts input[name=replace_id]", count: 0
+    assert_select "#registration-summary", text: / · 확인할 찾은 계정 1개$/
+    [unchecked, other, foreign].each do |excluded|
+      assert_select "#accounts form[action=?]", pd_profile_account_path(excluded), count: 0
+    end
+    assert_select "a[href^='/admin']", count: 0
   end
 
   test "등록 전 플랫폼에는 같은 테넌트의 미연결 계정만 표시한다" do

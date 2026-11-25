@@ -34,11 +34,19 @@ class Pd::MembersController < Pd::BaseController
     @unlinked_accounts_by_platform = unlinked_accounts.transform_values do |accounts|
       accounts.partition { |account| matching_account?(account) }
     end
-    @replacement_candidates = @accounts_by_platform.values.flatten.each_with_object({}) do |account, candidates|
-      groups = @unlinked_accounts_by_platform[account.platform]
-      next unless groups && replaceable_manual_account?(account)
+    @replacement_candidates = {}
+    @extra_found_accounts = {}
+    @accounts_by_platform.each do |platform, accounts|
+      groups = @unlinked_accounts_by_platform[platform]
+      next unless groups
 
-      candidates[account.id] = groups.map { |group| group.select { |found| found.external_id.present? }.first(5) }
+      candidates = groups.map { |group| group.select { |found| found.external_id.present? }.first(5) }
+      replaceable_accounts = accounts.select { |account| replaceable_manual_account?(account) }
+      if replaceable_accounts.empty?
+        @extra_found_accounts[platform] = candidates.first if candidates.first.any?
+      else
+        replaceable_accounts.each { |account| @replacement_candidates[account.id] = candidates }
+      end
     end
     @channel_overview_by_platform = build_channel_overview.select { |item| item[:channel] }
       .group_by { |item| item[:platform] }

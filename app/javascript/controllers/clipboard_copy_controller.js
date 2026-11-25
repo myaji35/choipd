@@ -3,6 +3,8 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["source", "button", "status"]
 
+  static values = { label: String }
+
   async copy() {
     const request = Symbol()
     this.copyRequest = request
@@ -24,7 +26,7 @@ export default class extends Controller {
     this.buttonTarget.textContent = "복사했어요"
     this.statusTarget.textContent = ""
     this.resetTimer = setTimeout(() => {
-      this.buttonTarget.textContent = "안내 복사"
+      this.buttonTarget.textContent = this.labelValue
     }, 2000)
   }
 
@@ -33,12 +35,18 @@ export default class extends Controller {
     source.focus()
     source.select()
     source.setSelectionRange(0, source.value.length)
-    this.buttonTarget.textContent = "안내 복사"
+    this.buttonTarget.textContent = this.labelValue
     this.statusTarget.textContent = "복사가 안 되면 글을 길게 눌러 복사해 주세요"
   }
 
   disconnect() {
+    this.reset()
+  }
+
+  reset() {
     clearTimeout(this.resetTimer)
     this.copyRequest = null
+    if (this.hasButtonTarget) this.buttonTarget.textContent = this.labelValue
+    if (this.hasStatusTarget) this.statusTarget.textContent = ""
   }
 }

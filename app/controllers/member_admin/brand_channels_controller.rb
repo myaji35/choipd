@@ -15,7 +15,11 @@ class MemberAdmin::BrandChannelsController < MemberAdmin::BaseController
           ActiveModel::Type::Boolean.new.cast(consent) == true ? (@brand_channel.delegation_consent_at || Time.current) : nil
       end
       revoked = was_delegated && !@brand_channel.delegated?
-      @brand_channel.update(attributes)
+      if attributes.key?(:account_handle) || attributes.key?(:profile_url)
+        BrandChannels::HandleNormalizer.save(@brand_channel, attributes)
+      else
+        @brand_channel.update(attributes)
+      end
     end
 
     if saved

@@ -27,6 +27,8 @@ class Admin::BrandChannelsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to admin_brand_path(@brand)
     channel = @brand.brand_channels.first
+    assert_equal "운영계정", channel.account_handle
+    assert_equal "https://blog.naver.com/%EC%9A%B4%EC%98%81%EA%B3%84%EC%A0%95", channel.profile_url
     assert_equal "ego_session", channel.connection_method
     assert_equal @brand.tenant_id, channel.tenant_id
     assert_not channel.delegated?
@@ -50,6 +52,82 @@ class Admin::BrandChannelsControllerTest < ActionDispatch::IntegrationTest
     assert_response :see_other
   end
 
+  test "운영자가 인스타그램 주소나 @이름을 입력하면 계정 이름과 기준 주소로 저장한다" do
+    sign_in @admin
+    url = "https://www.instagram.com/gagahoho_kang/"
+    post admin_brand_brand_channels_path(@brand),
+      params: { brand_channel: { platform: "instagram", account_handle: url, profile_url: "" } }
+    assert_redirected_to admin_brand_path(@brand)
+    channel = @brand.brand_channels.sole
+    assert_equal "gagahoho_kang", channel.account_handle
+    assert_equal url, channel.profile_url
+
+    patch admin_brand_brand_channel_path(@brand, channel),
+      params: { brand_channel: { account_handle: "@new_name", profile_url: url } }
+    assert_redirected_to admin_brand_path(@brand)
+    assert_equal "new_name", channel.reload.account_handle
+    assert_equal "https://www.instagram.com/new_name/", channel.profile_url
+  end
+
+  test "운영자 채널 등록 실패 시 입력한 계정 이름과 빈 주소를 유지한다" do
+    sign_in @admin
+    post admin_brand_brand_channels_path(@brand), params: {
+      brand_channel: { platform: "instagram", account_handle: "@new_name", profile_url: "", credential_ref: "invalid label" }
+    }
+
+    assert_response :unprocessable_entity
+    assert_select "input[name='brand_channel[account_handle]'][value='@new_name']"
+    assert_select "input[name='brand_channel[profile_url]']" do |fields|
+      assert_equal "", fields.first["value"].to_s
+    end
+  end
+
+  test "운영자가 빈 계정 이름으로 수정하면 기존 주소를 폼에 유지한다" do
+    sign_in @admin
+    url = "https://blog.naver.com/my-channel"
+    channel = @brand.brand_channels.create!(platform: "naver_blog", account_handle: "my-channel", profile_url: url)
+    patch admin_brand_brand_channel_path(@brand, channel),
+      params: { brand_channel: { account_handle: "", profile_url: url } }
+
+    assert_response :unprocessable_entity
+    assert_select "input[name='brand_channel[profile_url]'][value=?]", url
+    assert_select "input[name='brand_channel[account_handle]'][value='']"
+    assert_equal "my-channel", channel.reload.account_handle
+    assert_equal url, channel.profile_url
+  end
+
+  test "빈 네이버 블로그 계정 이름과 모델 오류를 함께 표시한다" do
+    sign_in @admin
+    assert_no_difference "BrandChannel.count" do
+      post admin_brand_brand_channels_path(@brand), params: {
+        brand_channel: { platform: "naver_blog", account_handle: "", profile_url: "", credential_ref: "invalid label" }
+      }
+    end
+    assert_response :unprocessable_entity
+    assert_select "[role=alert] li", text: "계정 이름을 적어 주세요. 채널 주소만 붙여 넣어도 됩니다."
+    assert_select "[role=alert] li", text: /보관 위치 이름표에는/
+  end
+
+  test "유튜브와 기타 채널은 계정 이름 없이 등록할 수 있다" do
+    sign_in @admin
+    %w[youtube other].each do |platform|
+      assert_difference "BrandChannel.count" do
+        post admin_brand_brand_channels_path(@brand), params: { brand_channel: { platform: platform } }
+      end
+      assert_redirected_to admin_brand_path(@brand)
+      assert @brand.brand_channels.find_by!(platform: platform).account_handle.blank?
+    end
+  end
+
+  test "계정 이름이 비어 있는 옛 채널의 연결 상태만 수정할 수 있다" do
+    sign_in @admin
+    channel = @brand.brand_channels.create!(platform: "naver_blog")
+    patch admin_brand_brand_channel_path(@brand, channel), params: { brand_channel: { session_status: "error" } }
+    assert_redirected_to admin_brand_path(@brand)
+    assert_equal "error", channel.reload.session_status
+    assert_nil channel.account_handle
+  end
+
   test "채널 폼은 기본 칸을 먼저 보여 주고 연결 설정은 접어 둔다" do
     sign_in @admin
 
@@ -61,7 +139,7 @@ class Admin::BrandChannelsControllerTest < ActionDispatch::IntegrationTest
     assert_select "details summary", text: /연결 설정/
 
     post admin_brand_brand_channels_path(@brand), params: {
-      brand_channel: { platform: "naver_blog", connection_method: "" }
+      brand_channel: { platform: "naver_blog", account_handle: "blog", connection_method: "" }
     }
     assert_redirected_to admin_brand_path(@brand)
     channel = @brand.brand_channels.sole
