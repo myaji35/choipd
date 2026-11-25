@@ -82,7 +82,7 @@
           <% if (url = http_url(brand.website_url)) %>
             <p style="margin-top: 8px;"><%= link_to url, url, target: '_blank', rel: 'noopener', style: 'color: var(--impd-accent); text-decoration: underline; display: inline-flex; align-items: center; min-height: 44px; overflow-wrap: anywhere;' %></p>
           <% end %>
-          <% if brand.personal? && industry_and_region.blank? && brand.description.blank? %>
+          <% if (brand.personal? || @brands.size == 1) && industry_and_region.blank? && brand.description.blank? %>
             <% profession = @member.profession_label if @member.profession.present? %>
             <% member_line = [["직업", profession == "custom" ? nil : profession], ["지역", @member.region]].filter_map { |label, value| "#{label}: #{value}" if value.present? }.join(" · ") %>
             <% if member_line.present? || @member.bio.present? %>

@@ -1,0 +1,38 @@
+<% published = post.is_published.to_i == 1 %>
+<% edit_failed = @post == post && @post.errors.any? %>
+<% item_id = "post-#{post.id}" %>
+<% just_saved = flash[:saved_item] == item_id %>
+<article id="<%= item_id %>" class="impd-card<%= ' is-just-saved' if just_saved %>" style="padding: 20px; overflow-wrap: anywhere;">
+  <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+    <h3 style="font-size: 17px; line-height: 1.45;<%= " color: var(--impd-muted);" unless published %>"><%= post.title %></h3>
+    <span style="border: 1px solid <%= published ? 'var(--impd-accent)' : 'var(--impd-rule)' %>; color: <%= published ? 'var(--impd-accent)' : 'var(--impd-muted)' %>; padding: 3px 7px; font-size: 12px; font-weight: 600;">
+      <%= published ? "보이는 중" : "나만 보기" %>
+    </span>
+    <% if just_saved %><span class="impd-just-saved-tag">방금 저장</span><% end %>
+  </div>
+  <p style="margin-top: 6px; font-size: 13px; color: var(--impd-muted);">
+    <% if post.published_at %>
+      <%= post.published_at.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %>에 올림
+    <% else %>
+      아직 고객에게 보이지 않아요
+    <% end %>
+    <% if post.category.present? %> · <%= post.category %><% end %>
+  </p>
+  <p class="post-preview"><%= truncate(post.content, length: 90) %></p>
+
+  <div class="impd-item-actions">
+    <details<%= " open" if edit_failed %>>
+      <summary>수정</summary>
+      <%= form_with model: (edit_failed ? @post : post), namespace: "edit_post_#{post.id}", url: slug_admin_post_path(slug: @member.slug, id: post), method: :patch, style: "margin: 8px 0;" do |form| %>
+        <%= render "post_fields", form: form %>
+        <%= form.submit "변경사항 저장", class: "impd-btn impd-btn-primary", style: "margin-top: 15px; height: 44px;" %>
+      <% end %>
+    </details>
+    <%= button_to(published ? "내 페이지에서 숨기기" : "내 페이지에 보이기",
+          toggle_publish_slug_admin_post_path(slug: @member.slug, id: post), method: :post,
+          class: "impd-btn impd-btn-quiet impd-btn-sm") %>
+    <%= button_to "삭제", slug_admin_post_path(slug: @member.slug, id: post), method: :delete,
+          class: "impd-btn impd-btn-danger impd-btn-sm",
+          form: { class: "impd-item-delete", data: { turbo_confirm: "이 소식을 지울까요? 지우면 되돌릴 수 없어요." } } %>
+  </div>
+</article>

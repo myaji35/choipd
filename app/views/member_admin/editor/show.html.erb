@@ -284,7 +284,7 @@
 
         <h2 class="impd-label">내 페이지 준비 항목</h2>
         <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px;">
-          <span class="impd-display" style="font-size: 36px; letter-spacing: -1px;"><%= done_count %><span style="color: var(--impd-muted); font-weight: 400;">/<%= @checklist.size %></span></span>
+          <span class="impd-display" style="font-size: 36px;"><%= done_count %><span style="color: var(--impd-muted); font-weight: 400;">/<%= @checklist.size %></span></span>
           <span class="impd-label-muted"><%= @checklist.size %>개 중 <%= done_count %>개 마쳤어요</span>
         </div>
         <p class="impd-label-muted" style="margin-bottom: 14px;">대시보드의 '다음 할 일'과 같은 목록이에요. 많이 채울수록 고객이 믿고 연락해요.</p>
@@ -315,7 +315,7 @@
           <div class="impd-stripe" style="position: absolute; inset: 0; opacity: 0.15;"></div>
           <div style="position: relative;">
             <div class="impd-label" style="color: var(--impd-paper);">내 페이지 주소</div>
-            <div class="impd-display" style="font-size: 28px; margin-top: 10px; letter-spacing: -0.5px; word-break: break-all;">
+            <div class="impd-display" style="font-size: 28px; margin-top: 10px; word-break: break-all;">
               impd.townin.net/<%= @member.slug %>
             </div>
             <div style="margin-top: 14px; font-size: 13px; color: rgba(239,236,228,.7); line-height: 1.55;">
@@ -408,7 +408,7 @@
   .editor-page select, .editor-fields :is(input, textarea) {
     max-width: 100%;
     border: 1px solid var(--impd-rule);
-    background: var(--impd-paper);
+    background: #fff;
     color: var(--impd-ink);
     font-family: var(--impd-font-sans);
     font-size: 16px;

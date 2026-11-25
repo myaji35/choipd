@@ -32,6 +32,13 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_select ".editor-pair", count: 2
   end
 
+  test "정보 확인 단계의 입력 칸은 흰 바탕이다" do
+    get slug_admin_editor_path(slug: @member.slug, step: 2)
+
+    assert_response :ok
+    assert_match(/\.editor-fields :is\(input, textarea\)\s*\{[^}]*background: #fff/, response.body)
+  end
+
   test "문서 유무에 맞게 강점 안내를 보여 준다" do
     path = slug_admin_editor_path(slug: @member.slug, step: 2)
     get path

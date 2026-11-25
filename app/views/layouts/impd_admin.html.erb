@@ -42,7 +42,7 @@
       @media (max-width: 768px) {
         .impd-admin .admin-page { padding: 20px 16px; }
       }
-      .impd-display { font-family: var(--impd-font-display); font-weight: 800; letter-spacing: -1.6px; line-height: 1.05; }
+      .impd-display { font-family: var(--impd-font-display); font-weight: 800; letter-spacing: -0.03em; word-spacing: 0.14em; line-height: 1.05; }
       .impd-section-header { display: flex; align-items: baseline; gap: 16px; border-top: 1px solid var(--impd-ink); padding-top: 14px; margin-bottom: 24px; }
       .impd-btn { display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; height: 44px; font-family: var(--impd-font-sans); font-size: 14px; font-weight: 600; letter-spacing: -0.2px; cursor: pointer; border: none; border-radius: 0; }
       .impd-btn-primary { background: var(--impd-ink); color: var(--impd-paper); }
@@ -51,10 +51,15 @@
       .impd-btn-secondary { background: transparent; color: var(--impd-ink); border: 1px solid var(--impd-ink); }
       .impd-btn-danger { background: transparent; color: var(--impd-accent-2); border: 1px solid var(--impd-accent-2); }
       .impd-btn-sm { height: 44px; padding: 0 12px; font-size: 13px; white-space: nowrap; }
+      .impd-btn-quiet { background: transparent; color: var(--impd-ink2); border: 0; text-decoration: underline; text-underline-offset: 3px; padding: 0 8px; }
+      .impd-btn-quiet:hover { color: var(--impd-ink); }
       .impd-item-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; padding-top: 6px; border-top: 1px solid var(--impd-rule); }
       .impd-item-actions details[open] { flex: 1 1 100%; min-width: 0; }
-      .impd-item-actions summary { cursor: pointer; color: var(--impd-accent); font-size: 13px; font-weight: 600; min-height: 44px; line-height: 44px; padding: 0 8px; }
-      .impd-item-actions details[open] > summary { width: fit-content; }
+      .impd-item-actions summary { cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 16px; border: 1px solid var(--impd-ink); color: var(--impd-ink); font-size: 13px; font-weight: 600; white-space: nowrap; list-style: none; }
+      .impd-item-actions summary::-webkit-details-marker { display: none; }
+      .impd-item-actions summary::after { content: "▾"; font-size: 11px; }
+      .impd-item-actions details[open] > summary { width: fit-content; background: var(--impd-ink); color: var(--impd-paper); }
+      .impd-item-actions details[open] > summary::after { content: "▴"; }
       .impd-item-actions .impd-item-delete { margin-left: auto; }
       .is-just-saved { border-color: var(--impd-accent) !important; box-shadow: inset 4px 0 0 var(--impd-accent); scroll-margin-top: 96px; }
       .impd-just-saved-tag { background: var(--impd-accent); color: var(--impd-card); padding: 3px 7px; font-size: 12px; font-weight: 700; white-space: nowrap; }

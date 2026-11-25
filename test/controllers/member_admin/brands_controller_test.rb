@@ -107,6 +107,22 @@ class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "하나뿐인 브랜드가 비어 있으면 내 페이지 정보를 보여 준다" do
+    @member.update!(region: "성남", bio: "소상공인 홍보를 돕습니다. " * 3)
+    Brand.create!(name: "하나뿐인 브랜드", member_id: @member.id)
+
+    get slug_admin_brand_path(slug: @member.slug)
+
+    assert_response :ok
+    assert_select "article.impd-card", count: 1 do |cards|
+      assert_includes cards.first.text, "지역: 성남"
+      assert_includes cards.first.text, "소상공인 홍보를 돕습니다."
+      assert_includes cards.first.text, "내 페이지에 적은 정보를 그대로 써요."
+      assert_select "a[href=?]", slug_admin_editor_path(slug: @member.slug, step: 2), text: "내 정보 고치기"
+    end
+    assert_not_includes response.body, "운영팀에 알려 주시면"
+  end
+
   test "개인 브랜드도 내 정보도 비어 있으면 적으러 가게 안내한다" do
     @member.update_columns(profession: nil, region: nil, bio: nil)
     Brand.create!(name: "개인", member_id: @member.id, personal: true)

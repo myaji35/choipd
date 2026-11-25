@@ -22,6 +22,7 @@ class MemberAdminPostsUxTest < ActionDispatch::IntegrationTest
     assert_select "#new-post h2", text: "새 소식 쓰기"
     assert_select "article details", count: 2
     assert_select "details[open]", count: 0
+    assert_select "article button.impd-btn-quiet", text: "내 페이지에서 숨기기"
     assert_select "article span", text: "보이는 중"
     assert_select "article span", text: "나만 보기"
     assert_select "article p", text: "2026.11.03 03:00에 올림 · 공지"
@@ -29,6 +30,56 @@ class MemberAdminPostsUxTest < ActionDispatch::IntegrationTest
     assert_select "article .post-preview", text: "이번 주 무료 상담"
     assert_select "#new-post input[type=checkbox][name='member_post[is_published]'][checked]", count: 1
     assert_select "article input[name='member_post[is_published]']", count: 0
+  end
+
+  test "최근 다섯 개만 펼치고 지난 소식을 숨기면 해당 카드를 펼쳐 강조한다" do
+    posts = 7.times.map do |index|
+      @member.member_posts.create!(title: "소식 #{index}", content: "상담 일정",
+        is_published: 1, published_at: index.days.ago)
+    end
+    oldest = posts.last
+
+    get @posts_path
+
+    assert_response :ok
+    assert_select ".impd-section-header .impd-label-muted", text: "7개"
+    assert_select ".posts-layout > section > div > article", count: 5
+    assert_select "details.posts-older", count: 1 do
+      assert_select "summary", text: "지난 소식 2개 더 보기"
+    end
+    assert_select "details.posts-older article", count: 2
+    assert_select "details.posts-older[open]", count: 0
+
+    post toggle_publish_slug_admin_post_path(slug: @member.slug, id: oldest)
+    follow_redirect!
+
+    assert_select "details.posts-older[open] article.is-just-saved", count: 1 do
+      assert_select "h3", text: oldest.title
+      assert_select ".impd-just-saved-tag", text: "방금 저장"
+    end
+  end
+
+  test "소식이 다섯 개면 지난 소식 묶음을 표시하지 않는다" do
+    5.times { |index| @member.member_posts.create!(title: "소식 #{index}", content: "상담 일정") }
+
+    get @posts_path
+
+    assert_response :ok
+    assert_select "article", count: 5
+    assert_select "details.posts-older", count: 0
+  end
+
+  test "지난 소식의 수정 저장에 실패하면 묶음과 수정 칸을 펼친다" do
+    oldest = @member.member_posts.create!(title: "지난 소식", content: "상담 일정", created_at: 1.day.ago)
+    5.times { |index| @member.member_posts.create!(title: "소식 #{index}", content: "상담 일정") }
+
+    patch slug_admin_post_path(slug: @member.slug, id: oldest),
+      params: { member_post: { title: "", content: "바꾼 상담 일정" } }
+
+    assert_response :unprocessable_entity
+    assert_select "details.posts-older[open] article#post-#{oldest.id} details[open]", count: 1 do
+      assert_select "textarea", text: "바꾼 상담 일정"
+    end
   end
 
   test "새 소식은 체크 여부에 맞게 저장된다" do

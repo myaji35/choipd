@@ -88,6 +88,14 @@ class MemberAdminFormFieldsTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "관리 화면 제목은 낱말 간격을 유지한다" do
+    get @pages.fetch(:services).first
+
+    assert_response :ok
+    assert_not_includes response.body, "letter-spacing: -1.6px"
+    assert_match(/\.impd-display\s*\{[^}]*word-spacing: 0\.14em/, response.body)
+  end
+
   private
 
   def create_member

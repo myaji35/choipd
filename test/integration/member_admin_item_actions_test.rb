@@ -14,7 +14,8 @@ class MemberAdminItemActionsTest < ActionDispatch::IntegrationTest
     get slug_admin_services_path(slug: @slug)
     assert_select "article#service-#{service.id} .impd-item-actions" do
       assert_select "summary", text: "수정"
-      assert_select "button", text: "내 페이지에서 숨기기"
+      assert_select "button.impd-btn-quiet", text: "내 페이지에서 숨기기"
+      assert_select "button.impd-btn-secondary", text: /숨기기/, count: 0
       assert_select ".impd-item-delete button.impd-btn-danger", text: "삭제"
     end
 
@@ -40,7 +41,8 @@ class MemberAdminItemActionsTest < ActionDispatch::IntegrationTest
     assert_select ".admin-subnav a", text: "FAQ", count: 0
     assert_select "article#faq-#{faq.id} .impd-item-actions" do
       assert_select "summary", text: "수정"
-      assert_select "button", text: "내 페이지에서 숨기기"
+      assert_select "button.impd-btn-quiet", text: "내 페이지에서 숨기기"
+      assert_select "button.impd-btn-secondary", text: /숨기기/, count: 0
       assert_select ".impd-item-delete button.impd-btn-danger", text: "삭제"
     end
 

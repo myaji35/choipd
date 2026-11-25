@@ -45,7 +45,7 @@
                 <%= button_to(visible ? "내 페이지에서 숨기기" : "내 페이지에 보이기",
                       slug_admin_faq_path(slug: @member.slug, id: faq), method: :patch,
                       params: { member_faq: { is_published: visible ? 0 : 1 }, visibility_toggle: 1 },
-                      class: "impd-btn impd-btn-secondary impd-btn-sm") %>
+                      class: "impd-btn impd-btn-quiet impd-btn-sm") %>
                 <%= button_to "삭제", slug_admin_faq_path(slug: @member.slug, id: faq), method: :delete,
                       class: "impd-btn impd-btn-danger impd-btn-sm",
                       form: { class: "impd-item-delete", data: { turbo_confirm: "이 질문을 지울까요? 지우면 되돌릴 수 없어요." } } %>
