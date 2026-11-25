@@ -4003,12 +4003,12 @@
     {
       "id": "ISS-504",
       "title": "[맡김] imPD 기본 기능: 클라우드 스캔 자동 정리(명함→주소록, 영수증→시트, 문서→폴더·파일명)",
-      "status": "READY",
+      "status": "IN_PROGRESS",
       "type": "FEATURE",
       "priority": "P2",
       "assign_to": "agent-harness",
       "created_at": "2026-11-25T09:10:32.423069+09:00",
-      "updated_at": "2026-11-25T00:10:35.749Z",
+      "updated_at": "2026-11-25T09:20:56+09:00",
       "payload": {
         "origin": "chat-delegate",
         "delegated": {
@@ -4033,7 +4033,23 @@
           }
         ],
         "approved_at": "2026-11-25T00:10:35.749Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "gate": "deploy",
+        "branch": "factory/ISS-504",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "회원 기본 기능으로 가치가 크고 1차는 기능 스위치 꺼짐·외부 API 가짜 대체 테스트로 안전하게 만들 수 있다. 다만 회원 AI 키 보관·구글 주소록/시트/드라이브 권한·개인정보처리방침 수집 항목이 걸려 있어 구현은 브랜치에서 하고 운영 켜기 전 대표님 확인(gate=deploy).",
+          "risk": "중간(개인정보·외부 권한) — 스위치 기본 꺼짐으로 운영 영향 없음",
+          "effort": "L",
+          "by": "factory-runner",
+          "at": "2026-11-25T09:20:56+09:00"
+        },
+        "deploy_gate_items": [
+          "구글 OAuth 권한 범위(drive.file·contacts·spreadsheets) 앱 검수 필요 여부",
+          "개인정보처리방침에 스캔 이미지·명함 연락처·영수증 항목 추가",
+          "회원 AI 키 보관 정책(암호화 키 AR_ENCRYPTION_* 운영 환경변수 주입 확인)",
+          "기능 스위치 IMPD_SCAN_ORGANIZER_ENABLED 운영 켜기"
+        ]
       }
     },
     {
