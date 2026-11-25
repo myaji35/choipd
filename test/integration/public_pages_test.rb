@@ -72,4 +72,22 @@ class PublicPagesTest < ActionDispatch::IntegrationTest
     get community_path
     assert_response :success
   end
+
+  test "chopd footer keeps inquiry entry and service links" do
+    [ education_path, media_path, works_path, new_inquiry_path ].each do |path|
+      get path
+      assert_response :success
+
+      assert_select "footer a[href=?]", new_inquiry_path, text: "B2B/B2G 문의하기"
+      assert_select "footer a[href=?]", education_path, text: "교육 과정"
+      assert_select "footer a[href=?]", media_path, text: "한국환경저널"
+      assert_select "footer a[href=?]", works_path, text: "작품 갤러리"
+      assert_select "footer a[href=?]", community_path, text: "커뮤니티"
+      assert_select "footer a[href=?]", community_path, text: "뉴스레터 구독"
+      assert_select "footer a[href=?]", education_path, text: "교육"
+      assert_select "footer a[href=?]", media_path, text: "미디어"
+      assert_select "footer a[href=?]", works_path, text: "작품"
+      assert_select "footer a.whitespace-nowrap", minimum: 9
+    end
+  end
 end
