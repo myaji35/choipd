@@ -1,0 +1,32 @@
+<% content_for :title, "회원 대행 등록" %>
+
+<header class="mb-6">
+  <h1 class="text-xl font-bold text-navy">회원 대행 등록</h1>
+  <p class="mt-2 text-sm text-gray-600">회원 대신 프로필 계정(네이버 인물정보·LinkedIn)과 채널(네이버 블로그·페이스북·인스타그램)을 등록하는 곳입니다.</p>
+</header>
+
+<%= form_with url: pd_members_path, method: :get, class: "mb-6 flex flex-wrap items-center gap-2" do |form| %>
+  <%= form.label :q, "이름·이메일·주소(슬러그) 검색", class: "sr-only" %>
+  <%= form.search_field :q, value: params[:q], placeholder: "이름·이메일·주소(슬러그) 검색", class: "min-w-0 max-w-full flex-1 basis-52 rounded-lg border border-gray-300 px-3 py-2 text-sm" %>
+  <%= form.submit "검색", class: "rounded-lg bg-primary px-4 py-2 text-sm text-white cursor-pointer" %>
+<% end %>
+
+<% if @members.empty? %>
+  <p class="rounded-lg border border-gray-100 bg-white p-4 text-sm text-gray-600 shadow-sm">조건에 맞는 회원이 없습니다.</p>
+<% else %>
+  <ul class="divide-y divide-gray-100 rounded-lg border border-gray-100 bg-white shadow-sm">
+    <% @members.each do |member| %>
+      <% account_count = (member.profile_accounts.map(&:platform) & ProfileAccount::PLATFORMS.keys).size %>
+      <% channel_count = (member.brands.flat_map { |brand| brand.brand_channels.map(&:platform) } & Pd::MembersController::CHANNEL_PLATFORMS.keys).size %>
+      <li class="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm">
+        <div class="min-w-0 max-w-full grow break-words">
+          <strong class="text-navy"><%= member.name %></strong>
+          <span class="text-gray-500">/<%= member.slug %></span>
+        </div>
+        <span class="text-gray-600">프로필 계정 <%= account_count %>/2</span>
+        <span class="text-gray-600">채널 <%= channel_count %>/3</span>
+        <%= link_to "등록·확인", pd_member_path(member), class: "ml-auto inline-flex min-h-[44px] items-center text-primary hover:underline" %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

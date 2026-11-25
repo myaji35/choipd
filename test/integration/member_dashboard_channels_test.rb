@@ -83,7 +83,7 @@ class MemberDashboardChannelsTest < ActionDispatch::IntegrationTest
     assert_select "#channel-status article[style*='overflow-wrap: anywhere']", count: 0
   end
 
-  test "운영자 대리 접속에서만 각 카드에 관리 화면 링크를 보여 준다" do
+  test "회원 본인에게는 관리 링크를 숨기고 운영자에게 플랫폼별 등록 링크를 보여 준다" do
     get @path
     assert_response :ok
     assert_select "#channel-status a", text: "관리 화면에서 열기", count: 0
@@ -93,6 +93,26 @@ class MemberDashboardChannelsTest < ActionDispatch::IntegrationTest
     get @path
 
     assert_response :ok
-    assert_select "#channel-status a[href=?]", admin_brands_path, text: "관리 화면에서 열기", count: 3
+    assert_select "#channel-status a", text: "관리 화면에서 열기", count: 3
+    MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS.each_key do |platform|
+      assert_select "#channel-status a[href=?]", new_pd_member_channel_path(@member, platform: platform),
+        text: "관리 화면에서 열기", count: 1
+    end
+  end
+
+  test "PD 대리 접속에서는 세 채널 모두 PD 관리 화면으로 연결한다" do
+    channel = @member.ensure_personal_brand!.brand_channels.create!(platform: "naver_blog")
+    reset!
+    sign_in AdminUser.create!(email: "dashboard-channel-pd@example.test", password: "password1234", role: "pd")
+    get @path
+
+    assert_response :ok
+    assert_select "#channel-status a", text: "관리 화면에서 열기", count: 3 do |links|
+      links.each do |link|
+        assert link["href"].start_with?("/pd/members/")
+        assert_not_includes link["href"], "/admin/brands"
+      end
+    end
+    assert_select "#channel-status a[href=?]", edit_pd_member_channel_path(@member, channel), text: "관리 화면에서 열기"
   end
 end

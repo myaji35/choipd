@@ -1,5 +1,17 @@
 <% content_for :title, "인물정보 계정 상세" %>
-<div class="mb-6"><%= link_to "← 인물정보 계정", pd_profile_accounts_path, class: "text-primary text-sm" %><h1 class="text-xl font-bold text-navy mt-2"><%= @account.display_name %></h1></div>
+<header class="mb-6">
+  <%= link_to "← 인물정보 계정", pd_profile_accounts_path, class: "text-primary text-sm" %>
+  <h1 class="text-xl font-bold text-navy mt-2"><%= @account.display_name %></h1>
+  <% if (member = @account.member) %>
+    <p class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
+      <span>회원 <%= member.name %></span>
+      <%= link_to "이 회원 대행 등록 현황", pd_member_path(member), class: "text-primary hover:underline" %>
+      <% if member.slug.present? %>
+        <%= link_to "회원 화면에서 확인", slug_admin_dashboard_path(slug: member.slug), class: "text-primary hover:underline" %>
+      <% end %>
+    </p>
+  <% end %>
+</header>
 <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-6 space-y-4">
   <dl class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
     <% { "플랫폼" => @account.platform_label, "로그인 아이디" => @account.login_id, "외부 ID" => @account.external_id, "직함/직업" => @account.headline, "권한" => @account.auth_status, "상태" => @account.session_status_label, "마지막 점검" => @account.last_checked_at&.localtime&.strftime("%Y-%m-%d %H:%M"), "활성화" => (@account.is_active? ? "활성" : "비활성"), "메모" => @account.notes, "최근 오류" => @account.last_error }.each do |label, value| %><div class="min-w-0"><dt class="text-gray-500"><%= label %></dt><dd class="text-navy break-all"><%= value.presence || "-" %></dd></div><% end %>

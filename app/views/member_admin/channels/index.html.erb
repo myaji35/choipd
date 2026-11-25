@@ -104,8 +104,8 @@
         <%= render "member_admin/channels/progress", item: item %>
       <% end %>
 
-      <% if impersonating_admin_user&.admin? %>
-        <p style="margin-top: 8px;"><%= link_to (channel ? "채널 수정 (운영자 화면)" : "채널 등록 (운영자 화면)"), channel_management_path(item), style: channel_link_style %></p>
+      <% if impersonating_admin_user.present? %>
+        <p style="margin-top: 8px;"><%= link_to (channel ? "채널 수정 (관리 화면)" : "채널 등록 (관리 화면)"), channel_management_path(item), style: channel_link_style %></p>
       <% end %>
     </section>
   <% end %>

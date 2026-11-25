@@ -245,6 +245,9 @@ Rails.application.routes.draw do
         end
       end
     end
+    resources :members, only: [ :index, :show ] do
+      resources :channels, only: [ :new, :create, :edit, :update ], controller: "member_channels"
+    end
     resources :scheduled_posts,  controller: "sns_scheduled_posts"
     resources :hero_images
     resources :leads,            only: [ :index ]

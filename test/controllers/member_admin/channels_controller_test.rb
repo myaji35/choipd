@@ -224,7 +224,7 @@ class MemberAdmin::ChannelsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "토큰 만료 상세"
   end
 
-  test "운영자 대리 접속에서만 채널 수정 링크가 보인다" do
+  test "대리 접속한 역할에 맞는 채널 관리 링크가 보인다" do
     channel = create_channel("naver_blog")
     management_path = edit_admin_brand_brand_channel_path(channel.brand, channel)
     consent_path = edit_slug_admin_brand_brand_channel_path(slug: @member.slug, id: channel.id)
@@ -234,8 +234,10 @@ class MemberAdmin::ChannelsControllerTest < ActionDispatch::IntegrationTest
     get @path
 
     assert_response :ok
-    assert_select "a[href=?]", management_path, text: "채널 수정 (운영자 화면)"
-    assert_select "a[href=?]", new_admin_brand_brand_channel_path(channel.brand), text: "채널 등록 (운영자 화면)", count: 2
+    assert_select "a[href=?]", management_path, text: "채널 수정 (관리 화면)"
+    %w[facebook_page instagram].each do |platform|
+      assert_select "a[href=?]", new_pd_member_channel_path(@member, platform: platform), text: "채널 등록 (관리 화면)", count: 1
+    end
     assert_includes response.body, "동의는 회원 본인만 바꿀 수 있어요."
     assert_select "a[href=?]", consent_path, count: 0
 
@@ -245,6 +247,7 @@ class MemberAdmin::ChannelsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :ok
     assert_select "a[href^='/admin/brands']", count: 0
+    assert_select "a[href=?]", edit_pd_member_channel_path(@member, channel), text: "채널 수정 (관리 화면)"
     assert_select "a[href=?]", consent_path, count: 0
     assert_includes response.body, "동의는 회원 본인만 바꿀 수 있어요."
   end

@@ -74,6 +74,10 @@
           <%= lni_icon "share-1", class: "w-4 h-4" %>
           <span>SNS 계정</span>
         <% end %>
+        <%= link_to pd_members_path, class: "flex items-center space-x-2 px-3 py-2 rounded text-sm transition-colors #{request.path.start_with?('/pd/members') ? 'bg-primary/10 text-primary font-medium' : 'text-gray-500 hover:text-navy hover:bg-gray-50'}" do %>
+          <%= lni_icon "user-4", class: "w-4 h-4" %>
+          <span>회원 대행 등록</span>
+        <% end %>
         <%= link_to pd_profile_accounts_path, class: "flex items-center space-x-2 px-3 py-2 rounded text-sm transition-colors #{request.path.include?('/pd/people_accounts') ? 'bg-primary/10 text-primary font-medium' : 'text-gray-500 hover:text-navy hover:bg-gray-50'}" do %>
           <%= lni_icon "id-card", class: "w-4 h-4" %>
           <span>인물정보 계정</span>

@@ -12,6 +12,7 @@ class PdLayoutMobileMenuTest < ActionDispatch::IntegrationTest
       assert_includes buttons.first["data-action"].to_s, "impd-nav#toggle"
     end
     assert_select "aside#pd-navigation[data-pd-menu]"
+    assert_select "aside#pd-navigation a[href=?]", pd_members_path, text: "회원 대행 등록", count: 1
     assert_select 'aside#pd-navigation button.pd-menu-close[aria-label="메뉴 닫기"][data-action="impd-nav#close"]'
     assert_select ".pd-backdrop[hidden]"
 

@@ -38,7 +38,8 @@ class Pd::ProfileAccountsController < Pd::BaseController
   end
 
   def new
-    @account = ProfileAccount.new(member_id: params[:member_id])
+    platform = params[:platform].presence_in(ProfileAccount::PLATFORMS.keys)
+    @account = ProfileAccount.new({ member_id: params[:member_id], platform: platform }.compact)
   end
 
   def create

@@ -23,12 +23,13 @@ module MemberAdmin::ChannelsHelper
   end
 
   def channel_management_path(item)
-    if (channel = item[:channel])
+    channel = item[:channel]
+    return new_pd_member_channel_path(@member, platform: item[:platform]) unless channel
+
+    if impersonating_admin_user&.admin?
       edit_admin_brand_brand_channel_path(channel.brand_id, channel)
-    elsif (brand = item[:brand])
-      new_admin_brand_brand_channel_path(brand)
     else
-      admin_brands_path
+      edit_pd_member_channel_path(@member, channel)
     end
   end
 

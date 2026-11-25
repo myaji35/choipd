@@ -28,7 +28,7 @@
           <h3 style="font-size: 16px; font-weight: 700;"><%= item[:label] %> 등록 전</h3>
           <p style="color: var(--impd-muted); margin-top: 4px;">등록하면 운영팀이 글을 대신 올려 드려요. 등록은 운영자·PD에게 요청해 주세요.</p>
         <% end %>
-        <% if channel || impersonating_admin_user&.admin? %>
+        <% if channel || impersonating_admin_user.present? %>
           <div style="display: flex; flex-wrap: wrap; gap: 0 16px;">
             <% if channel %>
               <%= link_to "자세히 보기", slug_admin_channels_path(slug: @member.slug, anchor: "channel-#{channel.id}"), style: channel_link_style %>
@@ -36,7 +36,7 @@
                 <%= link_to "프로필 열기 ↗", profile_url, target: "_blank", rel: "noopener", style: channel_link_style %>
               <% end %>
             <% end %>
-            <% if impersonating_admin_user&.admin? %>
+            <% if impersonating_admin_user.present? %>
               <%= link_to "관리 화면에서 열기", channel_management_path(item), style: "#{channel_link_style} font-size: 12px; margin-left: auto;" %>
             <% end %>
           </div>

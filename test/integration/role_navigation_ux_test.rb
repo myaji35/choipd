@@ -133,6 +133,19 @@ class RoleNavigationUxTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "이미 로그인되어 있습니다."
   end
 
+  test "운영자 회원 상세에서 채널 관리와 대행 등록으로 이동할 수 있다" do
+    member = create_member(status: "approved")
+    brand = member.ensure_personal_brand!
+    sign_in staff_user("admin")
+
+    get admin_member_path(member)
+
+    assert_response :ok
+    assert_select "a[href=?]", admin_brand_path(brand), text: brand.name
+    assert_select "a[href=?]", edit_admin_brand_path(brand), text: "수정"
+    assert_select "a[href=?]", pd_member_path(member), text: "계정·채널 대행 등록"
+  end
+
   private
 
   def staff_user(role)

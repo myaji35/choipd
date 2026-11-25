@@ -219,7 +219,8 @@
         <ul class="space-y-2 text-sm">
           <% brands.each do |brand| %>
             <li>
-              <%= link_to brand.name, edit_admin_brand_path(brand), class: "text-primary hover:underline" %>
+              <%= link_to brand.name, admin_brand_path(brand), class: "text-primary hover:underline" %>
+              <%= link_to "수정", edit_admin_brand_path(brand), class: "ml-2 text-xs text-primary hover:underline" %>
               <% if brand.personal? %><span class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">개인(기본)</span><% end %>
             </li>
           <% end %>
@@ -228,7 +229,7 @@
       <% unless brands.any?(&:personal?) %>
         <%= button_to "개인 브랜드 만들기", create_personal_brand_admin_member_path(@member), class: "mt-3 bg-primary text-white px-3 py-2 rounded-lg text-sm" %>
       <% end %>
-      <p class="mt-3 text-xs text-gray-600">블로그·YouTube·인스타·페북·스레드 채널은 브랜드 편집 화면의 SocialDoctors 연결에서 관리합니다.</p>
+      <p class="mt-3 text-xs text-gray-600">네이버 블로그·페이스북·인스타그램 채널 등록은 아래 '계정·채널 대행 등록'에서 합니다. 개인 브랜드가 없으면 등록할 때 자동으로 만들어집니다.</p>
     </section>
 
     <section class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
@@ -247,6 +248,9 @@
         <p class="text-sm text-gray-600">연결된 프로필 계정이 없습니다.</p>
       <% end %>
       <%= link_to "계정 추가", new_pd_profile_account_path(member_id: @member.id), class: "inline-block mt-3 text-sm text-primary hover:underline" %>
+      <div>
+        <%= link_to "계정·채널 대행 등록", pd_member_path(@member), class: "inline-block mt-3 bg-primary text-white px-3 py-2 rounded-lg text-sm" %>
+      </div>
     </section>
 
     <!-- IMPD 인증 -->

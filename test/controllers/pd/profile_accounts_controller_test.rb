@@ -22,6 +22,30 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "계정 등록 화면에서 주소의 플랫폼과 회원을 미리 선택한다" do
+    member = Member.create!(name: "계정 등록 회원", email: "profile-new-member@example.test", slug: "profile-new-member")
+
+    get new_pd_profile_account_path(member_id: member.id, platform: "linkedin")
+
+    assert_response :ok
+    assert_select "#profile_account_platform option[value=linkedin][selected]"
+    assert_select "#profile_account_member_id option[value=?][selected]", member.id.to_s
+  end
+
+  test "계정 목록과 상세에서 연결된 회원으로 이동할 수 있다" do
+    member = Member.create!(name: "계정 연결 회원", email: "profile-linked-member@example.test", slug: "profile-linked")
+    @account.update!(member: member)
+
+    get pd_profile_accounts_path
+    assert_response :ok
+    assert_select "td a[href=?]", pd_member_path(member), text: member.name
+
+    get pd_profile_account_path(@account)
+    assert_response :ok
+    assert_select "a[href=?]", pd_member_path(member), text: "이 회원 대행 등록 현황"
+    assert_select "a[href=?]", slug_admin_dashboard_path(slug: member.slug), text: "회원 화면에서 확인"
+  end
+
   test "weekly report renders both platforms and the date form" do
     travel_to Time.utc(2026, 11, 23, 15, 30)
     @account.profile_snapshots.create!(captured_at: Time.current, data: {

@@ -1,0 +1,52 @@
+<% content_for :title, title %>
+<% editing = @brand_channel.persisted? %>
+<% platforms = Pd::MemberChannelsController::CHANNEL_PLATFORMS %>
+<% form_url = editing ? pd_member_channel_path(@member, @brand_channel) : pd_member_channels_path(@member) %>
+<% field_class = "w-full min-w-0 rounded-lg border border-gray-300 px-3 py-2 text-sm" %>
+<% label_class = "mb-1 block text-sm font-medium text-gray-700" %>
+
+<header class="mb-6 break-words">
+  <%= link_to "← #{@member.name} 대행 등록", pd_member_path(@member), class: "text-sm text-primary" %>
+  <h1 class="mt-2 text-xl font-bold text-navy"><%= title %></h1>
+  <p class="mt-1 text-sm text-gray-600"><%= @member.name %> (/<%= @member.slug %>)</p>
+</header>
+
+<div class="max-w-2xl rounded-lg border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
+  <%= form_with model: @brand_channel, url: form_url, scope: :brand_channel, class: "space-y-4" do |form| %>
+    <% if @brand_channel.errors.any? %>
+      <ul class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600" role="alert">
+        <% @brand_channel.errors.each do |error| %>
+          <li><%= error.message %></li>
+        <% end %>
+      </ul>
+    <% end %>
+    <div>
+      <% if editing %>
+        <p class="<%= label_class %>">채널 종류</p>
+        <p class="text-sm text-navy"><%= platforms.fetch(@brand_channel.platform) %></p>
+      <% else %>
+        <%= form.label :platform, "채널 종류", class: label_class %>
+        <%= form.select :platform, platforms.map { |platform, label| [label, platform] }, { include_blank: "선택해 주세요" }, required: true, class: field_class %>
+      <% end %>
+    </div>
+    <div>
+      <%= form.label :account_handle, "계정 이름(핸들)", class: label_class %>
+      <%= form.text_field :account_handle, class: field_class, aria: { describedby: "channel-handle-help" } %>
+      <p id="channel-handle-help" class="mt-1 text-xs text-gray-600">예: 블로그 아이디, 인스타그램 @ 뒤 이름</p>
+    </div>
+    <div>
+      <%= form.label :profile_url, "채널 주소", class: label_class %>
+      <%= form.url_field :profile_url, placeholder: "https://", class: field_class %>
+    </div>
+    <div>
+      <%= form.label :notes, "메모", class: label_class %>
+      <%= form.text_area :notes, rows: 3, class: field_class, aria: { describedby: "channel-notes-help" } %>
+      <p id="channel-notes-help" class="mt-1 text-xs text-gray-600">비밀번호는 여기에 적지 마세요.</p>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      <%= form.submit(editing ? "저장" : "등록", class: "rounded-lg bg-primary px-6 py-2 text-sm text-white cursor-pointer") %>
+      <%= link_to "취소", pd_member_path(@member), class: "rounded-lg bg-gray-100 px-6 py-2 text-sm text-gray-700" %>
+    </div>
+  <% end %>
+  <p class="mt-4 text-xs text-gray-600">등록 뒤 회원이 '내 채널'에서 운영 위탁에 동의하면 글을 올릴 수 있습니다.</p>
+</div>
