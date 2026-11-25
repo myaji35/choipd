@@ -83,7 +83,7 @@
              ["예약 링크", slug_admin_bookings_path(slug:), %w[bookings]]
            ],
            **(ScanOrganizer.enabled? ? { "업무" => [
-             ["스캔 정리", slug_admin_scan_organizer_path(slug:), %w[scan_organizers scan_items]]
+             ["스캔 정리", slug_admin_scan_organizer_path(slug:), %w[scan_organizers]]
            ] } : {}),
            "홍보" => [
              ["내 브랜드", slug_admin_brand_path(slug:), %w[brands brand_channels]],

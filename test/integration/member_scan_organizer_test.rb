@@ -11,14 +11,6 @@ class MemberScanOrganizerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  class FakeCloud
-    def create_contact(fields)
-      raise "Unexpected contact" unless fields == { names: [ { unstructuredName: "김회원" } ] }
-
-      "people/1"
-    end
-  end
-
   setup do
     @original_flag = ENV["IMPD_SCAN_ORGANIZER_ENABLED"]
     @member = create_member("scan-owner")
@@ -42,8 +34,32 @@ class MemberScanOrganizerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     post test_ai_key_slug_admin_scan_organizer_path(slug: @member.slug)
     assert_response :not_found
-    post resolve_slug_admin_scan_item_path(slug: @member.slug, id: 123)
-    assert_response :not_found
+  end
+
+  test "shows Gemini instructions and the saved organization prompt" do
+    ENV["IMPD_SCAN_ORGANIZER_ENABLED"] = "1"
+    patch @scan_path, params: { scan_organizer_setting: {
+      cloud_provider: "google_drive", receipts_sheet_name: "경비 장부", documents_folder_name: "자료실",
+      review_folder_name: "검토함", run_frequency: "weekly"
+    } }
+    assert_response :see_other
+
+    follow_redirect!
+    assert_response :success
+    assert_select "option[value=google_drive][selected]", text: /구글 드라이브.*Gemini/
+    assert_select "option[value=onedrive][disabled]", text: /원드라이브.*준비 중/
+    assert_select "h2", text: "Gemini 주기 실행 안내"
+    assert_select "ol li", text: /예약된 작업.*매주/
+    assert_select "textarea[readonly]", text: /#{@member.name}.*매주.*경비 장부.*자료실.*검토함/m
+    assert_select "button[type=button]", text: "프롬프트 복사"
+
+    patch @scan_path, params: { scan_organizer_setting: { cloud_provider: "onedrive", run_frequency: "daily" } }
+    assert_response :see_other
+    follow_redirect!
+    assert_includes response.body, "스캔 설정을 저장하지 못했습니다"
+    setting = @member.reload.scan_organizer_setting
+    assert_equal "google_drive", setting.cloud_provider
+    assert_equal "weekly", setting.run_frequency
   end
 
   test "enabled page stores a key without exposing it in the response or logs" do
@@ -61,7 +77,7 @@ class MemberScanOrganizerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", @scan_path, text: "스캔 정리"
     key = "secret-member-api-key-9876"
 
-    patch @scan_path, params: { scan_organizer_setting: { ai_provider: "gemini", ai_api_key: key, scan_folder_name: "스캔" } }
+    patch @scan_path, params: { scan_organizer_setting: { ai_provider: "gemini", ai_api_key: key, documents_folder_name: "스캔" } }
     assert_response :see_other
     refute_includes response.body, key
 
@@ -72,7 +88,7 @@ class MemberScanOrganizerTest < ActionDispatch::IntegrationTest
     assert_select "input[type=password][value='']"
     assert_equal key, @member.reload.scan_organizer_setting.ai_api_key
 
-    patch @scan_path, params: { scan_organizer_setting: { ai_api_key: "", scan_folder_id: "folder-id" } }
+    patch @scan_path, params: { scan_organizer_setting: { ai_api_key: "", documents_folder_name: "folder-id" } }
     assert_response :see_other
     assert_equal key, @member.reload.scan_organizer_setting.ai_api_key
     refute_includes log.string, key
@@ -89,19 +105,17 @@ class MemberScanOrganizerTest < ActionDispatch::IntegrationTest
 
     get @scan_path
     assert_redirected_to login_member_path(slug: @member.slug)
-    patch @scan_path, params: { scan_organizer_setting: { scan_folder_id: "other-folder" } }
+    patch @scan_path, params: { scan_organizer_setting: { documents_folder_name: "other-folder" } }
+    assert_redirected_to login_member_path(slug: @member.slug)
+    post test_ai_key_slug_admin_scan_organizer_path(slug: @member.slug)
     assert_redirected_to login_member_path(slug: @member.slug)
     assert_nil @member.reload.scan_organizer_setting
   end
 
-  test "connection test and review use replaceable adapters and member scoped items" do
+  test "connection test uses the saved key" do
     ENV["IMPD_SCAN_ORGANIZER_ENABLED"] = "1"
     setting = @member.create_scan_organizer_setting!(ai_provider: "gemini", ai_api_key: "stored-key-1234")
-    item = @member.scan_items.create!(source_file_id: "id1", source_name: "명함.png", status: "needs_review", extracted: { category: "business_card", fields: { name: "김회원" } }, failure_reason: "주소록 오류")
-    @member.scan_items.create!(source_file_id: "id2", status: "processing")
-    other_item = create_member("scan-item-other").scan_items.create!(source_file_id: "id1", status: "needs_review")
     ai = FakeAi.new
-    cloud = FakeCloud.new
 
     with_adapter(:ai_provider_for, ai) do
       post test_ai_key_slug_admin_scan_organizer_path(slug: @member.slug), params: { api_key: "unsaved-key" }
@@ -109,21 +123,6 @@ class MemberScanOrganizerTest < ActionDispatch::IntegrationTest
       assert_equal "stored-key-1234", ai.tested_key
       assert setting.reload.ai_key_verified_at.present?
     end
-
-    get @scan_path
-    assert_select "td", text: "확인 필요"
-    assert_select "td", text: "주소록 오류"
-    assert_select "td", text: "처리 중"
-    assert_select "form[action=?]", resolve_slug_admin_scan_item_path(slug: @member.slug, id: item), count: 3
-
-    with_adapter(:cloud_for, cloud) do
-      post resolve_slug_admin_scan_item_path(slug: @member.slug, id: other_item), params: { category: "business_card" }
-      assert_response :not_found
-      post resolve_slug_admin_scan_item_path(slug: @member.slug, id: item), params: { category: "business_card" }
-      assert_response :see_other
-    end
-    assert_equal "processed", item.reload.status
-    assert_equal "needs_review", other_item.reload.status
   end
 
   test "short keys are masked even if an older record has a stored suffix" do

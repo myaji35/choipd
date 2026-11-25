@@ -1,13 +1,15 @@
 class ScanOrganizerSetting < ApplicationRecord
   AI_PROVIDERS = %w[gemini openai anthropic].freeze
-  SECRET_ATTRIBUTES = %i[ai_api_key cloud_refresh_token].freeze
+  SECRET_ATTRIBUTES = %i[ai_api_key].freeze
+  RUN_FREQUENCIES = { "daily" => "매일", "weekly" => "매주" }.freeze
 
   belongs_to :member
 
-  encrypts :cloud_refresh_token
   encrypts :ai_api_key
   self.filter_attributes += SECRET_ATTRIBUTES
 
+  validates :cloud_provider, inclusion: { in: ->(_) { ScanOrganizer::Clouds.available_keys } }
+  validates :run_frequency, inclusion: { in: RUN_FREQUENCIES.keys }
   validates :ai_provider, inclusion: { in: AI_PROVIDERS }, allow_nil: true
 
   def ai_key_last4

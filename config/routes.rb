@@ -367,9 +367,6 @@ Rails.application.routes.draw do
       resource :scan_organizer, path: "scan", only: [ :show, :update ] do
         post :test_ai_key
       end
-      resources :scan_items, path: "scan/items", only: [] do
-        member { post :resolve }
-      end
       resources :sns_accounts, only: [ :index, :create, :update, :destroy ] do
         resources :follower_snapshots, controller: "sns_follower_snapshots", only: [ :create ]
       end

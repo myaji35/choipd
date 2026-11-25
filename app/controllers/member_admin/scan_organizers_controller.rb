@@ -3,11 +3,14 @@ class MemberAdmin::ScanOrganizersController < MemberAdmin::BaseController
   before_action :set_setting
 
   def show
-    @scan_items = @member.scan_items.order(created_at: :desc, id: :desc)
+    @cloud = ScanOrganizer::Clouds.fetch(@setting.cloud_provider)
+    @prompt = ScanOrganizer::PromptBuilder.new(member: @member, setting: @setting).build
   end
 
   def update
-    attributes = params.expect(scan_organizer_setting: [ :scan_folder_id, :scan_folder_name, :ai_provider, :ai_api_key ])
+    attributes = params.expect(scan_organizer_setting: [
+      :cloud_provider, :receipts_sheet_name, :documents_folder_name, :review_folder_name, :run_frequency, :ai_provider, :ai_api_key
+    ])
     attributes.delete(:ai_api_key) if attributes[:ai_api_key].blank?
     attributes[:ai_provider] = attributes[:ai_provider].presence if attributes.key?(:ai_provider)
 

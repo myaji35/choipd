@@ -1,35 +1,29 @@
-# 스캔 정리 1차
+# 스캔 정리
 
-회원이 구글 드라이브 스캔 폴더에 올린 이미지를 회원 본인의 Gemini, OpenAI 또는 Anthropic 키로 분류합니다. `IMPD_SCAN_ORGANIZER_ENABLED=1`이면 회원 관리자 메뉴의 **업무 → 스캔 정리**에서 폴더와 AI 키를 등록하고 처리 내역을 볼 수 있습니다. 스위치는 기본으로 꺼져 있습니다.
+imPD 회원 화면에서 정리 규칙을 저장하면 회원 이름과 규칙이 들어간 프롬프트를 생성합니다. 회원은 프롬프트를 복사해 구글 드라이브에 연결된 Gemini에서 직접 실행합니다. imPD 서버는 회원 드라이브나 주소록 권한을 받지 않고 스캔본을 읽거나 분류하지 않으므로, 이 기능을 위한 구글 민감 권한 검수는 필요하지 않습니다.
 
-## 처리 흐름
+## 회원 화면 흐름
 
-1. 구글 드라이브 어댑터가 스캔 폴더 바로 아래의 이미지 목록을 읽습니다. 처리기는 회원과 드라이브 파일 ID를 기준으로 항목을 찾아 완료 및 확인 대기 항목의 중복 처리를 건너뜁니다.
-2. 처리기가 원본 이미지를 내려받아 회원이 선택한 AI 제공자에 전송합니다. 분류 신뢰도가 0.75 미만이거나 알려진 분류가 아니면 추출 결과를 저장하고 **확인 필요**로 표시합니다. 회원은 처리 내역에서 분류를 선택해 저장을 실행할 수 있습니다.
-3. 명함은 Google People API를 통해 회원 주소록에 연락처를 생성합니다. 영수증은 스캔 폴더의 앱 전용 **영수증** 스프레드시트에 날짜, 가맹점, 합계, 부가세, 결제수단, 원본 파일명 순으로 추가합니다. 문서는 스캔 폴더 아래 `문서/<문서 유형>`에 이동하고 날짜와 제목으로 이름을 변경합니다. 날짜를 알 수 없으면 처리일을 사용합니다.
-4. 완료 시 결과 위치와 처리 시각을, 실패 시 자격 증명을 치환한 실패 사유를 기록합니다. 외부 쓰기 요청 직후 통신이 끊기면 결과가 불확실할 수 있으므로 재처리 전에 주소록이나 시트를 확인합니다.
+1. 관리자 메뉴의 **스캔 정리**에서 클라우드를 선택합니다. 구글 드라이브를 사용할 수 있으며 원드라이브는 준비 중입니다.
+2. 영수증 시트 이름, 문서 폴더 이름, 확인 필요 폴더 이름과 매일 또는 매주 실행할 주기를 저장합니다. 이름을 비우면 각각 ‘회원 이름 영수증’, ‘스캔 문서’, ‘스캔 확인 필요’를 사용합니다.
+3. 저장된 규칙으로 만든 프롬프트를 복사해 Gemini에서 한 번 실행하고 결과 표를 확인합니다.
+4. 계정에서 지원하면 Gemini의 ‘예약된 작업’에 프롬프트를 등록합니다. 일부 작업이 지원되지 않으면 결과 표의 ‘직접 반영 필요’ 항목을 손으로 처리합니다.
+5. 필요한 경우 회원 본인의 Gemini, OpenAI 또는 Anthropic 키를 등록하고 연결을 시험합니다. 저장된 키는 암호화되며 화면에는 등록 여부와 표시 가능한 끝 네 자리만 나옵니다. 키 입력을 비워 저장하면 기존 키를 유지합니다.
 
-[People API 연락처 생성](https://developers.google.com/people/api/rest/v1/people/createContact) · [Sheets API 행 추가](https://developers.google.com/workspace/sheets/api/reference/rest/v4/spreadsheets.values/append) · [Drive 폴더 및 파일 이동](https://developers.google.com/workspace/drive/api/guides/folder)
+## 클라우드 추가 방법
 
-## 구글 권한 범위
+1. `app/services/scan_organizer/clouds.rb`에 `key`, `label`, `ai_label`, `available`과 플랫폼별 안내 `instructions`를 등록합니다. 안내에 `%{frequency}`를 쓰면 저장된 주기가 표시됩니다.
+2. `app/services/scan_organizer/prompts/<key>.txt`에 한국어 프롬프트를 추가합니다. 템플릿에서는 `%{member_name}`, `%{receipts_sheet_name}`, `%{documents_folder_name}`, `%{review_folder_name}`, `%{frequency}`를 사용할 수 있습니다.
+3. 실제 계정에서 안내와 프롬프트를 검증한 뒤 `available`을 켭니다. 화면과 모델은 같은 등록부를 사용합니다.
 
-- `drive.file`을 우선 사용합니다. 앱이 생성했거나 회원이 Picker로 고른 파일에 접근하고 이동 및 이름 변경에 사용합니다.
-- `contacts`는 Google People API로 주소록에 연락처를 생성하는 데 사용합니다.
-- `spreadsheets`는 Google Sheets에 영수증 데이터를 추가하는 데 사용합니다.
+## 운영 켜기 전 확인
 
-스캐너 앱이 업로드한 파일은 `drive.file`만으로 목록 조회나 다운로드가 제한될 수 있습니다. Picker로 폴더와 필요한 파일을 회원이 직접 고르게 한 뒤, 새로 올라오는 파일의 조회 및 다운로드 가능 여부를 확인해야 합니다. Picker로 권한을 부여하는 흐름으로도 자동 수집이 불가능하면 읽기에 제한 권한인 `drive.readonly`가 필요하며 Google 앱 검수를 거쳐야 합니다. 파일 이동과 이름 변경에는 별도의 쓰기 권한이 필요하므로 대상 파일에 대해 Picker와 `drive.file`로 쓰기 가능 여부를 검증합니다. [Google Drive 권한 범위](https://developers.google.com/workspace/drive/api/guides/api-specific-auth)
-
-## 운영에서 켜기 전 대표님 확인 항목
-
-- Google 동의 화면 및 요청 권한을 검토하고 필요한 앱 검수를 완료합니다. 운영 OAuth 클라이언트의 `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`을 주입합니다.
-- 개인정보처리방침에 명함 연락처, 영수증 데이터, 스캔 이미지의 수집 항목과 목적, 보관 기간 및 삭제 절차를 반영합니다. 스캔 이미지가 회원이 선택한 AI 제공자에게 전송되는 점을 안내합니다.
-- AI 키의 보관 기간, 교체 및 삭제 정책을 승인합니다. 운영 환경에 `AR_ENCRYPTION_PRIMARY_KEY`, `AR_ENCRYPTION_DETERMINISTIC_KEY`, `AR_ENCRYPTION_SALT`를 주입합니다. AI 키와 구글 갱신 토큰은 DB에 암호화해 보관합니다.
-- 세 제공자 모델 이름을 확인합니다. 필요하면 `SCAN_ORGANIZER_GEMINI_MODEL`, `SCAN_ORGANIZER_OPENAI_MODEL`, `SCAN_ORGANIZER_ANTHROPIC_MODEL`로 지정합니다.
-- Drive 폴더·시트의 find_or_create가 동시에 실행되면 중복 생성될 수 있으므로 주기 처리 잡은 회원당 1개만 실행되도록 합니다.
-- 운영 승인 후 `IMPD_SCAN_ORGANIZER_ENABLED=1`을 설정합니다.
+- AI 키의 보관·교체·삭제 정책과 담당자를 확정하고 운영 환경에 `AR_ENCRYPTION_PRIMARY_KEY`, `AR_ENCRYPTION_DETERMINISTIC_KEY`, `AR_ENCRYPTION_SALT`를 주입합니다.
+- 등록된 AI 키는 연결 시험에만 사용됩니다. Gemini 앱에서 실행하는 정리 작업에는 회원의 앱 계정과 연결 권한을 사용합니다.
+- 개인정보처리방침에 ‘AI 키(암호화 보관)’ 항목을 추가할지 확인합니다.
+- 실제 운영 대상 계정에서 Gemini 예약 작업, Google Workspace 연결, 주소록 추가 및 파일 이동 지원 범위를 확인합니다.
+- 확인을 마치면 운영 환경에 `IMPD_SCAN_ORGANIZER_ENABLED=1`을 설정합니다.
 
 ## 다음 단계
 
-구글 OAuth 연결 화면과 동의 왕복, 폴더 및 파일 선택용 Picker, 주기 처리 잡, 원드라이브 어댑터를 추가합니다. 주기 처리 잡은 처리 도중 프로세스가 끊겨 `processing`(처리 중)으로 오래 남은 항목을 일정 시간 뒤 `failed`로 되돌려 다시 처리되게 해야 합니다(1차에는 잡이 없어 해당 경로 없음). 1차 화면은 구글 드라이브 연결이 운영 승인 후 열린다고 안내합니다.
-
-AI 이미지 요청 형식은 각 제공자의 API 문서를 따릅니다. [Gemini 모델](https://aistudio.google.com/docs/models/gemini-3.5-flash-lite) · [OpenAI 이미지 입력](https://developers.openai.com/api/docs/guides/images-vision) · [Anthropic 이미지 입력](https://platform.claude.com/docs/en/build-with-claude/vision)
+원드라이브용 Microsoft Copilot 프롬프트와 실행 안내를 작성하고, 실제 계정에서 파일 검색·이동 및 반복 실행 지원 범위를 검증합니다.
