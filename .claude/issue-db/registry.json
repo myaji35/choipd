@@ -4148,12 +4148,12 @@
     {
       "id": "ISS-504",
       "title": "imPD 기본 기능: 스캔 문서 정리 — 플랫폼 AI 프롬프트 방식(구글 드라이브=Gemini), 클라우드 회원 선택, AI 키 등록",
-      "status": "DONE",
+      "status": "READY",
       "type": "FEATURE",
       "priority": "P2",
       "assign_to": "agent-harness",
       "created_at": "2026-11-25T09:10:32.423069+09:00",
-      "updated_at": "2026-11-25T02:46:49.447Z",
+      "updated_at": "2026-11-25T04:53:38Z",
       "payload": {
         "origin": "chat-delegate",
         "delegated": {
@@ -4188,11 +4188,11 @@
         "branch": "factory/ISS-504",
         "recommendation": {
           "verdict": "승인 권장",
-          "reason": "대표님 결정(A. 스위치 끈 채로 합치기) — 이 결정대로 진행",
-          "risk": "—",
-          "effort": "—",
-          "by": "관제실 결정",
-          "at": "2026-11-25T02:46:49.447Z"
+          "reason": "실행기 재검증 실패로 되돌림 — 다시 돌린 결과가 다름: `PARALLEL_WORKERS=1 bin/rails test test/integration/member_sc` 기록 0 → 실제 1",
+          "risk": "낮음",
+          "effort": "작음",
+          "by": "factory-recheck",
+          "at": "2026-11-25T04:53:38Z"
         },
         "deploy_gate_items": [
           "회원 AI 키 보관·교체·삭제 정책 승인, 운영 AR_ENCRYPTION_* 키 주입 확인(현재 키 용도는 연결 시험뿐)",
@@ -4316,6 +4316,40 @@
           "question": "스위치를 끈 상태의 \"스캔 정리\" 기능을 본선(main)에 합칠까요?",
           "by": "대표님(헤르메스)",
           "at": "2026-11-25T02:46:49.447Z"
+        },
+        "recheck_reopens": 1,
+        "recheck_fail": {
+          "at": "2026-11-25T04:53:38Z",
+          "sha": "091a09e",
+          "problems": [
+            "다시 돌린 결과가 다름: `PARALLEL_WORKERS=1 bin/rails test test/integration/member_sc` 기록 0 → 실제 1",
+            "다시 돌린 결과가 다름: `bin/rails test` 기록 0 → 실제 1",
+            "다시 돌린 결과가 다름: `bin/rubocop` 기록 0 → 실제 1"
+          ]
+        },
+        "next_prompt_at": "2026-11-25T04:56:34.706832Z",
+        "next_prompt_proposals": [
+          {
+            "next_prompt": "ISS-504 recheck 실패 원인을 찾아 고쳐라. recheck 기록(sha 091a09e, 2026-11-25T04:53:38Z)에서 `PARALLEL_WORKERS=1 bin/rails test test/integration/member_scan_organizer_test.rb ...`, `bin/rails test`, `bin/rubocop` 세 명령이 모두 기록 exit 0 인데 실제 exit 1 로 나왔다. 순서: (1) `git cat-file -t 091a09e` 와 `git branch --contains 091a09e` 로 이 sha 가 main(bc80d3d)에 포함된 커밋인지, 아니면 병합 전 브랜치 커밋인지 먼저 밝힌다. (2) recheck 가 돌린 작업 디렉터리·브랜치 상태에서 세 명령을 각각 실행해 exit 1 의 첫 오류 메시지(마지막 30줄)를 그대로 기록한다. (3) 원인이 코드·마이그레이션·테스트 문제면 고치고 세 명령이 모두 exit 0 이 되게 한다. 원인이 recheck 실행 환경(잘못된 sha·브랜치 체크아웃, 번들·DB 준비 누락 등)이면 코드는 건드리지 말고 recheck 가 main 최신(bc80d3d 이후)에서 돌도록 설정을 바로잡는다. 마지막에 원인 한 줄, 수정 내용, 세 명령의 실제 exit code 와 출력 요약을 보고한다.",
+            "basis": "recheck_fail: 세 명령 모두 기록 0 → 실제 1. 테스트·rubocop 이 한꺼번에 실패하고 sha 091a09e 가 git_log 의 main 커밋(bc80d3d, 8f9b841, 584bd2d)에 없다. 기준 4(전체 통과)는 proof 상 충족이지만 recheck 와 충돌한다.",
+            "expected_effect": "recheck 실패가 코드 결함인지 실행 환경 문제인지 갈리고, 해소되어 ISS-504 의 통과 근거가 recheck 와 일치한다.",
+            "done_when": "세 명령이 같은 sha 에서 실제 exit 0 으로 나오고, recheck_fail 원인이 한 줄로 기록되어 있다.",
+            "risk_tier": "T0",
+            "t2_category": null,
+            "reversible": true,
+            "question": "",
+            "plain_summary": "테스트상으로는 다 통과했는데, 나중에 다시 돌린 기록에서는 세 검사가 모두 실패로 나왔습니다. 코드 문제인지 검사를 돌린 환경 문제인지 원인을 찾아 바로잡습니다.",
+            "if_not_decided": "대표님 결정이 필요 없는 항목이라 바로 진행합니다.",
+            "status": "hint",
+            "at": "2026-11-25T04:56:34.706832Z"
+          }
+        ],
+        "next_prompt_cost_usd": 0.033048,
+        "next_prompt_hint": {
+          "next_prompt": "ISS-504 recheck 실패 원인을 찾아 고쳐라. recheck 기록(sha 091a09e, 2026-11-25T04:53:38Z)에서 `PARALLEL_WORKERS=1 bin/rails test test/integration/member_scan_organizer_test.rb ...`, `bin/rails test`, `bin/rubocop` 세 명령이 모두 기록 exit 0 인데 실제 exit 1 로 나왔다. 순서: (1) `git cat-file -t 091a09e` 와 `git branch --contains 091a09e` 로 이 sha 가 main(bc80d3d)에 포함된 커밋인지, 아니면 병합 전 브랜치 커밋인지 먼저 밝힌다. (2) recheck 가 돌린 작업 디렉터리·브랜치 상태에서 세 명령을 각각 실행해 exit 1 의 첫 오류 메시지(마지막 30줄)를 그대로 기록한다. (3) 원인이 코드·마이그레이션·테스트 문제면 고치고 세 명령이 모두 exit 0 이 되게 한다. 원인이 recheck 실행 환경(잘못된 sha·브랜치 체크아웃, 번들·DB 준비 누락 등)이면 코드는 건드리지 말고 recheck 가 main 최신(bc80d3d 이후)에서 돌도록 설정을 바로잡는다. 마지막에 원인 한 줄, 수정 내용, 세 명령의 실제 exit code 와 출력 요약을 보고한다.",
+          "basis": "recheck_fail: 세 명령 모두 기록 0 → 실제 1. 테스트·rubocop 이 한꺼번에 실패하고 sha 091a09e 가 git_log 의 main 커밋(bc80d3d, 8f9b841, 584bd2d)에 없다. 기준 4(전체 통과)는 proof 상 충족이지만 recheck 와 충돌한다.",
+          "done_when": "세 명령이 같은 sha 에서 실제 exit 0 으로 나오고, recheck_fail 원인이 한 줄로 기록되어 있다.",
+          "at": "2026-11-25T04:56:34.706832Z"
         }
       },
       "history": [
@@ -4371,9 +4405,54 @@
             "exit_code": 0,
             "output": "483 files inspected, no offenses detected"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "failed",
+          "at": "2026-11-25T04:53:38Z",
+          "sha": "091a09e",
+          "problems": [
+            "다시 돌린 결과가 다름: `PARALLEL_WORKERS=1 bin/rails test test/integration/member_sc` 기록 0 → 실제 1",
+            "다시 돌린 결과가 다름: `bin/rails test` 기록 0 → 실제 1",
+            "다시 돌린 결과가 다름: `bin/rubocop` 기록 0 → 실제 1"
+          ],
+          "commands": [
+            {
+              "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/member_scan_organizer_test.rb test/models/scan_organizer_setting_test.rb test/services/scan_organizer test/integration/brand_profile_process_test.rb",
+              "status": "different",
+              "expected": 0,
+              "actual": 1,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "bin/rails test",
+              "status": "different",
+              "expected": 0,
+              "actual": 1,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "bin/rubocop",
+              "status": "different",
+              "expected": 0,
+              "actual": 1,
+              "output": "ace inside array brackets.\n      [\"0건\", \"아직 없어요\", \"최근 30일 올린 글\"].each do |phrase|\n      ^\ntest/integration/member_dashboard_channels_test.rb:72:37: C: Layout/SpaceInsideArrayLiteralBrackets: Use space inside array brackets.\n      [\"0건\", \"아직 없어요\", \"최근 30일 올린 글\"].each do |phrase|\n                                                ^\n\n493 files inspected, 44 offenses detected, 22 offenses autocorrectable"
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json",
+            "app/controllers/concerns/member_admin/channel_overview.rb",
+            "app/helpers/member_admin/channels_helper.rb",
+            "app/views/member_admin/channels/_overview_section.html.erb",
+            "app/views/member_admin/channels/_progress.html.erb",
+            "app/views/member_admin/channels/index.html.erb",
+            "app/views/member_admin/dashboard/show.html.erb",
+            "docs/design-loop/member-1125/LOG.md",
+            "script/qa/member_loop_shots.cjs",
+            "test/controllers/member_admin/channels_controller_test.rb"
+          ]
+        }
       },
-      "completed_at": "2026-11-25T13:39:12.290394"
+      "completed_at": null
     },
     {
       "id": "ISS-509",
@@ -10339,7 +10418,48 @@
             "exit_code": 0,
             "output": "SUMMARY pass=true"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T04:53:38Z",
+          "sha": "091a09e",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_greeting_readability_test.rb test/integration/public_pages_test.rb test/integration/chopd_header_links_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "node script/qa/greeting_readability_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "aderBottom\": 81.5,\n      \"noHeaderOverlap\": true\n    },\n    {\n      \"width\": 390,\n      \"minContrast\": 10.9,\n      \"contrastItems\": [],\n      \"breadcrumbTop\": 88,\n      \"headerBottom\": 80,\n      \"noHeaderOverlap\": true\n    },\n    {\n      \"width\": 320,\n      \"minContrast\": 10.9,\n      \"contrastItems\": [],\n      \"breadcrumbTop\": 88,\n      \"headerBottom\": 80,\n      \"noHeaderOverlap\": true\n    }\n  ]\n}"
+            },
+            {
+              "cmd": "ROUTES=/media/greeting WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "\"width\":320,\"file\":\"tmp/qa/layout/media-greeting-320.png\",\"bytes\":111196,\"scrollWidth\":320,\"clientWidth\":320,\"hScroll\":false,\"checked\":1,\"clipped\":0,\"clippedItems\":[],\"footerWrapped\":0,\"footerWrappedItems\":[],\"pillWrapped\":0,\"pillWrappedItems\":[],\"pillMinHeight\":null,\"pillShort\":0,\"pillShortItems\":[],\"consoleErrors\":0,\"consoleErrorItems\":[],\"badResponses\":0,\"badResponseItems\":[]}\nSUMMARY pass=true"
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json",
+            "app/controllers/concerns/member_admin/channel_overview.rb",
+            "app/helpers/member_admin/channels_helper.rb",
+            "app/views/member_admin/channels/_overview_section.html.erb",
+            "app/views/member_admin/channels/_progress.html.erb",
+            "app/views/member_admin/channels/index.html.erb",
+            "app/views/member_admin/dashboard/show.html.erb",
+            "docs/design-loop/member-1125/LOG.md",
+            "script/qa/member_loop_shots.cjs",
+            "test/controllers/member_admin/channels_controller_test.rb"
+          ]
+        }
       },
       "spawn_rules": [],
       "started_at": "2026-11-25T04:39:51.039003Z",
@@ -12302,7 +12422,7 @@
       "id": "ISS-591",
       "title": "[브랜드] chopd 헤더의 직접 그린 아이콘 2개(강좌 문의 말풍선·모바일 메뉴 줄 세 개)를 LineIcons 로 교체",
       "type": "DESIGN_FIX",
-      "status": "DONE",
+      "status": "READY",
       "priority": "P2",
       "assign_to": "agent-harness",
       "depth": 3,
@@ -12352,11 +12472,43 @@
         "priority_reason": "엔진 기본 P0 이나 표시 아이콘 교체라 사용자 막힘 없음 → P2",
         "recommendation": {
           "verdict": "승인 권장",
-          "reason": "대표님 지시(2026-11-19, 아이콘은 LineIcons만) 위반이 공개 사이트 모든 화면 헤더에 남아 있음. lineicons 이미 로드·lni_icon 도우미 있어 교체만",
-          "risk": "T0 — 화면 표시만, 데이터 영향 없음",
-          "effort": "XS",
-          "by": "factory-runner",
-          "at": "2026-11-25T04:09:30Z"
+          "reason": "실행기 재검증 실패로 되돌림 — 다시 돌린 결과가 다름: `BASE_URL=http://127.0.0.1:3099 node script/qa/chopd_mobile_m` 기록 0 → 실제 1",
+          "risk": "낮음",
+          "effort": "작음",
+          "by": "factory-recheck",
+          "at": "2026-11-25T04:53:38Z"
+        },
+        "recheck_reopens": 1,
+        "recheck_fail": {
+          "at": "2026-11-25T04:53:38Z",
+          "sha": "091a09e",
+          "problems": [
+            "다시 돌린 결과가 다름: `BASE_URL=http://127.0.0.1:3099 node script/qa/chopd_mobile_m` 기록 0 → 실제 1"
+          ]
+        },
+        "next_prompt_at": "2026-11-25T04:56:47.584858Z",
+        "next_prompt_proposals": [
+          {
+            "next_prompt": "ISS-591 recheck 불일치 원인 규명: chopd_mobile_menu_check 의 기록은 exit 0 이었는데 재실행은 exit 1 이었다. 1) 커밋 677c8a4 기준 서버를 포트 3099 에서 새로 띄우고 서버가 응답하는지 먼저 확인한다(curl -sI http://127.0.0.1:3099/education). 2) `BASE_URL=http://127.0.0.1:3099 node script/qa/chopd_mobile_menu_check.cjs` 를 실행하고 전체 출력에서 실패한 단계와 메시지를 뽑아 원인을 분류한다: (a) 서버가 꺼져 있거나 포트가 달라서 생긴 환경 문제, (b) 스크립트가 불안정(타이밍·셀렉터) 한 문제, (c) 아이콘 교체로 생긴 실제 동작 문제(메뉴 버튼 aria-label '메뉴', 열림 flex/expanded true, 닫힘 none/false). 3) (c)면 app/views/layouts/_chopd_header.html.erb 만 최소 수정한다. (a)·(b)면 실행 방법이나 스크립트의 대기 조건을 고치고, 실패 원인과 수정 내용을 이슈에 적는다. 4) 수정 후 같은 명령을 연속 3번 실행해 모두 exit 0 인지 기록하고, chopd_header_icons_test 와 layout_check 도 함께 통과하는지 확인한다.",
+            "basis": "recheck_fail: 같은 명령(chopd_mobile_menu_check)의 기록 exit 0 이 재실행에서 exit 1 로 나왔다. criteria_check 2번(모바일 메뉴 동작 그대로)이 met=true 라고 했지만 재실행 결과가 이를 뒷받침하지 못한다. 원인이 어느 쪽인지는 아직 드러나지 않았다.",
+            "expected_effect": "재실행 불일치의 원인을 확정하고, 모바일 메뉴 동작 기준을 안정적으로 통과하는 상태로 만든다.",
+            "done_when": "원인이 (a)(b)(c) 중 하나로 확정되어 이슈에 기록되고, chopd_mobile_menu_check 가 연속 3회 exit 0·SUMMARY pass=true 이다.",
+            "risk_tier": "T0",
+            "t2_category": null,
+            "reversible": true,
+            "question": "",
+            "plain_summary": "모바일 메뉴 점검이 처음엔 통과했는데 다시 돌리니 실패했습니다. 서버 문제인지 점검 스크립트 문제인지 아이콘 교체의 실제 문제인지 가려내고 바로잡습니다.",
+            "if_not_decided": "결정할 사항은 없습니다. 이 항목은 바로 진행해도 안전합니다.",
+            "status": "hint",
+            "at": "2026-11-25T04:56:47.584858Z"
+          }
+        ],
+        "next_prompt_cost_usd": 0.027264,
+        "next_prompt_hint": {
+          "next_prompt": "ISS-591 recheck 불일치 원인 규명: chopd_mobile_menu_check 의 기록은 exit 0 이었는데 재실행은 exit 1 이었다. 1) 커밋 677c8a4 기준 서버를 포트 3099 에서 새로 띄우고 서버가 응답하는지 먼저 확인한다(curl -sI http://127.0.0.1:3099/education). 2) `BASE_URL=http://127.0.0.1:3099 node script/qa/chopd_mobile_menu_check.cjs` 를 실행하고 전체 출력에서 실패한 단계와 메시지를 뽑아 원인을 분류한다: (a) 서버가 꺼져 있거나 포트가 달라서 생긴 환경 문제, (b) 스크립트가 불안정(타이밍·셀렉터) 한 문제, (c) 아이콘 교체로 생긴 실제 동작 문제(메뉴 버튼 aria-label '메뉴', 열림 flex/expanded true, 닫힘 none/false). 3) (c)면 app/views/layouts/_chopd_header.html.erb 만 최소 수정한다. (a)·(b)면 실행 방법이나 스크립트의 대기 조건을 고치고, 실패 원인과 수정 내용을 이슈에 적는다. 4) 수정 후 같은 명령을 연속 3번 실행해 모두 exit 0 인지 기록하고, chopd_header_icons_test 와 layout_check 도 함께 통과하는지 확인한다.",
+          "basis": "recheck_fail: 같은 명령(chopd_mobile_menu_check)의 기록 exit 0 이 재실행에서 exit 1 로 나왔다. criteria_check 2번(모바일 메뉴 동작 그대로)이 met=true 라고 했지만 재실행 결과가 이를 뒷받침하지 못한다. 원인이 어느 쪽인지는 아직 드러나지 않았다.",
+          "done_when": "원인이 (a)(b)(c) 중 하나로 확정되어 이슈에 기록되고, chopd_mobile_menu_check 가 연속 3회 exit 0·SUMMARY pass=true 이다.",
+          "at": "2026-11-25T04:56:47.584858Z"
         }
       },
       "result": {
@@ -12403,13 +12555,56 @@
             "exit_code": 0,
             "output": "SUMMARY pass=true"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "failed",
+          "at": "2026-11-25T04:53:38Z",
+          "sha": "091a09e",
+          "problems": [
+            "다시 돌린 결과가 다름: `BASE_URL=http://127.0.0.1:3099 node script/qa/chopd_mobile_m` 기록 0 → 실제 1"
+          ],
+          "commands": [
+            {
+              "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_header_icons_test.rb test/integration/chopd_header_links_test.rb test/integration/chopd_header_member_session_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "BASE_URL=http://127.0.0.1:3099 node script/qa/chopd_mobile_menu_check.cjs",
+              "status": "different",
+              "expected": 0,
+              "actual": 1,
+              "output": "{\"viewport\":{\"width\":390,\"height\":844},\"consoleErrorItems\":[],\"pageErrorItems\":[],\"error\":\"page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3099/education\\nCall log:\\n  - navigating to \\\"http://127.0.0.1:3099/education\\\", waiting until \\\"load\\\"\\n\",\"consoleErrors\":0,\"pageErrors\":0}\nSUMMARY pass=false"
+            },
+            {
+              "cmd": "ROUTES=/education,/media/greeting WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": "\"width\":320,\"file\":\"tmp/qa/layout/media-greeting-320.png\",\"bytes\":111196,\"scrollWidth\":320,\"clientWidth\":320,\"hScroll\":false,\"checked\":1,\"clipped\":0,\"clippedItems\":[],\"footerWrapped\":0,\"footerWrappedItems\":[],\"pillWrapped\":0,\"pillWrappedItems\":[],\"pillMinHeight\":null,\"pillShort\":0,\"pillShortItems\":[],\"consoleErrors\":0,\"consoleErrorItems\":[],\"badResponses\":0,\"badResponseItems\":[]}\nSUMMARY pass=true"
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json",
+            "app/controllers/concerns/member_admin/channel_overview.rb",
+            "app/helpers/member_admin/channels_helper.rb",
+            "app/views/member_admin/channels/_overview_section.html.erb",
+            "app/views/member_admin/channels/_progress.html.erb",
+            "app/views/member_admin/channels/index.html.erb",
+            "app/views/member_admin/dashboard/show.html.erb",
+            "docs/design-loop/member-1125/LOG.md",
+            "script/qa/member_loop_shots.cjs",
+            "test/controllers/member_admin/channels_controller_test.rb"
+          ]
+        }
       },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T04:44:15.889028Z",
+      "updated_at": "2026-11-25T04:53:38Z",
       "origin": "factory-observation",
       "started_at": "2026-11-25T04:44:15.889028Z",
-      "completed_at": "2026-11-25T13:47:51.739879"
+      "completed_at": null
     },
     {
       "id": "ISS-592",
@@ -12615,7 +12810,41 @@
             "exit_code": 0,
             "output": "nav-cta default 5.8 / hover 7.39 / filter-pill.active 5.8 / mobile nav-cta 5.8, pass true"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T04:53:38Z",
+          "sha": "091a09e",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_cta_contrast_test.rb test/integration/education_filter_test.rb test/integration/chopd_header_icons_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "node script/qa/cta_contrast_check.cjs",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " \"color\": \"rgb(10, 14, 26)\",\n      \"background\": \"rgb(255, 77, 28)\",\n      \"ratio\": 5.8,\n      \"required\": 4.5,\n      \"pass\": true\n    },\n    {\n      \"viewport\": 390,\n      \"selector\": \"#mobile-nav .nav-cta\",\n      \"state\": \"menu open\",\n      \"color\": \"rgb(10, 14, 26)\",\n      \"background\": \"rgb(255, 77, 28)\",\n      \"ratio\": 5.8,\n      \"required\": 4.5,\n      \"pass\": true\n    }\n  ],\n  \"pass\": true\n}"
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json",
+            "app/controllers/concerns/member_admin/channel_overview.rb",
+            "app/helpers/member_admin/channels_helper.rb",
+            "app/views/member_admin/channels/_overview_section.html.erb",
+            "app/views/member_admin/channels/_progress.html.erb",
+            "app/views/member_admin/channels/index.html.erb",
+            "app/views/member_admin/dashboard/show.html.erb",
+            "docs/design-loop/member-1125/LOG.md",
+            "script/qa/member_loop_shots.cjs",
+            "test/controllers/member_admin/channels_controller_test.rb"
+          ]
+        }
       },
       "spawn_rules": [],
       "started_at": "2026-11-25T04:48:00.774618Z",
@@ -12802,7 +13031,39 @@
             "exit_code": 0,
             "output": "<option selected=\"selected\" value=\"b2b\">B2B/B2G 교육 (worktree 3099 실측)"
           }
-        ]
+        ],
+        "recheck": {
+          "status": "verified",
+          "at": "2026-11-25T04:53:38Z",
+          "sha": "091a09e",
+          "problems": [],
+          "commands": [
+            {
+              "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_inquiry_type_prefill_test.rb test/integration/education_filter_test.rb test/integration/public_pages_test.rb",
+              "status": "same",
+              "expected": 0,
+              "actual": 0,
+              "output": " from <main> at /Volumes/GH_APFS/0008_choi-pd/config/application.rb:19)\n/Volumes/GH_APFS/0008_choi-pd/app/controllers/admin/newsletter_controller.rb:1: warning: /Users/gangmini/.rbenv/versions/3.3.14/lib/ruby/3.3.0/csv.rb was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.4.0.\nYou can add csv to your Gemfile or gemspec to silence this warning."
+            },
+            {
+              "cmd": "curl -s http://127.0.0.1:3008/inquiries/new?type=b2b | grep selected",
+              "status": "skipped",
+              "why": "검사 명령 아님: curl -s http://127.0.0.1:3008/inquiries/"
+            }
+          ],
+          "dirty": [
+            "claude/issue-db/registry.json",
+            "app/controllers/concerns/member_admin/channel_overview.rb",
+            "app/helpers/member_admin/channels_helper.rb",
+            "app/views/member_admin/channels/_overview_section.html.erb",
+            "app/views/member_admin/channels/_progress.html.erb",
+            "app/views/member_admin/channels/index.html.erb",
+            "app/views/member_admin/dashboard/show.html.erb",
+            "docs/design-loop/member-1125/LOG.md",
+            "script/qa/member_loop_shots.cjs",
+            "test/controllers/member_admin/channels_controller_test.rb"
+          ]
+        }
       },
       "spawn_rules": [],
       "started_at": "2026-11-25T04:50:12.399807Z",
@@ -13563,7 +13824,7 @@
       "id": "ISS-602",
       "title": "[Plan:도메인분석] ISS-571 비즈니스 규칙/시나리오 도출",
       "type": "DOMAIN_ANALYZE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "domain-analyst",
       "depth": 2,
@@ -13585,17 +13846,75 @@
           }
         ],
         "approved_at": "2026-11-25T04:43:54.027Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-571(인사말 화면 가독성) 변경이 표시만 바꿨는지 도메인 규칙 관점에서 확인 — 읽기 전용 점검",
+          "risk": "T0",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:57:35Z"
+        },
+        "acceptance_criteria": [
+          "인사말 화면의 도메인 규칙(발행인 이름·인사말·서명·이동 경로 노출, 강좌 문의 동선)이 문서로 정리된다",
+          "ISS-571 변경이 데이터·라우트·권한을 바꾸지 않았음이 diff 로 확인된다",
+          "관련 테스트가 통과한다"
+        ]
       },
-      "result": null,
+      "result": {
+        "domain": "chopd 발행인 인사말(/media/greeting)",
+        "rules": [
+          "헤더 '소개'는 /media/greeting 으로 이어진다(ISS-557) — 방문자가 처음 보는 PD 소개 화면",
+          "인사말 화면은 비로그인 공개, 읽기 전용(데이터 쓰기·권한 없음)",
+          "발행인 이름·직함·인사말·서명은 모두 읽을 수 있어야 한다(대비 4.5:1 이상)",
+          "이동 경로(미디어 / 발행인 인사말)는 헤더와 겹치지 않는다",
+          "아이콘은 LineIcons 만 쓴다"
+        ],
+        "scenarios": [],
+        "observations": [
+          "ISS-571 커밋 1d78a48 은 뷰 1개·점검 스크립트·테스트만 바꿈 — 라우트·모델·권한 변경 없음",
+          "인사말 본문은 전부 '한국환경저널 발행인' 이야기인데, 헤더 '소개'의 도착지이고 사이트 정체성은 '스마트폰 창업 전략가 최범희 PD' — 소개 화면 문구 방향은 대표님 원고가 필요한 사안이라 카드로 만들지 않고 기록만 남김",
+          "화면 안에 다음 행동(강좌 보기·문의) 버튼이 없음 — ISS-603 UX 수정 카드로 넘김"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "인사말 화면의 도메인 규칙이 문서로 정리된다",
+            "met": true,
+            "how": "rules 5개를 이 결과에 기록"
+          },
+          {
+            "criterion": "ISS-571 변경이 데이터·라우트·권한을 바꾸지 않았음이 diff 로 확인된다",
+            "met": true,
+            "how": "git show 1d78a48 --stat → greeting.html.erb·greeting_readability_check.cjs·chopd_greeting_readability_test.rb 3개만, routes.rb 55행 그대로"
+          },
+          {
+            "criterion": "관련 테스트가 통과한다",
+            "met": true,
+            "how": "12 runs 0 failures"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_greeting_readability_test.rb test/integration/public_pages_test.rb test/integration/chopd_header_links_test.rb",
+            "exit_code": 0,
+            "output": "12 runs, 181 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "git show 1d78a48 --stat --format=",
+            "exit_code": 0,
+            "output": "3 files changed, 168 insertions(+), 13 deletions(-)"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T04:43:54.027Z"
+      "updated_at": "2026-11-25T04:57:35Z",
+      "completed_at": "2026-11-25T14:01:07.735750"
     },
     {
       "id": "ISS-603",
       "title": "[Plan:UX리뷰] ISS-571 UI 변경 검증",
       "type": "UI_REVIEW",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "ux-harness",
       "depth": 2,
@@ -13617,17 +13936,74 @@
           }
         ],
         "approved_at": "2026-11-25T04:43:54.027Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-571 화면 변경을 1280·390·320 에서 실제 렌더로 점검 — 읽기 전용",
+          "risk": "T0",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:57:35Z"
+        },
+        "acceptance_criteria": [
+          "/media/greeting 이 1280·390·320 에서 가로 스크롤·잘림·콘솔 오류가 없다(layout_check 통과)",
+          "본문 글자 대비 4.5:1 이상·이동 경로와 헤더 겹침 없음(greeting_readability_check 통과)",
+          "화면 캡처를 눈으로 확인해 결과를 남긴다"
+        ]
       },
-      "result": null,
+      "result": {
+        "passed": false,
+        "issues": [
+          "390·320: 화면 안에 다음 행동 버튼이 없다 — 헤더 '강좌 문의'는 모바일에서 메뉴 속에 숨고(_chopd_header 26행 .nav-cta-wrap display:none), 본문 끝에도 버튼이 없어 인사말을 다 읽은 방문자가 갈 곳이 바닥글뿐. 서명 아래에 '교육 과정 보기'(주) + '강좌 문의'(보조) 버튼 추가, LineIcons 사용, 같은 무게 버튼 나열 금지",
+          "1280: 제목 영역(이동 경로·'발행인 인사말')이 왼쪽 16px 에 붙어 헤더 로고(48px)·본문(272px)과 줄이 맞지 않음 — greeting-heading 을 본문과 같은 max-w-3xl 가운데 정렬 또는 헤더와 같은 좌우 여백으로 맞춤",
+          "제목과 프로필 사이 빈 공간이 1280 에서 약 100px(헤딩 하단 48px + 본문 py-16) — 하단 여백을 줄여 첫 화면에 인사말 첫 문장까지 보이게"
+        ],
+        "files": [
+          "app/views/chopd/media/greeting.html.erb"
+        ],
+        "evidence": [
+          "tmp/qa/layout/media-greeting-1280.png",
+          "tmp/qa/layout/media-greeting-390.png"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "/media/greeting 이 1280·390·320 에서 가로 스크롤·잘림·콘솔 오류가 없다",
+            "met": true,
+            "how": "layout_check SUMMARY pass=true, hScroll false·clipped 0·consoleErrors 0"
+          },
+          {
+            "criterion": "본문 글자 대비 4.5:1 이상·이동 경로와 헤더 겹침 없음",
+            "met": true,
+            "how": "greeting_readability_check pass true, minContrast 10.9, breadcrumbTop 112>headerBottom 81.5(1280), 88>80(390·320)"
+          },
+          {
+            "criterion": "화면 캡처를 눈으로 확인해 결과를 남긴다",
+            "met": true,
+            "how": "1280·390 캡처 확인 — 가독성은 해결, 모바일 다음 행동 부재·1280 제목 정렬 어긋남·과한 여백 3건을 UX_FIX 로 넘김"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/greeting_readability_check.cjs",
+            "exit_code": 0,
+            "output": "\"pass\": true, minContrast 10.9 (1280/390/320), noHeaderOverlap true"
+          },
+          {
+            "cmd": "ROUTES=/media/greeting WIDTHS=1280,390,320 node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "SUMMARY pass=true"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T04:43:54.027Z"
+      "updated_at": "2026-11-25T04:57:35Z",
+      "completed_at": "2026-11-25T14:01:17.711948"
     },
     {
       "id": "ISS-604",
       "title": "[Plan:브랜드검증] ISS-571 아젠다 표현 + Action Clarity",
       "type": "BRAND_GUARD",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "brand-guardian",
       "depth": 2,
@@ -13649,11 +14025,64 @@
           }
         ],
         "approved_at": "2026-11-25T04:43:54.027Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-571 화면이 brand-dna 아젠다·anti_patterns(직접 그린 svg·이모지 금지 등)를 지키는지 점검 — 읽기 전용",
+          "risk": "T0",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:57:35Z"
+        },
+        "acceptance_criteria": [
+          "greeting.html.erb 에 이모지·직접 그린 svg 가 없다",
+          "화면에 다음 행동(강좌 문의 등) 버튼이 1개 이상 보인다",
+          "아젠다 표현·Action Clarity 점수를 근거와 함께 남긴다"
+        ]
       },
-      "result": null,
+      "result": {
+        "brand_score": 14,
+        "agenda_expression": 6,
+        "action_clarity": 6,
+        "anti_patterns_found": [],
+        "notes": [
+          "anti_patterns 9개 대조: 이모지·직접 그린 svg 0개(grep '<svg' → 0, 이모지 0), 개발자 용어 없음, 빈 구역 노출 없음, 버튼 과다 나열 없음",
+          "아젠다 6/10: PD 본인 신뢰(이름·직함·서명)는 보이나 본문이 '한국환경저널' 이야기 위주라 '스마트폰 창업 전략가' 정체성과 연결이 약함 — 원고 방향은 대표님 원고 사안이라 기록만",
+          "Action 6/10: 1280 은 헤더 주황 '강좌 문의'가 0.5초 안에 보임, 390·320 은 메뉴 속에 숨어 본문에 다음 행동 없음 — 이 부분은 ISS-609 UX 수정 카드(서명 아래 교육 과정 보기·강좌 문의 버튼)로 처리되어 중복 카드 만들지 않음"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "greeting.html.erb 에 이모지·직접 그린 svg 가 없다",
+            "met": true,
+            "how": "grep -c '<svg' → 0, 이모지 범위 grep 0건"
+          },
+          {
+            "criterion": "화면에 다음 행동 버튼이 1개 이상 보인다",
+            "met": true,
+            "how": "1280 헤더 '강좌 문의'(주황) 확인. 모바일 본문 버튼 부재는 ISS-609 로 넘김"
+          },
+          {
+            "criterion": "아젠다 표현·Action Clarity 점수를 근거와 함께 남긴다",
+            "met": true,
+            "how": "아젠다 6/10·Action 6/10·브랜드 14/20 근거 notes 에 기록"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "grep -c '<svg' app/views/chopd/media/greeting.html.erb",
+            "exit_code": 1,
+            "output": "0"
+          },
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_greeting_readability_test.rb",
+            "exit_code": 0,
+            "output": "0 failures, 0 errors"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "updated_at": "2026-11-25T04:43:54.027Z"
+      "updated_at": "2026-11-25T04:57:35Z",
+      "completed_at": "2026-11-25T14:01:26.669387"
     },
     {
       "id": "ISS-605",
@@ -13731,7 +14160,7 @@
       "title": "[린트] 디자인 루프 15회차(b8230f3) 내 채널 화면 파일 4개 RuboCop 배열 괄호 공백 위반 34건 정리",
       "type": "STYLE_FIX",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "assign_to": "agent-harness",
       "origin": "factory-ship",
       "depth": 1,
@@ -13739,7 +14168,7 @@
       "parent_id": null,
       "depends_on": [],
       "created_at": "2026-11-25T04:52:06Z",
-      "updated_at": "2026-11-25T04:52:06.213Z",
+      "updated_at": "2026-11-25T04:57:35Z",
       "description": "공장 회차 끝 bin/rubocop 이 34 offenses(Layout/SpaceInsideArrayLiteralBrackets, 자동 수정 가능)를 보고. 모두 다른 대화 세션의 디자인 루프 15회차 커밋 b8230f3 파일. 그 세션이 같은 시각 작업 중이라 이번 회차에서는 손대지 않음. ISS-600 과 같은 유형.",
       "payload": {
         "origin": "factory-ship",
@@ -13777,14 +14206,54 @@
         "approved_at": "2026-11-25T04:52:06.213Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
-      "result": null,
-      "spawn_rules": []
+      "result": {
+        "files_changed": [
+          "app/controllers/concerns/member_admin/channel_overview.rb",
+          "app/helpers/member_admin/channels_helper.rb",
+          "test/controllers/member_admin/channels_controller_test.rb",
+          "test/integration/member_dashboard_channels_test.rb",
+          "app/assets/builds/tailwind.css"
+        ],
+        "commit": "357e631",
+        "note": "디자인 루프 세션이 같은 파일을 작업 중일 수 있어 worktree(factory/ISS-606)에서 고치고 cherry-pick. 테스트 실행 중 tailwind 빌드가 16회차 소스 기준으로 재생성되어 함께 반영(빌드 산출물, 소스 변경 없음). Gemini hydrogen-high 독립 검수: 결함 없음",
+        "criteria_check": [
+          {
+            "criterion": "bin/rubocop 위반 0건",
+            "met": true,
+            "how": "main 반영 후 bin/rubocop → 493 files inspected, no offenses detected"
+          },
+          {
+            "criterion": "동작 변경 없음 — 관련 테스트 통과",
+            "met": true,
+            "how": "git diff -w 0줄(공백만), channels_controller_test·member_dashboard_channels_test 15 runs 0 failures"
+          },
+          {
+            "criterion": "다른 세션 작업 중이면 worktree에서 고치고 cherry-pick",
+            "met": true,
+            "how": "worktree /Volumes/GH_APFS/choi-pd-iss606 에서 커밋 후 main 으로 cherry-pick, worktree 제거"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rubocop",
+            "exit_code": 0,
+            "output": "493 files inspected, no offenses detected"
+          },
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/controllers/member_admin/channels_controller_test.rb test/integration/member_dashboard_channels_test.rb",
+            "exit_code": 0,
+            "output": "15 runs, 164 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "completed_at": "2026-11-25T13:59:02.087532"
     },
     {
       "id": "ISS-607",
       "title": "[Plan:품질평가] ISS-601 품질 점수 산출",
       "type": "SCORE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "eval-harness",
       "depth": 3,
@@ -13808,11 +14277,168 @@
           }
         ],
         "approved_at": "2026-11-25T04:52:06.213Z",
-        "approved_by": "자동 승인(추천: 승인 권장)"
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-601 테스트 통과 결과로 품질 점수 산출 — 실행 결과(테스트·린트) 기준",
+          "risk": "T0",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T04:57:35Z"
+        },
+        "acceptance_criteria": [
+          "전체 테스트·린트 실측 결과로 품질 점수(0~100)와 항목별 근거를 남긴다",
+          "점수 산출에 쓴 명령을 다시 돌릴 수 있다"
+        ]
+      },
+      "result": {
+        "score": 95,
+        "prev_score": 86,
+        "breakdown": {
+          "tests": 100,
+          "lint": 100,
+          "security": 100,
+          "coverage_unmeasured_penalty": -5
+        },
+        "method": "커밋된 HEAD 357e631 을 깨끗한 사본(worktree)에서 실측: 전체 테스트 0 실패=100, RuboCop 0건=100, Brakeman 경고 0=100. 커버리지 측정 도구 없음 → 5점 감점. 작업 트리의 실패 4건·린트 2건·brakeman 1건은 다른 대화 세션(디자인 루프)이 지금 편집 중인 미커밋 파일(dashboard/show, channels/index, brands_controller 등) 때문이라 점수에서 제외하고 기록만",
+        "criteria_check": [
+          {
+            "criterion": "전체 테스트·린트 실측 결과로 품질 점수와 항목별 근거를 남긴다",
+            "met": true,
+            "how": "HEAD 357e631 사본: 522 runs 0 failures, rubocop no offenses, brakeman 0 warnings → 95점(커버리지 미측정 -5)"
+          },
+          {
+            "criterion": "점수 산출에 쓴 명령을 다시 돌릴 수 있다",
+            "met": true,
+            "how": "proof 의 3개 명령"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test",
+            "exit_code": 0,
+            "output": "522 runs, 4604 assertions, 0 failures, 0 errors, 1 skips"
+          },
+          {
+            "cmd": "bin/rubocop",
+            "exit_code": 0,
+            "output": "493 files inspected, no offenses detected"
+          },
+          {
+            "cmd": "bin/brakeman -q --no-pager",
+            "exit_code": 0,
+            "output": "Security Warnings: 0"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T04:57:35Z",
+      "completed_at": "2026-11-25T14:02:32.862477"
+    },
+    {
+      "id": "ISS-608",
+      "title": "[Plan:비즈니스검증] chopd 발행인 인사말(/media/greeting) 규칙 5개 정적 검증",
+      "type": "BIZ_VALIDATE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "biz-validator",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-602",
+      "depends_on": [],
+      "created_at": "2026-11-25T14:01:07.735750",
+      "payload": {
+        "rules": [
+          "헤더 '소개'는 /media/greeting 으로 이어진다(ISS-557) — 방문자가 처음 보는 PD 소개 화면",
+          "인사말 화면은 비로그인 공개, 읽기 전용(데이터 쓰기·권한 없음)",
+          "발행인 이름·직함·인사말·서명은 모두 읽을 수 있어야 한다(대비 4.5:1 이상)",
+          "이동 경로(미디어 / 발행인 인사말)는 헤더와 겹치지 않는다",
+          "아이콘은 LineIcons 만 쓴다"
+        ],
+        "scenarios": [],
+        "domain": "chopd 발행인 인사말(/media/greeting)",
+        "source_issue": "ISS-602",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T05:01:09.596Z",
+            "by": "auto",
+            "reason": "「[Plan:비즈니스검증] chopd 발행인 인사말(/media/greeting) 규칙 5개 정적 검증」(BIZ_VALIDATE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T05:01:09.596Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "인사말 화면 규칙 5개를 테스트·점검 스크립트와 대조하는 읽기 전용 검증. 대부분 ISS-571 테스트가 이미 덮고 있어 빠르게 끝남",
+          "risk": "T0 — 읽기 전용",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T05:02:48Z"
+        },
+        "acceptance_criteria": [
+          "규칙 5개마다 그것을 확인하는 테스트·점검 스크립트가 있는지 표로 남긴다",
+          "덮지 못한 규칙이 있으면 테스트를 추가하거나 수정 카드를 만든다"
+        ]
       },
       "result": null,
       "spawn_rules": [],
-      "updated_at": "2026-11-25T04:52:06.213Z"
+      "updated_at": "2026-11-25T05:01:09.596Z"
+    },
+    {
+      "id": "ISS-609",
+      "title": "[Plan:UX수정] UX 이슈 3건 수정",
+      "type": "UX_FIX",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "agent-harness",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-603",
+      "depends_on": [],
+      "created_at": "2026-11-25T14:01:17.711948",
+      "payload": {
+        "ux_issues": [
+          "390·320: 화면 안에 다음 행동 버튼이 없다 — 헤더 '강좌 문의'는 모바일에서 메뉴 속에 숨고(_chopd_header 26행 .nav-cta-wrap display:none), 본문 끝에도 버튼이 없어 인사말을 다 읽은 방문자가 갈 곳이 바닥글뿐. 서명 아래에 '교육 과정 보기'(주) + '강좌 문의'(보조) 버튼 추가, LineIcons 사용, 같은 무게 버튼 나열 금지",
+          "1280: 제목 영역(이동 경로·'발행인 인사말')이 왼쪽 16px 에 붙어 헤더 로고(48px)·본문(272px)과 줄이 맞지 않음 — greeting-heading 을 본문과 같은 max-w-3xl 가운데 정렬 또는 헤더와 같은 좌우 여백으로 맞춤",
+          "제목과 프로필 사이 빈 공간이 1280 에서 약 100px(헤딩 하단 48px + 본문 py-16) — 하단 여백을 줄여 첫 화면에 인사말 첫 문장까지 보이게"
+        ],
+        "source_issue": "ISS-603",
+        "action": "fix_ux",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T05:02:33.626Z",
+            "by": "auto",
+            "reason": "「[Plan:UX수정] UX 이슈 3건 수정」은 P1 사용자 영향 결함이므로 우선 해결이 필요합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T05:02:33.626Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "files": [
+          "app/views/chopd/media/greeting.html.erb"
+        ],
+        "origin": "factory-observation",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "헤더 '소개'의 도착지인데 휴대폰에서 다 읽은 뒤 갈 곳이 바닥글뿐. 서명 아래 버튼 2개와 제목 정렬·여백 조정 수준의 표시 변경",
+          "risk": "T0 — 화면 표시만, 데이터 영향 없음",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T05:02:48Z"
+        },
+        "acceptance_criteria": [
+          "390·320 에서 인사말 끝(서명 아래)에 '교육 과정 보기'(주 버튼) 와 '강좌 문의'(보조) 가 보이고 각각 교육 목록·문의 양식으로 이동한다",
+          "1280 에서 제목 영역 왼쪽 끝이 본문 또는 헤더 로고와 줄이 맞는다",
+          "1280 첫 화면에 인사말 첫 문장이 보인다(제목~프로필 빈 공간 축소)",
+          "layout_check·greeting_readability_check(1280·390·320) 통과, 버튼 아이콘은 LineIcons",
+          "버튼 존재·링크를 확인하는 테스트가 있다"
+        ],
+        "priority_reason": "엔진 기본 P1 유지 — 첫 방문자 소개 화면의 다음 행동 부재"
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T05:02:33.626Z"
     }
   ],
   "hooks": {
@@ -14496,6 +15122,36 @@
         "issue_type": "RUN_TESTS",
         "plan_created": 1,
         "timestamp": "2026-11-25T13:52:06.039262"
+      },
+      {
+        "issue_id": "ISS-606",
+        "issue_type": "STYLE_FIX",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T13:59:02.087532"
+      },
+      {
+        "issue_id": "ISS-602",
+        "issue_type": "DOMAIN_ANALYZE",
+        "plan_created": 1,
+        "timestamp": "2026-11-25T14:01:07.735750"
+      },
+      {
+        "issue_id": "ISS-603",
+        "issue_type": "UI_REVIEW",
+        "plan_created": 1,
+        "timestamp": "2026-11-25T14:01:17.711948"
+      },
+      {
+        "issue_id": "ISS-604",
+        "issue_type": "BRAND_GUARD",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T14:01:26.669387"
+      },
+      {
+        "issue_id": "ISS-607",
+        "issue_type": "SCORE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T14:02:32.862477"
       }
     ],
     "on_fail": [],
@@ -14520,6 +15176,12 @@
         "context": "ISS-554 all scenarios passed",
         "frequency": 1,
         "discovered_at": "2026-11-25T11:55:15.933731"
+      },
+      {
+        "pattern": "score_95",
+        "context": "ISS-607 chain",
+        "frequency": 1,
+        "discovered_at": "2026-11-25T14:02:32.862477"
       }
     ],
     "failure_patterns": [],
@@ -18738,8 +19400,8 @@
     ]
   },
   "stats": {
-    "total_issues": 607,
-    "completed": 113,
+    "total_issues": 609,
+    "completed": 118,
     "failed": 0,
     "evolved": 223
   },
