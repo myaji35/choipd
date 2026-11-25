@@ -8600,7 +8600,7 @@
       "parent_id": "ISS-547",
       "depends_on": [],
       "created_at": "2026-11-25T11:48:22+09:00",
-      "updated_at": "2026-11-25T11:48:48+09:00",
+      "updated_at": "2026-11-25T02:48:51.102Z",
       "result": null,
       "spawn_rules": [],
       "payload": {
@@ -8627,7 +8627,17 @@
           "effort": "XS",
           "by": "factory-runner",
           "at": "2026-11-25T11:48:48+09:00"
-        }
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T02:48:51.102Z",
+            "by": "auto",
+            "reason": "모두 bin/rubocop -a 로 고칠 수 있는 서식 위반. 2026-11-25 회원 디자인 루프 세션이 이 파일들을 계속 고치는 중이라 그 루프가 끝난 뒤 처리(이미 고쳐졌으면 rubocop 0 확인 후 DONE). 테스트 387건은 통과"
+          }
+        ],
+        "approved_at": "2026-11-25T02:48:51.102Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
       }
     }
   ],
