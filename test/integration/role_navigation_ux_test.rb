@@ -93,6 +93,22 @@ class RoleNavigationUxTest < ActionDispatch::IntegrationTest
     assert_select "nav a[href=?].bg-primary", admin_members_path, count: 1
   end
 
+  test "운영자 메뉴와 회원 목록에서 대행 등록으로 바로 갈 수 있다" do
+    member = create_member(status: "approved")
+    waiting = create_member(status: "pending_approval")
+    sign_in staff_user("admin")
+
+    get admin_members_path
+
+    assert_response :success
+    assert_select "nav a[href=?]", pd_members_path, text: "계정·채널 대행 등록", count: 1
+    assert_select "nav a[href=?].bg-primary", pd_members_path, count: 0
+    [member, waiting].each do |listed_member|
+      assert_select "tbody tr a[href=?][title=?]", pd_member_path(listed_member),
+        "#{listed_member.name}님의 계정·채널 대행 등록", text: "대행 등록", count: 1
+    end
+  end
+
   test "거부된 회원 상세에 다시 승인 버튼과 거부 사유를 표시한다" do
     member = create_member(status: "rejected")
     member.update!(rejection_reason: "신청 정보 확인 필요")

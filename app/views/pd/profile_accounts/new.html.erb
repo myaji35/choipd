@@ -1,5 +1,5 @@
-<% member = @member %>
-<% title = member ? (@account.platform_label ? "#{@account.platform_label} 계정 등록" : "프로필 계정 등록") : "인물정보 계정 추가" %>
+<% member = @member if @lock_member %>
+<% title = member ? (@lock_platform && @account.platform_label ? "#{@account.platform_label} 계정 등록" : "프로필 계정 등록") : "인물정보 계정 추가" %>
 <% content_for :title, title %>
 
 <div class="max-w-lg">

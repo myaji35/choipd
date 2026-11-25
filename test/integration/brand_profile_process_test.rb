@@ -130,18 +130,18 @@ class BrandProfileProcessTest < ActionDispatch::IntegrationTest
     ENV["APPLY"] = previous_apply
   end
 
-  test "PD가 새 계정 화면에서 회원을 미리 선택하고 저장할 수 있다" do
+  test "PD가 새 계정 화면에서 회원을 고정하고 저장할 수 있다" do
     sign_in staff("pd")
     member = create_member
     pending = create_member(status: "pending_approval")
 
     get new_pd_profile_account_path(member_id: member.id)
     assert_response :success
-    assert_select "select[name='profile_account[member_id]']" do
-      assert_select "option[selected][value=?]", member.id.to_s, text: "#{member.name} (#{member.slug})"
-      assert_select "option[value='']", text: "연결 안 함"
-      assert_select "option[value=?]", pending.id.to_s, count: 0
-    end
+    assert_select "input[type=hidden][name='profile_account[member_id]'][value=?]", member.id.to_s
+    assert_select "p", text: "회원: #{member.name} (/#{member.slug})"
+    assert_select "select#profile_account_member_id", count: 0
+    assert_select "select#profile_account_platform"
+    assert_select "input[type=hidden][name='profile_account[member_id]'][value=?]", pending.id.to_s, count: 0
 
     post pd_profile_accounts_path, params: { profile_account: { member_id: member.id, platform: "linkedin", display_name: "회원 프로필" } }
     assert_redirected_to pd_member_path(member, anchor: "accounts")
@@ -149,18 +149,25 @@ class BrandProfileProcessTest < ActionDispatch::IntegrationTest
     assert_select "td", text: member.name
   end
 
-  test "PD 새 계정 화면과 저장 실패 화면에서 승인 대기 회원을 선택한 상태로 표시한다" do
+  test "PD 새 계정 화면과 저장 실패 화면에서 승인 대기 회원을 고정해 표시한다" do
     sign_in staff("pd")
     member = create_member(status: "pending_approval")
-    selector = "select[name='profile_account[member_id]'] option[selected][value=?]"
+    selector = "input[type=hidden][name='profile_account[member_id]'][value=?]"
 
     get new_pd_profile_account_path(member_id: member.id)
     assert_response :success
-    assert_select selector, member.id.to_s, text: "#{member.name} (승인 대기)"
+    assert_select selector, member.id.to_s
+    assert_select "p", text: "회원: #{member.name} (/#{member.slug})"
 
-    post pd_profile_accounts_path, params: { profile_account: { member_id: member.id, platform: "linkedin" } }
+    post pd_profile_accounts_path, params: {
+      lock_member: css_select("input[name=lock_member]").first["value"],
+      lock_platform: css_select("input[name=lock_platform]").first["value"],
+      profile_account: { member_id: member.id, platform: "linkedin" }
+    }
     assert_response :unprocessable_entity
-    assert_select selector, member.id.to_s, text: "#{member.name} (승인 대기)"
+    assert_select selector, member.id.to_s
+    assert_select "p", text: "회원: #{member.name} (/#{member.slug})"
+    assert_select "select#profile_account_platform option[selected][value=linkedin]"
   end
 
   private

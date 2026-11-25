@@ -43,11 +43,55 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     ProfileAccount::PLATFORMS.each_key do |platform|
       assert_select "a[href=?]", new_pd_profile_account_path(member_id: @member.id, platform: platform), text: "계정 등록"
     end
-    assert_select "#channels a", text: "채널 등록", count: 3
+    assert_select "#channels a.bg-primary", text: "채널 등록", count: 3
     MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS.each_key do |platform|
       assert_select "a[href=?]", new_pd_member_channel_path(@member, platform: platform), text: "채널 등록"
     end
     assert_select "a[href=?]", slug_admin_dashboard_path(slug: @member.slug), text: "회원 화면에서 확인"
+  end
+
+  test "대행 등록 화면 맨 위에 남은 등록 수를 요약한다" do
+    sign_in @pd
+    get pd_member_path(@member)
+    assert_select "#registration-summary", text: "프로필 계정 0/2 · 채널 0/3 등록"
+
+    account = @member.profile_accounts.create!(platform: "naver_people", display_name: @member.name)
+    @member.profile_accounts.create!(platform: account.platform, display_name: "같은 종류의 계정")
+    brand = @member.ensure_personal_brand!
+    channel = brand.brand_channels.create!(platform: "naver_blog")
+    get pd_member_path(@member)
+    assert_select "#registration-summary", text: "프로필 계정 1/2 · 채널 1/3 등록 · 위탁 동의 대기 1개"
+
+    @member.profile_accounts.create!(platform: "linkedin", display_name: @member.name)
+    channel.update!(delegation_consent_at: Time.current)
+    (MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS.keys - [channel.platform]).each do |platform|
+      brand.brand_channels.create!(platform: platform, delegation_consent_at: Time.current)
+    end
+    get pd_member_path(@member)
+    assert_select "#registration-summary", text: "등록을 모두 마쳤습니다."
+  end
+
+  test "등록된 계정마다 다음에 할 일을 알려 준다" do
+    sign_in @pd
+    account = @member.profile_accounts.create!(platform: "linkedin", display_name: @member.name)
+    messages = {
+      "unknown" => "아직 점검 전입니다. 점검을 돌리면 회원 화면의 '계정 확인'이 채워집니다.",
+      "logged_out" => "로그인이 풀려 있습니다. ego 브라우저에서 다시 로그인한 뒤 점검해 주세요.",
+      "error" => "점검 중 오류가 났습니다. 계정 상세에서 내용을 확인해 주세요.",
+      "logged_in" => "계정 확인까지 끝났습니다. 다음은 계정 상세에서 내용 손보기입니다."
+    }
+
+    messages.each do |status, message|
+      account.update!(session_status: status)
+      get pd_member_path(@member)
+      assert_select "#accounts li p", text: /#{Regexp.escape(message)}/
+      assert_select "#accounts a[href=?]", pd_profile_accounts_path,
+        text: "점검하러 가기", count: %w[unknown logged_out].include?(status) ? 1 : 0
+    end
+
+    account.profile_snapshots.create!(captured_at: Time.current)
+    get pd_member_path(@member)
+    assert_select "#accounts li p", text: "관리 중 — 회원 화면에도 '관리 중'으로 보입니다."
   end
 
   test "등록 전 플랫폼에는 같은 테넌트의 미연결 계정만 표시한다" do

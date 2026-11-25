@@ -26,7 +26,7 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "계정 등록 화면에서 주소의 플랫폼과 회원을 미리 선택한다" do
+  test "계정 등록 화면에서 주소의 플랫폼과 회원을 고정하고 입력 칸 네 개를 보여 준다" do
     member = Member.create!(name: "계정 등록 회원", email: "profile-new-member@example.test", slug: "profile-new-member")
 
     get new_pd_profile_account_path(member_id: member.id, platform: "linkedin")
@@ -40,8 +40,24 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     %w[display_name login_id external_id].each do |field|
       assert_select "input#profile_account_#{field}[aria-describedby=profile_account_#{field}_help] + p#profile_account_#{field}_help"
     end
-    assert_select "#profile_account_platform option[value=linkedin][selected]"
-    assert_select "#profile_account_member_id option[value=?][selected]", member.id.to_s
+    assert_select "input[type=hidden][name='profile_account[member_id]'][value=?]", member.id.to_s
+    assert_select "input[type=hidden][name='profile_account[platform]'][value=linkedin]"
+    assert_select "form select", count: 0
+    assert_select "p", text: "회원: #{member.name} (/#{member.slug})"
+    assert_select "p", text: "종류: LinkedIn"
+    assert_select "form > div > input[type=text], form > div > textarea" do |fields|
+      assert_equal %w[display_name login_id profile_url notes].map { |field| "profile_account_#{field}" }, fields.map { |field| field["id"] }
+    end
+    assert_select "details[open]", count: 0
+    assert_select "details" do
+      assert_select "summary", text: "더 적기 (외부 ID·직함 — 비워 둬도 등록됩니다)"
+      assert_select "input#profile_account_external_id"
+      assert_select "input#profile_account_headline"
+      assert_select "input[type=checkbox]#profile_account_is_active"
+    end
+    assert_select "button[name=next][value='1']", text: "등록하고 다음"
+    assert_select 'nav a[href=?][class~="bg-primary/10"]', pd_members_path, text: "회원 대행 등록"
+    assert_select 'nav a[href=?][class~="bg-primary/10"]', pd_profile_accounts_path, count: 0
   end
 
   test "회원 계정을 등록하면 대행 등록 화면으로 돌아간다" do
@@ -54,6 +70,92 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "LinkedIn 계정을 등록했습니다. 회원 대시보드 '내 프로필 관리 현황'에 바로 보입니다.", flash[:notice]
     follow_redirect!
     assert_select "#accounts a[href=?]", pd_profile_account_path(member.profile_accounts.sole), text: "계정 상세"
+  end
+
+  test "등록하고 다음으로 LinkedIn 폼, 이어서 첫 미등록 채널 폼으로 이동한다" do
+    member = Member.create!(name: "이어 등록 회원", email: "profile-next@example.test", slug: "profile-next")
+
+    post pd_profile_accounts_path, params: {
+      next: "1", profile_account: { member_id: member.id, platform: "naver_people", display_name: member.name }
+    }
+    assert_redirected_to new_pd_profile_account_path(member_id: member.id, platform: "linkedin")
+    assert_equal "네이버 인물정보 계정을 등록했습니다. 이어서 LinkedIn 계정을 등록하세요.", flash[:notice]
+    follow_redirect!
+    assert_select "h1", text: "LinkedIn 계정 등록"
+
+    post pd_profile_accounts_path, params: {
+      next: "1", profile_account: { member_id: member.id, platform: "linkedin", display_name: member.name }
+    }
+    assert_redirected_to new_pd_member_channel_path(member, platform: "naver_blog")
+    assert_equal "LinkedIn 계정을 등록했습니다. 이어서 네이버 블로그 채널을 등록하세요.", flash[:notice]
+    follow_redirect!
+    assert_response :success
+  end
+
+  test "남은 등록이 없으면 등록하고 다음 버튼을 숨기고 대행 등록 화면으로 돌아간다" do
+    member = Member.create!(name: "마지막 등록 회원", email: "profile-last@example.test", slug: "profile-last")
+    member.profile_accounts.create!(platform: "naver_people", display_name: member.name)
+    brand = member.ensure_personal_brand!
+    MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS.each_key do |platform|
+      brand.brand_channels.create!(platform: platform)
+    end
+
+    get new_pd_profile_account_path(member_id: member.id, platform: "linkedin")
+    assert_response :success
+    assert_select "button[name=next]", count: 0
+
+    post pd_profile_accounts_path, params: {
+      next: "1", profile_account: { member_id: member.id, platform: "linkedin", display_name: member.name }
+    }
+    assert_redirected_to pd_member_path(member, anchor: "accounts")
+    assert_equal "LinkedIn 계정을 등록했습니다. 회원 대시보드 '내 프로필 관리 현황'에 바로 보입니다.", flash[:notice]
+  end
+
+  test "회원과 플랫폼을 지정하지 않고 연 폼은 등록 실패 후에도 선택 칸을 유지한다" do
+    member = Member.create!(name: "선택 회원", email: "profile-select@example.test", slug: "profile-select", status: "approved")
+
+    get new_pd_profile_account_path
+    assert_response :success
+    assert_select "select#profile_account_member_id"
+    assert_select "select#profile_account_platform"
+    assert_select "details, button[name=next]", count: 0
+
+    post pd_profile_accounts_path, params: {
+      lock_member: css_select("input[name=lock_member]").first["value"],
+      lock_platform: css_select("input[name=lock_platform]").first["value"],
+      profile_account: { member_id: member.id, platform: "linkedin", display_name: "" }
+    }
+
+    assert_response :unprocessable_entity
+    assert_select "select#profile_account_member_id option[selected][value=?]", member.id.to_s
+    assert_select "select#profile_account_platform option[selected][value=linkedin]"
+    assert_select "a[href=?]", pd_profile_accounts_path, text: "취소"
+    assert_select 'nav a[href=?][class~="bg-primary/10"]', pd_members_path, text: "회원 대행 등록"
+    assert_select 'nav a[href=?][class~="bg-primary/10"]', pd_profile_accounts_path, count: 0
+  end
+
+  test "고정된 회원 계정 등록은 실패 후에도 고정을 유지하고 추가 입력 영역을 펼친다" do
+    member = Member.create!(name: "재입력 회원", email: "profile-retry@example.test", slug: "profile-retry")
+
+    get new_pd_profile_account_path(member_id: member.id, platform: "linkedin")
+    assert_response :success
+
+    post pd_profile_accounts_path, params: {
+      lock_member: css_select("input[name=lock_member]").first["value"],
+      lock_platform: css_select("input[name=lock_platform]").first["value"],
+      profile_account: { member_id: member.id, platform: "linkedin", display_name: "", headline: "편집자" }
+    }
+
+    assert_response :unprocessable_entity
+    assert_select "input[type=hidden][name=lock_member][value='1']"
+    assert_select "input[type=hidden][name=lock_platform][value='1']"
+    assert_select "input[type=hidden][name='profile_account[member_id]'][value=?]", member.id.to_s
+    assert_select "input[type=hidden][name='profile_account[platform]'][value=linkedin]"
+    assert_select "form select", count: 0
+    assert_select "a[href=?]", pd_member_path(member, anchor: "accounts"), text: "취소"
+    assert_select 'nav a[href=?][class~="bg-primary/10"]', pd_members_path, text: "회원 대행 등록"
+    assert_select 'nav a[href=?][class~="bg-primary/10"]', pd_profile_accounts_path, count: 0
+    assert_select "details[open] input#profile_account_headline[value='편집자']"
   end
 
   test "회원 없이 계정을 추가하면 계정 상세로 이동한다" do

@@ -17,7 +17,10 @@ class Pd::MembersController < Pd::BaseController
 
   def show
     @member = Member.for_tenant.find(params[:id])
-    @accounts_by_platform = @member.profile_accounts.order(:platform, :display_name).group_by(&:platform)
+    @registration_summary = member_registration_rows([@member]).first
+    @registration_complete = !registration_todo?(@registration_summary) && @registration_summary.fetch(:consent_waiting).zero?
+    @accounts_by_platform = @member.profile_accounts.includes(:naver_people_target)
+      .order(:platform, :display_name).group_by(&:platform)
     unlinked_accounts = ProfileAccount.where(member_id: nil, tenant_id: @member.tenant_id)
       .order(:display_name, :id).group_by(&:platform)
     @unlinked_accounts_by_platform = unlinked_accounts.transform_values do |accounts|

@@ -1,6 +1,8 @@
 class Pd::ProfileAccountsController < Pd::BaseController
   before_action :set_account, only: [ :show, :edit, :update, :destroy, :invitation_action, :search_queries ]
 
+  helper_method :more_registrations?
+
   def index
     @accounts = tenant_accounts.includes(:member).order(:platform, :display_name).group_by(&:platform)
     @ego_available = EgoProfile::Runner.available?
@@ -38,6 +40,8 @@ class Pd::ProfileAccountsController < Pd::BaseController
   end
 
   def new
+    @lock_member = params[:member_id].present?
+    @lock_platform = params[:platform].present?
     platform = params[:platform].presence_in(ProfileAccount::PLATFORMS.keys)
     @member = Member.for_tenant.find_by(id: params[:member_id])
     @account = ProfileAccount.new({ member: @member, platform: platform }.compact)
@@ -45,12 +49,13 @@ class Pd::ProfileAccountsController < Pd::BaseController
   end
 
   def create
+    @lock_member = params[:lock_member] == "1"
+    @lock_platform = params[:lock_platform] == "1"
     @account = tenant_accounts.new
     assign_account_attributes
     if @account.errors.empty? && @account.save
       if @member
-        redirect_to pd_member_path(@member, anchor: "accounts"),
-          notice: "#{@account.platform_label} 계정을 등록했습니다. 회원 대시보드 '내 프로필 관리 현황'에 바로 보입니다."
+        redirect_after_registration
       else
         redirect_to pd_profile_account_path(@account), notice: "인물정보 계정이 추가되었습니다."
       end
@@ -123,6 +128,36 @@ class Pd::ProfileAccountsController < Pd::BaseController
   end
 
   private
+
+  def redirect_after_registration
+    if params[:next] == "1"
+      notice = "#{@account.platform_label} 계정을 등록했습니다."
+      if (platform = remaining_account_platforms.first)
+        return redirect_to new_pd_profile_account_path(member_id: @member.id, platform: platform),
+          notice: "#{notice} 이어서 #{ProfileAccount::PLATFORMS.fetch(platform)} 계정을 등록하세요."
+      end
+      if (platform = remaining_channel_platforms.first)
+        return redirect_to new_pd_member_channel_path(@member, platform: platform),
+          notice: "#{notice} 이어서 #{MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS.fetch(platform)} 채널을 등록하세요."
+      end
+    end
+
+    redirect_to pd_member_path(@member, anchor: "accounts"),
+      notice: "#{@account.platform_label} 계정을 등록했습니다. 회원 대시보드 '내 프로필 관리 현황'에 바로 보입니다."
+  end
+
+  def more_registrations?
+    (remaining_account_platforms - [@account.platform]).any? || remaining_channel_platforms.any?
+  end
+
+  def remaining_account_platforms
+    ProfileAccount::PLATFORMS.keys - @member.profile_accounts.distinct.pluck(:platform)
+  end
+
+  def remaining_channel_platforms
+    platforms = MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS.keys
+    platforms - BrandChannel.joins(:brand).where(brands: { member_id: @member.id }, platform: platforms).distinct.pluck(:platform)
+  end
 
   def report_week_end(value)
     return @today unless value.is_a?(String) && value.match?(/\A\d{4}-\d{2}-\d{2}\z/)

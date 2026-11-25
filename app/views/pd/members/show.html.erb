@@ -2,6 +2,8 @@
 
 <% row_link_class = "inline-flex items-center text-primary hover:underline" %>
 <% link_height = "min-height: 44px;" %>
+<% registration_button_class = "inline-flex items-center bg-primary text-white rounded-lg px-4 py-2" %>
+<% registration_button_style = "#{link_height} background-color: #00A1E0;" %>
 
 <header class="mb-6">
   <div class="flex flex-wrap gap-3">
@@ -14,6 +16,13 @@
     <div class="min-w-0 max-w-full break-words">
       <h1 class="text-xl font-bold text-navy"><%= @member.name %> 대행 등록</h1>
       <p class="text-sm text-gray-500">/<%= @member.slug %></p>
+      <p id="registration-summary" class="mt-2 text-sm text-gray-700">
+        <% if @registration_complete %>
+          등록을 모두 마쳤습니다.
+        <% else %>
+          프로필 계정 <%= @registration_summary.fetch(:account_count) %>/2 · 채널 <%= @registration_summary.fetch(:channel_count) %>/3 등록<% if @registration_summary.fetch(:consent_waiting).positive? %> · 위탁 동의 대기 <%= @registration_summary.fetch(:consent_waiting) %>개<% end %>
+        <% end %>
+      </p>
     </div>
     <% if @member.slug.present? %>
       <%= link_to "회원 화면에서 확인", slug_admin_dashboard_path(slug: @member.slug), class: "inline-flex items-center bg-primary text-white px-4 py-2 rounded-lg text-sm", style: link_height %>
@@ -45,6 +54,13 @@
             <% if @member.slug.present? %>
               <%= link_to "회원 화면에서 보기", slug_admin_dashboard_path(slug: @member.slug, anchor: "profile-accounts-status"), class: row_link_class, style: link_height %>
             <% end %>
+            <% message, link_label, link_path = profile_account_next_step(account) %>
+            <p class="w-full min-w-0 break-words text-gray-700">
+              <%= message %>
+              <% if link_path %>
+                <%= link_to link_label, link_path, class: row_link_class, style: link_height %>
+              <% end %>
+            </p>
           </li>
         <% end %>
       <% else %>
@@ -53,8 +69,8 @@
           <div class="flex flex-wrap items-center justify-between gap-2">
             <p class="text-gray-600"><%= label %> 등록 전</p>
             <%= link_to "계정 등록", new_pd_profile_account_path(member_id: @member.id, platform: platform),
-                class: matching_accounts.any? ? row_link_class : "inline-flex items-center bg-primary text-white rounded-lg px-4 py-2",
-                style: matching_accounts.any? ? link_height : "#{link_height} background-color: #00A1E0;" %>
+                class: matching_accounts.any? ? row_link_class : registration_button_class,
+                style: matching_accounts.any? ? link_height : registration_button_style %>
           </div>
           <% [matching_accounts, other_accounts].each do |unlinked_accounts| %>
             <% next if unlinked_accounts.empty? %>
@@ -153,7 +169,7 @@
       <% else %>
         <li class="flex flex-wrap items-center justify-between gap-2 py-2">
           <p class="text-gray-600"><%= label %> 등록 전</p>
-          <%= link_to "채널 등록", new_pd_member_channel_path(@member, platform: platform), class: row_link_class, style: link_height %>
+          <%= link_to "채널 등록", new_pd_member_channel_path(@member, platform: platform), class: registration_button_class, style: registration_button_style %>
         </li>
       <% end %>
     <% end %>
