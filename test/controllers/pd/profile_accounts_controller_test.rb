@@ -403,6 +403,19 @@ class Pd::ProfileAccountsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", slug_admin_dashboard_path(slug: member.slug), text: "회원 화면에서 확인"
   end
 
+  test "미연결 계정에만 회원 지정 링크를 표시한다" do
+    member = Member.create!(name: "연결 회원", email: "linked-account@example.test", slug: "linked-account")
+    linked = member.profile_accounts.create!(platform: "linkedin", display_name: "연결 계정")
+
+    get pd_profile_accounts_path
+    assert_response :ok
+    assert_select "td", text: /미연결/ do
+      assert_select "a[href=?]", edit_pd_profile_account_path(@account), text: "회원 지정", count: 1
+    end
+    assert_select "td a[href=?]", pd_member_path(member), text: member.name, count: 1
+    assert_select "td a[href=?]", edit_pd_profile_account_path(linked), count: 0
+  end
+
   test "weekly report renders both platforms and the date form" do
     travel_to Time.utc(2026, 11, 23, 15, 30)
     @account.profile_snapshots.create!(captured_at: Time.current, data: {

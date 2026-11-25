@@ -16,14 +16,17 @@ class Pd::MemberChannelsControllerTest < ActionDispatch::IntegrationTest
     assert_select "select[name='brand_channel[platform]']", count: 0
     assert_select "h1", text: "네이버 블로그 채널 등록"
     assert_select "p", text: "종류: 네이버 블로그"
-    assert_select "#channel-handle-help", text: "블로그 아이디 — blog.naver.com/ 뒤에 오는 글자"
-    assert_select "input[name='brand_channel[profile_url]'][placeholder='https://blog.naver.com/아이디']"
+    assert_select "#channel-handle-help", text: "블로그 아이디 — blog.naver.com/ 뒤에 오는 글자. 주소를 통째로 붙여 넣어도 됩니다."
+    assert_select "input[name='brand_channel[profile_url]'][placeholder='https://blog.naver.com/아이디'][aria-describedby=channel-url-help]"
+    assert_select "#channel-url-help", text: "비워 두면 계정 이름으로 자동으로 채워집니다."
     assert_select "input[name^='brand_channel'], select[name^='brand_channel'], textarea[name^='brand_channel']", count: 4
 
     assert_difference({ "Brand.where(personal: true).count" => 1, "BrandChannel.count" => 1 }) do
-      post pd_member_channels_path(@member), params: { brand_channel: { platform: "naver_blog", account_handle: "new-blog" } }
+      post pd_member_channels_path(@member), params: { brand_channel: { platform: "naver_blog", account_handle: "@new-blog" } }
     end
     channel = @member.personal_brand.brand_channels.sole
+    assert_equal "new-blog", channel.account_handle
+    assert_equal "https://blog.naver.com/new-blog", channel.profile_url
     assert_equal BrandChannel::DEFAULT_CONNECTION_METHODS.fetch("naver_blog"), channel.connection_method
     assert_nil channel.delegation_consent_at
     assert_redirected_to pd_member_path(@member, anchor: "channels")
@@ -34,6 +37,73 @@ class Pd::MemberChannelsControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
     assert_select "#channel-status h3", text: "네이버 블로그 등록 전", count: 0
     assert_select "#channel-status article", text: /네이버 블로그.*준비 중/m
+    assert_select "#channel-status a[href=?]", channel.profile_url, text: "프로필 열기 ↗"
+  end
+
+  test "계정 이름과 주소가 비어 있으면 개인 브랜드와 채널을 만들지 않는다" do
+    sign_in @pd
+
+    assert_no_difference [ "Brand.count", "BrandChannel.count" ] do
+      post pd_member_channels_path(@member), params: { brand_channel: { platform: "naver_blog", account_handle: "", profile_url: "" } }
+    end
+    assert_response :unprocessable_entity
+    assert_select "[role=alert] li", text: "계정 이름을 적어 주세요. 채널 주소만 붙여 넣어도 됩니다."
+  end
+
+  test "계정 이름 칸에 붙여 넣은 인스타그램 주소를 정리한다" do
+    sign_in @pd
+    url = "https://www.instagram.com/my_photo/"
+
+    post pd_member_channels_path(@member), params: { brand_channel: { platform: "instagram", account_handle: url } }
+
+    assert_redirected_to pd_member_path(@member, anchor: "channels")
+    channel = @member.personal_brand.brand_channels.sole
+    assert_equal "my_photo", channel.account_handle
+    assert_equal url, channel.profile_url
+  end
+
+  test "채널 주소만 등록하면 주소를 유지하고 계정 이름을 뽑는다" do
+    sign_in @pd
+    url = "https://m.blog.naver.com/abc"
+
+    post pd_member_channels_path(@member), params: { brand_channel: { platform: "naver_blog", account_handle: "", profile_url: url } }
+
+    assert_redirected_to pd_member_path(@member, anchor: "channels")
+    channel = @member.personal_brand.brand_channels.sole
+    assert_equal "abc", channel.account_handle
+    assert_equal url, channel.profile_url
+  end
+
+  test "수정할 때 기준 주소는 새 이름으로 바꾸고 직접 적은 주소는 유지한다" do
+    sign_in @pd
+    brand = @member.ensure_personal_brand!
+    channel = brand.brand_channels.create!(platform: "naver_blog", account_handle: "a", profile_url: "https://blog.naver.com/a")
+
+    patch pd_member_channel_path(@member, channel), params: { brand_channel: { account_handle: "@b", profile_url: channel.profile_url } }
+
+    assert_redirected_to pd_member_path(@member, anchor: "channels")
+    assert_equal "b", channel.reload.account_handle
+    assert_equal "https://blog.naver.com/b", channel.profile_url
+
+    custom_url = "https://example.test/my-photo"
+    channel.update!(profile_url: custom_url)
+    patch pd_member_channel_path(@member, channel), params: { brand_channel: { account_handle: "c", profile_url: custom_url } }
+
+    assert_redirected_to pd_member_path(@member, anchor: "channels")
+    assert_equal "c", channel.reload.account_handle
+    assert_equal custom_url, channel.profile_url
+  end
+
+  test "채널 수정에서 잘못된 계정 이름을 저장하지 않는다" do
+    sign_in @pd
+    channel = @member.ensure_personal_brand!.brand_channels.create!(platform: "naver_blog", account_handle: "original")
+
+    patch pd_member_channel_path(@member, channel), params: { brand_channel: { account_handle: "bad name/@part" } }
+
+    assert_response :unprocessable_entity
+    assert_select "[role=alert] li", text: "계정 이름에는 빈칸이나 주소를 넣을 수 없습니다. 예: gagahoho_kang"
+    assert_select "input[name='brand_channel[profile_url]'][value]", count: 0
+    assert_equal "original", channel.reload.account_handle
   end
 
   test "운영자도 채널을 등록할 수 있고 허용된 필드만 저장한다" do
@@ -157,18 +227,18 @@ class Pd::MemberChannelsControllerTest < ActionDispatch::IntegrationTest
     get new_pd_member_channel_path(@member, platform: "naver_blog")
     assert_select "button[name=next][value='1']", text: "등록하고 다음: 페이스북"
 
-    post pd_member_channels_path(@member), params: { next: "1", brand_channel: { platform: "naver_blog" } }
+    post pd_member_channels_path(@member), params: { next: "1", brand_channel: { platform: "naver_blog", account_handle: "naver-name" } }
     assert_redirected_to new_pd_member_channel_path(@member, platform: "facebook_page")
     assert_equal "네이버 블로그 채널을 등록했습니다. 이어서 페이스북을 등록하세요.", flash[:notice]
     follow_redirect!
     assert_select "button[name=next][value='1']", text: "등록하고 다음: 인스타그램"
 
-    post pd_member_channels_path(@member), params: { next: "1", brand_channel: { platform: "facebook_page" } }
+    post pd_member_channels_path(@member), params: { next: "1", brand_channel: { platform: "facebook_page", account_handle: "facebook-name" } }
     assert_redirected_to new_pd_member_channel_path(@member, platform: "instagram")
     follow_redirect!
     assert_select "button[name=next]", count: 0
 
-    post pd_member_channels_path(@member), params: { next: "1", brand_channel: { platform: "instagram" } }
+    post pd_member_channels_path(@member), params: { next: "1", brand_channel: { platform: "instagram", account_handle: "instagram-name" } }
     assert_redirected_to pd_member_path(@member, anchor: "channels")
     assert_equal %w[facebook_page instagram naver_blog], @member.personal_brand.brand_channels.order(:platform).pluck(:platform)
   end

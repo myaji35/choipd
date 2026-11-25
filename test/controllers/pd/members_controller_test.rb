@@ -47,7 +47,7 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
     MemberAdmin::ChannelOverview::CHANNEL_PLATFORMS.each_key do |platform|
       assert_select "a[href=?]", new_pd_member_channel_path(@member, platform: platform), text: "채널 등록"
     end
-    assert_select "a[href=?]", slug_admin_dashboard_path(slug: @member.slug), text: "회원 화면에서 확인"
+    assert_select "a[href=?]", slug_admin_dashboard_path(slug: @member.slug, anchor: "profile-accounts-status"), text: "회원 화면에서 확인"
   end
 
   test "대행 등록 화면 맨 위에 남은 등록 수를 요약한다" do
@@ -102,7 +102,7 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
 
   test "PD는 채널 동의 뒤 상태에 맞는 다음 할 일을 본다" do
     sign_in @pd
-    channel = @member.ensure_personal_brand!.brand_channels.create!(platform: "naver_blog")
+    channel = @member.ensure_personal_brand!.brand_channels.create!(platform: "naver_blog", account_handle: "blog")
 
     get pd_member_path(@member)
     assert_select "#channels li p", text: /운영 위탁 동의 대기/
@@ -130,11 +130,38 @@ class Pd::MembersControllerTest < ActionDispatch::IntegrationTest
   test "운영자는 동의한 채널의 연결 설정을 바로 열 수 있다" do
     sign_in AdminUser.create!(email: "channel-setup-admin@example.test", password: "password123", role: "admin")
     brand = @member.ensure_personal_brand!
-    channel = brand.brand_channels.create!(platform: "naver_blog", delegation_consent_at: Time.current)
+    channel = brand.brand_channels.create!(platform: "naver_blog", account_handle: "blog", delegation_consent_at: Time.current)
 
     get pd_member_path(@member)
     assert_response :ok
     assert_select "#channels a[href=?]", edit_admin_brand_brand_channel_path(brand, channel), text: "연결 설정 열기"
+  end
+
+  test "PD와 운영자에게 기존 빈 채널의 계정 이름 수정 경로를 보여 준다" do
+    brand = @member.ensure_personal_brand!
+    waiting = brand.brand_channels.create!(platform: "naver_blog")
+    consented = brand.brand_channels.create!(platform: "instagram", delegation_consent_at: Time.current)
+    admin = AdminUser.create!(email: "channel-actions-admin@example.test", password: "password123", role: "admin")
+
+    sign_in @pd
+    get pd_member_path(@member)
+    assert_response :ok
+    [waiting, consented].each do |channel|
+      assert_select "#channels a[href=?]", edit_pd_member_channel_path(@member, channel), text: "계정 이름 적기"
+    end
+    assert_select "#channels li p", text: /계정 이름이 비어 있어 연결 점검과 글 올리기를 할 수 없습니다\./, count: 2
+    assert_select "a", text: "채널 지우기(운영자)", count: 0
+    assert_select "a[href^='/admin/']", count: 0
+    assert_select "p", text: "위탁 동의는 회원 본인만 할 수 있습니다. 잘못 등록한 채널은 '수정'에서 바로잡고, 지워야 하면 운영자에게 요청해 주세요. 연결 설정(로그인 보관·점검)도 운영자가 합니다."
+
+    sign_in admin
+    get pd_member_path(@member)
+    assert_response :ok
+    [waiting, consented].each do |channel|
+      assert_select "#channels a[href=?]", edit_pd_member_channel_path(@member, channel), text: "계정 이름 적기"
+    end
+    assert_select "#channels a[href=?]", admin_brand_path(brand), text: "채널 지우기(운영자)", count: 2
+    assert_select "p", text: "위탁 동의는 회원 본인만 할 수 있습니다. 잘못 등록한 채널은 '수정'에서 바로잡거나 '채널 지우기(운영자)'에서 지웁니다."
   end
 
   test "등록된 계정마다 다음에 할 일을 알려 준다" do

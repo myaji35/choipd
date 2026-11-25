@@ -41,9 +41,10 @@
             </td>
             <td class="px-4 py-3">
               <% if (member = account.member) %>
-                <%= link_to member.name, pd_member_path(member), class: "text-primary" %>
+                <%= link_to member.name, pd_member_path(member), class: "inline-flex items-center text-primary", style: "min-height: 44px;" %>
               <% else %>
-                —
+                <p>미연결</p>
+                <%= link_to "회원 지정", edit_pd_profile_account_path(account), class: "inline-flex items-center text-primary", style: "min-height: 44px;" %>
               <% end %>
             </td>
             <td class="px-4 py-3 break-all"><%= account.login_id.presence || "-" %></td><td class="px-4 py-3"><div class="max-w-[10rem] truncate font-mono text-xs" title="<%= account.external_id %>"><%= account.external_id.presence || "-" %></div></td><td class="px-4 py-3"><div class="max-w-xs line-clamp-2 break-words" title="<%= account.headline %>"><%= account.headline.presence || "-" %></div></td><td class="px-4 py-3"><%= account.auth_status.presence || "-" %></td>

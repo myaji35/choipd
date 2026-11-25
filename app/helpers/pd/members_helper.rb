@@ -22,7 +22,11 @@ module Pd::MembersHelper
     end
   end
 
-  def brand_channel_next_step(channel, state)
+  def brand_channel_next_step(channel, state, member:)
+    if channel.account_handle.blank?
+      return ["계정 이름이 비어 있어 연결 점검과 글 올리기를 할 수 없습니다.", "계정 이름 적기", edit_pd_member_channel_path(member, channel)]
+    end
+
     return [nil, nil, nil] unless channel.delegated?
     return ["운영 중 — 회원 화면에도 '운영 중'으로 보입니다.", nil, nil] if state == :running
 

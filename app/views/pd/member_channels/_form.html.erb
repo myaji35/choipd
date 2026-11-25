@@ -1,13 +1,13 @@
 <% editing = @brand_channel.persisted? %>
 <% platforms = Pd::MemberChannelsController::CHANNEL_PLATFORMS %>
-<% platform = @brand_channel.platform.presence_in(platforms.keys) unless editing %>
+<% platform = @brand_channel.platform.presence_in(platforms.keys) %>
 <% title = "#{platforms.fetch(platform)} 채널 등록" if @lock_platform %>
 <% content_for :title, title %>
 <% handle_help, url_placeholder = {
-  "naver_blog" => ["블로그 아이디 — blog.naver.com/ 뒤에 오는 글자", "https://blog.naver.com/아이디"],
-  "facebook_page" => ["페이지 이름 — facebook.com/ 뒤에 오는 글자", "https://www.facebook.com/페이지이름"],
-  "instagram" => ["@ 뒤에 오는 이름", "https://www.instagram.com/이름"]
-}.fetch(platform, ["예: 블로그 아이디, 인스타그램 @ 뒤 이름", "https://"]) %>
+  "naver_blog" => ["블로그 아이디 — blog.naver.com/ 뒤에 오는 글자. 주소를 통째로 붙여 넣어도 됩니다.", "https://blog.naver.com/아이디"],
+  "facebook_page" => ["페이지 이름 — facebook.com/ 뒤에 오는 글자. 주소를 통째로 붙여 넣어도 됩니다.", "https://www.facebook.com/페이지이름"],
+  "instagram" => ["@ 뒤에 오는 이름. @ 를 붙이거나 주소를 통째로 붙여 넣어도 됩니다.", "https://www.instagram.com/이름"]
+}.fetch(platform, ["블로그 아이디나 @ 뒤 이름. 주소를 통째로 붙여 넣어도 됩니다.", "https://"]) %>
 <% form_url = editing ? pd_member_channel_path(@member, @brand_channel) : pd_member_channels_path(@member) %>
 <% field_class = "w-full min-w-0 rounded-lg border border-gray-300 px-3 py-2 text-sm" %>
 <% control_height = "min-height: 44px;" %>
@@ -48,7 +48,8 @@
     </div>
     <div>
       <%= form.label :profile_url, "채널 주소", class: label_class %>
-      <%= form.url_field :profile_url, placeholder: url_placeholder, class: field_class, style: control_height %>
+      <%= form.url_field :profile_url, placeholder: url_placeholder, class: field_class, style: control_height, aria: { describedby: "channel-url-help" } %>
+      <p id="channel-url-help" class="mt-1 text-xs text-gray-600">비워 두면 계정 이름으로 자동으로 채워집니다.</p>
     </div>
     <div>
       <%= form.label :notes, "메모", class: label_class %>

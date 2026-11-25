@@ -26,7 +26,7 @@
       </p>
     </div>
     <% if @member.slug.present? %>
-      <%= link_to "회원 화면에서 확인", slug_admin_dashboard_path(slug: @member.slug), class: "inline-flex items-center bg-primary text-white px-4 py-2 rounded-lg text-sm", style: link_height %>
+      <%= link_to "회원 화면에서 확인", slug_admin_dashboard_path(slug: @member.slug, anchor: "profile-accounts-status"), class: "inline-flex items-center bg-primary text-white px-4 py-2 rounded-lg text-sm", style: link_height %>
     <% end %>
   </div>
   <% unless @member.can_sign_in? %>
@@ -191,7 +191,7 @@
                   운영 위탁 동의 대기 — 회원 본인이 '내 채널'에서 동의해야 글을 올릴 수 있습니다.
                 <% end %>
               </p>
-              <% message, link_label, link_path = brand_channel_next_step(channel, item[:state]) %>
+              <% message, link_label, link_path = brand_channel_next_step(channel, item[:state], member: @member) %>
               <% if message %>
                 <p class="mt-1 min-w-0 break-words text-gray-700">
                   <%= message %>
@@ -206,6 +206,9 @@
               <% if @member.slug.present? %>
                 <%= link_to "회원 화면에서 보기", slug_admin_channels_path(slug: @member.slug, anchor: "channel-#{channel.id}"), class: row_link_class, style: link_height %>
               <% end %>
+              <% if current_admin_user.admin? %>
+                <%= link_to "채널 지우기(운영자)", admin_brand_path(channel.brand_id), class: row_link_class, style: link_height %>
+              <% end %>
             </div>
           </li>
         <% end %>
@@ -219,4 +222,10 @@
   </ul>
 </section>
 
-<p class="mt-4 text-xs text-gray-600">위탁 동의는 회원 본인만 할 수 있습니다. 채널 삭제와 연결 설정(로그인 보관·점검)은 운영자가 합니다.</p>
+<p class="mt-4 text-xs text-gray-600">
+  <% if current_admin_user.admin? %>
+    위탁 동의는 회원 본인만 할 수 있습니다. 잘못 등록한 채널은 '수정'에서 바로잡거나 '채널 지우기(운영자)'에서 지웁니다.
+  <% else %>
+    위탁 동의는 회원 본인만 할 수 있습니다. 잘못 등록한 채널은 '수정'에서 바로잡고, 지워야 하면 운영자에게 요청해 주세요. 연결 설정(로그인 보관·점검)도 운영자가 합니다.
+  <% end %>
+</p>
