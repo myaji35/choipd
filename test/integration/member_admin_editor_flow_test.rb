@@ -107,19 +107,32 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     get path
 
     assert_response :ok
-    assert_select "a[href='?step=1&tab=docs#docs']", text: "← 문서 올리러 가기"
-    assert_not_includes response.body, "문서 더 올리기"
+    assert_select "a[href='?step=1&tab=docs#docs']", text: "← 글 올리러 가기"
+    assert_not_includes response.body, "글 더 올리기"
 
     @member.member_documents.create!(tenant_id: 1, filename: "career.txt", category: "career", content_md: "경력 메모")
     get path
 
     assert_response :ok
     assert_includes response.body, "아직 강점을 찾지 못했어요"
-    assert_select "a[href='?step=1&tab=docs#docs']", text: "문서 더 올리기"
-    assert_not_includes response.body, "문서 올리러 가기"
+    assert_select "a[href='?step=1&tab=docs#docs']", text: "글 더 올리기"
+    assert_not_includes response.body, "글 올리러 가기"
     assert_select "label[for=member_phone]", text: "전화번호 (선택)"
     assert_includes response.body, "min-height: 48px"
     assert_not_includes response.body, "카카오톡 채널 URL"
+  end
+
+  test "정보 확인 단계에서 지금까지 넣은 것을 고치러 갈 수 있다" do
+    get slug_admin_editor_path(slug: @member.slug, step: 2)
+
+    assert_response :ok
+    assert_select ".impd-card[aria-labelledby=editor-added-materials-title]" do
+      assert_select "h2", text: "지금까지 넣은 것"
+      assert_select "a[href='?step=1&tab=docs#docs']"
+      assert_select "a[href='?step=1&tab=media#media']"
+      assert_select "a[href=?]", slug_admin_services_path(slug: @member.slug)
+    end
+    assert_not_includes Nokogiri::HTML(response.body).at_css("body").text, "문서"
   end
 
   test "공개 단계의 준비 항목은 대시보드와 같다" do

@@ -16,7 +16,7 @@ export default class extends Controller {
 
   async destroy(e) {
     e.preventDefault()
-    if (!confirm("이 파일을 지울까요?")) return
+    if (!confirm("이 글을 지울까요? 지우면 되돌릴 수 없어요.")) return
     const res = await fetch(this.deleteUrlValue, {
       method: "DELETE",
       headers: { "X-CSRF-Token": this.csrfValue, "Accept": "application/json" }

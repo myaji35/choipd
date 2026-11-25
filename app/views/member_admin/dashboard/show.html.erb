@@ -18,7 +18,7 @@
     </p>
   </div>
 
-  <div style="display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 40px;" class="dashboard-grid">
+  <div style="display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 32px;" class="dashboard-grid">
     <!-- Main 영역 -->
     <div class="dashboard-main">
       <% next_item = @checklist.find { |item| !item[:done] } %>
@@ -304,7 +304,7 @@
   .profile-account-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; margin-top: 8px; }
   .profile-account-actions details[open] { flex-basis: 100%; }
   .dashboard-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--impd-ink); margin-bottom: 24px; }
-  .dashboard-stat { padding: 24px 20px; }
+  .dashboard-stat { padding: 24px 16px; }
   .dashboard-stat + .dashboard-stat { border-left: 1px solid var(--impd-rule); }
   .dashboard-stat-value { font-family: var(--impd-font-display); font-size: 48px; font-weight: 800; line-height: 1; margin-top: 8px; color: var(--impd-accent); }
   .dashboard-stat-pending { font-size: 22px; color: var(--impd-muted); line-height: 48px; }

@@ -13,14 +13,16 @@
         <%= lni_icon "file-multiple", size: 20 %>
         <strong style="flex: 1; min-width: 120px; overflow-wrap: anywhere;"><%= d.filename %></strong>
         <span hidden data-category-chip style="border-radius: 999px; background: var(--impd-card); color: var(--impd-ink); padding: 5px 10px; font-size: 13px;"><%= { "bio" => "이력", "career" => "이력", "certificate" => "자격증", "awards" => "자격증", "review" => "후기", "portfolio" => "작품", "curriculum" => "작품", "course" => "작품", "interview" => "이력", "press" => "이력", "other" => "일상" }[d.category] || "일상" %></span>
-        <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--impd-muted);">종류
-          <select data-action="change->member-doc-row#updateCategory" style="max-width: 100%; height: 44px; padding: 0 10px; border: 1px solid var(--impd-rule); background: var(--impd-paper); color: var(--impd-ink); font-family: var(--impd-font-sans); font-size: 16px;">
-            <% doc_categories.each do |cat| %>
-              <option value="<%= cat %>" <%= "selected" if d.category == cat %>><%= { "bio" => "이력", "career" => "이력", "certificate" => "자격증", "awards" => "자격증", "review" => "후기", "portfolio" => "작품", "curriculum" => "작품", "course" => "작품", "interview" => "이력", "press" => "이력", "other" => "일상" }[cat] %></option>
-            <% end %>
-          </select>
-        </label>
-        <button type="button" class="impd-btn impd-btn-secondary" style="height: 44px; padding: 0 14px; font-size: 13px; white-space: nowrap; color: var(--impd-accent-2); border-color: var(--impd-accent-2);" aria-label="<%= d.filename %> 지우기" data-action="click->member-doc-row#destroy">지우기</button>
+        <div style="display: flex; align-items: center; gap: 10px; margin-left: auto;">
+          <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--impd-muted);">종류
+            <select data-action="change->member-doc-row#updateCategory" style="max-width: 100%; height: 44px; padding: 0 10px; border: 1px solid var(--impd-rule); background: #fff; color: var(--impd-ink); font-family: var(--impd-font-sans); font-size: 16px;">
+              <% doc_categories.each do |cat| %>
+                <option value="<%= cat %>" <%= "selected" if d.category == cat %>><%= { "bio" => "이력", "career" => "이력", "certificate" => "자격증", "awards" => "자격증", "review" => "후기", "portfolio" => "작품", "curriculum" => "작품", "course" => "작품", "interview" => "이력", "press" => "이력", "other" => "일상" }[cat] %></option>
+              <% end %>
+            </select>
+          </label>
+          <button type="button" class="impd-btn impd-btn-danger impd-btn-sm" aria-label="<%= d.filename %> 지우기" data-action="click->member-doc-row#destroy">지우기</button>
+        </div>
       </article>
     <% end %>
   </div>
@@ -59,7 +61,7 @@
       </div>
     </div>
 
-    <div data-member-doc-uploader-target="error" style="display: none; margin-top: 12px; padding: 10px; background: rgba(255,90,31,.1); color: var(--impd-accent-2); font-size: 14px; text-align: left; overflow-wrap: anywhere; line-height: 1.5;"></div>
+    <div data-member-doc-uploader-target="error" style="display: none; margin-top: 12px; padding: 10px; background: rgba(180,35,24,.08); color: #b42318; font-size: 14px; text-align: left; overflow-wrap: anywhere; line-height: 1.5;"></div>
     <p data-member-doc-uploader-target="status" class="impd-label-muted" style="margin-top: 10px; min-height: 14px; overflow-wrap: anywhere;"></p>
   </div>
 

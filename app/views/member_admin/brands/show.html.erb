@@ -9,7 +9,7 @@
 
   <section class="impd-card" style="margin-bottom: 32px; min-width: 0; overflow-wrap: anywhere;">
     <h2>내 브랜드 운영 현황</h2>
-    <p style="margin:12px 0;">최근 4주 활동과 그전 4주와의 차이예요.</p>
+    <p style="margin:12px 0;">지난 4주<% if @four_week_range %>(<%= @four_week_range.map { |date| date.strftime("%-m/%-d") }.join("~") %>)<% end %> 동안의 활동이에요. 그전 4주와 견줘 봤어요. 아직 지나고 있는 이번 주는 빼고 셌어요.</p>
     <div class="ops-key-grid ops-owner-stats">
       <% [[:visits, "방문", "회"], [:inquiries, "문의", "건"], [:posts, "올린 소식", "건"], [:sns_posts, "SNS에 올린 글", "건"]].each do |key, label, unit| %>
         <% stat = @four_week_stats[key]; delta = stat[:delta] %>

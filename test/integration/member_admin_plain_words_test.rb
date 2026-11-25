@@ -85,7 +85,10 @@ class MemberAdminPlainWordsTest < ActionDispatch::IntegrationTest
 
     get slug_admin_editor_path(slug: @member.slug, step: 1)
     assert_response :ok
-    assert_select 'button.impd-btn[data-action="click->member-doc-row#destroy"]', count: 1, text: "지우기"
+    assert_select 'button.impd-btn.impd-btn-danger[data-action="click->member-doc-row#destroy"]', count: 1, text: "지우기"
+    assert_select "#docs" do |panels|
+      assert_not_includes panels.first.to_html, "impd-accent-2"
+    end
     assert_no_match "빼기", response.body
     assert_no_match "분류 바꾸기", response.body
   end

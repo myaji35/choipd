@@ -1,6 +1,6 @@
 <% content_for :title, "페이지 만들기 — #{@member.name}" %>
 
-<div class="admin-page editor-page" style="--admin-page-max-width: 1200px;">
+<div class="admin-page editor-page">
   <%= render "member_admin/shared/checklist_arrival" %>
   <!-- 4단계 progress rail — 모두 클릭 가능. 각 단계별 완료 상태 표시. -->
   <%
@@ -191,7 +191,7 @@
       <%# 우: AI 추출 달란트 요약 %>
       <div>
         <div class="impd-card" style="margin-bottom: 14px;">
-          <div class="impd-label-muted" style="margin-bottom: 10px;">자료에서 찾은 강점<% if @skills.any? %> · <%= @skills.size %>개<% end %></div>
+          <div class="impd-label-muted" style="margin-bottom: 10px;">올린 글에서 찾은 강점<% if @skills.any? %> · <%= @skills.size %>개<% end %></div>
           <% if @skills.any? %>
             <div style="display: flex; flex-wrap: wrap; gap: 6px;">
               <% @skills.each do |ms| %>
@@ -202,28 +202,41 @@
               <% end %>
             </div>
             <p class="impd-label-muted" style="margin-top: 14px;">
-              올린 문서 <%= @doc_count %>개에서 찾았어요. 숫자가 클수록 자료에 자주 나온 강점이에요.
+              올린 글 <%= @doc_count %>개에서 찾았어요. 숫자가 클수록 글에 자주 나온 강점이에요.
             </p>
           <% elsif @doc_count == 0 %>
             <p style="font-size: 13px; color: var(--impd-muted); margin: 12px 0;">
               이력서나 경력을 적은 글을 올리면, 그 안에서 강점을 찾아 여기에 보여 드려요.
             </p>
-            <a href="<%= editor_path %>?step=1&amp;tab=docs#docs" class="impd-btn impd-btn-secondary" style="margin-top: 6px;">← 문서 올리러 가기</a>
+            <a href="<%= editor_path %>?step=1&amp;tab=docs#docs" class="impd-btn impd-btn-secondary" style="margin-top: 6px;">← 글 올리러 가기</a>
           <% else %>
             <p style="font-size: 13px; color: var(--impd-muted); margin: 12px 0;">
-              올린 문서 <%= @doc_count %>개에서는 아직 강점을 찾지 못했어요. 자격·수상·전문 분야가 적힌 글을 더 올리면 찾기 쉬워요. 없어도 페이지는 공개할 수 있어요.
+              올린 글 <%= @doc_count %>개에서는 아직 강점을 찾지 못했어요. 자격·수상·전문 분야를 적은 글을 더 올리면 찾기 쉬워요. 없어도 페이지는 공개할 수 있어요.
             </p>
-            <a href="<%= editor_path %>?step=1&amp;tab=docs#docs" class="impd-btn impd-btn-secondary" style="margin-top: 6px;">문서 더 올리기</a>
+            <a href="<%= editor_path %>?step=1&amp;tab=docs#docs" class="impd-btn impd-btn-secondary" style="margin-top: 6px;">글 더 올리기</a>
           <% end %>
         </div>
 
-        <div class="impd-card">
-          <div class="impd-label-muted" style="margin-bottom: 10px;">올린 자료</div>
+        <div class="impd-card" aria-labelledby="editor-added-materials-title">
+          <h2 id="editor-added-materials-title" class="impd-label-muted" style="margin-bottom: 10px;">지금까지 넣은 것</h2>
+          <p class="impd-label-muted" style="font-size: 13px; margin-bottom: 6px;">눌러서 더 넣거나 고칠 수 있어요.</p>
           <ul style="list-style: none; padding: 0; margin: 0; font-size: 13px; color: var(--impd-ink);">
-            <li style="padding: 6px 0; border-bottom: 1px dashed var(--impd-rule); display: flex; align-items: center; gap: 8px;"><%= lni_icon "file-multiple", size: 20 %>문서 <strong><%= @doc_count %></strong>개</li>
-            <li style="padding: 6px 0; border-bottom: 1px dashed var(--impd-rule); display: flex; align-items: center; gap: 8px;"><%= lni_icon "camera-1", size: 20 %>사진 <strong><%= @photos_count %></strong>장</li>
-            <li style="padding: 6px 0; border-bottom: 1px dashed var(--impd-rule); display: flex; align-items: center; gap: 8px;"><%= lni_icon "service-bell-1", size: 20 %>서비스 <strong><%= @services_count %></strong>개</li>
-            <li style="padding: 6px 0; display: flex; align-items: center; gap: 8px;"><%= lni_icon "folder-1", size: 20 %>작업 사진·사례 <strong><%= @portfolio_count %></strong>개</li>
+            <% [
+              ["file-multiple", "글", @doc_count, "?step=1&tab=docs#docs"],
+              ["camera-1", "사진·영상", @photos_count, "?step=1&tab=media#media"],
+              ["service-bell-1", "서비스", @services_count, slug_admin_services_path(slug: @member.slug)]
+            ].each do |icon, label, count, path| %>
+              <li style="border-bottom: 1px dashed var(--impd-rule);">
+                <a href="<%= path %>" style="min-height: 44px; display: flex; align-items: center; gap: 8px; color: inherit; text-decoration: none;">
+                  <%= lni_icon icon, size: 20 %><span><%= label %> <strong><%= count %></strong>개</span>
+                  <span style="margin-left: auto; color: var(--impd-accent); font-weight: 600; font-size: 13px;"><%= count.zero? ? "넣으러 가기 →" : "더 넣기 →" %></span>
+                </a>
+              </li>
+            <% end %>
+            <li>
+              <div style="padding: 6px 0; display: flex; align-items: center; gap: 8px;"><%= lni_icon "folder-1", size: 20 %><span>작업 사진·사례 <strong><%= @portfolio_count %></strong>개</span></div>
+              <p class="impd-label-muted" style="font-size: 13px;">올린 글·사진으로 운영팀이 정리해 드려요.</p>
+            </li>
           </ul>
         </div>
       </div>
@@ -453,6 +466,7 @@
     .editor-upload-card { grid-column: 2; grid-row: 1 / span 2; }
   }
   @media (max-width: 768px) {
+    #member_bio { min-height: 240px; }
     .editor-page .impd-section-header > .impd-display { flex: 1 1 100% !important; font-size: 28px !important; word-break: keep-all; }
     .editor-page .impd-section-header > .impd-label-muted { flex: 1 1 100%; }
     .editor-upload-grid { grid-template-rows: auto !important; }

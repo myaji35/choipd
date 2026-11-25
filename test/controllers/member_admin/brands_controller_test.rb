@@ -37,11 +37,13 @@ class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "브랜드는 운영팀이 등록을 도와드려요"
   end
   test "shows raw four week counts and changes" do
-    4.times { AnalyticsEvent.create!(event_name: "page_view", event_category: "page", page_path: "/#{@member.slug}") }
-    MemberInquiry.create!(member: @member, sender_name: "방문자", sender_email: "visitor@example.com", message: "문의 내용입니다")
+    travel_to Time.find_zone!("Asia/Seoul").local(2026, 11, 25, 12)
+    last_week = 1.week.ago
+    4.times { AnalyticsEvent.create!(event_name: "page_view", event_category: "page", page_path: "/#{@member.slug}", created_at: last_week) }
+    MemberInquiry.create!(member: @member, sender_name: "방문자", sender_email: "visitor@example.com", message: "문의 내용입니다", created_at: last_week)
     2.times { MemberPost.create!(member: @member, title: "이전 게시", content: "내용", is_published: 1, published_at: 5.weeks.ago) }
-    scheduled = SnsScheduledPost.create!(member: @member, message: "내용", platform: "instagram", scheduled_at: Time.current)
-    2.times { SnsPostHistory.create!(sns_scheduled_post: scheduled, status: "success") }
+    scheduled = SnsScheduledPost.create!(member: @member, message: "내용", platform: "instagram", scheduled_at: last_week)
+    2.times { SnsPostHistory.create!(sns_scheduled_post: scheduled, status: "success", created_at: last_week) }
     get slug_admin_brand_path(slug: @member.slug)
     assert_select ".ops-owner-stats section", count: 4
     assert_select ".ops-owner-stats section", text: /방문.*4회.*4회 늘었어요/m
@@ -49,6 +51,29 @@ class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".ops-owner-stats section", text: /올린 소식.*0건.*2건 줄었어요/m
     assert_select ".ops-owner-stats section", text: /SNS에 올린 글.*2건.*2건 늘었어요/m
     assert_includes response.body, "이번 달 소식 0건 · SNS에 올린 글 2건"
+  end
+
+  test "끝난 4주만 비교하고 이번 주 방문은 따로 보여 준다" do
+    travel_to Time.find_zone!("Asia/Seoul").local(2026, 11, 25, 12) do
+      { 0 => 5, 1 => 3, 5 => 1 }.each do |weeks_ago, count|
+        count.times do
+          AnalyticsEvent.create!(event_name: "page_view", event_category: "page", page_path: "/kang-seung-sig",
+            created_at: weeks_ago.weeks.ago, user_agent: "Mozilla/5.0")
+        end
+      end
+
+      get slug_admin_brand_path(slug: @member.slug)
+
+      assert_response :ok
+      assert_select ".ops-owner-stats section:first-child" do
+        assert_select "strong", text: "3회"
+        assert_select "p", text: "그전 4주보다 2회 늘었어요"
+      end
+      assert_includes response.body, "이번 주(월요일부터 지금까지): 방문 5회"
+      assert_includes response.body, "지난 4주(10/26~11/22)"
+      assert_includes response.body, "아직 지나고 있는 이번 주는 빼고 셌어요."
+      assert_not_includes response.body, "최근 4주 활동과 그전 4주와의 차이예요."
+    end
   end
 
   test "진행 중인 이번 주를 설명하고 현재까지의 숫자를 보여 준다" do
