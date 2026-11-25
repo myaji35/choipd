@@ -12526,7 +12526,7 @@
       "id": "ISS-593",
       "title": "[대비] chopd 헤더·모바일 메뉴 '강좌 문의' 버튼 흰 글자가 주황 배경 위 3.32:1 — 문의 양식 버튼처럼 어두운 글자로",
       "type": "DESIGN_FIX",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P2",
       "assign_to": "agent-harness",
       "depth": 3,
@@ -12573,9 +12573,53 @@
         "approved_at": "2026-11-25T04:20:10.552Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
-      "result": null,
+      "result": {
+        "files_changed": [
+          "app/views/layouts/_chopd_header.html.erb",
+          "app/views/chopd/education/index.html.erb",
+          "script/qa/cta_contrast_check.cjs",
+          "test/integration/chopd_cta_contrast_test.rb"
+        ],
+        "commit": "de2f23e",
+        "extra": "같은 파일의 로그아웃 버튼 hover(.nav-session-btn:hover, 주황 배경·흰 글자)도 같은 위반이라 함께 어두운 글자로",
+        "criteria_check": [
+          {
+            "criterion": "헤더 강좌 문의(데스크톱·모바일) 대비가 기본·hover 모두 4.5:1 이상",
+            "met": true,
+            "how": "cta_contrast_check(3099): 데스크톱 기본 5.8, hover 7.39, 390 모바일 메뉴 열림 5.8"
+          },
+          {
+            "criterion": "/education 전체 선택 버튼 대비 4.5:1 이상",
+            "met": true,
+            "how": ".filter-pill.active 5.8:1"
+          },
+          {
+            "criterion": "버튼 배경 주황(#ff4d1c) 유지",
+            "met": true,
+            "how": "측정 background rgb(255,77,28) 그대로, 테스트가 background: #ff4d1c 확인"
+          },
+          {
+            "criterion": "대비 확인 테스트 또는 script/qa 점검",
+            "met": true,
+            "how": "test/integration/chopd_cta_contrast_test.rb + script/qa/cta_contrast_check.cjs"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "PARALLEL_WORKERS=1 bin/rails test test/integration/chopd_cta_contrast_test.rb test/integration/education_filter_test.rb test/integration/chopd_header_icons_test.rb",
+            "exit_code": 0,
+            "output": "10 runs, 69 assertions, 0 failures, 0 errors, 0 skips"
+          },
+          {
+            "cmd": "node script/qa/cta_contrast_check.cjs",
+            "exit_code": 0,
+            "output": "nav-cta default 5.8 / hover 7.39 / filter-pill.active 5.8 / mobile nav-cta 5.8, pass true"
+          }
+        ]
+      },
       "spawn_rules": [],
-      "started_at": "2026-11-25T04:48:00.774618Z"
+      "started_at": "2026-11-25T04:48:00.774618Z",
+      "completed_at": "2026-11-25T13:50:12.339084"
     },
     {
       "id": "ISS-594",
@@ -12669,7 +12713,7 @@
       "id": "ISS-595",
       "title": "[문의] 교육 화면 문의 링크가 넘기는 유형(type=b2b)이 문의 양식에 반영되지 않아 '선택하세요'로 비어 있음",
       "type": "FIX_BUG",
-      "status": "READY",
+      "status": "IN_PROGRESS",
       "priority": "P2",
       "assign_to": "agent-harness",
       "depth": 3,
@@ -12677,7 +12721,7 @@
       "parent_id": "ISS-578",
       "depends_on": [],
       "created_at": "2026-11-25T04:20:09Z",
-      "updated_at": "2026-11-25T04:20:10.552Z",
+      "updated_at": "2026-11-25T04:50:12.399807Z",
       "origin": "factory-observation",
       "payload": {
         "origin": "factory-observation",
@@ -12717,7 +12761,8 @@
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
       "result": null,
-      "spawn_rules": []
+      "spawn_rules": [],
+      "started_at": "2026-11-25T04:50:12.399807Z"
     },
     {
       "id": "ISS-596",
@@ -14260,6 +14305,12 @@
         "issue_type": "DESIGN_FIX",
         "plan_created": 0,
         "timestamp": "2026-11-25T13:47:51.739879"
+      },
+      {
+        "issue_id": "ISS-593",
+        "issue_type": "DESIGN_FIX",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T13:50:12.339084"
       }
     ],
     "on_fail": [],
@@ -18503,7 +18554,7 @@
   },
   "stats": {
     "total_issues": 604,
-    "completed": 110,
+    "completed": 111,
     "failed": 0,
     "evolved": 223
   },
