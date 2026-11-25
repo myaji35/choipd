@@ -121,7 +121,7 @@ class MemberAdmin::ChannelsControllerTest < ActionDispatch::IntegrationTest
       assert_select "h3", text: "팔로워 변화", count: 1
       assert_select "strong", text: "222명", count: 1
       headings = section.first.css("h3").map(&:text)
-      assert_equal ["팔로워 변화", "올린 글·예약된 글"], headings.first(2)
+      assert_equal [ "팔로워 변화", "올린 글·예약된 글" ], headings.first(2)
     end
   end
 

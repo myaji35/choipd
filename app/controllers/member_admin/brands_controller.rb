@@ -15,7 +15,7 @@ class MemberAdmin::BrandsController < MemberAdmin::BaseController
     now = Time.current.in_time_zone("Asia/Seoul")
     month = now.beginning_of_month..now
     @month_posts = MemberPost.where(member_id: @member.id, is_published: 1, published_at: month).count
-    @month_sns_posts = BrandOps::WeeklyStats.sns_publications([@member.id], month).size
+    @month_sns_posts = BrandOps::WeeklyStats.sns_publications([ @member.id ], month).size
     @consented = ProConsent.has_consent?(owner_id: @member.id, type: "socialdoctors_exposure")
     @brands = @member.brands.personal_first
     @show_brand_channels = current_member&.id == @member.id

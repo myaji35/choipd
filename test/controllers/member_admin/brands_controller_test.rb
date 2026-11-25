@@ -111,7 +111,7 @@ class MemberAdmin::BrandsControllerTest < ActionDispatch::IntegrationTest
   test "그래프의 점과 날짜 눈금은 끝난 주만 보여 준다" do
     seoul = Time.find_zone!("Asia/Seoul")
     travel_to seoul.local(2026, 11, 25, 12) do
-      [1.week.ago, 1.week.ago, 1.week.ago, 1.week.ago, Time.current].each do |date|
+      [ 1.week.ago, 1.week.ago, 1.week.ago, 1.week.ago, Time.current ].each do |date|
         AnalyticsEvent.create!(event_name: "page_view", event_category: "page", page_path: "/#{@member.slug}",
           created_at: date, user_agent: "Mozilla/5.0")
       end
