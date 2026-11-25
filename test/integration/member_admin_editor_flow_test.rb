@@ -55,7 +55,7 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
       File.read(Rails.root.join("app/javascript/controllers/#{name}_controller.js"))
     end
     [ doc, photo ].each do |source|
-      [ "메모장", "확장자 불가", "업로드 중", "업로드 완료", 'HTTP $' ].each do |phrase|
+      [ "메모장", "확장자 불가", "업로드 중", "업로드 완료", "HTTP $" ].each do |phrase|
         assert_not_includes source, phrase
       end
     end
