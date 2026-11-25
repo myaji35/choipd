@@ -15,8 +15,8 @@ class BrandProfileProcessTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_member_path(member)
     assert member.reload.approved?
     brand = member.personal_brand
-    assert_equal [member.name, member.profession_label, member.region, false],
-      [brand.name, brand.business_type, brand.region, brand.published?]
+    assert_equal [ member.name, member.profession_label, member.region, false ],
+      [ brand.name, brand.business_type, brand.region, brand.published? ]
     assert_not existing.reload.personal?
 
     assert_no_difference -> { member.brands.count } do
@@ -72,11 +72,11 @@ class BrandProfileProcessTest < ActionDispatch::IntegrationTest
 
     get slug_admin_dashboard_path(slug:)
     assert_response :success
-    [slug_admin_sns_accounts_path(slug:), slug_admin_scheduled_posts_path(slug:)].each do |path|
+    [ slug_admin_sns_accounts_path(slug:), slug_admin_scheduled_posts_path(slug:) ].each do |path|
       assert_select ".admin-nav a[href=?], aside a[href=?]", path, path, count: 0
     end
 
-    [slug_admin_sns_accounts_path(slug:), slug_admin_scheduled_posts_path(slug:)].each do |path|
+    [ slug_admin_sns_accounts_path(slug:), slug_admin_scheduled_posts_path(slug:) ].each do |path|
       get path
       assert_response :success
       assert_select "p", text: "SNS 채널 운영은 SocialDoctors 로 옮겨졌습니다. 이미 예약된 발행은 그대로 진행됩니다. 새 채널 연결·발행은 운영팀이 SocialDoctors 에서 맡습니다."
@@ -105,7 +105,7 @@ class BrandProfileProcessTest < ActionDispatch::IntegrationTest
   test "개인 브랜드 생성 작업은 기본 실행에서 대상 회원만 집계한다" do
     previous_apply = ENV.delete("APPLY")
     candidate = create_member
-    excluded = [create_member(status: "pending_approval"), create_member(withdrawn_at: Time.current)]
+    excluded = [ create_member(status: "pending_approval"), create_member(withdrawn_at: Time.current) ]
     with_brand = create_member
     with_brand.ensure_personal_brand!
     task = Rake::Task.task_defined?("brands:ensure_personal") ? Rake::Task["brands:ensure_personal"] : nil
@@ -119,7 +119,7 @@ class BrandProfileProcessTest < ActionDispatch::IntegrationTest
       output, = capture_io { task.invoke }
     end
     assert_includes output.lines.map(&:strip), candidate.id.to_s
-    (excluded + [with_brand]).each do |member|
+    (excluded + [ with_brand ]).each do |member|
       assert_not_includes output.lines.map(&:strip), member.id.to_s
     end
     assert_match(/DRY_RUN: \d+건/, output)
