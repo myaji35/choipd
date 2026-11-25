@@ -6186,7 +6186,26 @@
           "390px 교육 화면 바닥글에 B2B/B2G 문의하기가 한 줄로 보인다",
           "링크를 누르면 /inquiries/new 문의 폼이 200으로 열린다",
           "흐름 중 콘솔 에러가 없다"
-        ]
+        ],
+        "next_prompt_at": "2026-11-25T01:57:43.063048Z",
+        "next_prompt_proposals": [
+          {
+            "next_prompt": "chopd 레이아웃의 인라인 스크립트에서 최상위 `const/let revealEls` 선언을 찾아, Turbo 이동 때 다시 실행돼도 충돌하지 않게 고쳐라. 스크립트 전체를 IIFE로 감싸거나 `turbo:load` 핸들러 안으로 옮기고, 변수는 함수 지역 변수로 둔다. .reveal 요소 처리 동작은 그대로 유지한다. 고친 뒤 `node script/qa/footer_inquiry_flow.cjs`를 실행해 consoleErrors가 0이고 SUMMARY pass=true인지 출력으로 보여라. 같은 원인의 열린 이슈 '[화면 깨짐] chopd 화면 사이를 링크로 이동하면 스크립트 오류로 콘텐츠(.reveal)가 투명하게 남음'에도 이 수정 내용을 연결하라.",
+            "basis": "criteria_check 3번 '흐름 중 콘솔 에러가 없다'가 met=false. proof 출력에 consoleErrors 1건, pageerror \"Identifier 'revealEls' has already been declared\"가 있고 exit_code 1이다. 1·2번 기준은 이미 충족됐다.",
+            "expected_effect": "Turbo 이동 시 revealEls 재선언 오류가 사라진다. ISS-529의 3개 기준이 모두 충족되고, .reveal 콘텐츠가 투명하게 남는 화면 깨짐도 함께 해소된다.",
+            "done_when": "footer_inquiry_flow.cjs가 exit 0, consoleErrors 0, SUMMARY pass=true로 끝난다.",
+            "risk_tier": "T0",
+            "t2_category": null,
+            "reversible": true,
+            "question": "",
+            "plain_summary": "바닥글 링크와 문의 폼은 잘 열리지만, 화면을 이동할 때 같은 스크립트가 두 번 실행되며 오류가 1건 납니다. 스크립트가 반복 실행돼도 문제없게 고치면 됩니다.",
+            "if_not_decided": "해당 없음. 되돌릴 수 있는 코드 수정이라 바로 진행해도 된다.",
+            "status": "promoted",
+            "at": "2026-11-25T01:57:43.063048Z",
+            "child_id": "ISS-541"
+          }
+        ],
+        "next_prompt_cost_usd": 0.02086
       },
       "result": {
         "total_scenarios": 1,
@@ -6813,7 +6832,7 @@
       "id": "ISS-539",
       "type": "FIX_BUG",
       "priority": "P0",
-      "status": "READY",
+      "status": "DONE",
       "origin": "factory-observation",
       "depth": 1,
       "retry_count": 0,
@@ -6859,14 +6878,76 @@
         "approved_at": "2026-11-25T01:56:26.968Z",
         "approved_by": "자동 승인(추천: 승인 권장)"
       },
-      "result": null,
-      "spawn_rules": []
+      "result": {
+        "files_modified": [
+          "app/views/layouts/chopd.html.erb",
+          "app/views/layouts/_chopd_header.html.erb",
+          "script/qa/turbo_reveal_check.cjs"
+        ],
+        "commit": "82c315b",
+        "criteria_check": [
+          {
+            "criterion": "chopd 화면 사이를 링크로 이동해도 콘솔 오류가 없다(footer_inquiry_flow.cjs SUMMARY pass=true)",
+            "met": true,
+            "how": "START=/education·/works·/media·/media/greeting·/inquiries/new 5개 모두 consoleErrors 0, SUMMARY pass=true"
+          },
+          {
+            "criterion": "Turbo 로 이동한 화면의 .reveal 콘텐츠가 스크롤하면 모두 보인다",
+            "met": true,
+            "how": "turbo_reveal_check: /education→/works Turbo 이동 후 그려진 .reveal 6개 중 투명 0·visible 누락 0 (비활성 탭 안 14개는 display:none이라 제외, 첫 진입과 동일)"
+          },
+          {
+            "criterion": "스크롤 진행바 리스너가 이동할 때마다 중복 등록되지 않는다",
+            "met": true,
+            "how": "scroll 리스너 수 첫 화면 3 → /works 3 → 복귀 3 (증가 0). 헤더 nav 리스너 중복도 같이 해소"
+          },
+          {
+            "criterion": "첫 진입 화면과 1280/390 layout_check 결과가 바뀌지 않는다",
+            "met": true,
+            "how": "layout_check.cjs 전 경로 1280/390 SUMMARY pass=true, hScroll·clipped 0"
+          },
+          {
+            "criterion": "Turbo 이동 후 .reveal 표시를 확인하는 자동 점검이 있다",
+            "met": true,
+            "how": "script/qa/turbo_reveal_check.cjs 신규 — 수정 전 코드로 돌리면 pageerror 3건·pass=false로 결함을 잡음을 확인"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/turbo_reveal_check.cjs",
+            "exit_code": 0,
+            "output": "{\"consoleErrors\": 0, \"revealTotal\": 6, \"revealHidden\": 0, \"revealNotVisibleClass\": 0, \"initialScrollListenerCount\": 3, \"scrollListenerCount\": 3, \"scrollListenerGrowth\": 0} SUMMARY pass=true"
+          },
+          {
+            "cmd": "node script/qa/footer_inquiry_flow.cjs",
+            "exit_code": 0,
+            "output": "consoleErrors 0, finalPath /inquiries/new status 200, SUMMARY pass=true"
+          },
+          {
+            "cmd": "node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "모든 경로 1280/390 hScroll false clipped 0 consoleErrors 0, SUMMARY pass=true"
+          },
+          {
+            "cmd": "bin/rails test test/integration/public_pages_test.rb test/integration/inquiry_submit_contrast_test.rb test/integration/inquiries_form_test.rb",
+            "exit_code": 0,
+            "output": "13 runs, 195 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ],
+        "review": {
+          "gemini": "gemini-4-hydrogen-high 결함 없음",
+          "opus": "Turbo 캐시 복원·모바일 메뉴 재등록 확인, 문제 없음"
+        },
+        "regression_probe": "HEAD 레이아웃으로 되돌려 turbo_reveal_check 실행 → revealEls 재선언 pageerror 3건, pass=false (복원 후 pass=true)"
+      },
+      "spawn_rules": [],
+      "completed_at": "2026-11-25T11:08:29.496229"
     },
     {
       "id": "ISS-540",
       "title": "[Plan:품질평가] ISS-533 품질 점수 산출",
       "type": "SCORE",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "assign_to": "eval-harness",
       "depth": 3,
@@ -6888,10 +6969,515 @@
           "effort": "XS",
           "by": "factory-runner",
           "at": "2026-11-25T01:56:43Z"
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T01:57:51.592Z",
+            "by": "auto",
+            "reason": "ISS-531 계열 테스트 통과(353건 실패 0) 후 품질 점수 산출 — 자동 후속"
+          }
+        ],
+        "approved_at": "2026-11-25T01:57:51.592Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "acceptance_criteria": [
+          "전체 테스트·린트를 다시 돌려 점수 근거를 남긴다",
+          "점수와 영역별 내역을 result 에 기록한다"
+        ]
+      },
+      "result": {
+        "score": 88,
+        "prev_score": 87,
+        "breakdown": {
+          "quality": 93,
+          "tests": 91,
+          "ux": 86,
+          "docs": 80
+        },
+        "basis": "quality: RuboCop 448파일 위반 0(ISS-548 교정 후) / tests: 363건 실패 0·스킵 1, Turbo 이동 점검(turbo_reveal_check) 추가 / ux: 교육 화면 분류 버튼 쪼개짐(ISS-531) 해소, Turbo 이동 본문 투명 결함(ISS-539) 해소, chopd 1280/390 layout_check 통과 — 바닥글 글자 대비 1.8~2.6:1(ISS-532 미처리) 감점 / docs: 커밋 메시지에 카드 ID·qa 스크린샷 근거. 커버리지 도구 미설정(null)",
+        "criteria_check": [
+          {
+            "criterion": "전체 테스트·린트를 다시 돌려 점수 근거를 남긴다",
+            "met": true,
+            "how": "bin/rails test 363 runs 0 failures 0 errors 1 skip, bin/rubocop 448 files no offenses"
+          },
+          {
+            "criterion": "점수와 영역별 내역을 result 에 기록한다",
+            "met": true,
+            "how": "score 88, breakdown 4영역, 이전 ISS-526 87점 대비 +1"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test",
+            "exit_code": 0,
+            "output": "363 runs, 0 failures, 0 errors, 1 skips"
+          },
+          {
+            "cmd": "bin/rubocop",
+            "exit_code": 0,
+            "output": "448 files inspected, no offenses detected"
+          },
+          {
+            "cmd": "node script/qa/layout_check.cjs",
+            "exit_code": 0,
+            "output": "SUMMARY pass=true"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T01:57:51.592Z",
+      "completed_at": "2026-11-25T11:10:28.127443"
+    },
+    {
+      "title": "[다음] chopd 레이아웃의 인라인 스크립트에서 최상위 `const/let revealEls` 선언을 찾아, Turbo 이동 때 다시",
+      "type": "FEATURE",
+      "priority": "P1",
+      "origin": "next-prompt",
+      "source_issue": "ISS-529",
+      "status": "DONE",
+      "created_at": "2026-11-25T01:57:43.063048Z",
+      "updated_at": "2026-11-25T01:57:51.592Z",
+      "payload": {
+        "user_request": "chopd 레이아웃의 인라인 스크립트에서 최상위 `const/let revealEls` 선언을 찾아, Turbo 이동 때 다시 실행돼도 충돌하지 않게 고쳐라. 스크립트 전체를 IIFE로 감싸거나 `turbo:load` 핸들러 안으로 옮기고, 변수는 함수 지역 변수로 둔다. .reveal 요소 처리 동작은 그대로 유지한다. 고친 뒤 `node script/qa/footer_inquiry_flow.cjs`를 실행해 consoleErrors가 0이고 SUMMARY pass=true인지 출력으로 보여라. 같은 원인의 열린 이슈 '[화면 깨짐] chopd 화면 사이를 링크로 이동하면 스크립트 오류로 콘텐츠(.reveal)가 투명하게 남음'에도 이 수정 내용을 연결하라.",
+        "acceptance_criteria": [
+          "footer_inquiry_flow.cjs가 exit 0, consoleErrors 0, SUMMARY pass=true로 끝난다."
+        ],
+        "next_prompt_depth": 1,
+        "next_prompt_root": "ISS-529",
+        "next_prompt_basis": "criteria_check 3번 '흐름 중 콘솔 에러가 없다'가 met=false. proof 출력에 consoleErrors 1건, pageerror \"Identifier 'revealEls' has already been declared\"가 있고 exit_code 1이다. 1·2번 기준은 이미 충족됐다.",
+        "expected_effect": "Turbo 이동 시 revealEls 재선언 오류가 사라진다. ISS-529의 3개 기준이 모두 충족되고, .reveal 콘텐츠가 투명하게 남는 화면 깨짐도 함께 해소된다.",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "criteria_check 3번 '흐름 중 콘솔 에러가 없다'가 met=false. proof 출력에 consoleErrors 1건, pageerror \"Identifier 'revealEls' has already been declared\"가 있고 exit_code 1이다. 1·2번 기준은 이미 충족됐다.",
+          "risk": "T0",
+          "effort": "medium",
+          "by": "factory-next-prompt",
+          "at": "2026-11-25T01:57:43.063048Z"
+        },
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T01:57:51.592Z",
+            "by": "auto",
+            "reason": "criteria_check 3번 '흐름 중 콘솔 에러가 없다'가 met=false. proof 출력에 consoleErrors 1건, pageerror \"Identifier 'revealEls' has already been declared\"가 있고 exit_code 1이다. 1·2번 기준은 이미 충족됐다."
+          }
+        ],
+        "approved_at": "2026-11-25T01:57:51.592Z",
+        "approved_by": "자동 승인(추천: 승인 권장)"
+      },
+      "id": "ISS-541",
+      "completed_at": "2026-11-25T11:08:38.040292",
+      "result": {
+        "files_modified": [
+          "app/views/layouts/chopd.html.erb",
+          "app/views/layouts/_chopd_header.html.erb",
+          "script/qa/turbo_reveal_check.cjs"
+        ],
+        "commit": "82c315b",
+        "linked_issue": "ISS-539",
+        "criteria_check": [
+          {
+            "criterion": "footer_inquiry_flow.cjs가 exit 0, consoleErrors 0, SUMMARY pass=true로 끝난다.",
+            "met": true,
+            "how": "수정 후 실행 exit 0, consoleErrors 0, SUMMARY pass=true (수정 전 pageerror 'revealEls has already been declared' 1건·pass=false 재현 확인)"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "node script/qa/footer_inquiry_flow.cjs",
+            "exit_code": 0,
+            "output": "{\"start\":\"/education\",\"width\":390,\"finalPath\":\"/inquiries/new\",\"status\":200,\"formFound\":true,\"consoleErrors\":0,\"badResponses\":0} SUMMARY pass=true"
+          },
+          {
+            "cmd": "node script/qa/turbo_reveal_check.cjs",
+            "exit_code": 0,
+            "output": "consoleErrors 0, revealHidden 0, scrollListenerGrowth 0, SUMMARY pass=true"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ISS-542",
+      "title": "[Plan:테스트] ISS-539 변경사항 검증",
+      "type": "RUN_TESTS",
+      "status": "DONE",
+      "priority": "P1",
+      "assign_to": "test-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-539",
+      "depends_on": [],
+      "created_at": "2026-11-25T11:08:29.496229",
+      "payload": {
+        "files": [
+          "app/views/layouts/chopd.html.erb"
+        ],
+        "source_issue": "ISS-539",
+        "scope": "changed",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T02:08:31.656Z",
+            "by": "auto",
+            "reason": "「[Plan:테스트] ISS-539 변경사항 검증」(RUN_TESTS, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T02:08:31.656Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-539 레이아웃 스크립트 수정 후 전체 테스트로 회귀 확인 — 자동 후속",
+          "risk": "T0 — 검증만",
+          "effort": "S",
+          "by": "factory-runner",
+          "at": "2026-11-25T02:08:54Z"
+        },
+        "acceptance_criteria": [
+          "전체 Rails 테스트가 실패 0으로 끝난다",
+          "레이아웃 수정으로 공개 화면 통합 테스트가 깨지지 않는다"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "total": 363,
+        "failed_count": 0,
+        "coverage": null,
+        "criteria_check": [
+          {
+            "criterion": "전체 Rails 테스트가 실패 0으로 끝난다",
+            "met": true,
+            "how": "bin/rails test 363 runs, 0 failures, 0 errors, 1 skips"
+          },
+          {
+            "criterion": "레이아웃 수정으로 공개 화면 통합 테스트가 깨지지 않는다",
+            "met": true,
+            "how": "public_pages·inquiries_form·inquiry_submit_contrast 13 runs 0 failures"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rails test",
+            "exit_code": 0,
+            "output": "363 runs, 2571 assertions, 0 failures, 0 errors, 1 skips"
+          },
+          {
+            "cmd": "bin/rails test test/integration/public_pages_test.rb test/integration/inquiries_form_test.rb test/integration/inquiry_submit_contrast_test.rb",
+            "exit_code": 0,
+            "output": "13 runs, 195 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ]
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T02:08:54Z",
+      "completed_at": "2026-11-25T11:09:10.252066"
+    },
+    {
+      "id": "ISS-543",
+      "title": "[Plan:도메인분석] ISS-539 비즈니스 규칙/시나리오 도출",
+      "type": "DOMAIN_ANALYZE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "domain-analyst",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-539",
+      "depends_on": [],
+      "created_at": "2026-11-25T11:08:29.496229",
+      "payload": {
+        "files": [
+          "app/views/layouts/chopd.html.erb"
+        ],
+        "source_issue": "ISS-539",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T02:08:31.656Z",
+            "by": "auto",
+            "reason": "「[Plan:도메인분석] ISS-539 비즈니스 규칙/시나리오 도출」(DOMAIN_ANALYZE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T02:08:31.656Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-539는 화면 스크립트 수정이라 새 업무 규칙이 없음 — 도메인 분석은 짧게 확인만 하면 됨",
+          "risk": "T0 — 검증만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T02:10:42Z"
         }
       },
       "result": null,
-      "spawn_rules": []
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T02:08:31.656Z"
+    },
+    {
+      "id": "ISS-544",
+      "title": "[Plan:UX리뷰] ISS-539 UI 변경 검증",
+      "type": "UI_REVIEW",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "ux-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-539",
+      "depends_on": [],
+      "created_at": "2026-11-25T11:08:29.496229",
+      "payload": {
+        "files": [
+          "app/views/layouts/chopd.html.erb"
+        ],
+        "source_issue": "ISS-539",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T02:08:31.656Z",
+            "by": "auto",
+            "reason": "「[Plan:UX리뷰] ISS-539 UI 변경 검증」(UI_REVIEW, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T02:08:31.656Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "Turbo 이동 후 본문 표시는 turbo_reveal_check·스크린샷으로 이미 확인됨. UX 리뷰는 그 증거(tmp/qa/ISS-546)를 재사용해 빠르게 마감 가능",
+          "risk": "T0 — 검증만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T02:10:42Z"
+        }
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T02:08:31.656Z"
+    },
+    {
+      "id": "ISS-545",
+      "title": "[Plan:브랜드검증] ISS-539 아젠다 표현 + Action Clarity",
+      "type": "BRAND_GUARD",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "brand-guardian",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-539",
+      "depends_on": [],
+      "created_at": "2026-11-25T11:08:29.496229",
+      "payload": {
+        "files": [
+          "app/views/layouts/chopd.html.erb"
+        ],
+        "source_issue": "ISS-539",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T02:08:31.656Z",
+            "by": "auto",
+            "reason": "「[Plan:브랜드검증] ISS-539 아젠다 표현 + Action Clarity」(BRAND_GUARD, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T02:08:31.656Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "스크립트 수정으로 문구·CTA 변화 없음 — 브랜드 점검은 변화 없음 확인 수준",
+          "risk": "T0 — 검증만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T02:10:42Z"
+        }
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T02:08:31.656Z"
+    },
+    {
+      "id": "ISS-546",
+      "title": "[Plan:브라우저QA] ISS-539 콘솔 에러 + 스크린샷 검증",
+      "type": "BROWSER_QA",
+      "status": "DONE",
+      "priority": "P1",
+      "assign_to": "agent-harness",
+      "depth": 2,
+      "retry_count": 0,
+      "parent_id": "ISS-539",
+      "depends_on": [],
+      "created_at": "2026-11-25T11:08:29.496229",
+      "payload": {
+        "files": [
+          "app/views/layouts/chopd.html.erb"
+        ],
+        "source_issue": "ISS-539",
+        "action": "run_browse_qa",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T02:08:31.656Z",
+            "by": "auto",
+            "reason": "「[Plan:브라우저QA] ISS-539 콘솔 에러 + 스크린샷 검증」(BROWSER_QA, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T02:08:31.656Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-539 수정 화면을 브라우저로 이동·스크롤하며 콘솔 오류와 화면을 확인 — 기존 점검 스크립트 재사용",
+          "risk": "T0 — 검증만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T02:08:54Z"
+        },
+        "acceptance_criteria": [
+          "chopd 주요 화면을 Turbo로 이동해도 콘솔 오류 0",
+          "1280/390 두 폭 스크린샷에서 본문이 투명하지 않고 가로 넘침이 없다"
+        ]
+      },
+      "result": {
+        "console_errors": 0,
+        "network_errors": 0,
+        "screenshots": [
+          "tmp/qa/ISS-546/works-1280.png",
+          "tmp/qa/ISS-546/works-390.png"
+        ],
+        "criteria_check": [
+          {
+            "criterion": "chopd 주요 화면을 Turbo로 이동해도 콘솔 오류 0",
+            "met": true,
+            "how": "turbo_reveal_check 1280/390 consoleErrors 0, footer_inquiry_flow START 5개 화면 consoleErrors 0"
+          },
+          {
+            "criterion": "1280/390 두 폭 스크린샷에서 본문이 투명하지 않고 가로 넘침이 없다",
+            "met": true,
+            "how": "Turbo 이동 후 /works 스크린샷 육안 확인 — 히어로·대표 저서 카드·바닥글 표시, layout_check hScroll false"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "WIDTH=390 OUT_DIR=tmp/qa/ISS-546 node script/qa/turbo_reveal_check.cjs",
+            "exit_code": 0,
+            "output": "SUMMARY pass=true"
+          },
+          {
+            "cmd": "WIDTH=1280 OUT_DIR=tmp/qa/ISS-546 node script/qa/turbo_reveal_check.cjs",
+            "exit_code": 0,
+            "output": "SUMMARY pass=true"
+          }
+        ],
+        "note": "전체 페이지 캡처에서 고정 메뉴·분류 탭이 중간에 찍히는 것은 fixed/sticky 요소의 캡처 특성(결함 아님). 바닥글 글자 대비 부족은 ISS-532에서 별도 처리"
+      },
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T02:08:54Z",
+      "completed_at": "2026-11-25T11:09:31.493301"
+    },
+    {
+      "id": "ISS-547",
+      "title": "[Plan:품질평가] ISS-542 품질 점수 산출",
+      "type": "SCORE",
+      "status": "READY",
+      "priority": "P1",
+      "assign_to": "eval-harness",
+      "depth": 3,
+      "retry_count": 0,
+      "parent_id": "ISS-542",
+      "depends_on": [],
+      "created_at": "2026-11-25T11:09:10.252066",
+      "payload": {
+        "test_result": {
+          "passed": true,
+          "total": 363,
+          "coverage": null
+        },
+        "source_issue": "ISS-542",
+        "decisions": [
+          {
+            "action": "approve",
+            "at": "2026-11-25T02:09:10.791Z",
+            "by": "auto",
+            "reason": "「[Plan:품질평가] ISS-542 품질 점수 산출」(SCORE, P1)을 다음 실행에 착수할 만합니다."
+          }
+        ],
+        "approved_at": "2026-11-25T02:09:10.791Z",
+        "approved_by": "자동 승인(추천: 승인 권장)",
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "ISS-542 전체 테스트 363건 통과 후 자동 점수 산출(ISS-540 88점과 같은 근거 재사용 가능)",
+          "risk": "T0 — 검증만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T02:10:42Z"
+        }
+      },
+      "result": null,
+      "spawn_rules": [],
+      "updated_at": "2026-11-25T02:09:10.791Z"
+    },
+    {
+      "id": "ISS-548",
+      "title": "[린트] 회원 대시보드 프로필 계정 테스트 2개 파일 배열 괄호 간격 RuboCop 위반 6건",
+      "type": "STYLE_FIX",
+      "priority": "P1",
+      "status": "DONE",
+      "origin": "factory-observation",
+      "created_at": "2026-11-25T02:10:00Z",
+      "updated_at": "2026-11-25T02:10:00Z",
+      "payload": {
+        "origin": "factory-observation",
+        "files": [
+          "test/helpers/member_admin/profile_accounts_helper_test.rb",
+          "test/integration/member_dashboard_profile_accounts_test.rb"
+        ],
+        "evidence": [
+          "bin/rubocop → 448 files, 6 offenses (Layout/SpaceInsideArrayLiteralBrackets) — 커밋 297811f 에서 들어옴"
+        ],
+        "acceptance_criteria": [
+          "bin/rubocop 전체가 위반 0으로 끝난다",
+          "두 테스트 파일의 테스트가 그대로 통과한다(동작 변경 없음)"
+        ],
+        "recommendation": {
+          "verdict": "승인 권장",
+          "reason": "회차 끝 린트 게이트가 실패하면 출고가 멈춤. 공백만 바꾸는 자동 교정이라 동작 영향 없음",
+          "risk": "T0 — 공백 수정만",
+          "effort": "XS",
+          "by": "factory-runner",
+          "at": "2026-11-25T02:10:00Z"
+        }
+      },
+      "result": {
+        "files_modified": [
+          "test/helpers/member_admin/profile_accounts_helper_test.rb",
+          "test/integration/member_dashboard_profile_accounts_test.rb"
+        ],
+        "lint_errors": 0,
+        "type_errors": 0,
+        "criteria_check": [
+          {
+            "criterion": "bin/rubocop 전체가 위반 0으로 끝난다",
+            "met": true,
+            "how": "448 files inspected, no offenses detected"
+          },
+          {
+            "criterion": "두 테스트 파일의 테스트가 그대로 통과한다(동작 변경 없음)",
+            "met": true,
+            "how": "8 runs 87 assertions 0 failures, diff는 배열 괄호 안 공백 3줄뿐"
+          }
+        ],
+        "proof": [
+          {
+            "cmd": "bin/rubocop",
+            "exit_code": 0,
+            "output": "448 files inspected, no offenses detected"
+          },
+          {
+            "cmd": "bin/rails test test/helpers/member_admin/profile_accounts_helper_test.rb test/integration/member_dashboard_profile_accounts_test.rb",
+            "exit_code": 0,
+            "output": "8 runs, 87 assertions, 0 failures, 0 errors, 0 skips"
+          }
+        ],
+        "note": "구현은 rubocop -a 자동 교정기(공백만), 코드 작성 없음"
+      },
+      "spawn_rules": [],
+      "completed_at": "2026-11-25T11:10:12.786679"
     }
   ],
   "hooks": {
@@ -7167,6 +7753,42 @@
         "issue_type": "BROWSER_QA",
         "plan_created": 0,
         "timestamp": "2026-11-25T10:56:36.835610"
+      },
+      {
+        "issue_id": "ISS-539",
+        "issue_type": "FIX_BUG",
+        "plan_created": 5,
+        "timestamp": "2026-11-25T11:08:29.496229"
+      },
+      {
+        "issue_id": "ISS-541",
+        "issue_type": "FEATURE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T11:08:38.040292"
+      },
+      {
+        "issue_id": "ISS-542",
+        "issue_type": "RUN_TESTS",
+        "plan_created": 1,
+        "timestamp": "2026-11-25T11:09:10.252066"
+      },
+      {
+        "issue_id": "ISS-546",
+        "issue_type": "BROWSER_QA",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T11:09:31.493301"
+      },
+      {
+        "issue_id": "ISS-548",
+        "issue_type": "STYLE_FIX",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T11:10:12.786679"
+      },
+      {
+        "issue_id": "ISS-540",
+        "issue_type": "SCORE",
+        "plan_created": 0,
+        "timestamp": "2026-11-25T11:10:28.127443"
       }
     ],
     "on_fail": [],
@@ -11390,8 +12012,8 @@
     ]
   },
   "stats": {
-    "total_issues": 539,
-    "completed": 45,
+    "total_issues": 545,
+    "completed": 51,
     "failed": 0,
     "evolved": 223
   },
@@ -11422,19 +12044,28 @@
         "total": 353,
         "coverage": null
       }
+    },
+    {
+      "source_issue": "ISS-542",
+      "source_type": "RUN_TESTS",
+      "result": {
+        "passed": true,
+        "total": 363,
+        "coverage": null
+      }
     }
   ],
   "opus_budget_state": {
     "daily": {
       "date": "2026-11-25",
-      "cost_usd": 15.97,
-      "calls": 17
+      "cost_usd": 19.72,
+      "calls": 22
     },
     "monthly": {
       "month": "2026-11",
-      "cost_usd": 15.97,
-      "calls": 17
+      "cost_usd": 19.72,
+      "calls": 22
     },
-    "demotion_active": false
+    "demotion_active": true
   }
 }
