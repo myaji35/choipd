@@ -70,6 +70,24 @@ class EducationFilterTest < ActionDispatch::IntegrationTest
     assert_operator ratio, :>=, 4.5, format("Empty state text on #0a0e1a has a contrast ratio of %.4f:1", ratio)
   end
 
+  test "course card without an external link offers an inquiry link to the form" do
+    get education_path
+
+    assert_response :success
+    title = assert_select(".course-title", text: @b2b.title, count: 1).first
+    card = title.ancestors(".course-card").first
+    assert card, "Expected the B2B course title inside a course card"
+
+    link = assert_select(card, "a[href]", text: "문의하기", count: 1).first
+    href = link["href"]
+    assert URI.parse(href).path.start_with?(new_inquiry_path)
+
+    get href
+
+    assert_response :ok
+    assert_select "form select[name=?]", "inquiry[inquiry_type]"
+  end
+
   private
 
   def contrast_ratio(first, second)
