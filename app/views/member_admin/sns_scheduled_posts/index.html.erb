@@ -1,6 +1,7 @@
 <% content_for :title, "예약 발행 — #{@member.name}" %>
 
 <div class="scheduled-posts-wrap" style="max-width: 1120px; margin: 0 auto; padding: 40px;">
+  <%= render "member_admin/shared/sns_migration_notice" %>
   <header style="margin-bottom: 32px;">
     <p class="impd-label-muted">SCHEDULED POSTS · /<%= @member.slug %></p>
     <h1 class="impd-display" style="font-size: 44px; margin-top: 12px;">예약 발행</h1>

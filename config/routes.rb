@@ -95,6 +95,7 @@ Rails.application.routes.draw do
         post :reject
         post :suspend
         post :activate
+        post :create_personal_brand
         post :unlink_oauth
         # ISS-135: OAuth 미설정 시 로그인 경로 복구 — 관리자가 비밀번호 직접 재설정
         post :reset_password

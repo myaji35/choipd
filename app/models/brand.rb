@@ -1,11 +1,17 @@
 require "openssl"
 
 class Brand < ApplicationRecord
+  belongs_to :member, optional: true
   has_many :brand_channels, dependent: :destroy
 
   validates :name, :slug, presence: true
   validates :slug, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }
 
+  validates :member_id, presence: true,
+    uniqueness: { conditions: -> { where(personal: true) }, message: "에 이미 개인(기본) 브랜드가 있습니다." },
+    if: :personal?
+
+  scope :personal_first, -> { order(personal: :desc, name: :asc) }
   scope :published, -> { where(published: true) }
   scope :recent, -> { order(created_at: :desc) }
 

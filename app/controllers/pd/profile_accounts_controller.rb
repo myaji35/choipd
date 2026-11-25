@@ -2,7 +2,7 @@ class Pd::ProfileAccountsController < Pd::BaseController
   before_action :set_account, only: [ :show, :edit, :update, :destroy, :invitation_action, :search_queries ]
 
   def index
-    @accounts = ProfileAccount.order(:platform, :display_name).group_by(&:platform)
+    @accounts = ProfileAccount.includes(:member).order(:platform, :display_name).group_by(&:platform)
     @ego_available = EgoProfile::Runner.available?
   end
 
@@ -38,7 +38,7 @@ class Pd::ProfileAccountsController < Pd::BaseController
   end
 
   def new
-    @account = ProfileAccount.new
+    @account = ProfileAccount.new(member_id: params[:member_id])
   end
 
   def create
@@ -141,6 +141,6 @@ class Pd::ProfileAccountsController < Pd::BaseController
   end
 
   def account_params
-    params.require(:profile_account).permit(:platform, :login_id, :external_id, :display_name, :headline, :profile_url, :notes, :is_active)
+    params.require(:profile_account).permit(:member_id, :platform, :login_id, :external_id, :display_name, :headline, :profile_url, :notes, :is_active)
   end
 end

@@ -43,6 +43,12 @@
               <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded shrink-0">비공개</span>
             <% end %>
           </div>
+          <% if brand.personal? %>
+            <p class="mb-2 text-xs">
+              <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">개인(기본)</span>
+              <% if brand.member %><%= link_to brand.member.name, admin_member_path(brand.member), class: "text-primary hover:underline" %><% end %>
+            </p>
+          <% end %>
           <p class="text-xs text-gray-500 line-clamp-2 mb-3"><%= brand.description %></p>
 
           <div class="flex items-center justify-between text-xs">
@@ -103,6 +109,12 @@
                 <% end %>
                 <div>
                   <span class="font-medium text-navy block"><%= link_to brand.name, admin_brand_path(brand) %></span>
+                  <% if brand.personal? %>
+                    <p class="mb-2 text-xs">
+                      <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">개인(기본)</span>
+                      <% if brand.member %><%= link_to brand.member.name, admin_member_path(brand.member), class: "text-primary hover:underline" %><% end %>
+                    </p>
+                  <% end %>
                   <span class="text-xs text-gray-400 line-clamp-1"><%= brand.description %></span>
                 </div>
               </div>

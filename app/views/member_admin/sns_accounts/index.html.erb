@@ -1,6 +1,7 @@
 <% content_for :title, "SNS 계정 연결 — #{@member.name}" %>
 
 <div class="impd-wrap" style="max-width: 1120px; margin: 0 auto; padding: 40px;">
+  <%= render "member_admin/shared/sns_migration_notice" %>
   <header style="margin-bottom: 32px;">
     <p class="impd-label-muted">SNS ACCOUNTS · /<%= @member.slug %></p>
     <h1 class="impd-display" style="font-size: 44px; margin-top: 12px;">SNS 계정 연결</h1>

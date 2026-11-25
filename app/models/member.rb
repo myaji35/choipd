@@ -19,6 +19,8 @@ class Member < ApplicationRecord
   has_many :member_photos,          dependent: :destroy
   has_many :member_gap_reports,     dependent: :destroy
   has_many :identity_probes,        dependent: :destroy
+  has_many :brands
+  has_many :profile_accounts
   has_many :sns_accounts,           dependent: :destroy
   has_many :sns_scheduled_posts,    dependent: :destroy
   # 단축링크는 회원 페이지로 가는 리다이렉트일 뿐이라 보존 대상이 아니다.
@@ -56,6 +58,27 @@ class Member < ApplicationRecord
   scope :by_impd, ->(s) { where(impd_status: s) if s.present? }
   scope :by_profession, ->(p) { where(profession: p) if p.present? }
   scope :search, ->(q) { where("name LIKE ? OR email LIKE ? OR slug LIKE ?", "%#{q}%", "%#{q}%", "%#{q}%") if q.present? }
+
+  def personal_brand
+    brands.find_by(personal: true)
+  end
+
+  def ensure_personal_brand!
+    with_lock(requires_new: true) do
+      personal_brand || Brand.create!(
+        member_id: id, personal: true, name: name, business_type: profession_label,
+        region: region, published: false
+      )
+    end
+  rescue ActiveRecord::RecordNotUnique
+    brands.reload.find(&:personal?) || raise
+  rescue ActiveRecord::RecordInvalid => error
+    brand = error.record
+    raise unless brand.is_a?(Brand) && brand.member_id == id && brand.personal? &&
+      brand.errors.of_kind?(:member_id, :taken)
+
+    brands.reload.find(&:personal?) || raise
+  end
 
   def display_url
     "/#{slug}"

@@ -84,15 +84,14 @@
            ],
            "홍보" => [
              ["내 브랜드", slug_admin_brand_path(slug:), %w[brands brand_channels]],
-             ["SNS 연결", slug_admin_sns_accounts_path(slug:), %w[sns_accounts facebook_connections]],
-             ["예약 발행", slug_admin_scheduled_posts_path(slug:), %w[sns_scheduled_posts]],
              ["노출·광고 동의", slug_admin_brand_consents_path(slug:), %w[brand_consents]]
            ]
          }
          active_item = nav_groups.values.flatten(1).find do |_, _, controllers|
            controllers.any? { |controller| controller_path == "member_admin/#{controller}" }
          end
-         active_group = nav_groups.find { |_, items| items.include?(active_item) }&.first %>
+         active_group = nav_groups.find { |_, items| items.include?(active_item) }&.first
+         active_group = "홍보" if %w[member_admin/sns_accounts member_admin/sns_scheduled_posts member_admin/facebook_connections].include?(controller_path) %>
     <% end %>
     <% acting_user = impersonating_admin_user %>
     <header class="admin-header">

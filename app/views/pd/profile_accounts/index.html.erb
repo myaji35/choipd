@@ -20,7 +20,7 @@
     <h2 class="font-semibold text-navy p-4"><%= label %></h2>
     <div class="overflow-x-auto">
     <table class="w-full min-w-[1200px] table-fixed text-sm text-left">
-      <thead class="text-gray-500 border-b"><tr><% ["이름", "로그인 아이디", "외부 ID", "직함/직업", "권한", "상태", "마지막 점검", "최근 사본 시각", "프로필 링크", "상세"].each do |heading| %><th class="px-4 py-2 whitespace-nowrap"><%= heading %></th><% end %></tr></thead>
+      <thead class="text-gray-500 border-b"><tr><% ["이름", "회원", "로그인 아이디", "외부 ID", "직함/직업", "권한", "상태", "마지막 점검", "최근 사본 시각", "프로필 링크", "상세"].each do |heading| %><th class="px-4 py-2 whitespace-nowrap"><%= heading %></th><% end %></tr></thead>
       <tbody>
         <% accounts.each do |account| %>
           <tr class="border-b border-gray-100 align-top">
@@ -39,6 +39,7 @@
               <% end %>
               <% if account.last_error.present? %><p class="text-xs text-red-600 mt-1"><%= account.last_error %></p><% end %>
             </td>
+            <td class="px-4 py-3"><%= account.member&.name || "—" %></td>
             <td class="px-4 py-3 break-all"><%= account.login_id.presence || "-" %></td><td class="px-4 py-3"><div class="max-w-[10rem] truncate font-mono text-xs" title="<%= account.external_id %>"><%= account.external_id.presence || "-" %></div></td><td class="px-4 py-3"><div class="max-w-xs line-clamp-2 break-words" title="<%= account.headline %>"><%= account.headline.presence || "-" %></div></td><td class="px-4 py-3"><%= account.auth_status.presence || "-" %></td>
             <% badge = { "logged_in" => "bg-green-100 text-green-700", "logged_out" => "bg-amber-100 text-amber-700", "error" => "bg-red-100 text-red-700", "unknown" => "bg-gray-100 text-gray-500" }[account.session_status] %>
             <td class="px-4 py-3 whitespace-nowrap"><span class="<%= badge %> text-sm px-3 py-2 rounded-full"><%= lni_icon(account.session_status == "logged_in" ? "check-circle-1" : "xmark-circle") %> <%= account.session_status_label %></span></td>

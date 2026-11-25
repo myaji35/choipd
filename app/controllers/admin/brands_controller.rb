@@ -2,7 +2,7 @@ class Admin::BrandsController < Admin::BaseController
   before_action :set_brand, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @brands = Brand.recent
+    @brands = Brand.includes(:member).recent
     @brands = @brands.where(business_type: params[:business_type]) if params[:business_type].present?
     @brands = @brands.where(published: params[:published] == "true") if params[:published].present?
     @pagy, @brands = pagy(@brands, items: 24) if respond_to?(:pagy)

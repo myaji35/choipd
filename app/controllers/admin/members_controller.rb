@@ -1,5 +1,5 @@
 class Admin::MembersController < Admin::BaseController
-  before_action :set_member, only: [ :show, :edit, :update, :destroy, :approve, :reject, :suspend, :activate,
+  before_action :set_member, only: [ :show, :edit, :update, :destroy, :approve, :reject, :suspend, :activate, :create_personal_brand,
                                      :unlink_oauth, :reset_password, :lookup_townin, :link_townin, :promote_partner, :suspend_partner, :unlink_townin,
                                      :update_stats, :refresh_stats ]
 
@@ -53,7 +53,7 @@ class Admin::MembersController < Admin::BaseController
 
   def approve
     @member.update!(status: "approved")
-    redirect_to admin_member_path(@member), notice: "#{@member.name} 승인 완료"
+    redirect_to admin_member_path(@member), notice: "#{@member.name} 승인 완료#{personal_brand_notice_suffix}"
   end
 
   def reject
@@ -68,7 +68,12 @@ class Admin::MembersController < Admin::BaseController
 
   def activate
     @member.update!(status: "approved")
-    redirect_to admin_member_path(@member), notice: "#{@member.name} 재활성화 완료"
+    redirect_to admin_member_path(@member), notice: "#{@member.name} 재활성화 완료#{personal_brand_notice_suffix}"
+  end
+
+  def create_personal_brand
+    @member.ensure_personal_brand!
+    redirect_to admin_member_path(@member), notice: "개인(기본) 브랜드를 확인할 수 있습니다.", status: :see_other
   end
 
   # 소셜 로그인(OAuth) 연결 해제 — 회원은 비밀번호 재설정 후 로그인해야 함.
@@ -205,6 +210,14 @@ class Admin::MembersController < Admin::BaseController
   end
 
   private
+
+  def personal_brand_notice_suffix
+    @member.ensure_personal_brand!
+    ""
+  rescue StandardError => error
+    Rails.logger.error("Personal brand creation failed for member #{@member.id}: #{error.class}: #{error.message}")
+    " (개인 브랜드는 회원 상세에서 다시 만들어 주세요)"
+  end
 
   def set_member
     @member = Member.for_tenant.find_by(slug: params[:id]) || Member.for_tenant.find(params[:id])
