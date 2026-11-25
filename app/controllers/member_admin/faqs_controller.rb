@@ -9,6 +9,7 @@ class MemberAdmin::FaqsController < MemberAdmin::BaseController
     faq = @member.member_faqs.new(faq_params)
 
     if faq.save
+      flash[:saved_item] = "faq-#{faq.id}"
       redirect_to slug_admin_faqs_path(slug: @member.slug), notice: "질문을 저장했어요. 내 페이지에서 볼 수 있어요."
     else
       @faqs = @member.member_faqs.sorted
@@ -19,7 +20,13 @@ class MemberAdmin::FaqsController < MemberAdmin::BaseController
 
   def update
     if @faq.update(faq_params)
-      redirect_to slug_admin_faqs_path(slug: @member.slug), notice: "질문을 고쳤어요."
+      flash[:saved_item] = "faq-#{@faq.id}"
+      message = if params[:visibility_toggle].present?
+        @faq.is_published.to_i == 1 ? "질문을 내 페이지에 보이게 했어요." : "질문을 내 페이지에서 숨겼어요."
+      else
+        "질문을 고쳤어요."
+      end
+      redirect_to slug_admin_faqs_path(slug: @member.slug), notice: message
     else
       @faqs = @member.member_faqs.sorted
       flash.now[:alert] = @faq.errors.full_messages.join(", ")

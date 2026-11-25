@@ -10,6 +10,7 @@ class MemberAdmin::PostsController < MemberAdmin::BaseController
     post.published_at = Time.current if post.is_published.to_i == 1
 
     if post.save
+      flash[:saved_item] = "post-#{post.id}"
       message = post.is_published.to_i == 1 ? "소식을 올렸어요. 내 페이지에 바로 보여요." : "소식을 저장했어요. 아직 나만 볼 수 있어요."
       redirect_to slug_admin_posts_path(slug: @member.slug), notice: message
     else
@@ -26,6 +27,7 @@ class MemberAdmin::PostsController < MemberAdmin::BaseController
     end
 
     if @post.update(attributes)
+      flash[:saved_item] = "post-#{@post.id}"
       redirect_to slug_admin_posts_path(slug: @member.slug), notice: "소식을 고쳤어요."
     else
       @posts = @member.member_posts.recent
@@ -39,6 +41,7 @@ class MemberAdmin::PostsController < MemberAdmin::BaseController
     attributes = { is_published: publishing ? 1 : 0 }
     attributes[:published_at] = Time.current if publishing
     @post.update!(attributes)
+    flash[:saved_item] = "post-#{@post.id}"
 
     message = publishing ? "소식을 내 페이지에 보이게 했어요." : "소식을 내 페이지에서 숨겼어요."
     redirect_to slug_admin_posts_path(slug: @member.slug), notice: message, status: :see_other

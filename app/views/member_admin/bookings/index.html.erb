@@ -22,30 +22,33 @@
       <% if @bookings.any? %>
         <div style="display: grid; gap: 14px;">
           <% @bookings.each do |booking| %>
-            <article class="impd-card" style="padding: 20px;">
-              <div style="display: flex; justify-content: space-between; gap: 20px; align-items: flex-start;">
-                <div style="min-width: 0;">
-                  <h3 style="font-size: 17px; line-height: 1.45;"><%= booking.booking_type.presence || "예약 링크" %></h3>
-                  <% if http_url(booking.external_url).present? %>
-                  <%= link_to booking.external_url, http_url(booking.external_url), target: "_blank", rel: "noopener", style: "display: block; margin-top: 8px; color: var(--impd-accent); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere;" %>
-                  <% else %>
-                    <span style="display: block; margin-top: 8px; font-size: 13px; color: var(--impd-muted); overflow-wrap: anywhere;"><%= booking.external_url %></span>
-                  <% end %>
-                  <% if booking.description.present? %>
-                    <p style="margin-top: 8px; color: var(--impd-ink2); font-size: 14px; line-height: 1.6;"><%= booking.description %></p>
-                  <% end %>
-                </div>
-                <%= button_to "삭제", slug_admin_booking_path(slug: @member.slug, id: booking), method: :delete,
-                      form: { style: "flex-shrink: 0;", data: { turbo_confirm: "이 예약 링크를 지울까요? 지우면 되돌릴 수 없어요." } },
-                      class: "impd-btn impd-btn-secondary", style: "height: 44px; white-space: nowrap; flex-shrink: 0; padding: 0 12px; font-size: 12px; color: var(--impd-accent-2); border-color: var(--impd-accent-2);" %>
+            <% item_id = "booking-#{booking.id}" %>
+            <% just_saved = flash[:saved_item] == item_id %>
+            <article id="<%= item_id %>" class="impd-card<%= ' is-just-saved' if just_saved %>" style="padding: 20px; overflow-wrap: anywhere;">
+              <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+                <h3 style="font-size: 17px; line-height: 1.45;"><%= booking.booking_type.presence || "예약 링크" %></h3>
+                <% if just_saved %><span class="impd-just-saved-tag">방금 저장</span><% end %>
               </div>
+              <% if http_url(booking.external_url).present? %>
+                <%= link_to booking.external_url, http_url(booking.external_url), target: "_blank", rel: "noopener", style: "display: block; min-height: 44px; padding-block: 12px; color: var(--impd-accent); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere;" %>
+              <% else %>
+                <span style="display: block; margin-top: 8px; font-size: 13px; color: var(--impd-muted); overflow-wrap: anywhere;"><%= booking.external_url %></span>
+              <% end %>
+              <% if booking.description.present? %>
+                <p style="margin-top: 8px; color: var(--impd-ink2); font-size: 14px; line-height: 1.6;"><%= booking.description %></p>
+              <% end %>
 
-              <details style="margin-top: 16px; border-top: 1px solid var(--impd-rule); padding-top: 14px;">
-                <summary style="cursor: pointer; color: var(--impd-accent); font-size: 13px; font-weight: 600;">수정</summary>
-                <%= form_with model: booking, url: slug_admin_booking_path(slug: @member.slug, id: booking), method: :patch, class: "booking-form", style: "margin-top: 18px;" do |form| %>
-                  <%= render "booking_fields", form: form, submit_label: "변경사항 저장" %>
-                <% end %>
-              </details>
+              <div class="impd-item-actions">
+                <details>
+                  <summary>수정</summary>
+                  <%= form_with model: booking, url: slug_admin_booking_path(slug: @member.slug, id: booking), method: :patch, class: "booking-form", style: "margin-top: 18px;" do |form| %>
+                    <%= render "booking_fields", form: form, submit_label: "변경사항 저장" %>
+                  <% end %>
+                </details>
+                <%= button_to "삭제", slug_admin_booking_path(slug: @member.slug, id: booking), method: :delete,
+                      class: "impd-btn impd-btn-danger impd-btn-sm",
+                      form: { class: "impd-item-delete", data: { turbo_confirm: "이 예약 링크를 지울까요? 지우면 되돌릴 수 없어요." } } %>
+              </div>
             </article>
           <% end %>
         </div>
@@ -71,7 +74,7 @@
   @media (max-width: 820px) {
     .bookings-layout.is-empty > section:last-child { order: -1; }
     .impd-wrap { padding: 28px 20px !important; }
-    .bookings-layout { grid-template-columns: 1fr !important; }
+    .bookings-layout { grid-template-columns: minmax(0, 1fr) !important; }
     .bookings-layout > section:last-child { position: static !important; }
   }
 </style>

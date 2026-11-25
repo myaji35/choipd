@@ -49,6 +49,15 @@
       .impd-btn-primary:hover { background: var(--impd-accent); }
       .impd-btn-accent { background: var(--impd-accent); color: white; }
       .impd-btn-secondary { background: transparent; color: var(--impd-ink); border: 1px solid var(--impd-ink); }
+      .impd-btn-danger { background: transparent; color: var(--impd-accent-2); border: 1px solid var(--impd-accent-2); }
+      .impd-btn-sm { height: 44px; padding: 0 12px; font-size: 13px; white-space: nowrap; }
+      .impd-item-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; padding-top: 6px; border-top: 1px solid var(--impd-rule); }
+      .impd-item-actions details[open] { flex: 1 1 100%; min-width: 0; }
+      .impd-item-actions summary { cursor: pointer; color: var(--impd-accent); font-size: 13px; font-weight: 600; min-height: 44px; line-height: 44px; padding: 0 8px; }
+      .impd-item-actions details[open] > summary { width: fit-content; }
+      .impd-item-actions .impd-item-delete { margin-left: auto; }
+      .is-just-saved { border-color: var(--impd-accent) !important; box-shadow: inset 4px 0 0 var(--impd-accent); scroll-margin-top: 96px; }
+      .impd-just-saved-tag { background: var(--impd-accent); color: var(--impd-card); padding: 3px 7px; font-size: 12px; font-weight: 700; white-space: nowrap; }
       .impd-card { background: var(--impd-card); border: 1px solid var(--impd-rule); padding: 24px; }
       .impd-field { margin-top: 16px; }
       .impd-field:first-child { margin-top: 0; }
@@ -95,7 +104,7 @@
       .admin-nav { background: var(--impd-paper); border-bottom: 1px solid var(--impd-rule); }
       .admin-nav-bar { padding: 14px 40px; display: flex; align-items: center; gap: 24px; }
       .admin-nav-links { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 22px; flex: 1; min-width: 0; }
-      .admin-nav-link { font-size: 13px; color: var(--impd-muted); padding: 8px 0; border-bottom: 2px solid transparent; }
+      .admin-nav-link { display: flex; align-items: center; min-height: 44px; font-size: 13px; color: var(--impd-muted); padding: 8px 0; border-bottom: 2px solid transparent; }
       .admin-nav-link[aria-current="page"] { color: var(--impd-accent); border-bottom-color: var(--impd-accent); font-weight: 700; }
       .admin-subnav { max-width: 100%; display: flex; gap: 22px; padding: 0 40px; border-top: 1px solid var(--impd-rule); overflow-x: auto; white-space: nowrap; }
       .admin-subnav .admin-nav-link { flex: none; }
@@ -106,7 +115,7 @@
         .admin-nav-bar { padding: 12px 18px; gap: 12px; }
         .admin-nav-links, .admin-email, .admin-logout { display: none; }
         .admin-identity { margin-left: auto; }
-        .admin-menu-button { display: inline-flex; border: 0; background: transparent; padding: 8px; font-size: 22px; }
+        .admin-menu-button { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; border: 0; background: transparent; padding: 8px; font-size: 22px; }
         .admin-subnav { padding: 0 18px; }
         .admin-mobile-panel:not([hidden]) { display: block; padding: 0 18px 16px; max-height: 60dvh; overflow-y: auto; }
         .admin-mobile-panel h2 { margin-top: 12px; font-size: 13px; color: var(--impd-muted); }
@@ -122,7 +131,7 @@
            "내 페이지" => [
              ["에디터", slug_admin_editor_path(slug:), %w[editor photos documents]],
              ["서비스", slug_admin_services_path(slug:), %w[services]],
-             ["FAQ", slug_admin_faqs_path(slug:), %w[faqs]],
+             ["자주 묻는 질문", slug_admin_faqs_path(slug:), %w[faqs]],
              ["소식", slug_admin_posts_path(slug:), %w[posts]]
            ],
            "고객" => [
@@ -155,7 +164,7 @@
       <% end %>
       <nav class="admin-nav" data-controller="impd-nav" aria-label="회원 관리 메뉴">
         <div class="admin-nav-bar">
-          <%= link_to "imPD.", (@member ? slug_admin_dashboard_path(slug: @member.slug) : root_path), style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 20px;" %>
+          <%= link_to "imPD.", (@member ? slug_admin_dashboard_path(slug: @member.slug) : root_path), style: "display: flex; align-items: center; min-height: 44px; font-family: var(--impd-font-display); font-weight: 800; font-size: 20px;" %>
           <% if @member %>
             <div class="admin-nav-links">
               <% nav_groups.each do |label, items| %>
@@ -172,7 +181,7 @@
               <% end %>
             </div>
             <% unless acting_user %>
-              <div class="admin-logout"><%= button_to "로그아웃", logout_member_path(slug: @member.slug), method: :delete, class: "impd-btn impd-btn-secondary", style: "height: 32px; padding: 0 12px; font-size: 12px;" %></div>
+              <div class="admin-logout"><%= button_to "로그아웃", logout_member_path(slug: @member.slug), method: :delete, class: "impd-btn impd-btn-secondary impd-btn-sm" %></div>
             <% end %>
             <button type="button" class="admin-menu-button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="admin-mobile-menu" data-impd-nav-target="button" data-action="impd-nav#toggle">
               <span data-impd-nav-target="menuIcon"><%= lni_icon "menu-hamburger-1" %></span><span data-impd-nav-target="closeIcon" hidden><%= lni_icon "xmark" %></span>
@@ -208,5 +217,34 @@
     <%= render "shared/flash" %>
 
     <main id="main-content" tabindex="-1"><%= yield %></main>
+    <script>
+      (() => {
+        if (window.impdSavedItemScrollInstalled) return;
+        window.impdSavedItemScrollInstalled = true;
+
+        const scrolledCards = new WeakSet();
+
+        function scrollToSavedItem() {
+          const card = document.querySelector(".is-just-saved");
+          if (!card || scrolledCards.has(card)) return;
+
+          const { top, bottom } = card.getBoundingClientRect();
+          const headerBottom = document.querySelector(".admin-header")?.getBoundingClientRect().bottom ?? 0;
+          if (bottom > Math.max(0, headerBottom) && top < window.innerHeight) return;
+
+          const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+          scrolledCards.add(card);
+          card.scrollIntoView({ block: "center", behavior });
+        }
+
+        document.addEventListener("DOMContentLoaded", scrollToSavedItem, { once: true });
+        document.addEventListener("turbo:load", scrollToSavedItem);
+        document.addEventListener("turbo:before-cache", () => {
+          const card = document.querySelector(".is-just-saved");
+          card?.classList.remove("is-just-saved");
+          card?.querySelector(".impd-just-saved-tag")?.remove();
+        });
+      })();
+    </script>
   </body>
 </html>
