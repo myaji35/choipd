@@ -2,24 +2,63 @@
 <div class="impd-wrap" style="max-width: 1120px; margin: 0 auto; padding: 40px;">
   <div style="max-width: 820px;">
     <header style="margin-bottom: 32px;">
-      <p class="impd-label-muted">홍보 › 노출·광고 동의</p>
+      <p class="impd-label-muted" style="font-family: var(--impd-font-sans);">홍보 › 노출·광고 동의</p>
       <h1 class="impd-display" style="font-size: 36px; margin-top: 12px;">노출·광고 동의</h1>
-      <p style="margin-top: 12px;">선택 사항이며 언제든 철회할 수 있어요.</p>
+      <p style="margin-top: 12px;">둘 다 선택이에요. 동의하지 않아도 내 페이지는 그대로 쓸 수 있고, 동의한 뒤에도 언제든 그만둘 수 있어요.</p>
     </header>
     <div style="display: grid; gap: 16px;">
       <% ProConsent::BRAND_CONSENT_TEXTS.each do |type, text| %>
         <% current = ProConsent.current_for(@member.id, type); consent = @consents[type] %>
         <% social = type == "socialdoctors_exposure"; disabled = !social && !current && !ProConsent.current_for(@member.id, "socialdoctors_exposure") %>
         <section class="impd-card" id="<%= social ? 'socialdoctors-consent' : 'townin-consent' %>">
-          <h2 style="font-size: 20px;"><%= social ? 'SocialDoctors 노출' : 'Townin 지역 광고' %></h2>
-          <p style="line-height: 1.7; margin-top: 12px;"><strong>무엇이 어디에 보이나요?</strong><br><%= social ? '브랜드 정보가 SocialDoctors에 전달되어 홍보 콘텐츠를 만드는 데 사용돼요.' : '브랜드를 알리는 광고가 Townin의 선택한 지역 주민에게 보일 수 있어요.' %><br>동의는 언제든 철회할 수 있어요.</p>
-          <details style="margin-top: 16px;"><summary style="cursor: pointer;">전체 문구 보기</summary><p style="white-space: pre-line; line-height: 1.8; margin-top: 12px;"><%= text %></p></details>
-          <p style="display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; padding: 6px 10px; border: 1px solid var(--impd-rule); border-radius: 999px;"><%= lni_icon(current ? 'check-circle-1' : 'xmark-circle') %> <% if current %>동의함 · <%= l(current.consented_at, format: :short) %><% elsif consent&.revoked_at %>철회함 · <%= l(consent.revoked_at, format: :short) %><% else %>동의 안 함<% end %></p>
-          <% if disabled %><p style="margin-top: 12px;"><a href="#socialdoctors-consent" style="color: var(--impd-accent); text-decoration: underline;">SocialDoctors 노출에 먼저 동의해야 해요</a></p><% end %>
-          <%= button_to current ? "철회하기" : "동의하기", slug_admin_brand_consents_path(slug: @member.slug), method: :patch, params: { consent_type: type, decision: current ? "revoke" : "grant" }, disabled: disabled, aria: { disabled: disabled }, data: (current ? { turbo_confirm: "철회하면 #{social ? 'SocialDoctors 노출이' : 'Townin 지역 광고가'} 중단돼요. 철회할까요?" } : {}), class: "impd-btn #{current ? 'impd-btn-secondary' : 'impd-btn-primary'}", style: "margin-top: 16px; #{'background: #d1d5db; color: #4b5563; cursor: not-allowed;' if disabled}" %>
+          <h2 style="font-size: 20px;"><%= social ? "SNS 대신 운영" : "우리 동네 광고" %></h2>
+          <p class="impd-label-muted"><%= social ? "SocialDoctors" : "Townin" %></p>
+          <dl style="line-height: 1.7; margin-top: 12px;">
+            <dt><strong>무엇을 하나요?</strong></dt>
+            <% if social %>
+              <dd>운영팀이 내 이름·소개·직업·지역·사진으로 홍보 글을 만들어 블로그·SNS에 대신 올려 드려요.</dd>
+              <dt><strong>빠지는 정보</strong></dt>
+              <dd>이메일·전화번호는 넘어가지 않아요.</dd>
+              <dt><strong>비용</strong></dt>
+              <dd>동의만으로 드는 돈은 없어요.</dd>
+            <% else %>
+              <dd>내 브랜드 정보로 동네 전단지 광고를 만들어 가까운 주민에게 보여 드려요. 지역 파트너가 승인한 뒤에만 실려요.</dd>
+              <dt><strong>비용</strong></dt>
+              <dd><strong>광고를 읽은 사람 1명당 50원이 내 Townin 광고 포인트에서 빠져요.</strong></dd>
+            <% end %>
+          </dl>
+          <details style="margin-top: 16px;">
+            <summary style="min-height: 44px; padding-block: 10px; cursor: pointer;">동의서 전문 보기</summary>
+            <p style="white-space: pre-line; line-height: 1.8; margin-top: 12px;"><%= text %></p>
+          </details>
+          <p style="display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; padding: 6px 10px; border: 1px solid var(--impd-rule); border-radius: 999px;">
+            <%= lni_icon(current ? 'check-circle-1' : 'xmark-circle') %>
+            <% if current %>
+              <%= social ? "맡기는 중" : "광고에 실리는 중" %> · <%= current.consented_at.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d") %>부터
+            <% elsif consent&.revoked_at %>
+              그만둠 · <%= consent.revoked_at.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d") %>
+            <% else %>
+              <%= social ? "아직 맡기지 않았어요" : "아직 실리지 않아요" %>
+            <% end %>
+          </p>
+          <% if disabled %>
+            <p style="margin-top: 12px;"><a href="#socialdoctors-consent" style="display: inline-flex; align-items: center; min-height: 44px; color: var(--impd-accent); text-decoration: underline;">'SNS 대신 운영'에 먼저 동의해야 해요</a></p>
+          <% end %>
+          <% confirmation = social ? "그만두면 운영팀이 내 소식을 새로 올리지 않아요. 그만둘까요?" : "그만두면 새 전단지 광고가 실리지 않아요. 그만둘까요?" %>
+          <%= button_to current ? "그만두기" : "동의하기", slug_admin_brand_consents_path(slug: @member.slug),
+            method: :patch, params: { consent_type: type, decision: current ? "revoke" : "grant" },
+            disabled: disabled, aria: { disabled: disabled }, form: (current ? { data: { turbo_confirm: confirmation } } : {}),
+            class: "impd-btn #{current ? 'impd-btn-secondary' : 'impd-btn-primary'}",
+            style: "margin-top: 16px; #{'background: var(--impd-rule); color: var(--impd-muted); cursor: not-allowed;' if disabled}" %>
         </section>
       <% end %>
     </div>
+    <nav style="display: flex; flex-wrap: wrap; gap: 0 16px; margin-top: 16px; color: var(--impd-muted); font-size: 13px;">
+      <% footer_link_style = "display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; text-underline-offset: 3px; color: inherit;" %>
+      <%= link_to "내 브랜드", slug_admin_brand_path(slug: @member.slug), style: footer_link_style %>
+      <%= link_to "내 채널", slug_admin_channels_path(slug: @member.slug), style: footer_link_style %>
+      <%= link_to "대시보드", slug_admin_dashboard_path(slug: @member.slug), style: footer_link_style %>
+    </nav>
   </div>
 </div>
 <style>

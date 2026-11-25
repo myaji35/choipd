@@ -46,4 +46,60 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
     assert_not_includes css_select("#classes").to_s, "position: absolute"
     assert_not_includes css_select("#classes").to_s, "impd-font-mono"
   end
+
+  test "서비스 카드에 신청 주소가 있으면 회원이 적은 버튼으로 연결한다" do
+    @member.member_services.create!(title: "상담", is_active: 1, cta_label: "카톡으로 신청", cta_url: "https://open.kakao.com/o/abc")
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select "#classes a.public-service-action[href='https://open.kakao.com/o/abc'][target='_blank'][rel='noopener']", text: /카톡으로 신청/
+  end
+
+  test "신청 주소가 없으면 문의 양식으로 연결한다" do
+    @member.member_services.create!(title: "보장 분석 상담", is_active: 1)
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select "#classes a.public-service-action[href='#contact'][data-inquiry-service='보장 분석 상담']", text: "이 서비스 문의하기"
+  end
+
+  test "안전하지 않은 주소는 버튼 주소로 쓰지 않는다" do
+    @member.member_services.create!(title: "상담", is_active: 1, cta_url: "javascript:alert(1)")
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_not_includes response.body, "javascript:alert"
+    assert_select "#classes a.public-service-action[href='#contact'][data-inquiry-service='상담']"
+  end
+
+  test "카드 모음형에서도 서비스 문의 버튼을 표시한다" do
+    @member.update!(layout_preset: "grid")
+    @member.member_services.create!(title: "상담", is_active: 1)
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select ".impd-bento article a.public-service-action[href='#contact']"
+  end
+
+  test "자기소개를 자르지 않고 끝까지 보여 준다" do
+    bio = ("안녕하세요. " * 20) + "\n끝까지 보입니다"
+    @member.update!(bio: bio)
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select ".public-hero .public-bio", text: /끝까지 보입니다/ do |paragraphs|
+      assert_equal bio, paragraphs.first.text
+      assert_no_match(/\.\.\.|…/, paragraphs.first.text)
+    end
+  end
+
+  test "문의 양식은 좁은 폭과 큰 동의 칸을 쓴다" do
+    get public_profile_path(slug: @member.slug)
+
+    assert_select "#contact form.public-form label.public-consent input[type=checkbox][required]"
+    assert_select "#contact .public-consent-link a[href='/privacy']", text: "개인정보처리방침 보기"
+    assert_includes response.body, "max-width: 640px"
+    assert_select "#contact textarea#member_inquiry_message[placeholder]"
+    assert_select "#contact input#member_inquiry_sender_name"
+  end
 end

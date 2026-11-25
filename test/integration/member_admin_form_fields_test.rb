@@ -26,6 +26,7 @@ class MemberAdminFormFieldsTest < ActionDispatch::IntegrationTest
 
     get @pages.fetch(:services).first
 
+    assert_includes response.body, "비워 두면 버튼이 내 페이지의 문의 양식으로 연결돼요."
     assert_select ".impd-field-row" do
       %w[price price_label].each do |field|
         assert_select "input[name='member_service[#{field}]']", count: 1

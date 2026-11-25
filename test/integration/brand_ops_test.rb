@@ -64,6 +64,12 @@ class BrandOpsTest < ActionDispatch::IntegrationTest
     assert_select ".ops-brand-card.ops-brand-card-compact .ops-brand-heading"
   end
 
+  test "public profile hero links to the consented member's activity" do
+    ProConsent.create!(owner_id: @member.id, consent_type: "socialdoctors_exposure", consented: true)
+    get "/ops-page"
+    assert_select ".public-hero a[href='/ops-page/brand']", text: "최근 활동 숫자 보기 →"
+  end
+
   test "brand page requires consent and hides inquiry details" do
     get "/ops-page/brand"
     assert_response :not_found

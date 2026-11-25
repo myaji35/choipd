@@ -18,24 +18,35 @@
   .public-actions a, .public-actions button, .public-sticky a, .public-sticky button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border: 1px solid var(--impd-accent); border-radius: 6px; color: var(--impd-accent); background: var(--impd-paper); text-decoration: none; font: inherit; cursor: pointer; }
   .public-actions .primary, .public-sticky .primary { background: var(--impd-accent); color: var(--impd-paper); }
   .public-sticky { display: none; }
-  .public-form input:not([type=checkbox]), .public-form textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--impd-rule); background: var(--impd-paper); color: var(--impd-ink); font: inherit; }
-  .public-form label { display: block; margin: 16px 0 6px; }
-  .public-form input[type=checkbox] { width: 20px; height: 20px; vertical-align: middle; }
-  @media (max-width: 767px) { .public-member-inner { padding: 40px 20px; } .public-avatar { width: 80px; height: 80px; font-size: 36px; } .public-sticky { display: flex; gap: 8px; position: fixed; z-index: 100; bottom: 0; left: 0; right: 0; padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); background: var(--impd-paper); border-top: 1px solid var(--impd-rule); } .public-sticky a, .public-sticky button { flex: 1; min-width: 0; } body { padding-bottom: calc(68px + env(safe-area-inset-bottom)); } .impd-section { padding-block: 40px !important; } }
+  .public-hero .public-member-inner { padding-bottom: 24px; }
+  .public-bio { max-width: 62ch; margin-top: 12px; white-space: pre-line; line-height: 1.7; }
+  .public-activity-link { display: inline-flex; align-items: center; min-height: 44px; margin-top: 12px; color: var(--impd-accent); text-decoration: underline; text-underline-offset: 3px; }
+  .public-service-action { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 16px; margin-top: 16px; border: 1px solid var(--impd-accent); color: var(--impd-accent); background: transparent; font-size: 15px; font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
+  .public-form { max-width: 640px; }
+  .public-form input[type=text], .public-form textarea { width: 100%; min-height: 48px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--impd-ink) 35%, transparent); background: var(--impd-card); color: var(--impd-ink); font: inherit; font-size: 16px; }
+  .public-form input:focus, .public-form textarea:focus { outline: 2px solid var(--impd-accent); outline-offset: 2px; }
+  .public-form label { display: block; margin: 16px 0 6px; font-size: 15px; font-weight: 600; }
+  .public-form .public-consent { display: flex; align-items: flex-start; gap: 12px; min-height: 44px; padding: 10px 0; font-weight: 400; cursor: pointer; }
+  .public-consent input[type=checkbox] { width: 24px; height: 24px; flex: none; margin: 2px 0 0; accent-color: var(--impd-accent); }
+  .public-consent-link { margin: 0 0 8px 36px; font-size: 14px; }
+  .public-consent-link a { display: inline-flex; align-items: center; min-height: 44px; color: var(--impd-ink2); text-decoration: underline; }
+  .public-form input[type=submit] { width: 100%; min-height: 52px; padding: 10px 20px; background: var(--impd-accent); color: var(--impd-paper); border: 0; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+  @media (max-width: 767px) { .public-member-inner { padding: 40px 20px; } .public-hero .public-member-inner { padding-bottom: 16px; } .public-avatar { width: 80px; height: 80px; font-size: 36px; } .public-sticky { display: flex; gap: 8px; position: fixed; z-index: 100; bottom: 0; left: 0; right: 0; padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); background: var(--impd-paper); border-top: 1px solid var(--impd-rule); } .public-sticky a, .public-sticky button { flex: 1; min-width: 0; } body { padding-bottom: calc(68px + env(safe-area-inset-bottom)); } .impd-section { padding-block: 40px !important; } }
 </style>
 <section class="public-member public-hero"><div class="public-member-inner">
   <% if member.profile_image.present? %><img fetchpriority="high" decoding="async" class="public-avatar" src="<%= member.profile_image %>" alt="<%= member.name %> 프로필 사진"><% else %><div class="public-avatar" aria-hidden="true"><%= member.name.to_s.first %></div><% end %>
   <h1><%= member.name %></h1>
   <p><%= member.profession_label if member.profession.present? %><% if member.region.present? %> <%= lni_icon "map-marker-5" %> <%= member.region %><% end %></p>
-  <% if member.bio.present? %><p><%= truncate(member.bio, length: 100) %></p><% end %>
+  <% if member.bio.present? %><p class="public-bio"><%= member.bio %></p><% end %>
   <div class="public-actions"><a class="primary" href="#contact">상담·문의하기</a><% if member.phone.present? %><a href="tel:<%= member.phone %>">전화</a><% end %><% if kakao %><a href="<%= kakao %>" target="_blank" rel="noopener">카카오톡</a><% end %><% if member.email.present? %><a href="mailto:<%= member.email %>">이메일</a><% end %></div>
   <% photos = moments.to_a.select { |photo| photo.image.attached? && !photo.video? }.first(3) %>
   <% if photos.any? %><div style="display: flex; gap: 8px; margin-top: 24px; overflow: hidden;"><% photos.each do |photo| %><img loading="lazy" decoding="async" src="<%= photo.thumbnail_url || photo.display_url %>" alt="<%= photo.caption.presence || member.name + ' 사진' %>" style="width: 100px; height: 100px; object-fit: cover; border: 4px solid var(--impd-paper);"><% end %></div><% end %>
+  <% if brand_ops_public? && ProConsent.has_consent?(owner_id: member.id, type: "socialdoctors_exposure") %>
+    <%= link_to "최근 활동 숫자 보기 →", member_brand_ops_path(slug: member.slug), class: "public-activity-link" %>
+  <% end %>
 </div></section>
 <nav class="public-sticky public-member" aria-label="빠른 연락"><% if member.phone.present? %><a href="tel:<%= member.phone %>">전화</a><% end %><a class="primary" href="#contact">문의</a><% if kakao %><a href="<%= kakao %>" target="_blank" rel="noopener">카카오</a><% else %><button type="button" onclick="shareMemberPage(this)">공유</button><% end %></nav>
 <script>
   async function copyMemberLink(button) { try { await navigator.clipboard.writeText(location.href); button.textContent = '복사했어요'; } catch (_) { const input = document.createElement('textarea'); input.value = location.href; document.body.appendChild(input); input.select(); document.execCommand('copy'); input.remove(); button.textContent = '복사했어요'; } }
   async function shareMemberPage(button) { if (navigator.share) { try { await navigator.share({ title: document.title, url: location.href }); } catch (_) {} } else { await copyMemberLink(button); } }
 </script>
-
-<% if brand_ops_public? && ProConsent.has_consent?(owner_id: member.id, type: "socialdoctors_exposure") %><p class="public-member-inner"><%= link_to "브랜드 운영 현황 보기 →", member_brand_ops_path(slug: member.slug), style: "color:#00754A;display:inline-block;padding:12px 0;" %></p><% end %>

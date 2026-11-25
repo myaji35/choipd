@@ -7,16 +7,32 @@
     </section>
   <% end %>
   <section class="public-member-inner" id="contact"><h2>상담·문의하기</h2>
+    <p style="color: var(--impd-ink2); margin-top: 4px;">남겨 주시면 <%= member.name %>님이 직접 확인하고 연락드려요.</p>
     <% if flash[:notice] == "보냈어요. 보통 24시간 안에 답장이 와요." %><div role="status" style="padding: 16px; border: 1px solid var(--impd-accent); margin-top: 16px;"><%= flash[:notice] %></div><% end %>
     <% if flash[:alert].present? %><p role="alert"><%= flash[:alert] %></p><% end %>
     <%= form_with model: MemberInquiry.new, url: member_inquiries_path(slug: member.slug), class: "public-form" do |form| %>
       <%= form.label :sender_name, "이름" %><%= form.text_field :sender_name, required: true, autocomplete: "name" %>
-      <%= form.label :sender_email, "연락처 (전화 또는 이메일)" %><%= form.text_field :sender_email, required: true, autocomplete: "on" %>
-      <%= form.label :message, "문의 내용" %><%= form.text_area :message, required: true, minlength: 5, maxlength: 2000, rows: 5 %>
-      <label><%= form.check_box :consent, { required: true }, "1", "0" %> 개인정보(이름·연락처)를 문의 답변 목적으로 <%= member.name %>님에게 전달하는 데 동의합니다 <a href="/privacy">개인정보처리방침</a></label>
+      <%= form.label :sender_email, "연락처 (전화 또는 이메일)" %><%= form.text_field :sender_email, required: true, autocomplete: "on", placeholder: "010-0000-0000 또는 메일 주소" %>
+      <%= form.label :message, "문의 내용" %><%= form.text_area :message, required: true, minlength: 5, maxlength: 2000, rows: 5, placeholder: "궁금한 점이나 원하는 상담 내용을 적어 주세요." %>
+      <label class="public-consent"><%= form.check_box :consent, { required: true }, "1", "0" %><span>이름과 연락처를 답변을 위해 <%= member.name %>님에게 전달하는 데 동의합니다. (필수)</span></label>
+      <p class="public-consent-link"><a href="/privacy">개인정보처리방침 보기</a></p>
       <%= hidden_field_tag :website, "", autocomplete: "off", tabindex: -1 %>
-      <div class="public-actions"><%= form.submit "문의 보내기", class: "primary", style: "min-height: 44px; padding: 10px 20px; background: var(--impd-accent); color: var(--impd-paper); border: 0; font: inherit; cursor: pointer;" %></div>
+      <%= form.submit "문의 보내기" %>
+      <p style="font-size: 14px; color: var(--impd-ink2); margin-top: 8px;">보통 24시간 안에 답장이 와요.</p>
     <% end %>
   </section>
   <section class="public-member-inner"><h2>디지털 명함</h2><img src="/qr/<%= member.slug %>.svg" alt="<%= member.name %> QR 코드" width="160" height="160"><div class="public-actions"><a href="/qr/<%= member.slug %>.svg" download="<%= member.slug %>-qr.svg" aria-label="QR 저장">QR 저장</a><button type="button" aria-label="링크 복사" onclick="copyMemberLink(this)">링크 복사</button><a href="/card/<%= member.slug %>.svg" aria-label="명함 보기">명함 보기</a></div></section>
 </div>
+<script>
+  document.querySelectorAll('[data-inquiry-service]').forEach((link) => {
+    link.addEventListener('click', () => {
+      const message = document.getElementById('member_inquiry_message');
+      if (message && message.value === '') {
+        message.value = `'${link.dataset.inquiryService}' 문의드려요.\n`;
+      }
+      requestAnimationFrame(() => {
+        document.getElementById('member_inquiry_sender_name')?.focus({ preventScroll: true });
+      });
+    });
+  });
+</script>

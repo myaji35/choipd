@@ -481,6 +481,7 @@
           <p style="margin-top: 16px; font-family: var(--impd-font-sans); font-weight: 600; font-size: 14px; color: var(--impd-accent);">
             <%= s.price_label.presence || (s.price.present? ? "₩#{s.price}" : "문의") %>
           </p>
+          <%= render "public_profile/service_action", service: s %>
         </div>
       <% end %>
     </div>
@@ -562,7 +563,7 @@
           오늘도 활동 중
         </span>
       <% else %>
-        <span class="impd-label-muted">활동 기록</span>
+        <span class="impd-label-muted">최근 소식 <%= @posts.size %>개</span>
       <% end %>
     </div>
     <div>
