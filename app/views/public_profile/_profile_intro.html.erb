@@ -20,6 +20,7 @@
   .public-hero h1 { font-size: clamp(32px, 5vw, 56px); line-height: 1.15; margin: 16px 0 8px; }
   .public-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
   .public-actions a, .public-actions button, .public-sticky a, .public-sticky button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border: 1px solid var(--impd-accent); border-radius: 6px; color: var(--impd-accent); background: var(--impd-paper); text-decoration: none; font: inherit; cursor: pointer; }
+  .public-contact-value { margin-left: 6px; font-weight: 600; overflow-wrap: anywhere; }
   .public-actions .primary, .public-sticky .primary { background: var(--impd-accent); color: var(--impd-paper); }
   .public-sticky { display: none; }
   .public-hero .public-member-inner { padding-bottom: 24px; }
@@ -37,7 +38,7 @@
   .public-consent-link { margin: 0 0 8px 36px; font-size: 14px; }
   .public-consent-link a { display: inline-flex; align-items: center; min-height: 44px; color: var(--impd-ink2); text-decoration: underline; }
   .public-form input[type=submit] { width: 100%; min-height: 52px; padding: 10px 20px; background: var(--impd-accent); color: var(--impd-paper); border: 0; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
-  @media (max-width: 767px) { .public-member-inner { padding: 40px 20px; } .public-hero .public-member-inner { padding-bottom: 16px; } .public-avatar { width: 80px; height: 80px; font-size: 36px; } .public-sticky { display: flex; gap: 8px; position: fixed; z-index: 100; bottom: 0; left: 0; right: 0; padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); background: var(--impd-paper); border-top: 1px solid var(--impd-rule); } .public-sticky.is-away { display: none; } .public-sticky a, .public-sticky button { flex: 1; min-width: 0; } body { padding-bottom: calc(68px + env(safe-area-inset-bottom)); } .impd-section { padding-block: 40px !important; } }
+  @media (max-width: 767px) { .public-contact-value { display: none; } .public-member-inner { padding: 40px 20px; } .public-hero .public-member-inner { padding-bottom: 16px; } .public-avatar { width: 80px; height: 80px; font-size: 36px; } .public-sticky { display: flex; gap: 8px; position: fixed; z-index: 100; bottom: 0; left: 0; right: 0; padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); background: var(--impd-paper); border-top: 1px solid var(--impd-rule); } .public-sticky.is-away { display: none; } .public-sticky a, .public-sticky button { flex: 1; min-width: 0; } body { padding-bottom: calc(68px + env(safe-area-inset-bottom)); } .impd-section { padding-block: 40px !important; } }
 </style>
 <section class="public-member public-hero"><div class="public-member-inner">
   <% if member.profile_image.present? %><img fetchpriority="high" decoding="async" class="public-avatar" src="<%= member.profile_image %>" alt="<%= member.name %> 프로필 사진"><% else %><div class="public-avatar" aria-hidden="true"><%= member.name.to_s.first %></div><% end %>
@@ -47,7 +48,7 @@
     <p class="public-offer"><span class="public-offer-label">하는 일</span> <%= services.first(3).map(&:title).join(" · ") %><% if services.size > 3 %> 외 <%= services.size - 3 %>개<% end %></p>
   <% end %>
   <% if member.bio.present? %><p class="public-bio"><%= member.bio %></p><% end %>
-  <div class="public-actions"><a class="primary" href="#contact" data-turbo="false">상담·문의하기</a><% if member.phone.present? %><a href="tel:<%= member.phone %>">전화</a><% end %><% if kakao %><a href="<%= kakao %>" target="_blank" rel="noopener">카카오톡</a><% end %><% if member.email.present? %><a href="mailto:<%= member.email %>">이메일</a><% end %><% if show_offer %><a href="#classes" data-turbo="false">서비스 보기</a><% end %></div>
+  <div class="public-actions"><a class="primary" href="#contact" data-turbo="false">상담·문의하기</a><% if member.phone.present? %><a href="tel:<%= member.phone %>">전화<span class="public-contact-value"> <%= member.phone %></span></a><% end %><% if kakao %><a href="<%= kakao %>" target="_blank" rel="noopener">카카오톡</a><% end %><% if member.email.present? %><a href="mailto:<%= member.email %>">이메일<span class="public-contact-value"> <%= member.email %></span></a><% end %><% if show_offer %><a href="#classes" data-turbo="false">서비스 보기</a><% end %></div>
   <% photos = moments.to_a.select { |photo| photo.image.attached? && !photo.video? }.first(3) %>
   <% if photos.any? %><div style="display: flex; gap: 8px; margin-top: 24px; overflow: hidden;"><% photos.each do |photo| %><img loading="lazy" decoding="async" src="<%= photo.thumbnail_url || photo.display_url %>" alt="<%= photo.caption.presence || member.name + ' 사진' %>" style="width: 100px; height: 100px; object-fit: cover; border: 4px solid var(--impd-paper);"><% end %></div><% end %>
   <% if brand_ops_public? && ProConsent.has_consent?(owner_id: member.id, type: "socialdoctors_exposure") %>

@@ -626,6 +626,62 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "사진 타일의 분류를 우리말로 적는다" do
+    @member.update!(layout_preset: "editorial")
+    3.times do
+      @member.member_photos.create!(category: "daily", image: fixture_file_upload(Rails.root.join("public/icon.png"), "image/png"))
+    end
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select "#gallery figcaption .impd-label", text: "일상"
+    assert_not_includes response.body, "DAILY"
+  end
+
+  test "카드 모음형에 사진이 있으면 첫머리에 하는 일을 보여 준다" do
+    @member.update!(layout_preset: "grid")
+    @member.member_services.create!(title: "상담", is_active: 1)
+    @member.member_services.create!(title: "추가 상담", is_active: 1)
+    @member.member_photos.create!(category: "daily", image: fixture_file_upload(Rails.root.join("public/icon.png"), "image/png"))
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select ".public-hero .public-offer", text: /하는 일\s*상담/
+    assert_select ".public-hero .public-actions a[href='#classes'][data-turbo='false']", text: "서비스 보기"
+    assert_select ".impd-bento article#classes", count: 1
+    assert_select "#classes", count: 1
+    assert_select ".impd-bento article#classes h2", text: "상담"
+  end
+
+  test "카드 모음형에 사진만 있고 서비스가 없으면 하는 일 줄이 없다" do
+    @member.update!(layout_preset: "grid")
+    @member.member_photos.create!(category: "daily", image: fixture_file_upload(Rails.root.join("public/icon.png"), "image/png"))
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select ".public-offer", count: 0
+    assert_select "a[href='#classes']", count: 0
+  end
+
+  test "첫머리 전화·이메일 버튼에 번호와 주소를 함께 적는다" do
+    @member.update!(phone: "010-1234-5678")
+
+    each_service_layout do
+      assert_select ".public-hero .public-actions a[href='tel:010-1234-5678'] .public-contact-value", text: "010-1234-5678"
+      assert_select ".public-hero .public-actions a[href='mailto:#{@member.email}'] .public-contact-value", text: @member.email
+      assert_includes response.body, ".public-contact-value { display: none; }"
+      assert_select ".public-sticky .public-contact-value", count: 0
+    end
+  end
+
+  test "전화번호가 없으면 전화 버튼이 없다" do
+    @member.update!(phone: nil)
+
+    each_service_layout do
+      assert_select ".public-actions a[href^='tel:']", count: 0
+    end
+  end
+
   private
 
   def each_service_layout

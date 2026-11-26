@@ -1,4 +1,11 @@
 module PublicProfileHelper
+  PHOTO_CATEGORY_LABELS = { "daily" => "일상", "workshop" => "작품", "product" => "작품", "press" => "이력", "people" => "일상" }.freeze
+
+  # 사진 분류를 방문 고객이 읽는 우리말로. 모르는 값·빈 값은 "사진".
+  def photo_category_label(category)
+    PHOTO_CATEGORY_LABELS[category.to_s] || "사진"
+  end
+
   # 소개 글을 limit 자 안에서 '문장이 끝나는 곳' 까지만 보여 준다. 글자를 바꾸거나 지어내지 않는다.
   def bio_excerpt(text, limit = 140)
     text = text.to_s.squish

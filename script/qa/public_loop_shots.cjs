@@ -6,10 +6,14 @@ const pages = [
   ['editorial', '/kang-seung-sig'], ['grid', '/ux-grid'], ['sparse', '/ux-member'], ['card', '/kang-seung-sig/card']
 ];
 (async () => {
+  const gridPhotoResponse = await fetch(base + '/ux-photo', { redirect: 'manual' }).catch(() => null);
+  const hasGridPhoto = gridPhotoResponse?.status === 200;
+  await gridPhotoResponse?.body?.cancel();
   const browser = await chromium.launch();
   const report = [];
   for (const [vw, vh, tag] of [[1440, 900, 'd'], [390, 844, 'm']]) {
-    for (const [name, path] of pages) {
+    const targets = hasGridPhoto ? [...pages, ['gridphoto', '/ux-photo']] : pages;
+    for (const [name, path] of targets) {
       const ctx = await browser.newContext({ viewport: {width: vw, height: vh}, locale: 'ko-KR', deviceScaleFactor: 1 });
       const page = await ctx.newPage();
       const errors = [];
@@ -29,6 +33,28 @@ const pages = [
           firstCta: first, ctaScroll: first ? Math.max(0, first.top + first.h - vh) : null, submitTop: subTop, submitScroll: subTop != null ? Math.max(0, subTop + 40 - vh) : null,
           h1: h1 ? h1.innerText.trim().slice(0,60) : null, fold };
       }, vh);
+      let extra = {};
+      if (name === 'gridphoto') {
+        const photoPath = await page.locator('a[href^="/p/ux-photo/"]').first().evaluateAll(links => links[0]?.getAttribute('href'));
+        if (photoPath) targets.push(['photo', photoPath]);
+        extra = await page.evaluate(() => {
+          const classes = document.getElementById('classes');
+          return { classesTop: classes ? classes.getBoundingClientRect().top + scrollY : null };
+        });
+      }
+      if (name === 'photo') {
+        extra = await page.evaluate(() => {
+          const cta = document.querySelector('a.primary');
+          return {
+            chrome: {
+              joinstrip: !!document.querySelector('.impd-joinstrip'),
+              platformNav: !!document.querySelector('nav.impd-topnav-links'),
+              frap: !!document.querySelector('.impd-frap')
+            },
+            cta: { href: cta?.getAttribute('href') ?? null, inFold: !!cta && cta.getBoundingClientRect().bottom <= innerHeight }
+          };
+        });
+      }
       let reach = null;
       if (name === 'editorial' || name === 'grid') {
         const contactTop = await page.locator('#contact').evaluate(el => el.getBoundingClientRect().top + scrollY);
@@ -134,7 +160,7 @@ const pages = [
           }
         } catch (e) { flow.error = String(e).slice(0,160); }
       }
-      report.push({ name, tag, status: resp && resp.status(), overflowX: m.sw > m.cw, height: m.h, h1: m.h1, firstCta: m.firstCta, ctaScroll: m.ctaScroll, submitScroll: m.submitScroll, fold: m.fold, reach, svc, badContact, fail, flow, consoleErrors: [...errors] });
+      report.push({ name, tag, status: resp && resp.status(), overflowX: m.sw > m.cw, height: m.h, h1: m.h1, firstCta: m.firstCta, ctaScroll: m.ctaScroll, submitScroll: m.submitScroll, fold: m.fold, reach, svc, badContact, fail, flow, consoleErrors: [...errors], ...extra });
       await ctx.close();
     }
   }

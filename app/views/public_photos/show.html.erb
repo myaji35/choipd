@@ -1,5 +1,5 @@
 <% content_for :title, (@photo.caption.presence || "#{@member.name} 사진") %>
-<% content_for :description, (@photo.caption.presence || "imPD · #{@member.name} · #{@photo.category.to_s.upcase}").first(160) %>
+<% content_for :description, (@photo.caption.presence || "imPD · #{@member.name} · #{photo_category_label(@photo.category)}").first(160) %>
 
 <% photo_url = url_for(@photo.image) %>
 <% photo_abs = photo_url.start_with?("http") ? photo_url : "#{request.base_url}#{photo_url}" %>
@@ -11,7 +11,7 @@
     page_url  = "#{request.protocol}#{request.host_with_port}/p/#{@member.slug}/#{@photo.id}"
   %>
   <meta property="og:type" content="article">
-  <meta property="og:title" content="<%= @photo.caption.presence || "#{@member.name} · #{@photo.category.to_s.upcase}" %>">
+  <meta property="og:title" content="<%= @photo.caption.presence || "#{@member.name} · #{photo_category_label(@photo.category)}" %>">
   <meta property="og:description" content="<%= "imPD · #{@member.name}" %>">
   <meta property="og:url" content="<%= page_url %>">
   <meta property="article:author" content="<%= @member.name %>">
@@ -21,6 +21,16 @@
 
 <style>
   .photo-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px 64px; }
+  .photo-owner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; margin-bottom: 20px; font-family: var(--impd-font-sans); word-break: keep-all; overflow-wrap: anywhere; }
+  .photo-owner-text { min-width: 0; flex: 1 1 320px; }
+  .photo-owner-name { font-size: 15px; color: var(--impd-ink2); }
+  .photo-owner-name a { font-size: 20px; font-weight: 800; color: var(--impd-ink); text-decoration: none; }
+  .photo-owner-offer { margin-top: 6px; font-size: 15px; font-weight: 600; line-height: 1.5; color: var(--impd-ink); }
+  .photo-owner-label { display: inline-block; margin-right: 8px; padding: 2px 8px; border: 1px solid var(--impd-accent); border-radius: 4px; color: var(--impd-accent); font-size: 13px; font-weight: 600; }
+  .photo-owner-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .photo-owner-actions a { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border: 1px solid var(--impd-accent); border-radius: 6px; color: var(--impd-accent); background: var(--impd-paper); font-size: 15px; font-weight: 600; text-decoration: none; }
+  .photo-owner-actions .primary { background: var(--impd-accent); color: var(--impd-paper); }
+
   .photo-meta-top {
     display: flex; align-items: center; gap: 14px;
     font-family: var(--impd-font-mono);
@@ -30,8 +40,6 @@
     border-bottom: 1px solid var(--impd-rule);
     margin-bottom: 20px;
   }
-  .photo-meta-top a { color: var(--impd-ink); text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 1px; }
-  .photo-meta-top .spacer { flex: 1; }
 
   .photo-frame {
     position: relative;
@@ -95,6 +103,11 @@
   .photo-nav .placeholder { visibility: hidden; }
 
   @media (max-width: 768px) {
+    .photo-wrap { padding: 20px 16px 48px; }
+    .photo-frame { padding: 8px; }
+    .photo-owner-actions { width: 100%; }
+    .photo-owner-actions a { flex: 1 1 auto; }
+    .photo-share-box { min-width: 0; }
     .photo-caption-row { grid-template-columns: 1fr; }
   }
 </style>
@@ -103,13 +116,24 @@
       data-card-share-short-url-value="<%= "#{request.protocol}#{request.host_with_port}/s/#{@short_link&.hash_code}" %>"
       data-card-share-profile-url-value="<%= "#{request.protocol}#{request.host_with_port}/p/#{@member.slug}/#{@photo.id}" %>">
 
+  <header class="photo-owner">
+    <div class="photo-owner-text">
+      <p class="photo-owner-name"><%= link_to @member.name, "/#{@member.slug}" %><% if @member.profession.present? %><span> · <%= @member.profession_label %></span><% end %><% if @member.region.present? %><span> · <%= @member.region %></span><% end %></p>
+      <% if @services.any? %>
+        <p class="photo-owner-offer"><span class="photo-owner-label">하는 일</span> <%= @services.first(3).map(&:title).join(" · ") %><% if @services.size > 3 %> 외 <%= @services.size - 3 %>개<% end %></p>
+      <% end %>
+    </div>
+    <div class="photo-owner-actions">
+      <a class="primary" href="<%= public_profile_path(slug: @member.slug, anchor: "contact") %>">상담·문의하기</a>
+      <a href="/<%= @member.slug %>"><%= @member.name %>님 페이지 보기</a>
+    </div>
+  </header>
+
   <!-- 상단 메타 -->
   <div class="photo-meta-top">
-    <span><%= @photo.category.to_s.upcase.presence || "MOMENT" %></span>
+    <span><%= photo_category_label(@photo.category) %></span>
     <% if @photo.uploaded_at %><span>· <%= @photo.uploaded_at.strftime("%Y.%m.%d") %></span><% end %>
     <span>· <%= @photo_position %> / <%= @photos_total %></span>
-    <span class="spacer"></span>
-    <%= link_to "← #{@member.name} 페이지로", "/#{@member.slug}" %>
   </div>
 
   <!-- 프레임 + 사진 -->
@@ -128,11 +152,11 @@
       <% if @photo.caption.present? %>
         <p class="photo-caption">"<%= @photo.caption %>"</p>
       <% else %>
-        <p class="photo-caption">— <%= @member.name %>의 <%= @photo.category || "작품" %></p>
+        <p class="photo-caption">— <%= @member.name %>님이 올린 사진</p>
       <% end %>
       <p class="photo-caption-byline">
         <%= link_to @member.name, "/#{@member.slug}" %>
-        <% if @member.profession.present? %> · <%= @member.profession %><% end %>
+        <% if @member.profession.present? %> · <%= @member.profession_label %><% end %>
         <% if @member.region.present? %> · <%= @member.region %><% end %>
       </p>
     </div>

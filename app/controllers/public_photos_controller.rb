@@ -26,6 +26,7 @@ class PublicPhotosController < ApplicationController
     # 공유용 짧은 URL
     @short_link = ShortLink.resolve_or_create(target_path: "/p/#{@member.slug}/#{@photo.id}", member: @member)
 
+    @services = @member.member_services.active.sorted
     track_view
   end
 

@@ -55,7 +55,7 @@
   }
 </style>
 
-<%= render "public_profile/profile_intro", member: member, services: services, moments: moments %>
+<%= render "public_profile/profile_intro", member: member, services: services, moments: moments, show_offer: grid_photos.any? %>
 <main class="impd-grid-page">
   <div class="impd-bento">
     <% grid_photos.each do |photo| %>
@@ -75,8 +75,8 @@
       </figure>
     <% end %>
 
-    <% grid_services.each do |service| %>
-      <article class="impd-bento-tile" style="min-height: 220px; display: flex; flex-direction: column; justify-content: space-between;">
+    <% grid_services.each_with_index do |service, index| %>
+      <article class="impd-bento-tile"<%= ' id="classes"'.html_safe if index.zero? %> style="min-height: 220px; display: flex; flex-direction: column; justify-content: space-between;">
         <div>
           <span class="impd-label">서비스</span>
           <h2 class="impd-bento-heading" style="font-size: 26px; margin-top: 12px;"><%= service.title %></h2>

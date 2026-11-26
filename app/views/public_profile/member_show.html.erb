@@ -131,7 +131,7 @@
     gallery_tiles << {
       kind: :moment,
       title: photo.caption.presence || @member.name + "의 일상",
-      category: photo.category.to_s.upcase,
+      category: photo_category_label(photo.category),
       media_url: photo.video? ? photo.display_url : (photo.thumbnail_url || photo.display_url),
       link_url: nil,
       is_video: photo.video?,
