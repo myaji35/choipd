@@ -23,7 +23,7 @@
   .photo-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px 64px; }
   .photo-owner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; margin-bottom: 20px; font-family: var(--impd-font-sans); word-break: keep-all; overflow-wrap: anywhere; }
   .photo-owner-text { min-width: 0; flex: 1 1 320px; }
-  .photo-owner-name { font-size: 15px; color: var(--impd-ink2); }
+  .photo-owner-name { margin: 0; font-size: 15px; font-weight: inherit; line-height: inherit; color: var(--impd-ink2); }
   .photo-owner-name a { font-size: 20px; font-weight: 800; color: var(--impd-ink); text-decoration: none; }
   .photo-owner-offer { margin-top: 6px; font-size: 15px; font-weight: 600; line-height: 1.5; color: var(--impd-ink); }
   .photo-owner-label { display: inline-block; margin-right: 8px; padding: 2px 8px; border: 1px solid var(--impd-accent); border-radius: 4px; color: var(--impd-accent); font-size: 13px; font-weight: 600; }
@@ -34,7 +34,7 @@
   .photo-meta-top {
     display: flex; align-items: center; gap: 14px;
     font-family: var(--impd-font-mono);
-    font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
+    font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase;
     color: var(--impd-muted);
     padding-bottom: 16px;
     border-bottom: 1px solid var(--impd-rule);
@@ -69,7 +69,7 @@
   .photo-caption-byline {
     margin-top: 12px;
     font-family: var(--impd-font-mono);
-    font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
+    font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase;
     color: var(--impd-muted);
   }
   .photo-caption-byline a { color: var(--impd-ink); text-decoration: none; border-bottom: 1px solid currentColor; }
@@ -80,13 +80,13 @@
     border: 1px solid var(--impd-ink);
     padding: 18px 16px;
   }
-  .photo-share-box .label { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-muted); margin-bottom: 8px; }
+  .photo-share-box .label { font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-muted); margin-bottom: 8px; }
   .photo-share-box code { font-family: var(--impd-font-mono); font-size: 12px; word-break: break-all; display: block; background: var(--impd-paper); border: 1px solid var(--impd-rule); padding: 8px 10px; }
   .photo-share-box .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
   .photo-share-box button,
   .photo-share-box a {
-    height: 34px; display: inline-flex; align-items: center; justify-content: center;
-    font-size: 11px; font-family: var(--impd-font-mono); letter-spacing: 1px;
+    min-height: 44px; display: inline-flex; align-items: center; justify-content: center;
+    font-size: 13px; font-family: var(--impd-font-mono); letter-spacing: 1px;
     border: 1px solid var(--impd-ink); background: transparent; color: var(--impd-ink);
     cursor: pointer; text-decoration: none; transition: all .15s;
   }
@@ -96,15 +96,19 @@
   .photo-nav {
     display: flex; justify-content: space-between; gap: 12px;
     margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--impd-rule);
-    font-family: var(--impd-font-mono); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
+    font-family: var(--impd-font-mono); font-size: 13px; letter-spacing: 1.4px; text-transform: uppercase;
   }
-  .photo-nav a { color: var(--impd-muted); text-decoration: none; padding: 10px 14px; border: 1px solid var(--impd-rule); }
+  .photo-nav a { display: inline-flex; align-items: center; min-height: 44px; color: var(--impd-muted); text-decoration: none; padding: 10px 14px; border: 1px solid var(--impd-rule); }
   .photo-nav a:hover { background: var(--impd-ink); color: var(--impd-paper); border-color: var(--impd-ink); }
   .photo-nav .placeholder { visibility: hidden; }
 
   @media (max-width: 768px) {
     .photo-wrap { padding: 20px 16px 48px; }
     .photo-frame { padding: 8px; }
+    .photo-owner-name a,
+    .photo-caption-byline a { display: inline-block; min-height: 44px; }
+    .photo-owner-name a { padding-block: 5px; margin-block: -5px; }
+    .photo-caption-byline a { padding-block: 12px; margin-block: -12px; border-bottom: 0; text-decoration: underline; text-underline-offset: 3px; }
     .photo-owner-actions { width: 100%; }
     .photo-owner-actions a { flex: 1 1 auto; }
     .photo-share-box { min-width: 0; }
@@ -112,13 +116,13 @@
   }
 </style>
 
-<main class="photo-wrap" data-controller="card-share"
+<div class="photo-wrap" data-controller="card-share"
       data-card-share-short-url-value="<%= "#{request.protocol}#{request.host_with_port}/s/#{@short_link&.hash_code}" %>"
       data-card-share-profile-url-value="<%= "#{request.protocol}#{request.host_with_port}/p/#{@member.slug}/#{@photo.id}" %>">
 
   <header class="photo-owner">
     <div class="photo-owner-text">
-      <p class="photo-owner-name"><%= link_to @member.name, "/#{@member.slug}" %><% if @member.profession.present? %><span> · <%= @member.profession_label %></span><% end %><% if @member.region.present? %><span> · <%= @member.region %></span><% end %></p>
+      <h1 class="photo-owner-name"><%= link_to @member.name, "/#{@member.slug}" %><% if @member.profession.present? %><span> · <%= @member.profession_label %></span><% end %><% if @member.region.present? %><span> · <%= @member.region %></span><% end %></h1>
       <% if @services.any? %>
         <p class="photo-owner-offer"><span class="photo-owner-label">하는 일</span> <%= @services.first(3).map(&:title).join(" · ") %><% if @services.size > 3 %> 외 <%= @services.size - 3 %>개<% end %></p>
       <% end %>
@@ -168,7 +172,7 @@
         <button type="button" data-action="click->card-share#copyShort"><%= lni_icon "link-2-angular-right" %> 복사</button>
         <button type="button" data-action="click->card-share#shareNative">공유 →</button>
       </div>
-      <p data-card-share-target="flash" style="margin-top: 8px; font-size: 10px; color: var(--impd-accent); opacity: 0; transition: opacity .2s; font-family: var(--impd-font-mono);"></p>
+      <p data-card-share-target="flash" style="margin-top: 8px; font-size: 13px; color: var(--impd-accent); opacity: 0; transition: opacity .2s; font-family: var(--impd-font-mono);"></p>
     </div>
   </div>
 
@@ -186,4 +190,4 @@
     <% end %>
   </nav>
 
-</main>
+</div>

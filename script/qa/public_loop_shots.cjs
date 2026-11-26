@@ -41,7 +41,21 @@ const pages = [
         const first = ctas.map(el => ({ text: (el.innerText || el.value).trim().slice(0,30), top: Math.round(el.getBoundingClientRect().top + scrollY), h: Math.round(el.getBoundingClientRect().height), href: el.getAttribute('href') })).sort((a,b) => a.top - b.top)[0] || null;
         const sub = document.querySelector('#contact input[type=submit], #contact button[type=submit]');
         const subTop = sub ? Math.round(sub.getBoundingClientRect().top + scrollY) : null;
-        const h1 = document.querySelector('h1'); 
+        const headings = [...document.querySelectorAll('h1, h2, h3, h4')].filter(vis);
+        const h1 = headings.find(el => el.tagName === 'H1');
+        const smallTaps = [...document.querySelectorAll('a, button, summary, input[type=submit]')]
+          .filter(vis)
+          .filter(el => el.checkVisibility({ opacityProperty: true }))
+          .map(el => ({ el, rect: el.getBoundingClientRect() }))
+          .filter(({ rect }) => rect.bottom + scrollY > 0 && rect.right > 0 && rect.left < innerWidth && rect.height < 44)
+          .map(({ el, rect }) => ({
+            text: (el.innerText || el.value || el.getAttribute('aria-label') || '').trim(),
+            w: Math.round(rect.width), h: Math.round(rect.height)
+          }));
+        const fonts = [...document.querySelectorAll('main, main *, .impd-privacy-footer, .impd-privacy-footer *')]
+          .filter(el => !el.matches('script, style, template') && el.checkVisibility({ opacityProperty: true, visibilityProperty: true }))
+          .filter(el => [...el.childNodes].some(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim()))
+          .map(el => parseFloat(getComputedStyle(el).fontSize));
         const fold = [...document.querySelectorAll('h1,h2,h3,p,a,button')].filter(vis).filter(el => el.getBoundingClientRect().top < vh && el.getBoundingClientRect().bottom > 0).map(el => (el.innerText||'').trim()).filter(Boolean).join(' | ').slice(0, 600);
         return { sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth, h: document.documentElement.scrollHeight,
           firstCta: first, ctaScroll: first ? Math.max(0, first.top + first.h - vh) : null, submitTop: subTop, submitScroll: subTop != null ? Math.max(0, subTop + 40 - vh) : null,
@@ -49,6 +63,9 @@ const pages = [
             title: document.querySelector('meta[property="og:title"]')?.content ?? null,
             description: document.querySelector('meta[property="og:description"]')?.content ?? null
           },
+          mains: document.querySelectorAll('main').length,
+          headings: headings.map(el => el.tagName[1] + ':' + el.innerText.trim().replace(/\s+/g, ' ').slice(0, 18)),
+          smallTaps, minFont: fonts.length ? Math.min(...fonts) : null,
           promoOverlay: !!document.querySelector('#promo-popup-overlay'),
           h1: h1 ? h1.innerText.trim().slice(0,60) : null, fold };
       }, vh);
@@ -236,7 +253,23 @@ const pages = [
           }
         } catch (e) { flow.error = String(e).slice(0,160); }
       }
-      report.push({ name, tag, status: resp && resp.status(), share: m.share, promo, overflowX: m.sw > m.cw, height: m.h, h1: m.h1, firstCta: m.firstCta, ctaScroll: m.ctaScroll, submitScroll: m.submitScroll, fold: m.fold, reach, svc, badContact, fail, flow, consoleErrors: [...errors], ...extra });
+      if (name === 'editorial' && tag === 'm') {
+        const reduced = await browser.newContext({ viewport: { width: vw, height: vh }, reducedMotion: 'reduce' });
+        try {
+          const reducedPage = await reduced.newPage();
+          await reducedPage.goto(base + path, { waitUntil: 'domcontentloaded' });
+          extra.reducedMotionScroll = await reducedPage.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior);
+        } finally {
+          await reduced.close();
+        }
+      }
+      report.push({
+        name, tag, status: resp && resp.status(), share: m.share, promo,
+        overflowX: m.sw > m.cw, height: m.h,
+        h1: m.h1, mains: m.mains, headings: m.headings, smallTaps: m.smallTaps, minFont: m.minFont,
+        firstCta: m.firstCta, ctaScroll: m.ctaScroll, submitScroll: m.submitScroll, fold: m.fold,
+        reach, svc, badContact, fail, flow, consoleErrors: [...errors], ...extra
+      });
       await ctx.close();
     }
   }

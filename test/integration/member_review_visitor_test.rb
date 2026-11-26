@@ -18,6 +18,13 @@ class MemberReviewVisitorTest < ActionDispatch::IntegrationTest
     assert_select "p", text: "이메일은 공개되지 않아요."
   end
 
+  test "review form has a single main landmark and heading" do
+    get @review_path
+
+    assert_select "main", 1
+    assert_select "main h1", 1
+  end
+
   test "validation explains missing fields in Korean and preserves the draft" do
     post @review_path, params: { member_review: { content: @review_params[:content] } }
 

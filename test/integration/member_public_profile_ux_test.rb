@@ -820,6 +820,75 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "public profile layouts and summary card have one main landmark each" do
+    %w[editorial grid].each do |layout|
+      @member.update!(layout_preset: layout)
+      get public_profile_path(slug: @member.slug)
+      assert_response :success
+      assert_select "main", 1
+    end
+
+    get public_profile_card_path(slug: @member.slug)
+    assert_response :success
+    assert_select "main", 1
+  end
+
+  test "editorial section headings establish levels for services and posts" do
+    @member.update!(layout_preset: "editorial")
+    @member.member_services.create!(title: "보험 상담", is_active: 1)
+    @member.member_posts.create!(title: "상담 소식", content: "상담 일정을 안내해요.", is_published: 1)
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select "#classes h2", text: "서비스"
+    assert_select "#classes h3", text: "보험 상담"
+    assert_select "#posts h2", text: "소식"
+    assert_select "#posts h3", text: "상담 소식"
+    assert_select "#posts h4", 0
+  end
+
+  test "summary card has larger share buttons and labels" do
+    get public_profile_card_path(slug: @member.slug)
+
+    assert_match(/\.cs-share-btn\s*\{[^}]*min-height: 44px/, response.body)
+    assert_no_match(/\.cs-share-btn\s*\{[^}]*height: 38px/, response.body)
+    assert_no_match(/font-size: (9|10)px/, response.body)
+  end
+
+  test "public privacy footer has a 44px link and uses the darker text color" do
+    get public_profile_path(slug: @member.slug)
+
+    assert_select ".impd-privacy-footer[style*='color: var(--impd-muted)']" do
+      assert_select "a[href='/privacy'][style*='min-height: 44px']", text: "개인정보처리방침"
+    end
+  end
+
+  test "editorial signup footer link has a 44px target" do
+    @member.update!(layout_preset: "editorial")
+    get public_profile_path(slug: @member.slug)
+
+    assert_select "footer a[style*='min-height: 44px']", text: "나도 만들기"
+  end
+
+  { "editorial" => "#reviews", "grid" => ".impd-bento-review" }.each do |layout, section|
+    test "#{layout} exposes the numerical rating for written reviews" do
+      @member.update!(layout_preset: layout)
+      @member.member_reviews.create!(reviewer_name: "김고객", rating: 5, status: "triaged", content: "설명이 쉬웠어요.")
+
+      get public_profile_path(slug: @member.slug)
+
+      assert_select "#{section} [role=img][aria-label='별점 5점']", 1 do
+        assert_select "i.lni-star-fat[aria-hidden=true]", 5
+      end
+    end
+  end
+
+  test "reduced motion disables smooth scrolling on public pages" do
+    get public_profile_path(slug: @member.slug)
+
+    assert_match(/@media \(prefers-reduced-motion: reduce\)\s*\{\s*html\s*\{\s*scroll-behavior: auto/, response.body)
+  end
+
   private
 
   def each_service_layout

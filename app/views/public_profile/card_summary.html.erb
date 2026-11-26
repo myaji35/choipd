@@ -43,7 +43,7 @@
   }
   .cs-eyebrow {
     font-family: var(--impd-font-mono);
-    font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase;
+    font-size: 12px; letter-spacing: 1.6px; text-transform: uppercase;
     color: var(--impd-accent);
   }
   .cs-name {
@@ -56,7 +56,7 @@
   }
   .cs-name .italic { font-family: var(--impd-font-serif); font-style: italic; font-weight: 400; color: var(--impd-accent); display: block; margin-top: 4px; word-break: keep-all; }
   .cs-meta { font-size: 13px; color: var(--impd-ink2); line-height: 1.5; }
-  .cs-meta dt { display: inline; font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted); margin-right: 6px; }
+  .cs-meta dt { display: inline; font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted); margin-right: 6px; }
   .cs-meta dd { display: inline; margin: 0 14px 0 0; }
 
   .cs-offer { font-family: var(--impd-font-sans); font-size: 15px; font-weight: 600; line-height: 1.5; color: var(--impd-ink); max-width: 48ch; }
@@ -74,7 +74,7 @@
   .cs-skills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
   .cs-skill-tag {
     padding: 4px 10px;
-    font-size: 11px;
+    font-size: 12px;
     font-family: var(--impd-font-sans);
     background: var(--impd-card);
     border: 1px solid var(--impd-ink);
@@ -101,7 +101,7 @@
   }
   .cs-contact-btn span:last-child { min-width: 0; overflow-wrap: anywhere; text-align: right; }
   .cs-contact-btn:hover { background: var(--impd-ink); color: var(--impd-paper); }
-  .cs-contact-btn .label { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; opacity: 0.55; font-weight: 500; }
+  .cs-contact-btn .label { font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.2px; opacity: 0.55; font-weight: 500; }
 
   .cs-full {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -135,12 +135,12 @@
     display: flex; flex-direction: column; gap: 4px;
     padding: 12px 14px; background: var(--impd-paper); border: 1px solid var(--impd-ink);
   }
-  .cs-share-row .item .lbl { font-family: var(--impd-font-mono); font-size: 9px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-muted); }
-  .cs-share-row .item code { font-family: var(--impd-font-mono); font-size: 11px; color: var(--impd-ink); word-break: break-all; }
+  .cs-share-row .item .lbl { font-family: var(--impd-font-mono); font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-muted); }
+  .cs-share-row .item code { font-family: var(--impd-font-mono); font-size: 13px; color: var(--impd-ink); word-break: break-all; }
   .cs-share-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
   .cs-share-btn {
-    height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    font-family: var(--impd-font-sans); font-size: 12px; font-weight: 600;
+    min-height: 44px; padding: 6px 8px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    font-family: var(--impd-font-sans); font-size: 13px; font-weight: 600;
     color: var(--impd-ink); background: transparent;
     border: 1px solid var(--impd-ink);
     cursor: pointer; text-decoration: none;
@@ -149,7 +149,7 @@
   .cs-share-btn:hover { background: var(--impd-ink); color: var(--impd-paper); }
 </style>
 
-<main class="card-wrap" data-controller="card-share"
+<div class="card-wrap" data-controller="card-share"
       data-card-share-short-url-value="<%= "#{public_base_url}/s/#{@short_link&.hash_code}" %>"
       data-card-share-profile-url-value="<%= "#{public_base_url}/#{@member.slug}" %>">
 
@@ -247,7 +247,7 @@
       </div>
 
       <p data-card-share-target="flash"
-         style="margin-top: 4px; font-size: 11px; color: var(--impd-accent); opacity: 0; transition: opacity .2s; text-align: center; font-family: var(--impd-font-mono);"></p>
+         style="margin-top: 4px; font-size: 13px; color: var(--impd-accent); opacity: 0; transition: opacity .2s; text-align: center; font-family: var(--impd-font-mono);"></p>
     </aside>
   </div>
-</main>
+</div>

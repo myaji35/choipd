@@ -2,6 +2,15 @@ require "test_helper"
 require "open3"
 
 class PublicLoopShotsTest < ActiveSupport::TestCase
+  test "report records landmarks, headings, tap targets, font size and reduced motion" do
+    source = Rails.root.join("script/qa/public_loop_shots.cjs").read
+    %w[mains headings smallTaps minFont].each do |metric|
+      assert_includes source, "#{metric}: m.#{metric}"
+    end
+    assert_includes source, "extra.reducedMotionScroll"
+    assert_includes source, "reducedMotion: 'reduce'"
+  end
+
   test "both viewports always include notfound and include photogone only when ux-photo exists" do
     output, status = Open3.capture2e("node", "-e", <<~JS, Rails.root.join("script/qa/public_loop_shots.cjs").to_s)
       const assert = require('node:assert/strict');

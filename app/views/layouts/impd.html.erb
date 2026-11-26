@@ -177,6 +177,7 @@
       .impd-pulse { animation: c1Pulse 2s infinite; }
 
       @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
         .impd-fade-in, .impd-pulse { animation: none !important; }
         .impd-btn, .impd-frap { transition: none !important; }
       }
@@ -226,6 +227,9 @@
       .impd-topnav-visitor.is-on { visibility: visible; }
       .impd-topnav-visitor-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 700; color: var(--impd-ink); }
       .impd-topnav-visitor-cta { flex: none; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 6px; background: var(--impd-accent); color: var(--impd-paper); font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+      @media (min-width: 769px) {
+        .impd-topnav-bar:has(> a:only-child) { padding-block: 14.7px; }
+      }
       @media (max-width: 768px) {
         .impd-topnav-bar { padding: 12px 16px; gap: 12px; }
         .impd-topnav-bar:has(> a:only-child) { min-height: 68px; }
@@ -241,7 +245,7 @@
     </style>
     <div class="impd-topnav"<% unless visitor_page %> data-controller="impd-nav" data-action="keydown.esc@window->impd-nav#close"<% end %>>
       <div class="impd-topnav-bar">
-        <%= link_to root_path, style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; color: var(--impd-green); white-space: nowrap;" do %>
+        <%= link_to root_path, style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; color: var(--impd-green); white-space: nowrap; display: inline-flex; align-items: center; min-height: 44px;" do %>
           imPD
         <% end %>
         <% if visitor_page && controller_path == "public_profile" && action_name == "show" %>
@@ -307,8 +311,8 @@
     </main>
 
     <% unless controller_path == "chopd/home" && action_name == "index" %>
-      <div style="padding: 16px 24px 22px; text-align: center; font-family: var(--impd-font-sans); font-size: 12px; color: var(--impd-soft-muted);">
-        <%= link_to "개인정보처리방침", privacy_path, style: "color: inherit; text-decoration: underline; text-underline-offset: 3px;" %>
+      <div class="impd-privacy-footer" style="padding: 4px 24px 10px; text-align: center; font-family: var(--impd-font-sans); font-size: 13px; color: var(--impd-muted);">
+        <%= link_to "개인정보처리방침", privacy_path, style: "color: inherit; text-decoration: underline; text-underline-offset: 3px; display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px;" %>
       </div>
     <% end %>
 

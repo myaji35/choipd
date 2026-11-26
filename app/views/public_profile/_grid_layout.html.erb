@@ -56,7 +56,7 @@
 </style>
 
 <%= render "public_profile/profile_intro", member: member, services: services, moments: moments, show_offer: grid_photos.any? %>
-<main class="impd-grid-page">
+<div class="impd-grid-page">
   <div class="impd-bento">
     <% grid_photos.each do |photo| %>
       <figure class="impd-bento-tile impd-bento-photo">
@@ -119,7 +119,7 @@
       <figure class="impd-bento-tile impd-bento-review" style="margin: 0;">
         <span class="impd-label">후기</span>
         <blockquote style="margin: 12px 0 0; line-height: 1.7; overflow-wrap: anywhere;">"<%= review.content %>"</blockquote>
-        <figcaption style="margin-top: 12px; font-size: 14px; color: var(--impd-ink2);">— <%= review.reviewer_name %><% if review.rating.to_i.positive? %> · <% review.rating.to_i.times do %><%= lni_icon "star-fat" %><% end %><% end %></figcaption>
+        <figcaption style="margin-top: 12px; font-size: 14px; color: var(--impd-ink2);">— <%= review.reviewer_name %><% if review.rating.to_i.positive? %> · <span role="img" aria-label="별점 <%= review.rating.to_i %>점"><% review.rating.to_i.times do %><%= lni_icon "star-fat" %><% end %></span><% end %></figcaption>
       </figure>
     <% end %>
 
@@ -147,5 +147,5 @@
 
 
   </div>
-</main>
+</div>
 <%= render "public_profile/profile_contact", member: member, services: services %>

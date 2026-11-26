@@ -68,6 +68,7 @@
   .impd-wrap { max-width: 1200px; margin: 0 auto; padding-inline: 40px; }
   .impd-section { padding-block: 40px; }  /* 64 → 40: 섹션간 세로 여백 축소 */
   .impd-section-header { margin-bottom: 20px; }
+  h2.impd-stat-num { margin: 0; line-height: 1.05; }
   .impd-section-header .impd-display, h2.impd-display, h3.impd-display, h4.impd-display { word-break: keep-all; }
   @media (max-width: 768px) { .impd-wrap { padding-inline: 20px; } .impd-section { padding-block: 28px; } }
   #gallery, #classes, #faq, #posts { scroll-margin-top: 80px; }
@@ -90,7 +91,7 @@
 <% if @services.any? %>
   <section class="impd-wrap impd-section" id="classes">
     <div class="impd-section-header">
-      <span class="impd-display impd-stat-num">서비스</span>
+      <h2 class="impd-display impd-stat-num">서비스</h2>
       <span class="impd-label-muted">서비스 <%= @services.size %>개</span>
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
@@ -155,7 +156,7 @@
 <% if gallery_tiles.any? && ((@moments || []).size >= 3 || @portfolio.any?) %>
   <section class="impd-wrap impd-section" id="gallery">
     <div class="impd-section-header">
-      <span class="impd-display impd-stat-num">사진·사례</span>
+      <h2 class="impd-display impd-stat-num">사진·사례</h2>
       <span class="impd-label-muted"><%= "사진 " unless gallery_tiles.any? { |tile| tile[:link_url] } %><%= gallery_tiles.size %>개</span>
     </div>
     <div class="impd-photo-grid">
@@ -205,7 +206,7 @@
 <% if @moments.present? && @moments.any? %>
   <section class="impd-wrap impd-section" id="moments">
     <div class="impd-section-header">
-      <span class="impd-display impd-stat-num">일상 장면</span>
+      <h2 class="impd-display impd-stat-num">일상 장면</h2>
       <span class="impd-label-muted">사진 <%= @member.member_photos.count %>개</span>
     </div>
 
@@ -546,12 +547,12 @@
         "<%= first_review.content %>"
       </p>
       <p class="impd-label-muted impd-quote-source" style="overflow-wrap: anywhere;">
-        — <%= first_review.reviewer_name %> · <% first_review.rating.to_i.times do %><%= lni_icon "star-fat" %><% end %>
+        — <%= first_review.reviewer_name %> · <% if first_review.rating.to_i.positive? %><span role="img" aria-label="별점 <%= first_review.rating.to_i %>점"><% first_review.rating.to_i.times do %><%= lni_icon "star-fat" %><% end %></span><% end %>
       </p>
       <% shown_reviews.drop(1).each do |review| %>
         <figure style="max-width: 62ch; margin: 28px auto 0; padding-top: 24px; border-top: 1px solid rgba(239,236,228,.25); text-align: left;">
           <blockquote style="margin: 0; font-size: 16px; line-height: 1.7; white-space: pre-line; overflow-wrap: anywhere; word-break: keep-all;">"<%= review.content %>"</blockquote>
-          <figcaption style="margin-top: 8px; font-size: 14px; color: rgba(239,236,228,.75); overflow-wrap: anywhere;">— <%= review.reviewer_name %> · <% review.rating.to_i.times do %><%= lni_icon "star-fat" %><% end %></figcaption>
+          <figcaption style="margin-top: 8px; font-size: 14px; color: rgba(239,236,228,.75); overflow-wrap: anywhere;">— <%= review.reviewer_name %> · <% if review.rating.to_i.positive? %><span role="img" aria-label="별점 <%= review.rating.to_i %>점"><% review.rating.to_i.times do %><%= lni_icon "star-fat" %><% end %></span><% end %></figcaption>
         </figure>
       <% end %>
     </div>
@@ -579,7 +580,7 @@
 <% if @member.career_note.present? %>
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
-      <span class="impd-display impd-stat-num">경력 · 이력</span>
+      <h2 class="impd-display impd-stat-num">경력 · 이력</h2>
       <span class="impd-label-muted">본인 제공 정보</span>
     </div>
     <div style="background: #fbf8f1; border: 1px solid var(--impd-rule); padding: 24px; font-family: var(--impd-font-sans); color: var(--impd-ink2); line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere;"><%= @member.career_note %></div>
@@ -590,7 +591,7 @@
 <% if @posts.any? %>
   <section class="impd-wrap impd-section" id="posts">
     <div class="impd-section-header">
-      <span class="impd-display impd-stat-num">소식</span>
+      <h2 class="impd-display impd-stat-num">소식</h2>
       <% if @member.activity_live? %>
         <span class="impd-live-badge">
           <span class="impd-live-dot"></span>
@@ -605,7 +606,7 @@
         <div style="display: grid; grid-template-columns: 120px 1fr; gap: 24px; padding: 20px 0; border-top: 1px solid var(--impd-rule);">
           <span class="impd-label-muted"><%= p.published_at&.strftime("%Y.%m.%d") || p.created_at.strftime("%Y.%m.%d") %></span>
           <div>
-            <h4 class="impd-display" style="font-size: 22px;"><%= p.title %></h4>
+            <h3 class="impd-display" style="font-size: 22px;"><%= p.title %></h3>
             <% if p.content.present? %>
               <p style="margin-top: 8px; color: var(--impd-ink2); font-size: 14px; white-space: pre-line; overflow-wrap: anywhere; word-break: keep-all;"><%= truncate(p.content.to_s, length: 140, separator: " ") %></p>
               <% if p.content.length > 140 %>
@@ -643,7 +644,7 @@
   %>
   <section class="impd-wrap impd-section">
     <div class="impd-section-header">
-      <span class="impd-display impd-stat-num">검증된 달란트</span>
+      <h2 class="impd-display impd-stat-num">검증된 달란트</h2>
       <span class="impd-label-muted"><%= @skills.size %>개</span>
     </div>
 
@@ -709,7 +710,7 @@
 %>
 <section class="impd-wrap impd-section">
   <div class="impd-section-header">
-    <span class="impd-display impd-stat-num">이렇게 도와드립니다.</span>
+    <h2 class="impd-display impd-stat-num">이렇게 도와드립니다.</h2>
     <span class="impd-label-muted">항목 <%= kit.size %>개</span>
   </div>
   <div class="impd-card-grid">
@@ -783,8 +784,8 @@
 <%= render "public_profile/profile_contact", member: @member, services: @services %>
 
 <!-- Footer -->
-<footer style="border-top: 1px solid var(--impd-rule); padding: 32px 40px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; font-family: var(--impd-font-sans); font-size: 13px; color: var(--impd-muted);">
+<footer style="border-top: 1px solid var(--impd-rule); padding: 22px 40px 21px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; font-family: var(--impd-font-sans); font-size: 13px; color: var(--impd-muted);">
   <span>imPD로 만든 페이지 · <%= public_host %>/<%= @member.slug %></span>
-  <%= link_to "나도 만들기", member_signup_path, style: "color: var(--impd-accent);" %>
+  <%= link_to "나도 만들기", member_signup_path, style: "color: var(--impd-accent); display: inline-flex; align-items: center; min-height: 44px;" %>
 </footer>
 <% end %>

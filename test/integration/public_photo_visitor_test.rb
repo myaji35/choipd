@@ -21,6 +21,24 @@ class PublicPhotoVisitorTest < ActionDispatch::IntegrationTest
     assert_select ".photo-owner-actions a[href='/#{@member.slug}']", text: "#{@member.name}님 페이지 보기"
   end
 
+  test "photo has a single main landmark and a heading linking to its owner" do
+    get public_photo_path(slug: @member.slug, photo_id: @photo.id)
+
+    assert_select "main", 1
+    assert_select "h1", 1
+    assert_select "h1.photo-owner-name", 1 do
+      assert_select "a[href='/#{@member.slug}']", text: @member.name
+    end
+  end
+
+  test "photo share and navigation buttons and labels have larger sizes" do
+    get public_photo_path(slug: @member.slug, photo_id: @photo.id)
+
+    assert_no_match(/height: 34px|font-size: (10|11)px/, response.body)
+    assert_match(/\.photo-nav a\s*\{[^}]*min-height: 44px/, response.body)
+    assert_match(/\.photo-share-box button,\s*\.photo-share-box a\s*\{[^}]*min-height: 44px/, response.body)
+  end
+
   test "서비스가 없으면 하는 일 줄 없이 문의 버튼만 보여 준다" do
     get public_photo_path(slug: @member.slug, photo_id: @photo.id)
 
@@ -39,7 +57,7 @@ class PublicPhotoVisitorTest < ActionDispatch::IntegrationTest
   test "영어 내부 값 대신 우리말로 적는다" do
     get public_photo_path(slug: @member.slug, photo_id: @photo.id)
 
-    photo_body = response.body.split('<main class="photo-wrap"', 2).fetch(1)
+    photo_body = assert_select(".photo-wrap", 1).first.inner_html
     [ "보험 설계사", "일상", "#{@member.name}님이 올린 사진" ].each do |text|
       assert_includes photo_body, text
     end
