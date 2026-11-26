@@ -29,10 +29,35 @@ const pages = [
           firstCta: first, ctaScroll: first ? Math.max(0, first.top + first.h - vh) : null, submitTop: subTop, submitScroll: subTop != null ? Math.max(0, subTop + 40 - vh) : null,
           h1: h1 ? h1.innerText.trim().slice(0,60) : null, fold };
       }, vh);
+      let reach = null;
+      if (name === 'editorial' || name === 'grid') {
+        const contactTop = await page.locator('#contact').evaluate(el => el.getBoundingClientRect().top + scrollY);
+        reach = { points: 0, withCta: 0, gaps: [] };
+        for (let y = 0; y <= contactTop - vh; y += 300) {
+          await page.evaluate(y => window.scrollTo({ top: y, left: 0, behavior: 'instant' }), y);
+          await page.waitForTimeout(250);
+          const hasCta = await page.evaluate(() => {
+            const nav = document.querySelector('.impd-topnav');
+            const navBottom = nav.getBoundingClientRect().bottom;
+            return [...document.querySelectorAll("a[href$='#contact']")].some(el => {
+              const rect = el.getBoundingClientRect();
+              const style = getComputedStyle(el);
+              return rect.width > 0 && style.visibility === 'visible' && style.display !== 'none' &&
+                rect.bottom <= innerHeight && (rect.top >= navBottom || nav.contains(el));
+            });
+          });
+          reach.points++;
+          if (hasCta) reach.withCta++;
+          else reach.gaps.push(y);
+        }
+        await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+        await page.waitForTimeout(250);
+      }
       await page.screenshot({ path: outDir + '/' + name + '-' + tag + '.png', fullPage: true });
       await page.screenshot({ path: outDir + '/' + name + '-' + tag + '-fold.png' });
       let svc = null;
       let fail = null;
+      let badContact = null;
       if (name === 'editorial' || name === 'grid') {
         await page.fill('#member_inquiry_sender_name', '쓰던 이름');
         await page.evaluate(() => window.scrollTo(0, 0));
@@ -49,6 +74,19 @@ const pages = [
         await page.goto(base + path, {waitUntil: 'networkidle'});
       }
       if (submit && name === 'editorial' && tag === 'm') {
+        await page.fill('#member_inquiry_sender_name', '쓰던 이름');
+        await page.fill('#member_inquiry_sender_email', '010');
+        await page.fill('#member_inquiry_message', '연락처 확인 시험입니다.');
+        await page.check('#member_inquiry_consent');
+        await page.click('#contact input[type=submit], #contact button[type=submit]');
+        await page.waitForTimeout(500);
+        badContact = await page.evaluate(() => ({
+          message: document.getElementById('member_inquiry_sender_email')?.validationMessage ?? '',
+          blocked: !!document.querySelector('#contact form') && !document.getElementById('inquiry-sent')
+        }));
+        await page.evaluate(() => sessionStorage.clear());
+        await page.goto(base + path, {waitUntil: 'networkidle'});
+
         await page.fill('#member_inquiry_sender_name', '쓰던 이름');
         await page.fill('#member_inquiry_sender_email', '010-0000-0000');
         await page.fill('#member_inquiry_message', ' '.repeat(10));
@@ -96,7 +134,7 @@ const pages = [
           }
         } catch (e) { flow.error = String(e).slice(0,160); }
       }
-      report.push({ name, tag, status: resp && resp.status(), overflowX: m.sw > m.cw, height: m.h, h1: m.h1, firstCta: m.firstCta, ctaScroll: m.ctaScroll, submitScroll: m.submitScroll, fold: m.fold, svc, fail, flow, consoleErrors: [...errors] });
+      report.push({ name, tag, status: resp && resp.status(), overflowX: m.sw > m.cw, height: m.h, h1: m.h1, firstCta: m.firstCta, ctaScroll: m.ctaScroll, submitScroll: m.submitScroll, fold: m.fold, reach, svc, badContact, fail, flow, consoleErrors: [...errors] });
       await ctx.close();
     }
   }

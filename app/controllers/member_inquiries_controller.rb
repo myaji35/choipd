@@ -17,6 +17,8 @@ class MemberInquiriesController < ApplicationController
     problem =
       if attrs.values_at("sender_name", "sender_email", "message").any?(&:blank?)
         "이름·연락처·문의 내용을 모두 적어 주세요."
+      elsif !attrs["sender_email"].match?(/[^@\s]+@[^@\s]+\.[^@\s]+/) && attrs["sender_email"].scan(/\d/).size < 9
+        "답장받을 전화번호나 메일 주소를 다시 확인해 주세요."
       elsif attrs["message"].length < 5
         "문의 내용을 다섯 글자 이상 적어 주세요."
       elsif attrs["message"].length > 2000
@@ -32,6 +34,7 @@ class MemberInquiriesController < ApplicationController
     if inquiry.persisted?
       MemberInquiryMailer.notify(inquiry).deliver_later
       flash[:inquiry_sent] = true
+      flash[:inquiry_contact] = attrs["sender_email"]
       redirect_to public_profile_path(slug: member.slug, anchor: "contact"), status: :see_other
     else
       redirect_to public_profile_path(slug: member.slug, anchor: "contact"),

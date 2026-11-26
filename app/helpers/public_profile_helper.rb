@@ -1,4 +1,21 @@
 module PublicProfileHelper
+  # 소개 글을 limit 자 안에서 '문장이 끝나는 곳' 까지만 보여 준다. 글자를 바꾸거나 지어내지 않는다.
+  def bio_excerpt(text, limit = 140)
+    text = text.to_s.squish
+    return text if text.length <= limit
+
+    excerpt = +""
+    text.split(/(?<=[.!?]) /).each do |sentence|
+      break unless sentence.end_with?(".", "!", "?")
+
+      separator = excerpt.empty? ? "" : " "
+      break if excerpt.length + separator.length + sentence.length > limit
+
+      excerpt << separator << sentence
+    end
+    excerpt.presence || truncate(text, length: limit, separator: " ", omission: "…")
+  end
+
   def service_price_text(service)
     price = service.price.to_s.strip
     unit = service.price_label.to_s.strip

@@ -183,7 +183,7 @@
       <% end %>
 
       <% if @member.bio.present? %>
-        <p class="cs-bio">"<%= truncate(@member.bio.to_s, length: 140) %>"</p>
+        <p class="cs-bio">"<%= bio_excerpt(@member.bio) %>"</p>
       <% end %>
 
       <% if @skills_top.any? %>

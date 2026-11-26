@@ -518,6 +518,114 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "읽는 도중에도 위 띠에서 문의 칸으로 갈 수 있다" do
+    each_service_layout do
+      assert_select ".impd-topnav nav.impd-topnav-visitor .impd-topnav-visitor-name", text: @member.name
+      assert_select ".impd-topnav nav.impd-topnav-visitor a.impd-topnav-visitor-cta[href='#contact'][data-turbo='false']", text: "문의하기"
+      assert_includes response.body, ".impd-topnav-visitor.is-on { visibility: visible; }"
+      assert_includes response.body, "classList.toggle('is-on'"
+      assert_visitor_topnav
+    end
+  end
+
+  test "요약 명함과 다른 화면의 위 띠에는 넣지 않는다" do
+    [ public_profile_card_path(slug: @member.slug), root_path, explore_path ].each do |path|
+      get path
+
+      assert_response :success
+      assert_select "nav.impd-topnav-visitor", count: 0
+    end
+  end
+
+  test "로그인한 회원이 볼 때는 위 띠가 지금 그대로다" do
+    @member.update!(password: "password1234", password_confirmation: "password1234")
+    post "/auth/login", params: { email: @member.email, password: "password1234" }
+    get public_profile_path(slug: @member.slug)
+
+    assert_select "nav.impd-topnav-visitor", count: 0
+    assert_select ".impd-topnav a", text: "내 페이지"
+  end
+
+  test "답장받을 수 없는 연락처는 저장하지 않고 이유를 알려 준다" do
+    [ "010", "김고객", "abc@" ].each do |contact|
+      assert_no_difference "MemberInquiry.count" do
+        post member_inquiries_path(slug: @member.slug), params: { member_inquiry: inquiry_attributes.merge(sender_email: contact) }
+      end
+      assert_redirected_to public_profile_path(slug: @member.slug, anchor: "contact")
+      follow_redirect!
+      assert_select "#contact #inquiry-alert[role=alert]", text: "답장받을 전화번호나 메일 주소를 다시 확인해 주세요."
+    end
+  end
+
+  test "전화번호·메일 주소는 여러 꼴로 받는다" do
+    [ "02-123-4567", "+82 10 1234 5678", "010-1234-5678 (저녁에 연락 주세요)", "visitor@example.com" ].each do |contact|
+      assert_difference "MemberInquiry.count", 1 do
+        post member_inquiries_path(slug: @member.slug), params: { member_inquiry: inquiry_attributes.merge(sender_email: contact) }
+      end
+      assert_inquiry_confirmation
+      assert_select "#inquiry-sent strong", text: contact
+    end
+  end
+
+  test "보낸 뒤 남긴 연락처를 다시 보여 준다" do
+    post member_inquiries_path(slug: @member.slug), params: { member_inquiry: inquiry_attributes }
+    assert_inquiry_confirmation
+    assert_select "#inquiry-sent", text: /남겨 주신 연락처\(010-1234-5678\)로/
+    assert_select "#inquiry-sent", text: /번호나 주소가 틀렸다면 아래에서 다시 보내 주세요\./
+
+    get public_profile_path(slug: @member.slug)
+    assert_not_includes response.body, "010-1234-5678"
+
+    post member_inquiries_path(slug: @member.slug), params: { website: "x", member_inquiry: inquiry_attributes }
+    assert_inquiry_confirmation
+    assert_select "#inquiry-sent", text: /남겨 주신 연락처로/
+    assert_not_includes response.body, "010-1234-5678"
+  end
+
+  test "연락처를 보내기 전에 확인하는 장치가 있다" do
+    each_service_layout do
+      assert_includes response.body, "setCustomValidity"
+      assert_includes response.body, "답장받을 전화번호나 메일 주소를 다시 확인해 주세요."
+    end
+  end
+
+  test "요약 명함 소개는 문장이 끝나는 곳에서 멈춘다" do
+    second_sentence = "둘째 문장은 조금 더 길게 적어 둡니다."
+    @member.update!(bio: "첫 문장입니다. " + ("#{second_sentence} " * 7) + "마지막 문장입니다.")
+    get public_profile_card_path(slug: @member.slug)
+    assert_select ".cs-bio", text: %("#{(["첫 문장입니다."] + [second_sentence] * 5).join(" ")}")
+
+    @member.update!(bio: "첫 문장입니다.\n\n  마지막 문장입니다.")
+    get public_profile_card_path(slug: @member.slug)
+    assert_select ".cs-bio", text: '"첫 문장입니다. 마지막 문장입니다."'
+  end
+
+  test "문장 부호 없이 긴 소개는 낱말 사이에서 줄인다" do
+    @member.update!(bio: "가나다라 " * 60)
+    get public_profile_card_path(slug: @member.slug)
+
+    assert_select ".cs-bio", text: /\A"(?:가나다라 ){0,27}가나다라…"\z/
+  end
+
+  test "달란트 칸에 점수와 내부 용어를 보여 주지 않는다" do
+    bio = "고객의 이야기를 듣고 필요한 보장을 알기 쉽게 설명합니다."
+    @member.update!(layout_preset: "editorial", bio: bio)
+    skill = Skill.create!(canonical_name: "보장 분석", category: "hard")
+    @member.member_skills.create!(skill: skill, weight: 72, source: "document", level: "expert")
+    get public_profile_path(slug: @member.slug)
+
+    assert_select ".public-bio", text: /#{Regexp.escape(bio)}/
+    assert_select "section", text: /검증된 달란트/ do |sections|
+      section = sections.first.text
+      [ "보장 분석", "대표 달란트", "이력 문서 기준", "#{@member.name}님이 올린 이력·수료증 문서에서 뽑은 내용이에요." ].each do |text|
+        assert_includes section, text
+      end
+      [ "가중치", "72/100", "문서 추출", "EXPERT", "빈도·맥락", "· 72", bio ].each do |text|
+        assert_not_includes section, text
+      end
+    end
+  end
+
   private
 
   def each_service_layout

@@ -11,7 +11,12 @@
     <% if flash[:inquiry_sent] %>
       <div id="inquiry-sent" role="status" tabindex="-1" style="border: 1px solid var(--impd-accent); padding: 20px; max-width: 640px; margin-top: 16px;">
         <p style="font-size: 18px; font-weight: 700;">보냈어요. 보통 24시간 안에 답장이 와요.</p>
-        <p>남겨 주신 연락처로 <%= member.name %>님이 직접 답해 드려요.</p>
+        <% if flash[:inquiry_contact] %>
+          <p>남겨 주신 연락처(<strong style="overflow-wrap: anywhere;"><%= flash[:inquiry_contact] %></strong>)로 <%= member.name %>님이 직접 답해 드려요.</p>
+          <p style="font-size: 14px; color: var(--impd-ink2);">번호나 주소가 틀렸다면 아래에서 다시 보내 주세요.</p>
+        <% else %>
+          <p>남겨 주신 연락처로 <%= member.name %>님이 직접 답해 드려요.</p>
+        <% end %>
         <a href="<%= public_profile_path(slug: member.slug, anchor: "contact") %>" style="display: inline-flex; align-items: center; min-height: 44px; color: var(--impd-accent); text-decoration: underline;">다른 문의 더 보내기</a>
       </div>
       <script>
@@ -94,6 +99,18 @@
   })();
 
   (() => {
+    const contact = document.getElementById('member_inquiry_sender_email');
+    if (!contact) return;
+    const check = () => {
+      const value = contact.value.trim();
+      const ok = value === '' || /[^@\s]+@[^@\s]+\.[^@\s]+/.test(value) || (value.match(/\d/g) || []).length >= 9;
+      contact.setCustomValidity(ok ? '' : '답장받을 전화번호나 메일 주소를 다시 확인해 주세요.');
+    };
+    contact.addEventListener('input', check);
+    check();
+  })();
+
+  (() => {
     const message = document.getElementById('member_inquiry_message');
     if (!message) return;
     let lastPrefill;
@@ -118,5 +135,20 @@
     new IntersectionObserver(([entry]) => {
       bar.classList.toggle('is-away', entry.isIntersecting);
     }, { rootMargin: '0px 0px -25% 0px' }).observe(contact);
+  })();
+
+  (() => {
+    const quick = document.querySelector('.impd-topnav-visitor');
+    const heroCta = document.querySelector('.public-hero .public-actions .primary');
+    const contact = document.getElementById('contact');
+    if (!quick || !heroCta || !contact || !('IntersectionObserver' in window)) return;
+    // 첫머리 '상담·문의하기' 도 문의 칸도 화면에 없을 때만 위 띠에 이름·문의하기를 보여 준다.
+    const seen = new Map();
+    const watch = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => seen.set(entry.target, entry.isIntersecting));
+      quick.classList.toggle('is-on', !seen.get(heroCta) && !seen.get(contact));
+    }, { rootMargin: '-80px 0px 0px 0px' });
+    watch.observe(heroCta);
+    watch.observe(contact);
   })();
 </script>
