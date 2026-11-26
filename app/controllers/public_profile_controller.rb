@@ -16,7 +16,7 @@ class PublicProfileController < ApplicationController
       @portfolio = @member.member_portfolio_items.sorted
       @reviews = @member.member_reviews.public_visible.recent.limit(4)
       @posts = @member.member_posts.published.recent.limit(3)
-      @moments = @member.member_photos.ordered.limit(12)
+      @moments = @member.gallery_photos.ordered.limit(12)
       # 달란트 — .md/.txt 문서 자동 추출 결과를 공개 페이지에 반영.
       @skills = @member.member_skills
                        .includes(:skill)

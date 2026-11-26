@@ -1,0 +1,8 @@
+<div class="min-w-0" data-controller="clipboard-copy"
+     data-action="turbo:before-cache@document->clipboard-copy#reset" data-clipboard-copy-label-value="주소 복사">
+  <button type="button" class="impd-btn impd-btn-<%= button_style %>"
+          data-action="clipboard-copy#copy" data-clipboard-copy-target="button">주소 복사</button>
+  <input type="text" value="<%= public_base_url %><%= public_profile_path(slug: @member.slug) %>"
+         aria-label="내 페이지 주소" class="w-full" readonly hidden data-clipboard-copy-target="source">
+  <p role="status" aria-live="polite" data-clipboard-copy-target="status"></p>
+</div>

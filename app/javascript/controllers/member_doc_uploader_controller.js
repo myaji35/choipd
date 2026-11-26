@@ -16,7 +16,7 @@ function inferCategory(filename) {
 
 function errorMessage(data, status) {
   if (data?.message) return data.message
-  if (data?.error === "INVALID_EXT") return "이 파일은 올릴 수 없어요. 글 파일(.txt)로 올리거나 아래 칸에 바로 적어 주세요."
+  if (data?.error === "INVALID_EXT") return "이 파일은 올릴 수 없어요. 글 파일(.txt)로 올리거나 위 칸에 바로 적어 주세요."
   if (data?.error === "FILE_TOO_LARGE") return "파일이 너무 커요. 1MB보다 작게 나눠 올려 주세요."
   if (data?.error === "DUPLICATE_CONTENT") return "같은 내용이 이미 올라가 있어요."
   if (data?.error === "EMPTY_FILE") return "내용이 비어 있어요."
@@ -26,7 +26,7 @@ function errorMessage(data, status) {
 
 export default class extends Controller {
   static targets = ["fileInput", "title", "category", "error", "status", "progress", "progressBar", "pasteText", "pasteButton", "pasteStatus"]
-  static values = { createUrl: String, csrf: String }
+  static values = { createUrl: String, csrf: String, doneUrl: String }
 
   dragover(e) { e.preventDefault(); e.currentTarget.classList.add("border-primary", "bg-blue-50") }
   dragleave(e) { e.currentTarget.classList.remove("border-primary", "bg-blue-50") }
@@ -77,7 +77,7 @@ export default class extends Controller {
     if (result.ok) {
       status.style.color = "var(--impd-accent)"
       status.textContent = "올렸어요. 잠시 뒤 목록에 보여요."
-      setTimeout(() => location.reload(), 600)
+      setTimeout(() => this.finishUpload(), 600)
     } else {
       button.disabled = false
       button.textContent = "이 글 올리기"
@@ -104,7 +104,7 @@ export default class extends Controller {
 
     if (fail === 0) {
       this.statusTarget.textContent = `${ok}개 올렸어요.`
-      setTimeout(() => location.reload(), 600)
+      setTimeout(() => this.finishUpload(), 600)
     } else {
       this.statusTarget.textContent = `${ok}개 올렸고 ${fail}개는 올리지 못했어요.`
       this.showError(failures.join(" · "))
@@ -112,9 +112,19 @@ export default class extends Controller {
     }
   }
 
+  finishUpload() {
+    if (this.doneUrlValue) {
+      const url = new URL(this.doneUrlValue, window.location.href)
+      url.searchParams.set("done", "docs")
+      window.location.assign(url)
+    } else {
+      window.location.reload()
+    }
+  }
+
   async uploadOne(file) {
     if (!/\.(md|markdown|txt)$/i.test(file.name)) {
-      return { ok: false, error: "글 파일(.txt)만 올릴 수 있어요. 한글·워드·PDF는 내용을 복사해 아래 칸에 붙여 넣어 주세요." }
+      return { ok: false, error: "글 파일(.txt)만 올릴 수 있어요. 한글·워드·PDF는 내용을 복사해 위 칸에 붙여 넣어 주세요." }
     }
     if (file.size > 1024 * 1024) {
       return { ok: false, error: "파일이 너무 커요. 1MB보다 작게 나눠 올려 주세요." }

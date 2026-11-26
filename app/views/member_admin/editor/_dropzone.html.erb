@@ -28,23 +28,28 @@
   </div>
 <% end %>
 
-<%# 드롭존 — 파일 있으면 컴팩트, 없으면 full %>
+<% checklist_upload = params[:from] == "checklist" %>
 <div data-controller="member-doc-uploader"
-     data-member-doc-uploader-create-url-value="<%= slug_admin_documents_path(slug: member.slug, format: :json) %>"
+     data-member-doc-uploader-create-url-value="<%= slug_admin_documents_path(slug: member.slug, format: :json, from: ("checklist" if checklist_upload)) %>"
+     <% if checklist_upload %>
+       data-member-doc-uploader-done-url-value="<%= slug_admin_dashboard_path(slug: member.slug) %>"
+     <% end %>
      data-member-doc-uploader-csrf-value="<%= form_authenticity_token %>">
-  <div style="border: <%= has_docs ? '1px' : '2px' %> dashed var(--impd-ink); padding: <%= has_docs ? '20px 24px' : '48px 24px' %>; text-align: center; background: var(--impd-card); margin-top: <%= has_docs ? '18px' : '0' %>;"
+  <div id="write-doc" style="margin-top: <%= has_docs ? '18px' : '0' %>; padding: 20px; border: 1px solid var(--impd-rule); background: var(--impd-paper); text-align: left;">
+    <label for="doc_paste_text" style="font-size: 16px; font-weight: 700; color: var(--impd-ink);">이력·경력을 여기에 바로 적어 주세요</label>
+    <p id="doc_paste_help" style="font-size: 14px; color: var(--impd-muted); margin-top: 6px;">이력·경력·자격·수상을 생각나는 대로 적어 주세요. 한글·워드 문서는 내용을 복사해 여기에 붙여 넣으면 돼요.</p>
+    <textarea id="doc_paste_text" rows="6" aria-describedby="doc_paste_help" data-member-doc-uploader-target="pasteText"
+      placeholder="예: 2010년부터 보험 설계사로 일하고 있어요. 우수 설계사상(2019), 손해사정사 자격."
+      style="width: 100%; box-sizing: border-box; margin-top: 10px; min-height: 140px; padding: 11px 12px; border: 1px solid var(--impd-rule); background: #fff; color: var(--impd-ink); font-family: var(--impd-font-sans); font-size: 16px; line-height: 1.5; border-radius: 0; resize: vertical;"></textarea>
+    <button type="button" class="impd-btn impd-btn-primary" data-action="click->member-doc-uploader#uploadText" data-member-doc-uploader-target="pasteButton" style="margin-top: 10px; min-height: 48px;">이 글 올리기</button>
+    <p role="status" data-member-doc-uploader-target="pasteStatus" style="font-size: 14px; margin-top: 8px; min-height: 20px;"></p>
+  </div>
+
+  <div style="border: 1px dashed var(--impd-ink); padding: 20px 24px; text-align: center; background: var(--impd-card); margin-top: 18px;"
        data-action="dragover->member-doc-uploader#dragover dragleave->member-doc-uploader#dragleave drop->member-doc-uploader#drop">
-    <% unless has_docs %>
-      <%= lni_icon "cloud-upload", size: 20 %>
-    <% end %>
-    <p style="font-family: var(--impd-font-display); font-size: <%= has_docs ? '15px' : '22px' %>; font-weight: <%= has_docs ? '600' : '800' %>;">
-      <%= has_docs ? "+ 새 파일 추가" : "아직 올린 자료가 없어요" %>
-    </p>
-    <% unless has_docs %>
-      <p style="font-size: 14px; color: var(--impd-muted); margin-top: 8px;">글 파일(.txt)을 골라 주세요. 여러 개를 한 번에 골라도 돼요.</p>
-    <% end %>
-    <label style="margin-top: <%= has_docs ? '10px' : '20px' %>; display: inline-block; cursor: pointer;">
-      <span class="<%= has_docs ? 'impd-btn impd-btn-secondary' : 'impd-btn impd-btn-primary' %>" style="<%= 'height: 44px; font-size: 14px;' if has_docs %>">파일 선택</span>
+    <p style="font-family: var(--impd-font-display); font-size: 15px; font-weight: 600;">글 파일(.txt)이 있으면 올려도 돼요</p>
+    <label style="margin-top: 10px; display: inline-block; cursor: pointer;">
+      <span class="impd-btn impd-btn-secondary" style="height: 44px; font-size: 14px;">파일 선택</span>
       <input type="file" multiple class="hidden" style="display:none;" accept=".md,.markdown,.txt"
              data-member-doc-uploader-target="fileInput"
              data-action="change->member-doc-uploader#fileSelected">
@@ -52,7 +57,7 @@
     <input type="hidden" data-member-doc-uploader-target="title" value="">
     <select data-member-doc-uploader-target="category" style="display:none;"><option value="other">other</option></select>
     <% unless has_docs %>
-      <p style="font-size: 12px; color: var(--impd-muted); margin-top: 12px;">파일 이름에 <strong>이력 / 수료 / 후기 / 강의 / 언론 / 작품</strong> 같은 말이 있으면 종류를 알아서 나눠 드려요.</p>
+      <p style="font-size: 12px; color: var(--impd-muted); margin-top: 12px;">여러 개를 한 번에 골라도 돼요. 한글·워드·PDF 는 내용을 복사해 위 칸에 붙여 넣어 주세요.</p>
     <% end %>
 
     <div data-member-doc-uploader-target="progress" style="display: none; margin-top: 14px;">
@@ -63,15 +68,5 @@
 
     <div data-member-doc-uploader-target="error" style="display: none; margin-top: 12px; padding: 10px; background: rgba(180,35,24,.08); color: #b42318; font-size: 14px; text-align: left; overflow-wrap: anywhere; line-height: 1.5;"></div>
     <p data-member-doc-uploader-target="status" class="impd-label-muted" style="margin-top: 10px; min-height: 14px; overflow-wrap: anywhere;"></p>
-  </div>
-
-  <div id="write-doc" style="margin-top: 18px; padding: 20px; border: 1px solid var(--impd-rule); background: var(--impd-paper); text-align: left;">
-    <label for="doc_paste_text" style="font-size: 16px; font-weight: 700; color: var(--impd-ink);">파일이 없으면 여기에 바로 적어도 돼요</label>
-    <p id="doc_paste_help" style="font-size: 14px; color: var(--impd-muted); margin-top: 6px;">이력·경력·자격·수상을 생각나는 대로 적어 주세요. 한글·워드 문서는 내용을 복사해 여기에 붙여 넣으면 돼요.</p>
-    <textarea id="doc_paste_text" rows="6" aria-describedby="doc_paste_help" data-member-doc-uploader-target="pasteText"
-      placeholder="예: 2010년부터 보험 설계사로 일하고 있어요. 우수 설계사상(2019), 손해사정사 자격."
-      style="width: 100%; box-sizing: border-box; margin-top: 10px; min-height: 140px; padding: 11px 12px; border: 1px solid var(--impd-rule); background: #fff; color: var(--impd-ink); font-family: var(--impd-font-sans); font-size: 16px; line-height: 1.5; border-radius: 0; resize: vertical;"></textarea>
-    <button type="button" class="impd-btn impd-btn-primary" data-action="click->member-doc-uploader#uploadText" data-member-doc-uploader-target="pasteButton" style="margin-top: 10px; min-height: 48px;">이 글 올리기</button>
-    <p role="status" data-member-doc-uploader-target="pasteStatus" style="font-size: 14px; margin-top: 8px; min-height: 20px;"></p>
   </div>
 </div>

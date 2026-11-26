@@ -5,6 +5,37 @@ require "test_helper"
 class OnboardingJourneyTest < ActionDispatch::IntegrationTest
   PASSWORD = "password1234"
 
+  test "anonymous visitors see the profile photo only as the avatar in both layouts" do
+    email = "onboarding-photos@example.com"
+    post member_signup_path, params: {
+      member: { name: "사진 시험", email: email, password: PASSWORD, password_confirmation: PASSWORD },
+      terms_agree: "1"
+    }
+    member = Member.find_by!(email: email)
+    patch slug_admin_profile_photo_path(slug: member.slug), params: {
+      image: fixture_file_upload(Rails.root.join("public/icon.png"), "image/png")
+    }
+    assert_response :see_other
+    avatar = member.reload.profile_image
+    visitor = open_session
+    check_avatar = -> do
+      visitor.get public_profile_path(slug: member.slug)
+      visitor.assert_response :ok
+      visitor.assert_select "img.public-avatar[src=?]", avatar, count: 1
+      visitor.assert_select "img[src*='icon.png']", count: 1
+    end
+
+    check_avatar.call
+    visitor.assert_select "#moments", count: 0
+    member.member_photos.create!(category: "daily",
+      image: { io: StringIO.new(Rails.root.join("public/icon.png").binread), filename: "work.png", content_type: "image/png" })
+    check_avatar.call
+    visitor.assert_select "#moments .impd-label-muted", text: "사진 1개"
+
+    member.update!(layout_preset: "grid")
+    check_avatar.call
+  end
+
   test "email signup lands on the owner page with a welcome and a next step" do
     email = "onboarding-new@example.com"
     post member_signup_path, params: {

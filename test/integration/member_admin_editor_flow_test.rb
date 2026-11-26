@@ -39,9 +39,11 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
 
       assert_response :ok
       assert_select "#write-doc" do
-        assert_select "label[for=doc_paste_text]", text: "파일이 없으면 여기에 바로 적어도 돼요"
+        assert_select "label[for=doc_paste_text]", text: "이력·경력을 여기에 바로 적어 주세요"
         assert_select "button[data-action='click->member-doc-uploader#uploadText']", text: "이 글 올리기"
       end
+      assert_operator response.body.index('id="write-doc"'), :<, response.body.index('data-member-doc-uploader-target="fileInput"')
+      assert_includes response.body, "글 파일(.txt)이 있으면 올려도 돼요"
       assert_not_includes response.body, "메모장"
     end
 

@@ -5,6 +5,15 @@ const [,, base, outDir, runTag] = process.argv;
 const fs = require('fs'); fs.mkdirSync(outDir, {recursive:true});
 const snap = async (p, opts) => { try { await p.screenshot({ timeout: 45000, ...opts }); } catch (e) { console.error('screenshot skipped: ' + opts.path); } };
 const bioText = '온보딩 시험 소개 글입니다. 어떤 분께 무엇을 해 드리는지 두세 줄로 적어 보는 중이에요. 문의는 편하게 주세요.';
+const docText = '온보딩 시험 경력 글입니다. 휴대폰에서 경력과 자격을 직접 적어 보는 시험입니다.';
+const testPng = async (page, color) => Buffer.from(await page.evaluate(color => {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 64;
+  const drawing = canvas.getContext('2d');
+  drawing.fillStyle = color;
+  drawing.fillRect(0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL('image/png').split(',')[1];
+}, color), 'base64');
 const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
 (async () => {
   const browser = await chromium.launch();
@@ -23,7 +32,20 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
       };
       const fold = [...document.querySelectorAll('h1,h2,h3,p,a,button,label,[role=status],[role=alert]')]
         .filter(inFold).map(el => (el.innerText || '').trim()).filter(Boolean).join(' | ');
+      const writeDoc = document.querySelector('#write-doc');
+      const fileLabel = document.querySelector('[data-member-doc-uploader-target="fileInput"]')?.closest('label');
       return {
+        doneCount: Number(document.querySelector('.dashboard-next summary')?.textContent.match(/\d+개 중 (\d+)개/)?.[1] ?? NaN),
+        faceCopies: [...document.images].filter(img => img.src.includes('face.png')).length,
+        momentsShown: !!document.querySelector('#moments'),
+        profFieldInFold: inFold(document.querySelector('#member_profession')),
+        mediaButtonsInFold: inFold(document.querySelector('[data-member-photo-uploader-target="galleryInput"]')?.closest('label')),
+        docWriteInFold: inFold(document.querySelector('#doc_paste_text')),
+        docWriteBeforeFile: !!writeDoc && !!fileLabel && writeDoc.getBoundingClientRect().top < fileLabel.getBoundingClientRect().top,
+        workNoticeSeen: fold.includes('작업 사진을 올렸어요'),
+        docNoticeSeen: fold.includes('경력 글을 올렸어요'),
+        allDone: document.querySelector('.dashboard-next')?.innerText.includes('모두 마쳤어요') ?? false,
+        allDoneCopyInFold: inFold(document.querySelector('[data-all-done-actions] button')),
         overflowX: document.documentElement.scrollWidth > document.documentElement.clientWidth,
         height: document.documentElement.scrollHeight,
         url: location.pathname + location.search,
@@ -56,7 +78,8 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
       const { url, overflowX, height, fold, welcomeSeen, ownerBarInFold, unchosenProfession,
         nextTask, nextHref, nextStepInFold, nextStepTask, ownerNext,
         bioFieldInFold, bioPlaceholderLen, arrivalSeen, bioRequiredMarks,
-        photoPickerInFold, photoCapture, photoNoticeSeen } = await metric();
+        photoPickerInFold, photoCapture, photoNoticeSeen, doneCount, profFieldInFold, mediaButtonsInFold,
+        workNoticeSeen, docNoticeSeen, docWriteInFold, docWriteBeforeFile, allDone, allDoneCopyInFold } = await metric();
       await snap(page, { path: outDir + '/' + name + '-' + tag + '.png', fullPage: true });
       await snap(page, { path: outDir + '/' + name + '-' + tag + '-fold.png' });
       const row = { step: name, tag, url, overflowX, height, fold, consoleErrors: [...errors], ...extra };
@@ -65,7 +88,13 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
       if (name === 'service-added') Object.assign(row, { nextStepInFold, nextStepTask });
       if (name === 'bio') Object.assign(row, { bioFieldInFold, bioPlaceholderLen, arrivalSeen, bioRequiredMarks });
       if (name === 'photo') Object.assign(row, { photoPickerInFold, photoCapture, arrivalSeen });
-      if (name === 'photo-saved') Object.assign(row, { nextTask, photoNoticeSeen });
+      if (name === 'photo-saved') Object.assign(row, { nextTask, photoNoticeSeen, doneCount });
+      if (name === 'prof') Object.assign(row, { profFieldInFold, arrivalSeen });
+      if (name === 'prof-saved') row.nextTask = nextTask;
+      if (name === 'media') Object.assign(row, { mediaButtonsInFold, arrivalSeen });
+      if (name === 'media-saved') Object.assign(row, { nextTask, noticeSeen: workNoticeSeen });
+      if (name === 'docs') Object.assign(row, { docWriteInFold, docWriteBeforeFile, arrivalSeen });
+      if (name === 'docs-saved') Object.assign(row, { nextTask, noticeSeen: docNoticeSeen, allDone, allDoneCopyInFold });
       if (name === 'bio-saved') row.nextTask = nextTask;
       if (name === 'first-click') {
         row.reachedAdmin = /\/admin\//.test(url);
@@ -215,6 +244,7 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
       }
     }
     let photoClicks = 0, photoGuided = false;
+    let photoSaved;
     if (bioSaved?.url !== dashboardPath || bioSaved.nextTask !== 'profile-photo') {
       blocked.push('photo: 사진 할 일에 도착하지 못함');
     } else {
@@ -227,19 +257,12 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
         const photo = await shot('photo');
         if (photo.photoCapture !== null) blocked.push('photo: 사진 칸이 카메라만 엶');
 
-        const png = await page.evaluate(() => {
-          const canvas = document.createElement('canvas');
-          canvas.width = canvas.height = 64;
-          const drawing = canvas.getContext('2d');
-          drawing.fillStyle = '#52879b';
-          drawing.fillRect(0, 0, canvas.width, canvas.height);
-          return canvas.toDataURL('image/png').split(',')[1];
-        });
-        const buffer = Buffer.from(png, 'base64');
+        const buffer = await testPng(page, '#52879b');
         await fileInput.setInputFiles({ name: 'face.png', mimeType: 'image/png', buffer });
         photoClicks++;
         await page.waitForURL(url => url.pathname === dashboardPath, { timeout: 10000 }).catch(() => {});
-        const photoSaved = await shot('photo-saved');
+        photoSaved = await shot('photo-saved');
+        if (photoSaved.doneCount !== 3) blocked.push('photo-saved: 프로필 사진이 작업 사진으로 세어짐');
         if (photoSaved.url !== dashboardPath || photoSaved.nextTask !== 'profession-region') {
           blocked.push('photo-saved: 올린 뒤 다음 할 일로 안 이어짐');
         } else {
@@ -249,24 +272,109 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
         blocked.push('photo: ' + String(e).slice(0, 120));
       }
     }
-    const editorResponse = await page.goto(base + '/' + slug + '/admin/editor?step=1', {waitUntil: 'networkidle'});
-    await shot('editor1', { status: editorResponse.status() });
-    // 5) 공개 페이지(방문자 눈): 새 창 비로그인
+    // 공개 화면은 로그인한 회원과 쿠키를 공유하지 않는다.
     const anon = await browser.newContext({ viewport: {width: vw, height: vh}, locale: 'ko-KR' });
     const ap = await anon.newPage();
     const publicErrors = [];
     ap.on('console', m => { if (m.type() === 'error') publicErrors.push(m.text().slice(0, 200)); });
     ap.on('pageerror', e => publicErrors.push('pageerror: ' + String(e).slice(0, 200)));
+    if (photoSaved) {
+      await ap.goto(base + '/' + slug, {waitUntil: 'networkidle'});
+      const { faceCopies, momentsShown, overflowX } = await metric(ap);
+      await snap(ap, { path: outDir + '/public-photo-' + tag + '-fold.png' });
+      await snap(ap, { path: outDir + '/public-photo-' + tag + '.png', fullPage: true });
+      report.push({ step: 'public-photo', tag, faceCopies, momentsShown, overflowX, consoleErrors: publicErrors.splice(0) });
+      if (faceCopies !== 1 || momentsShown) blocked.push('public-photo: 프로필 사진이 사진 모음에 또 보임');
+    }
+
+    let tailClicks = 0, tailTyped = 0, tailGuided = false, allDone = false;
+    const nextAction = page.locator('.dashboard-next a.impd-btn-accent');
+    const arrive = async (name, field) => {
+      await nextAction.click({ timeout: 5000 });
+      tailClicks++;
+      await field.waitFor({ state: 'attached', timeout: 5000 });
+      return shot(name);
+    };
+    const waitForDashboard = () => page.waitForURL(url => url.pathname === dashboardPath, { timeout: 10000 }).catch(() => {});
+    let profSaved, mediaSaved;
+    if (!photoGuided || photoSaved.doneCount !== 3) {
+      blocked.push('prof: 할 일에 도착하지 못함');
+    } else {
+      const profession = page.locator('#member_profession');
+      try {
+        await arrive('prof', profession);
+        await profession.selectOption('educator', { timeout: 5000 });
+        tailClicks++;
+        await page.locator('#member_region').fill('서울 성북', { timeout: 5000 });
+        tailTyped++;
+        await page.locator('form.editor-fields button[type=submit]').click({ timeout: 5000 });
+        tailClicks++;
+        await waitForDashboard();
+        profSaved = await shot('prof-saved');
+        if (profSaved.url !== dashboardPath || profSaved.nextTask !== 'media') {
+          blocked.push('prof-saved: 저장 뒤 다음 할 일(작업 사진)로 안 이어짐');
+        }
+      } catch (e) {
+        blocked.push('prof: 할 일에 도착하지 못함');
+        console.error(String(e).slice(0, 200));
+      }
+    }
+    if (profSaved?.url !== dashboardPath || profSaved.nextTask !== 'media') {
+      blocked.push('media: 할 일에 도착하지 못함');
+    } else {
+      const gallery = page.locator('[data-member-photo-uploader-target="galleryInput"]');
+      try {
+        await arrive('media', gallery);
+        await gallery.setInputFiles({ name: 'work.png', mimeType: 'image/png', buffer: await testPng(page, '#b06b42') }, { timeout: 5000 });
+        tailClicks++;
+        await waitForDashboard();
+        mediaSaved = await shot('media-saved');
+        if (mediaSaved.url !== dashboardPath + '?done=photos' || mediaSaved.nextTask !== 'docs' || !mediaSaved.noticeSeen) {
+          blocked.push('media-saved: 올린 뒤 다음 할 일로 안 이어짐');
+        }
+      } catch (e) {
+        blocked.push('media: 할 일에 도착하지 못함');
+        console.error(String(e).slice(0, 200));
+      }
+    }
+    if (mediaSaved?.url !== dashboardPath + '?done=photos' || mediaSaved.nextTask !== 'docs' || !mediaSaved.noticeSeen) {
+      blocked.push('docs: 할 일에 도착하지 못함');
+    } else {
+      const docField = page.locator('#doc_paste_text');
+      try {
+        const docs = await arrive('docs', docField);
+        if (!docs.docWriteBeforeFile) blocked.push('docs: 바로 적는 칸이 파일 고르기 뒤에 있음');
+        if (!docs.docWriteInFold) blocked.push('docs: 바로 적는 칸이 첫 화면 밖');
+        await docField.fill(docText, { timeout: 5000 });
+        tailTyped++;
+        await page.getByRole('button', { name: '이 글 올리기' }).click({ timeout: 5000 });
+        tailClicks++;
+        await waitForDashboard();
+        const docsSaved = await shot('docs-saved');
+        allDone = docsSaved.allDone;
+        tailGuided = docsSaved.url === dashboardPath + '?done=docs' && !docsSaved.nextTask && allDone;
+        if (!tailGuided || !docsSaved.noticeSeen || !docsSaved.allDoneCopyInFold) {
+          blocked.push('docs-saved: 올린 뒤 마무리 안내로 안 이어짐');
+        }
+      } catch (e) {
+        blocked.push('docs: 할 일에 도착하지 못함');
+        console.error(String(e).slice(0, 200));
+      }
+    }
+
+    const editorResponse = await page.goto(base + '/' + slug + '/admin/editor?step=1', {waitUntil: 'networkidle'});
+    await shot('editor1', { status: editorResponse.status() });
     const pr = await ap.goto(base + '/' + slug, {waitUntil: 'networkidle'}).catch(() => null);
     const ready = await ap.evaluate(bioPrefix => ({ bio: document.body.innerText.includes(bioPrefix), service: document.body.innerText.includes('첫 상담 서비스'), contactForm: !!document.querySelector('#contact form'), cta: document.querySelector('a.public-service-action[href="#contact"]')?.textContent.trim() === '이 서비스 문의하기', photo: !!document.querySelector('.public-hero img.public-avatar') }), bioText.slice(0, 10));
     await snap(ap, { path: outDir + '/public-' + tag + '-fold.png' });
     await snap(ap, { path: outDir + '/public-' + tag + '.png', fullPage: true });
     const ownerBarLeak = await ap.evaluate(() => !!document.querySelector('[data-owner-bar]'));
     if (ownerBarLeak) blocked.push('public: 본인용 띠가 방문자에게 보임');
-    const { overflowX, unchosenProfession, title } = await metric(ap);
+    const { overflowX, unchosenProfession, title, faceCopies, momentsShown } = await metric(ap);
+    if (faceCopies !== 1 || !momentsShown) blocked.push('public: 프로필 사진이나 작업 사진이 기대와 다름');
     if (unchosenProfession) blocked.push('public: 고르지 않은 직업이 고객에게 보임');
     report.push({ step: 'public', tag, status: pr && pr.status(), ready, ownerBarLeak,
-      overflowX, unchosenProfession, title, consoleErrors: publicErrors });
+      overflowX, unchosenProfession, title, faceCopies, momentsShown, consoleErrors: publicErrors });
     await anon.close();
     // 6) 승인 대기 회원 로그인
     if (process.env.PENDING_PW) {
@@ -286,10 +394,10 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
       report.push({ step: 'pending', tag, url, fold, pendingNoticeSeen, pendingPrepSeen, pendingNoticeHeight, overflowX, consoleErrors: pendingErrors });
       await pc.close();
     }
-    report.push({ step: 'summary', tag, slug, clicks, typed, bioClicks, bioTyped, bioGuided, photoClicks, photoGuided, svcSubmitInFold, signupFields: fields, blocked, ready, svcOk, guided });
+    report.push({ step: 'summary', tag, slug, clicks, typed, bioClicks, bioTyped, bioGuided, photoClicks, photoGuided, tailClicks, tailTyped, tailGuided, allDone, svcSubmitInFold, signupFields: fields, blocked, ready, svcOk, guided });
     await ctx.close();
   }
   await browser.close();
   fs.writeFileSync(outDir + '/report.json', JSON.stringify(report, null, 1));
-  console.log(JSON.stringify(report.filter(r => r.step === 'summary' || r.overflowX || (r.consoleErrors && r.consoleErrors.length)).map(r => r.step === 'summary' ? [r.tag, 'slug '+r.slug, 'clicks '+r.clicks, 'typed '+r.typed, 'photoClicks '+r.photoClicks, 'photoGuided '+r.photoGuided, 'signupFields '+r.signupFields, 'svc '+r.svcOk, 'ready '+JSON.stringify(r.ready), 'blocked '+r.blocked.length+' '+r.blocked.join('; ')] : [r.step+'-'+r.tag, r.overflowX?'OVERFLOW':'', 'err'+(r.consoleErrors||[]).length])));
+  console.log(JSON.stringify(report.filter(r => r.step === 'summary' || r.overflowX || (r.consoleErrors && r.consoleErrors.length)).map(r => r.step === 'summary' ? [r.tag, 'slug '+r.slug, 'clicks '+r.clicks, 'typed '+r.typed, 'photoClicks '+r.photoClicks, 'photoGuided '+r.photoGuided, 'tailClicks '+r.tailClicks, 'tailTyped '+r.tailTyped, 'tailGuided '+r.tailGuided, 'allDone '+r.allDone, 'signupFields '+r.signupFields, 'svc '+r.svcOk, 'ready '+JSON.stringify(r.ready), 'blocked '+r.blocked.length+' '+r.blocked.join('; ')] : [r.step+'-'+r.tag, r.overflowX?'OVERFLOW':'', 'err'+(r.consoleErrors||[]).length])));
 })();

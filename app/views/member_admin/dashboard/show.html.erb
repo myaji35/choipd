@@ -42,6 +42,11 @@
           <%= link_to next_item[:action], next_item[:path], class: "impd-btn impd-btn-accent" %>
         <% else %>
           <p style="margin-top: 10px;">준비 항목을 모두 마쳤어요. 이제 주소를 고객에게 보내 보세요.</p>
+          <div data-all-done-actions style="display:flex; flex-wrap:wrap; gap:12px; margin-top:14px;">
+            <% page_path = public_profile_path(slug: @member.slug) %>
+            <%= render "copy_address", button_style: "accent" %>
+            <%= link_to "내 페이지 보기", page_path, target: "_blank", rel: "noopener", class: "impd-btn impd-btn-secondary" %>
+          </div>
         <% end %>
         <details style="margin-top: 20px; font-size: 14px;">
           <summary style="cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: 6px;">준비 항목 <%= @checklist.size %>개 중 <%= @checklist.count { |item| item[:done] } %>개 마쳤어요 · 전체 보기</summary>
@@ -246,8 +251,7 @@
         <% if fourteen_total < 20 %>
           <p style="color: var(--impd-ink2); font-size: 15px; line-height: 1.6;">아직 방문이 적어요. 명함 QR이나 내 페이지 주소를 고객에게 보내면 늘어나요.</p>
           <div style="display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
-            <button type="button" class="impd-btn impd-btn-secondary" data-page-path="<%= public_profile_path(slug: @member.slug) %>"
-                    onclick="navigator.clipboard.writeText(window.location.origin + this.dataset.pagePath).then(() => { this.textContent = '복사했어요' })">주소 복사</button>
+            <%= render "copy_address", button_style: "secondary" %>
             <%= link_to "QR 저장", member_qr_path(slug: @member.slug, format: :svg), download: "#{@member.slug}-qr.svg", class: "impd-btn impd-btn-secondary" %>
           </div>
         <% else %>
@@ -275,8 +279,7 @@
       <p class="dashboard-overview-address">impd.townin.net/<%= slug %></p>
       <div class="dashboard-overview-buttons">
         <%= link_to "내 페이지 보기", page_path, target: "_blank", rel: "noopener", class: "impd-btn impd-btn-secondary" %>
-        <button type="button" class="impd-btn impd-btn-secondary" data-page-path="<%= page_path %>"
-                onclick="navigator.clipboard.writeText(window.location.origin + this.dataset.pagePath).then(() => { this.textContent = '복사했어요' })">주소 복사</button>
+        <%= render "copy_address", button_style: "secondary" %>
       </div>
 
       <% add_item = "아직 없어요 · 추가하기" %>

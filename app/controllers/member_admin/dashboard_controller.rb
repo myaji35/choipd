@@ -3,6 +3,13 @@ class MemberAdmin::DashboardController < MemberAdmin::BaseController
   include MemberAdmin::ChannelOverview
 
   def show
+    case params[:done]
+    when "photos"
+      flash.now[:notice] = "작업 사진을 올렸어요. 아래에서 다음에 할 일을 확인해 보세요."
+    when "docs"
+      flash.now[:notice] = "경력 글을 올렸어요. 아래에서 다음에 할 일을 확인해 보세요."
+    end
+
     today = Date.current
     # CRIT-3 fix: owner/admin 트래픽 제외 — user_type='anonymous'만 카운트
     visit_scope = AnalyticsEvent.for_tenant

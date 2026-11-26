@@ -11,6 +11,26 @@ class MemberTest < ActiveSupport::TestCase
     )
   end
 
+  test "gallery omits the current uploaded profile photo" do
+    photo = @member.member_photos.create!(category: "people",
+      image: Rack::Test::UploadedFile.new(Rails.root.join("public/icon.png"), "image/png"))
+    routes = Rails.application.routes.url_helpers
+    paths = [routes.rails_blob_path(photo.image, only_path: true), routes.rails_service_blob_proxy_path(photo.image.signed_id, photo.image.filename)]
+    assert_match %r{\A/rails/active_storage/blobs/(redirect|proxy)/}, paths.first
+
+    paths.each do |path|
+      @member.profile_image = path
+      assert_equal photo, @member.profile_photo_record
+      assert_empty @member.gallery_photos
+    end
+
+    [nil, @image, "잘못된 값", "/rails/active_storage/blobs/redirect/bad/face.png"].each do |value|
+      @member.profile_image = value
+      assert_nil @member.profile_photo_record
+      assert_equal [photo], @member.gallery_photos.to_a
+    end
+  end
+
   test "public profession only labels a profession the member chose" do
     ["custom", nil, "", " "].each do |profession|
       @member.profession = profession

@@ -60,6 +60,20 @@ class Member < ApplicationRecord
   scope :by_profession, ->(p) { where(profession: p) if p.present? }
   scope :search, ->(q) { where("name LIKE ? OR email LIKE ? OR slug LIKE ?", "%#{q}%", "%#{q}%", "%#{q}%") if q.present? }
 
+  # The uploaded photo currently used as the profile image.
+  def profile_photo_record
+    signed_id = profile_image.to_s[%r{\A/rails/active_storage/blobs/(?:redirect|proxy)/([^/]+)/}, 1]
+    blob = signed_id && ActiveStorage::Blob.find_signed(signed_id)
+    return nil unless blob
+
+    member_photos.joins(:image_attachment).find_by(active_storage_attachments: { blob_id: blob.id })
+  end
+
+  def gallery_photos
+    record = profile_photo_record
+    record ? member_photos.where.not(id: record.id) : member_photos
+  end
+
   def personal_brand
     brands.find_by(personal: true)
   end

@@ -61,7 +61,9 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
     assert_select ".profile-photo-choices", count: 0
   end
 
-  test "upload sets the profile image and completes both photo checklist items" do
+  test "upload completes the profile photo task and leaves the work photo task open" do
+    @member.update!(bio: "가" * 60)
+    @member.member_services.create!(title: "첫 상담")
     assert_difference -> { @member.member_photos.count }, 1 do
       patch @photo_path, params: { image: upload_image, from: "checklist" }
     end
@@ -73,8 +75,11 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_select "[role=status]", text: /프로필 사진을 올렸어요/
     assert_select "[role=status]", text: /다음 할 일/
-    assert_select 'a[href*="task=profile-photo"], a[href*="task=media"]', count: 0
-    assert_select 'a[href*="task=bio"]', text: "자기소개 쓰기"
+    assert_select '.dashboard-next[data-next-task="profession-region"]'
+    assert_select ".dashboard-next summary", text: /6개 중 3개/
+    assert_select '.dashboard-next details a[href*="task=media"]', text: "작업 사진 올리기"
+    assert_select 'a[href*="task=profile-photo"]', count: 0
+    assert_select "[data-all-done-actions]", count: 0
   end
 
   test "upload outside the checklist returns to the profile photo editor" do
@@ -128,6 +133,89 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
     assert_nil @member.reload.profile_image
     follow_redirect!
     assert_select "#profile-photo [role=alert]", text: "선택한 사진을 사용할 수 없어요."
+  end
+
+  test "only checklist arrivals include upload return URLs" do
+    %w[docs media].zip(%w[doc photo], %i[slug_admin_documents_path slug_admin_photos_path]).each do |tab, uploader, route|
+      [nil, "checklist"].each do |from|
+        get slug_admin_editor_path(slug: @member.slug, step: 1, tab: tab, from: from, task: tab)
+        assert_response :ok
+        prefix = "data-member-#{uploader}-uploader"
+        create_url = public_send(route, slug: @member.slug, format: :json, from: from)
+        assert_select "##{tab} [#{prefix}-create-url-value=?]", create_url
+        if from
+          assert_select "##{tab} [#{prefix}-done-url-value=?]", @dashboard_path
+        else
+          assert_select "[#{prefix}-done-url-value]", count: 0
+        end
+      end
+    end
+  end
+
+  test "mixed checklist document uploads leave no completion notice in the session" do
+    path = slug_admin_documents_path(slug: @member.slug, format: :json, from: "checklist")
+    editor_path = slug_admin_editor_path(slug: @member.slug, step: 1, tab: "docs", from: "checklist")
+    get editor_path
+
+    post path, params: { filename: "career.txt", content: "시험용 경력 글입니다." }, as: :json
+    assert_response :created
+    assert_nil flash[:notice]
+    post path, params: { filename: "empty.txt", content: "" }, as: :json
+    assert_response :unprocessable_entity
+
+    get editor_path
+    assert_select "[role=status]", text: /경력 글을 올렸어요/, count: 0
+  end
+
+  test "mixed checklist photo uploads leave no completion notice in the session" do
+    path = slug_admin_photos_path(slug: @member.slug, format: :json, from: "checklist")
+    editor_path = slug_admin_editor_path(slug: @member.slug, step: 1, tab: "media", from: "checklist")
+    get editor_path
+
+    post path, params: { files: [upload_image] }
+    assert_response :created
+    assert_nil flash[:notice]
+    post path, params: { files: [fixture_file_upload("linkedin/profile.txt", "text/plain")] }
+    assert_response :unprocessable_entity
+
+    get editor_path
+    assert_select "[role=status]", text: /작업 사진을 올렸어요/, count: 0
+  end
+
+  test "dashboard shows only the matching completion notice for the current request" do
+    notices = {
+      "photos" => "작업 사진을 올렸어요. 아래에서 다음에 할 일을 확인해 보세요.",
+      "docs" => "경력 글을 올렸어요. 아래에서 다음에 할 일을 확인해 보세요."
+    }
+    [ "photos", "docs", "unknown", [ "photos" ], nil ].each do |done|
+      get @dashboard_path, params: { done: done }
+      assert_response :ok
+      notices.each do |key, message|
+        assert_select "[role=status]", text: message, count: key == done ? 1 : 0
+      end
+    end
+  end
+
+  test "completed checklist offers sharing actions" do
+    @member.update!(bio: "가" * 60, profession: "educator", region: "서울", profile_image: "/icon.png")
+    @member.member_services.create!(title: "첫 상담")
+    create_photo(@member)
+    @member.member_documents.create!(filename: "career.txt", category: "career", content_md: "시험용 글")
+
+    get @dashboard_path
+
+    assert_select "[data-all-done-actions]" do
+      assert_select "[data-controller=clipboard-copy][data-clipboard-copy-label-value='주소 복사']" do
+        assert_select "button[data-action='clipboard-copy#copy'][data-clipboard-copy-target=button]", text: "주소 복사"
+        assert_select "input[readonly][data-clipboard-copy-target=source]", count: 1 do |sources|
+          url = URI.parse(sources.first["value"])
+          assert_kind_of URI::HTTP, url
+          assert_equal "/#{@member.slug}", url.path
+        end
+        assert_select "[role=status][data-clipboard-copy-target=status]", count: 1
+      end
+      assert_select "a[href=?][target=_blank]", "/#{@member.slug}", text: "내 페이지 보기"
+    end
   end
 
   private

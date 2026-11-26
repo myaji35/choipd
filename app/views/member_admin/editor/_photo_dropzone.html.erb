@@ -1,6 +1,10 @@
 <%# 사진·영상 전용 드롭존 — 에디토리얼 톤에 맞는 미니멀 스타일 %>
+<% checklist_upload = params[:from] == "checklist" %>
 <div data-controller="member-photo-uploader"
-     data-member-photo-uploader-create-url-value="<%= slug_admin_photos_path(slug: member.slug, format: :json) %>"
+     data-member-photo-uploader-create-url-value="<%= slug_admin_photos_path(slug: member.slug, format: :json, from: ("checklist" if checklist_upload)) %>"
+     <% if checklist_upload %>
+       data-member-photo-uploader-done-url-value="<%= slug_admin_dashboard_path(slug: member.slug) %>"
+     <% end %>
      data-member-photo-uploader-csrf-value="<%= form_authenticity_token %>"
      data-action="dragover->member-photo-uploader#dragover dragleave->member-photo-uploader#dragleave drop->member-photo-uploader#drop"
      style="position: relative; border: 1px dashed var(--impd-ink); padding: 36px 28px; background: var(--impd-paper); transition: background 150ms ease;">

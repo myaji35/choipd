@@ -5,6 +5,10 @@ export default class extends Controller {
 
   static values = { label: String }
 
+  connect() {
+    this.sourceInitiallyHidden = this.sourceTarget.hidden
+  }
+
   async copy() {
     const request = Symbol()
     this.copyRequest = request
@@ -32,6 +36,7 @@ export default class extends Controller {
 
   selectForManualCopy() {
     const source = this.sourceTarget
+    source.hidden = false
     source.focus()
     source.select()
     source.setSelectionRange(0, source.value.length)
@@ -46,6 +51,7 @@ export default class extends Controller {
   reset() {
     clearTimeout(this.resetTimer)
     this.copyRequest = null
+    if (this.hasSourceTarget) this.sourceTarget.hidden = this.sourceInitiallyHidden
     if (this.hasButtonTarget) this.buttonTarget.textContent = this.labelValue
     if (this.hasStatusTarget) this.statusTarget.textContent = ""
   }

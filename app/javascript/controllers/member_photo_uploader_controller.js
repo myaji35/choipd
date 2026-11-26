@@ -62,7 +62,7 @@ function canvasToBlob(canvas, type, quality) {
 
 export default class extends Controller {
   static targets = ["cameraInput", "galleryInput", "category", "error", "status", "progress", "progressBar"]
-  static values = { createUrl: String, csrf: String }
+  static values = { createUrl: String, csrf: String, doneUrl: String }
 
   dragover(e) {
     e.preventDefault()
@@ -114,7 +114,15 @@ export default class extends Controller {
     if (failures.length === 0) {
       this.statusTarget.textContent = `${ok}장 올렸어요.${notes.length ? ` 안내 ${notes.length}건` : ""}`
       if (notes.length) this.showError(notes.join("\n"))
-      setTimeout(() => window.location.reload(), 800)
+      setTimeout(() => {
+        if (this.doneUrlValue) {
+          const url = new URL(this.doneUrlValue, window.location.href)
+          url.searchParams.set("done", "photos")
+          window.location.assign(url)
+        } else {
+          window.location.reload()
+        }
+      }, 800)
     } else {
       this.showError([...failures, ...notes].join("\n"))
       if (ok > 0) {
