@@ -13,11 +13,16 @@ const pages = [
   const brandResponse = await fetch(base + brandPath, { redirect: 'manual' }).catch(() => null);
   const hasBrand = brandResponse?.status === 200;
   await brandResponse?.body?.cancel();
+  const reviewPath = '/kang-seung-sig/review';
+  const reviewResponse = await fetch(base + reviewPath, { redirect: 'manual' }).catch(() => null);
+  const hasReview = reviewResponse?.status === 200;
+  await reviewResponse?.body?.cancel();
   const browser = await chromium.launch();
   const report = [];
   for (const [vw, vh, tag] of [[1440, 900, 'd'], [390, 844, 'm']]) {
     const targets = hasGridPhoto ? [...pages, ['gridphoto', '/ux-photo']] : [...pages];
     if (hasBrand) targets.push(['brand', brandPath]);
+    if (hasReview) targets.push(['review', reviewPath]);
     targets.push(['notfound', '/404.html']);
     if (hasGridPhoto) targets.push(['photogone', '/p/ux-photo/99999999']);
     for (const [name, path] of targets) {
@@ -87,6 +92,30 @@ const pages = [
       if (['editorial', 'grid', 'sparse', 'gridphoto'].includes(name)) {
         extra.cardLink = await page.locator('a[aria-label="명함 보기"]').evaluateAll(links =>
           links[0]?.getAttribute('href') ?? null);
+        extra.contactHints = await page.evaluate(() => {
+          const contact = document.getElementById('member_inquiry_sender_email');
+          return {
+            autocapitalize: contact?.getAttribute('autocapitalize') ?? null,
+            autocorrect: contact?.getAttribute('autocorrect') ?? null,
+            spellcheck: contact?.getAttribute('spellcheck') ?? null
+          };
+        });
+      }
+      if (name === 'review') {
+        extra = await page.evaluate(() => {
+          const fonts = [...document.querySelectorAll('main form input, main form textarea')]
+            .filter(input => !input.closest('[aria-hidden="true"]') && input.checkVisibility())
+            .map(input => parseFloat(getComputedStyle(input).fontSize));
+          return {
+            chrome: {
+              joinstrip: !!document.querySelector('.impd-joinstrip'),
+              platformNav: !!document.querySelector('.impd-topnav-links'),
+              frap: !!document.querySelector('.impd-frap')
+            },
+            minInputFont: fonts.length ? Math.min(...fonts) : null,
+            english: document.body.innerText.includes('REVIEW')
+          };
+        });
       }
       if (name === 'brand') {
         extra = await page.evaluate(() => {

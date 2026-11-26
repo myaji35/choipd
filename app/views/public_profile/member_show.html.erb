@@ -536,16 +536,24 @@
 <% end %>
 
 <!-- ── 후기 (인용) ───────────────────────── -->
-<% if @reviews.any? && @reviews.first.content.present? %>
-  <section style="background: var(--impd-ink); color: var(--impd-paper); padding: 80px 0; margin: 64px 0;">
+<% shown_reviews = @reviews.select { |review| review.content.present? }.first(3) %>
+<% if shown_reviews.any? %>
+  <% first_review = shown_reviews.first %>
+  <section id="reviews" style="background: var(--impd-ink); color: var(--impd-paper); padding: 80px 0; margin: 64px 0;">
     <div class="impd-wrap impd-centered">
       <p class="impd-label impd-accent-text">후기</p>
-      <p class="impd-serif impd-quote">
-        "<%= @reviews.first.content %>"
+      <p class="impd-serif impd-quote" style="overflow-wrap: anywhere;">
+        "<%= first_review.content %>"
       </p>
-      <p class="impd-label-muted impd-quote-source">
-        — <%= @reviews.first.reviewer_name %> · <% @reviews.first.rating.times do %><%= lni_icon "star-fat" %><% end %>
+      <p class="impd-label-muted impd-quote-source" style="overflow-wrap: anywhere;">
+        — <%= first_review.reviewer_name %> · <% first_review.rating.to_i.times do %><%= lni_icon "star-fat" %><% end %>
       </p>
+      <% shown_reviews.drop(1).each do |review| %>
+        <figure style="max-width: 62ch; margin: 28px auto 0; padding-top: 24px; border-top: 1px solid rgba(239,236,228,.25); text-align: left;">
+          <blockquote style="margin: 0; font-size: 16px; line-height: 1.7; white-space: pre-line; overflow-wrap: anywhere; word-break: keep-all;">"<%= review.content %>"</blockquote>
+          <figcaption style="margin-top: 8px; font-size: 14px; color: rgba(239,236,228,.75); overflow-wrap: anywhere;">— <%= review.reviewer_name %> · <% review.rating.to_i.times do %><%= lni_icon "star-fat" %><% end %></figcaption>
+        </figure>
+      <% end %>
     </div>
   </section>
 <% elsif @member.partner_active? && @member.stats["rating"].to_f > 0 %>

@@ -1,64 +1,73 @@
 <% content_for :title, "#{@member.name}님께 후기 남기기" %>
 
 <main style="max-width: 680px; margin: 64px auto; padding: 0 24px 72px;">
-  <p class="impd-label" style="font-size: 12px;">REVIEW</p>
+  <p class="impd-label" style="font-size: 12px;">후기</p>
   <h1 class="impd-display" style="font-size: clamp(36px, 7vw, 56px); margin-top: 12px; color: var(--impd-green);">
     <%= @member.name %>님께<br>후기 남기기
   </h1>
-  <p style="margin-top: 20px; font-size: 15px; line-height: 1.8; color: var(--impd-ink2);">
-    함께한 경험을 들려주세요. 작성한 후기는 <%= @member.name %>님의 승인 후 공개 페이지에 표시됩니다.
-  </p>
+  <% if flash[:review_sent] %>
+    <div id="review-sent" role="status" tabindex="-1" style="margin-top: 28px; padding: 24px; border: 1px solid var(--impd-accent); background: var(--impd-card);">
+      <p style="font-size: 18px; font-weight: 700;">후기를 보냈어요. 고맙습니다.</p>
+      <p style="margin-top: 8px; line-height: 1.7;"><%= @member.name %>님이 확인한 뒤 공개 페이지에 올라가요.</p>
+      <%= link_to "#{@member.name}님 페이지 보기", public_profile_path(slug: @member.slug), class: "impd-btn impd-btn-primary", style: "margin-top: 16px; min-height: 48px;" %>
+    </div>
+  <% else %>
+    <p style="margin-top: 20px; font-size: 15px; line-height: 1.8; color: var(--impd-ink2);">
+      함께한 경험을 들려주세요. 작성한 후기는 <%= @member.name %>님의 승인 후 공개 페이지에 표시됩니다.
+    </p>
 
-  <div style="margin-top: 36px; padding: 28px; background: var(--impd-card); border: 1px solid var(--impd-rule);">
-    <%= form_with model: @review, url: member_reviews_path(slug: @member.slug) do |form| %>
-      <% if @review.errors.any? %>
-        <div style="margin-bottom: 24px; padding: 14px 16px; border-left: 3px solid var(--impd-accent-2); background: var(--impd-gold-light); color: var(--impd-ink2); font-size: 13px; line-height: 1.7;">
-          <p style="font-weight: 700;">입력 내용을 확인해주세요.</p>
-          <ul style="margin: 6px 0 0; padding-left: 18px;">
-            <% @review.errors.full_messages.each do |message| %>
-              <li><%= message %></li>
+    <div style="margin-top: 36px; padding: 28px; background: var(--impd-card); border: 1px solid var(--impd-rule);">
+      <%= form_with model: @review, url: member_reviews_path(slug: @member.slug) do |form| %>
+        <% if @review.errors.any? %>
+          <div id="review-alert" role="alert" style="margin-bottom: 24px; padding: 14px 16px; border-left: 3px solid var(--impd-accent-2); background: var(--impd-gold-light); color: var(--impd-ink2); font-size: 13px; line-height: 1.7;">
+            <% rating_error = @review.errors[:rating].any? %>
+            <% name_error = @review.errors[:reviewer_name].any? %>
+            <% if rating_error %><p>별점을 골라 주세요.</p><% end %>
+            <% if name_error %><p>이름을 적어 주세요.</p><% end %>
+            <% unless rating_error || name_error %><p>입력한 내용을 다시 확인해 주세요.</p><% end %>
+          </div>
+        <% end %>
+
+        <fieldset style="margin: 0; padding: 0; border: 0;">
+          <legend style="font-size: 14px; font-weight: 700; color: var(--impd-ink);">별점 <span style="color: var(--impd-accent);">필수</span></legend>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+            <% (1..5).each do |rating| %>
+              <label style="display: inline-flex; align-items: center; gap: 6px; min-height: 48px; padding: 8px 12px; border: 1px solid var(--impd-rule); cursor: pointer; font-size: 14px;">
+                <%= form.radio_button :rating, rating, required: true, style: "font-size: 16px;" %>
+                <span style="color: var(--impd-gold); letter-spacing: 1px;"><% rating.times do %><%= lni_icon "star-fat" %><% end %></span>
+              </label>
             <% end %>
-          </ul>
+          </div>
+        </fieldset>
+
+        <div style="margin-top: 24px;">
+          <%= form.label :content, "후기 내용", style: "display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px;" %>
+          <%= form.text_area :content, rows: 7, placeholder: "함께한 과정과 좋았던 점을 자유롭게 적어주세요.", style: "width: 100%; border: 1px solid #d1d5db; padding: 12px 14px; font-size: 16px; line-height: 1.7; background: #fff; color: var(--impd-ink); resize: vertical;" %>
         </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 16px; margin-top: 20px;">
+          <div>
+            <%= form.label :reviewer_name, "이름", style: "display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px;" %>
+            <%= form.text_field :reviewer_name, required: true, autocomplete: "name", style: "width: 100%; border: 1px solid #d1d5db; padding: 12px 14px; font-size: 16px; min-height: 48px; background: #fff; color: var(--impd-ink);" %>
+            <p style="margin-top: 6px; font-size: 13px; color: var(--impd-ink2);">이름은 후기와 함께 공개돼요.</p>
+          </div>
+          <div>
+            <%= form.label :reviewer_email, "이메일 (선택)", style: "display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px;" %>
+            <%= form.email_field :reviewer_email, autocomplete: "email", style: "width: 100%; border: 1px solid #d1d5db; padding: 12px 14px; font-size: 16px; min-height: 48px; background: #fff; color: var(--impd-ink);" %>
+            <p style="margin-top: 6px; font-size: 13px; color: var(--impd-ink2);">이메일은 공개되지 않아요.</p>
+          </div>
+        </div>
+
+        <div aria-hidden="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;">
+          <label for="website">웹사이트</label>
+          <%= text_field_tag :website, nil, tabindex: -1, autocomplete: "off" %>
+        </div>
+
+        <p style="margin-top: 24px; font-size: 13px; line-height: 1.7; color: var(--impd-muted);">
+          <%= @member.name %>님이 확인하기 전에는 공개되지 않아요.
+        </p>
+        <%= form.submit "후기 등록하기", class: "impd-btn impd-btn-primary", style: "width: 100%; justify-content: center; margin-top: 12px; font-size: 16px;" %>
       <% end %>
-
-      <fieldset style="margin: 0; padding: 0; border: 0;">
-        <legend style="font-size: 14px; font-weight: 700; color: var(--impd-ink);">별점 <span style="color: var(--impd-accent);">필수</span></legend>
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
-          <% (1..5).each do |rating| %>
-            <label style="display: inline-flex; align-items: center; gap: 6px; min-height: 42px; padding: 8px 12px; border: 1px solid var(--impd-rule); cursor: pointer; font-size: 14px;">
-              <%= form.radio_button :rating, rating, required: true %>
-              <span style="color: var(--impd-gold); letter-spacing: 1px;"><% rating.times do %><%= lni_icon "star-fat" %><% end %></span>
-            </label>
-          <% end %>
-        </div>
-      </fieldset>
-
-      <div style="margin-top: 24px;">
-        <%= form.label :content, "후기 내용", style: "display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px;" %>
-        <%= form.text_area :content, rows: 7, placeholder: "함께한 과정과 좋았던 점을 자유롭게 적어주세요.", style: "width: 100%; border: 1px solid #d1d5db; padding: 10px 12px; font-size: 14px; line-height: 1.7; background: #fff; color: var(--impd-ink); resize: vertical;" %>
-      </div>
-
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 20px;">
-        <div>
-          <%= form.label :reviewer_name, "이름", style: "display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px;" %>
-          <%= form.text_field :reviewer_name, required: true, autocomplete: "name", style: "width: 100%; border: 1px solid #d1d5db; padding: 10px 12px; font-size: 14px; background: #fff; color: var(--impd-ink);" %>
-        </div>
-        <div>
-          <%= form.label :reviewer_email, "이메일 (선택)", style: "display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px;" %>
-          <%= form.email_field :reviewer_email, autocomplete: "email", style: "width: 100%; border: 1px solid #d1d5db; padding: 10px 12px; font-size: 14px; background: #fff; color: var(--impd-ink);" %>
-        </div>
-      </div>
-
-      <div aria-hidden="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;">
-        <label for="website">웹사이트</label>
-        <%= text_field_tag :website, nil, tabindex: -1, autocomplete: "off" %>
-      </div>
-
-      <p style="margin-top: 24px; font-size: 12px; line-height: 1.7; color: var(--impd-muted);">
-        제출한 후기는 승인 전까지 공개되지 않습니다.
-      </p>
-      <%= form.submit "후기 등록하기", class: "impd-btn impd-btn-primary", style: "width: 100%; justify-content: center; margin-top: 12px;" %>
-    <% end %>
-  </div>
+    </div>
+  <% end %>
 </main>

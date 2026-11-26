@@ -44,7 +44,7 @@
       <p style="color: var(--impd-ink2); margin-top: 4px;">남겨 주시면 <%= member.name %>님이 직접 확인하고 연락드려요.</p>
       <%= form_with model: MemberInquiry.new, url: member_inquiries_path(slug: member.slug), class: "public-form" do |form| %>
         <%= form.label :sender_name, "이름" %><%= form.text_field :sender_name, required: true, autocomplete: "name" %>
-        <%= form.label :sender_email, "연락처 (전화 또는 이메일)" %><%= form.text_field :sender_email, required: true, autocomplete: "on", placeholder: "010-0000-0000 또는 메일 주소" %>
+        <%= form.label :sender_email, "연락처 (전화 또는 이메일)" %><%= form.text_field :sender_email, required: true, autocomplete: "on", autocapitalize: "none", autocorrect: "off", spellcheck: "false", placeholder: "010-0000-0000 또는 메일 주소" %>
         <%= form.label :message, "문의 내용" %><%= form.text_area :message, required: true, minlength: 5, maxlength: 2000, rows: 5, placeholder: "궁금한 점이나 원하는 상담 내용을 적어 주세요." %>
         <label class="public-consent"><%= form.check_box :consent, { required: true }, "1", "0" %><span>이름과 연락처를 답변을 위해 <%= member.name %>님에게 전달하는 데 동의합니다. (필수)</span></label>
         <p class="public-consent-link"><a href="/privacy" target="_blank" rel="noopener">개인정보처리방침 보기</a></p>

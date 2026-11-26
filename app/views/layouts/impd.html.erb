@@ -202,7 +202,7 @@
   <body>
     <a class="skip-link" href="#main-content"><%= lni_icon "arrow-right" %>본문 바로가기</a>
     <!-- C2 Join Strip — 최상단 검정 bar (비로그인에만) -->
-    <% unless member_signed_in? || %w[public_profile public_photos].include?(controller_path) %>
+    <% unless member_signed_in? || %w[public_profile public_photos member_reviews].include?(controller_path) %>
       <div class="impd-joinstrip" style="background: #000; color: #fff; padding: 10px 24px; display: flex; align-items: center; gap: 14px; font-size: 13px; letter-spacing: -0.01em;">
         <span style="opacity: 0.9;">지금 가입하면 첫 페이지 제작 무료 · 수수료 없이 3개월</span>
         <span style="flex: 1;"></span>
@@ -212,7 +212,7 @@
 
     <!-- imPD TopNav — C2 whisper-soft shadow -->
     <% nav_links = [["홈", root_path, request.path == "/"], ["둘러보기", explore_path, request.path.start_with?("/explore")], ["예시", example_profile_path, false], ["가격", root_path(anchor: "pricing"), false], ["도움말", root_path(anchor: "faq"), false]] %>
-    <% visitor_page = %w[public_profile public_photos].include?(controller_path) && @member.present? && !member_signed_in? %>
+    <% visitor_page = %w[public_profile public_photos member_reviews].include?(controller_path) && @member.present? && !member_signed_in? %>
     <style>
       .impd-topnav { position: sticky; top: 0; z-index: 20; background: var(--impd-card); box-shadow: var(--impd-shadow-nav); }
       .impd-topnav-bar { padding: 18px 24px; display: flex; align-items: center; gap: 20px; }
@@ -301,7 +301,7 @@
 
     <%= render "shared/flash" unless action_name == "new" && %w[member_auth member_sessions].include?(controller_path) %>
 
-    <% hide_frap = %w[public_profile public_photos growth member_brand_ops].include?(controller_path) || (action_name == "new" && %w[member_signups member_auth member_sessions].include?(controller_path)) || request.path.match?(%r{\A/[^/]+/admin(?:/|\z)}) %>
+    <% hide_frap = %w[public_profile public_photos member_reviews growth member_brand_ops].include?(controller_path) || (action_name == "new" && %w[member_signups member_auth member_sessions].include?(controller_path)) || request.path.match?(%r{\A/[^/]+/admin(?:/|\z)}) %>
     <main id="main-content" tabindex="-1" class="<%= "impd-main-with-frap" unless hide_frap %>">
       <%= yield %>
     </main>

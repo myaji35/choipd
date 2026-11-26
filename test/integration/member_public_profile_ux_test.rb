@@ -29,6 +29,62 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
     assert_select "#promo-popup-overlay", count: 1
   end
 
+  %w[editorial grid].each do |layout|
+    test "#{layout} disables keyboard corrections for the contact field" do
+      @member.update!(layout_preset: layout)
+      get "/#{@member.slug}"
+
+      assert_select 'input#member_inquiry_sender_email[type=text][autocapitalize=none][autocorrect=off][spellcheck=false][autocomplete=on]'
+    end
+  end
+
+  test "editorial shows written reviews even when the latest review has only a rating" do
+    @member.update!(layout_preset: "editorial")
+    @member.member_reviews.create!(reviewer_name: "김고객", rating: 5, status: "triaged", content: "설명이 쉬웠어요.", created_at: 2.days.ago)
+    @member.member_reviews.create!(reviewer_name: "이고객", rating: 4, status: "triaged", created_at: 1.day.ago)
+
+    get "/#{@member.slug}"
+
+    assert_select "#reviews .impd-quote", text: /설명이 쉬웠어요/
+    assert_select "#reviews .impd-quote-source", text: /김고객/
+  end
+
+  test "editorial shows the three newest written reviews" do
+    @member.update!(layout_preset: "editorial")
+    4.times do |index|
+      @member.member_reviews.create!(reviewer_name: "김고객", rating: 5, status: "triaged", content: "후기 내용 #{index}", created_at: (4 - index).days.ago)
+    end
+
+    get "/#{@member.slug}"
+
+    assert_select "#reviews .impd-quote", text: /후기 내용 3/
+    assert_select "#reviews figure", count: 2
+    assert_select "#reviews figure blockquote", text: /후기 내용 2/
+    assert_select "#reviews figure blockquote", text: /후기 내용 1/
+    assert_select "#reviews p, #reviews blockquote", text: /후기 내용 0/, count: 0
+  end
+
+  test "editorial hides reviews awaiting approval" do
+    @member.update!(layout_preset: "editorial")
+    @member.member_reviews.create!(reviewer_name: "김고객", rating: 5, status: "new", content: "비공개 후기")
+
+    get "/#{@member.slug}"
+
+    assert_select "#reviews", count: 0
+  end
+
+  test "editorial escapes review content" do
+    @member.update!(layout_preset: "editorial")
+    content = "<script>alert(1)</script>"
+    @member.member_reviews.create!(reviewer_name: "김고객", rating: 5, status: "triaged", content: content)
+
+    get "/#{@member.slug}"
+
+    assert_select "#reviews script", count: 0
+    assert_select "#reviews .impd-quote", text: /#{Regexp.escape(content)}/
+    assert_not_includes response.body, content
+  end
+
   test "both layouts omit empty photos and services and show insurance disclosure" do
     [ "editorial", "grid" ].each do |layout|
       @member.update!(layout_preset: layout)

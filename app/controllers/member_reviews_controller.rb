@@ -9,9 +9,8 @@ class MemberReviewsController < ApplicationController
 
   def create
     if params[:website].present?
-      redirect_to member_review_new_path(slug: @member.slug),
-                  notice: success_message,
-                  status: :see_other
+      flash[:review_sent] = true
+      redirect_to member_review_new_path(slug: @member.slug), status: :see_other
       return
     end
 
@@ -20,11 +19,9 @@ class MemberReviewsController < ApplicationController
     @review.status = "new"
 
     if @review.save
-      redirect_to member_review_new_path(slug: @member.slug),
-                  notice: success_message,
-                  status: :see_other
+      flash[:review_sent] = true
+      redirect_to member_review_new_path(slug: @member.slug), status: :see_other
     else
-      flash.now[:alert] = "입력 내용을 확인해주세요."
       render :new, status: :unprocessable_entity
     end
   end
@@ -37,9 +34,5 @@ class MemberReviewsController < ApplicationController
 
   def review_params
     params.require(:member_review).permit(:rating, :content, :reviewer_name, :reviewer_email)
-  end
-
-  def success_message
-    "후기가 등록되었습니다. #{@member.name}님의 승인 후 공개됩니다."
   end
 end
