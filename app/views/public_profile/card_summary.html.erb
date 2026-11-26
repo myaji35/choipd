@@ -24,6 +24,7 @@
     .card-wrap { padding: 16px 14px 32px !important; }
     .cs-left   { padding: 20px 18px !important; gap: 10px !important; }
     .cs-name   { font-size: 38px !important; letter-spacing: -1.4px !important; }
+    .cs-offer  { font-size: 14px !important; }
     .cs-bio    { font-size: 13px !important; padding-top: 10px !important; }
     .cs-contacts { padding-top: 10px !important; }
     .cs-full   { height: 44px !important; font-size: 13px !important; margin-top: 8px !important; }
@@ -57,6 +58,9 @@
   .cs-meta { font-size: 13px; color: var(--impd-ink2); line-height: 1.5; }
   .cs-meta dt { display: inline; font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-muted); margin-right: 6px; }
   .cs-meta dd { display: inline; margin: 0 14px 0 0; }
+
+  .cs-offer { font-family: var(--impd-font-sans); font-size: 15px; font-weight: 600; line-height: 1.5; color: var(--impd-ink); max-width: 48ch; }
+  .cs-offer-label { display: inline-block; margin-right: 8px; padding: 2px 8px; border: 1px solid var(--impd-accent); border-radius: 4px; color: var(--impd-accent); font-size: 12px; font-weight: 600; }
 
   .cs-bio {
     font-family: var(--impd-font-serif); font-style: italic;
@@ -172,6 +176,11 @@
           <dt>달란트</dt><dd><%= @skills_top.size %>개</dd>
         <% end %>
       </dl>
+
+      <% card_services = @services.to_a %>
+      <% if card_services.any? %>
+        <p class="cs-offer"><span class="cs-offer-label">하는 일</span> <%= card_services.first(3).map(&:title).join(" · ") %><% if card_services.size > 3 %> 외 <%= card_services.size - 3 %>개<% end %></p>
+      <% end %>
 
       <% if @member.bio.present? %>
         <p class="cs-bio">"<%= truncate(@member.bio.to_s, length: 140) %>"</p>

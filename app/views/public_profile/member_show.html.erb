@@ -4,7 +4,7 @@
   <% content_for :og_image, URI.join("#{public_base_url}/", @member.profile_image).to_s %>
 <% end %>
 <% if @member.layout_preset == "grid" %>
-<%= render "public_profile/grid_layout", member: @member, services: @services, moments: @moments, portfolio: @portfolio %>
+<%= render "public_profile/grid_layout", member: @member, services: @services, moments: @moments, portfolio: @portfolio, faqs: @faqs, reviews: @reviews %>
 <% else %>
 <% content_for :title, "#{@member.name} | imPD" %>
 <% content_for :description, @member.bio.to_s.first(160) %>
@@ -202,9 +202,6 @@
       <span class="impd-display impd-stat-num">일상 장면</span>
       <span class="impd-label-muted">사진 <%= @member.member_photos.count %>개</span>
     </div>
-    <p style="font-family: var(--impd-font-serif); font-size: 17px; color: var(--impd-ink2); line-height: 1.55; max-width: 58ch; margin-bottom: 28px;">
-      작업 현장, 수강생의 환한 표정, 손끝의 순간들. 한 장의 사진이 한 줄의 카피보다 많은 것을 전합니다.
-    </p>
 
     <%# 에디토리얼 마소나리.
         사진 1장 = 4/3 풀폭, 2장 = 각 1/1 2열, 3장+ = 마소나리 (첫 크게 + 나머지 정방형) %>

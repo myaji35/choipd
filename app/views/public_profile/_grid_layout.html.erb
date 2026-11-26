@@ -1,10 +1,12 @@
+<% faqs = local_assigns.fetch(:faqs, []) %>
+<% reviews = local_assigns.fetch(:reviews, []) %>
 <% portfolio = local_assigns.fetch(:portfolio, []) %>
 <% content_for :title, "#{member.name} | imPD" %>
 <% content_for :description, member.bio.to_s.first(160) %>
 
 <%
   grid_photos = moments.to_a.select { |photo| photo.image.attached? }.first(6)
-  grid_services = services.to_a.first(3)
+  grid_services = services.to_a.first(6)
   grid_cases = portfolio.lazy.filter_map do |item|
     media = portfolio_media(item)
     next unless media[:link_url]
@@ -40,6 +42,11 @@
   .impd-bento-photo figcaption { position: absolute; inset: auto 0 0; padding: 28px 16px 14px; color: var(--impd-on-dark); background: linear-gradient(transparent, var(--impd-ink)); }
   .impd-bento-heading { font-family: var(--impd-font-display); font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; }
   .impd-bento-case { word-break: keep-all; overflow-wrap: anywhere; }
+  .impd-bento-faq details { border-top: 1px solid var(--impd-rule); }
+  .impd-bento-faq details:first-of-type { margin-top: 12px; }
+  .impd-bento-faq summary { min-height: 44px; display: flex; align-items: center; gap: 8px; padding: 8px 0; font-weight: 600; cursor: pointer; }
+  .impd-bento-faq details p { margin: 0 0 12px; color: var(--impd-ink2); line-height: 1.7; white-space: pre-line; }
+  .impd-bento-career, .impd-bento-review, .impd-bento-faq { word-break: keep-all; overflow-wrap: anywhere; }
   .impd-bento-link { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid var(--impd-rule); color: var(--impd-ink); text-decoration: none; overflow-wrap: anywhere; }
   @media (max-width: 620px) {
     .impd-grid-page { padding: 20px; }
@@ -92,6 +99,34 @@
         </div>
         <p style="margin-top: 16px; min-height: 44px; display: flex; align-items: center; color: var(--impd-accent); font-weight: 600; overflow-wrap: anywhere;"><%= [host, "보러 가기 ↗"].compact.join(" ") %></p>
       </a>
+    <% end %>
+
+    <% if member.career_note.present? && member.profession != "insurance_agent" %>
+      <section class="impd-bento-tile impd-bento-career">
+        <span class="impd-label">경력 · 이력</span>
+        <p style="margin-top: 12px; color: var(--impd-ink2); line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere;"><%= member.career_note %></p>
+      </section>
+    <% end %>
+
+    <% review = reviews.find { |r| r.content.present? } %>
+    <% if review %>
+      <figure class="impd-bento-tile impd-bento-review" style="margin: 0;">
+        <span class="impd-label">후기</span>
+        <blockquote style="margin: 12px 0 0; line-height: 1.7; overflow-wrap: anywhere;">"<%= review.content %>"</blockquote>
+        <figcaption style="margin-top: 12px; font-size: 14px; color: var(--impd-ink2);">— <%= review.reviewer_name %><% if review.rating.to_i.positive? %> · <% review.rating.to_i.times do %><%= lni_icon "star-fat" %><% end %><% end %></figcaption>
+      </figure>
+    <% end %>
+
+    <% if faqs.any? %>
+      <section class="impd-bento-tile impd-bento-faq">
+        <span class="impd-label">자주 묻는 질문</span>
+        <% faqs.first(5).each do |faq| %>
+          <details>
+            <summary><%= faq.question %></summary>
+            <p><%= faq.answer %></p>
+          </details>
+        <% end %>
+      </section>
     <% end %>
 
     <% if social_entries.any? %>

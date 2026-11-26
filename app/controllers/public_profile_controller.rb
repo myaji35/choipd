@@ -49,6 +49,7 @@ class PublicProfileController < ApplicationController
                          .where.not(skills: { canonical_name: nil })
                          .order(weight: :desc)
                          .limit(4)
+    @services = @member.member_services.active.sorted
     track_visit(@member, category: "card_summary")
     render :card_summary
   end

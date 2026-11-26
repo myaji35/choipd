@@ -326,6 +326,107 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "요약 명함에 하는 일을 보여 준다" do
+    @member.member_services.create!(title: "보장 분석 상담", is_active: 1, sort_order: 0)
+    @member.member_services.create!(title: "보험금 청구 도움", is_active: 1, sort_order: 1)
+
+    get public_profile_card_path(slug: @member.slug)
+
+    assert_select ".cs-left p.cs-offer", text: /하는 일\s*보장 분석 상담 · 보험금 청구 도움/
+    assert_operator response.body.index('class="cs-offer"'), :<, response.body.index('class="cs-inquiry"')
+  end
+
+  test "요약 명함도 서비스가 넷 이상이면 셋만 적는다" do
+    (1..5).each do |order|
+      @member.member_services.create!(title: "서비스 #{order}", is_active: 1, sort_order: order)
+    end
+
+    get public_profile_card_path(slug: @member.slug)
+
+    assert_select ".cs-offer", text: "하는 일 서비스 1 · 서비스 2 · 서비스 3 외 2개"
+  end
+
+  test "서비스가 없거나 마감뿐이면 요약 명함에 하는 일 줄이 없다" do
+    get public_profile_card_path(slug: @member.slug)
+    assert_select ".cs-offer", count: 0
+
+    @member.member_services.create!(title: "마감된 상담", is_active: 0)
+
+    get public_profile_card_path(slug: @member.slug)
+    assert_select ".cs-offer", count: 0
+  end
+
+  test "카드 모음형에도 경력·후기·자주 묻는 질문을 보여 준다" do
+    @member.update!(layout_preset: "grid", profession: "creator", career_note: "동네 가게 홍보 10년")
+    @member.member_faqs.create!(question: "상담은 어떻게 하나요?", answer: "전화로 먼저 이야기해요.", is_published: 1)
+    @member.member_reviews.create!(reviewer_name: "김고객", rating: 5, status: "triaged", content: "설명이 쉬웠어요.")
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select ".impd-bento .impd-bento-career p", text: "동네 가게 홍보 10년"
+    assert_select ".impd-bento .impd-bento-review blockquote", text: /설명이 쉬웠어요\./
+    assert_select ".impd-bento .impd-bento-review figcaption", text: /김고객/
+    assert_select ".impd-bento .impd-bento-faq details summary", text: "상담은 어떻게 하나요?"
+    assert_select ".impd-bento .impd-bento-faq details[open]", count: 0
+    assert_operator response.body.index('class="impd-bento-tile impd-bento-career"'), :<, response.body.index('id="contact"')
+  end
+
+  test "자료가 없으면 카드 모음형에 빈 타일을 만들지 않는다" do
+    @member.update!(layout_preset: "grid", profession: "creator")
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select ".impd-bento-career, .impd-bento-review, .impd-bento-faq", count: 0
+  end
+
+  test "공개하지 않은 후기·질문은 카드 모음형에도 나오지 않는다" do
+    @member.update!(layout_preset: "grid")
+    @member.member_faqs.create!(question: "비공개 질문", answer: "비공개 답변", is_published: 0)
+    @member.member_reviews.create!(reviewer_name: "김고객", rating: 5, status: "new", content: "비공개 후기")
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select ".impd-bento-review", count: 0
+    assert_select ".impd-bento-faq", count: 0
+  end
+
+  test "보험설계사는 경력을 상담 안내에만 보여 준다" do
+    @member.update!(layout_preset: "grid", career_note: "보험 상담 10년")
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select ".impd-bento-career", count: 0
+    assert_select ".public-member-inner p", text: /자격·경력:.*보험 상담 10년/m
+  end
+
+  test "카드 모음형도 서비스를 여섯 개까지 보여 준다" do
+    @member.update!(layout_preset: "grid")
+    (1..5).each do |order|
+      @member.member_services.create!(title: "서비스 #{order}", is_active: 1, sort_order: order)
+    end
+
+    get public_profile_path(slug: @member.slug)
+    assert_select ".impd-bento article a.public-service-action", count: 5
+
+    (6..7).each do |order|
+      @member.member_services.create!(title: "서비스 #{order}", is_active: 1, sort_order: order)
+    end
+
+    get public_profile_path(slug: @member.slug)
+    assert_select ".impd-bento article a.public-service-action", count: 6
+  end
+
+  test "일상 장면 칸에 회원이 쓰지 않은 소개 문장을 넣지 않는다" do
+    @member.update!(layout_preset: "editorial")
+    @member.member_photos.create!(category: "daily", image: fixture_file_upload(Rails.root.join("public/icon.png"), "image/png"))
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select "#moments"
+    assert_not_includes response.body, "수강생의 환한 표정"
+    assert_not_includes response.body, "한 줄의 카피보다"
+  end
+
   private
 
   def assert_visitor_topnav
