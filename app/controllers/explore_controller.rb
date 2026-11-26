@@ -8,8 +8,14 @@ class ExploreController < ApplicationController
     @total_count = @profession_groups.sum { |group| group[:count] }
     @regions = available.where.not(region: [nil, ""]).group(:region).count.sort.to_h
     @current_region = params[:region].presence
+    profession = params[:profession].presence
     @selected_profession = @profession_groups.find do |group|
-      params[:profession].present? && (group[:key] == params[:profession] || group[:values].include?(params[:profession]))
+      profession && (group[:key] == profession || group[:values].include?(profession))
+    end
+    if @selected_profession.nil? && Member::PROFESSIONS.include?(profession)
+      label, icon = helpers.member_profession_details(profession)
+      @selected_profession = { label: label, icon: icon, count: 0, values: [profession], key: profession }
+      @profession_groups << @selected_profession
     end
     @current_profession = @selected_profession&.fetch(:key)
 
