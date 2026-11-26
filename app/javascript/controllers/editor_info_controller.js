@@ -3,6 +3,8 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["bio", "bioCount", "bioHint", "profession", "customProfession", "photoStatus"]
 
+  static values = { task: String }
+
   connect() {
     this.updateBioCount()
     this.toggleProfession()
@@ -78,7 +80,9 @@ export default class extends Controller {
     this.bioCountTarget.textContent = count
     if (!this.hasBioHintTarget) return
 
-    if (count < 20) {
+    if (this.taskValue === "bio") {
+      this.bioHintTarget.textContent = count < 50 ? `${50 - count}자만 더 쓰면 이 할 일이 끝나요.` : "충분해요."
+    } else if (count < 20) {
       this.bioHintTarget.textContent = "20자를 넘기면 내 페이지를 공개할 수 있어요."
     } else if (count < 50) {
       this.bioHintTarget.textContent = "공개할 수 있어요. 50자를 넘기면 준비 항목 '자기소개'가 채워져요."

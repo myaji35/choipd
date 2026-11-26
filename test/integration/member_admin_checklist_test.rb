@@ -32,11 +32,13 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
     get path, params: { from: "checklist", task: "bio" }
     assert_select "#bio [data-task-save=bio] button[type=submit]", count: 1
     assert_select "[data-task-save=profession-region]", count: 0
+    assert_select "[data-task-save=docs]", count: 0
     assert_operator response.body.index('data-task-save="bio"'), :<, response.body.index('id="profession-region"')
 
     get path, params: { from: "checklist", task: "profession-region" }
     assert_select "#profession-region + [data-task-save=profession-region] button[type=submit]", count: 1
     assert_select "[data-task-save=bio]", count: 0
+    assert_select "[data-task-save=docs]", count: 0
     save_position = response.body.index('data-task-save="profession-region"')
     assert_operator response.body.index('id="member_region"'), :<, save_position
     assert_operator save_position, :<, response.body.index('name="member[email]"')
@@ -45,6 +47,9 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
     assert_select "[data-task-save]", count: 0
 
     get path, params: { task: "bio" }
+    assert_select "[data-task-save]", count: 0
+
+    get path, params: { task: "docs" }
     assert_select "[data-task-save]", count: 0
   end
 
@@ -98,7 +103,7 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
       "직업·지역 정하기" => [ "profession-region", "직업과 지역 적기" ],
       "작업 사진 올리기" => [ "media", "작업 사진·사례 올리기" ],
       "서비스 등록하기" => [ "new-service", "서비스 1개 넣기" ],
-      "경력 글 올리기" => [ "docs", "경력을 적은 글 올리기" ]
+      "경력 적기" => [ "career-note", "경력 적기" ]
     }
     links = css_select('a[href*="from=checklist"]').to_h { |link| [ link.text.strip, link["href"] ] }
     assert_equal actions.keys.sort, links.keys.sort
@@ -113,7 +118,12 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
       assert_select ".checklist-arrival", text: /#{Regexp.escape(label)}/ do
         assert_select "a[href=?]", @dashboard_path, text: "대시보드로 돌아가기 ←"
       end
-      if %w[media docs].include?(anchor)
+      if anchor == "career-note"
+        assert_includes URI.decode_www_form(uri.query), [ "step", "2" ]
+        assert_select "#career-note.checklist-target textarea#member_career_note", count: 1
+        assert_select "[data-task-save=docs] button[type=submit]", count: 1
+      end
+      if anchor == "media"
         assert_select "##{anchor}:not([hidden])", count: 1
         assert_select "[aria-controls=?][aria-pressed=true]", anchor, count: 1
       end
@@ -219,6 +229,11 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
       [nil, "checklist"].each do |from|
         get slug_admin_editor_path(slug: @member.slug, step: 1, tab: tab, from: from, task: tab)
         assert_response :ok
+        if tab == "docs"
+          assert_select "#docs:not([hidden]).checklist-target", count: 1
+          assert_select "[aria-controls=docs][aria-pressed=true]", count: 1
+          assert_select "[data-career-note-link][href*='step=2'][href$='#career-note']", count: 1
+        end
         prefix = "data-member-#{uploader}-uploader"
         create_url = public_send(route, slug: @member.slug, format: :json, from: from)
         assert_select "##{tab} [#{prefix}-create-url-value=?]", create_url
@@ -297,7 +312,75 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "bio checklist shows the remaining characters only on checklist arrival" do
+    path = slug_admin_editor_path(slug: @member.slug, step: 2)
+    task_selector = "[data-controller~='editor-info'][data-editor-info-task-value='bio']"
+    get path, params: { from: "checklist", task: "bio" }
+    assert_select "#member_bio_count", text: /50자만 더 쓰면 이 할 일이 끝나요./
+    assert_select task_selector, count: 1
+
+    @member.update!(bio: "가" * 24)
+    get path, params: { from: "checklist", task: "bio" }
+    assert_select "#member_bio_count", text: /26자만 더 쓰면 이 할 일이 끝나요./
+
+    @member.update!(bio: "")
+    get path, params: { task: "bio" }
+    assert_select "#member_bio_count", text: /20자를 넘기면 내 페이지를 공개할 수 있어요./
+    assert_select "[data-editor-info-task-value]", count: 0
+  end
+
+  test "bio checklist save explains what remains only below 50 characters" do
+    assert_checklist_save "bio", { bio: "가" * 24 },
+      "저장했어요. 자기소개가 지금 24자예요. 26자만 더 쓰면 이 할 일이 끝나요."
+    assert_equal "가" * 24, @member.reload.bio
+    assert_checklist_save "bio", { bio: "가" * 60 }
+  end
+
+  test "profession and region checklist save identifies the missing fields" do
+    assert_checklist_save "profession-region", { profession: "educator", region: "" },
+      "저장했어요. 지역도 적으면 이 할 일이 끝나요."
+    assert_checklist_save "profession-region", { profession: "custom", custom_profession: "", region: "서울" },
+      "저장했어요. 직업도 고르면 이 할 일이 끝나요."
+    assert_checklist_save "profession-region", { profession: "", region: "" },
+      "저장했어요. 직업과 지역을 적으면 이 할 일이 끝나요."
+    assert_checklist_save "profession-region", { profession: "educator", region: "서울" }
+  end
+
+  test "career checklist can be completed without uploading a document" do
+    @member.update!(bio: "가" * 60, profession: "educator", region: "서울", profile_image: "/icon.png")
+    @member.member_services.create!(title: "첫 상담")
+    create_photo(@member)
+
+    assert_checklist_save "docs", { career_note: " " },
+      "저장했어요. 경력 칸이 비어 있어요. 한 줄만 적어도 이 할 일이 끝나요."
+    assert_select '.dashboard-next[data-next-task="docs"]'
+    assert_select "[data-all-done-actions]", count: 0
+
+    assert_checklist_save "docs", { career_note: "시험 경력 10년" },
+      "경력을 저장했어요. 아래에서 다음에 할 일을 확인해 보세요."
+    assert_equal "시험 경력 10년", @member.reload.career_note
+    assert_empty @member.member_documents
+    assert_select ".dashboard-next", text: /준비 항목을 모두 마쳤어요/
+    assert_select "[data-all-done-actions]", count: 1
+  end
+
+  test "an uploaded document still completes the career task" do
+    @member.member_documents.create!(filename: "career.txt", category: "career", content_md: "시험용 글")
+
+    assert_checklist_save "docs", { career_note: "" }
+    assert_select '.dashboard-next a[href*="task=docs"]', count: 0
+    assert_select ".dashboard-next summary", text: /6개 중 1개/
+  end
+
   private
+
+  def assert_checklist_save(task, attributes, notice = "내 정보를 저장했어요. 아래 '다음 할 일'을 이어서 해 보세요.")
+    patch slug_admin_editor_update_info_path(slug: @member.slug),
+      params: { from: "checklist", task: task, member: attributes }
+    assert_redirected_to @dashboard_path
+    follow_redirect!
+    assert_select "[role=status]", text: notice
+  end
 
   def create_member
     slug = "checklist-#{SecureRandom.hex(4)}"

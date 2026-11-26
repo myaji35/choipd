@@ -156,7 +156,7 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "하러 가기"
     assert_no_match(/준비 \d+%/, response.body)
     assert_select ".editor-page a[href*='from=checklist']", count: 0
-    %w[profile-photo bio profession-region media new-service docs].each do |anchor|
+    %w[profile-photo bio profession-region media new-service career-note].each do |anchor|
       assert_select ".editor-page li a[href$='##{anchor}']", count: 1
     end
   end

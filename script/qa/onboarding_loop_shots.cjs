@@ -39,7 +39,7 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
       const writeDoc = document.querySelector('#write-doc');
       const fileLabel = document.querySelector('[data-member-doc-uploader-target="fileInput"]')?.closest('label');
       const task = new URLSearchParams(location.search).get('task');
-      const lastTaskField = document.querySelector(task === 'bio' ? '#member_bio' : '#member_region');
+      const lastTaskField = document.querySelector(task === 'bio' ? '#member_bio' : task === 'docs' ? '#member_career_note' : '#member_region');
       const taskSave = document.querySelector('[data-task-save] button[type=submit]');
       const followingSubmit = Array.from(lastTaskField?.form.querySelectorAll('button[type=submit]') ?? [])
         .find(button => lastTaskField.compareDocumentPosition(button) & Node.DOCUMENT_POSITION_FOLLOWING);
@@ -58,10 +58,12 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
         momentsShown: !!document.querySelector('#moments'),
         profFieldInFold: inFold(document.querySelector('#member_profession')),
         mediaButtonsInFold: inFold(document.querySelector('[data-member-photo-uploader-target="galleryInput"]')?.closest('label')),
+        careerFieldInFold: inFold(document.querySelector('#member_career_note')),
+        bioHint: document.querySelector('[data-editor-info-target=bioHint]')?.textContent.trim() ?? null,
         docWriteInFold: inFold(document.querySelector('#doc_paste_text')),
         docWriteBeforeFile: !!writeDoc && !!fileLabel && writeDoc.getBoundingClientRect().top < fileLabel.getBoundingClientRect().top,
         workNoticeSeen: fold.includes('작업 사진을 올렸어요'),
-        docNoticeSeen: fold.includes('경력 글을 올렸어요'),
+        docNoticeSeen: fold.includes('경력을 저장했어요'),
         allDone: document.querySelector('.dashboard-next')?.innerText.includes('모두 마쳤어요') ?? false,
         allDoneCopyInFold: inFold(document.querySelector('[data-all-done-actions] button')),
         overflowX: document.documentElement.scrollWidth > document.documentElement.clientWidth,
@@ -97,7 +99,7 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
         nextTask, nextHref, nextStepInFold, nextStepTask, ownerNext,
         bioFieldInFold, bioPlaceholderLen, arrivalSeen, bioRequiredMarks,
         photoPickerInFold, photoCapture, photoNoticeSeen, doneCount, profFieldInFold, mediaButtonsInFold,
-        workNoticeSeen, docNoticeSeen, docWriteInFold, docWriteBeforeFile, allDone, allDoneCopyInFold,
+        workNoticeSeen, docNoticeSeen, careerFieldInFold, bioHint, docWriteInFold, docWriteBeforeFile, allDone, allDoneCopyInFold,
         taskSaveInFold, saveGap, mediaDefaultCategory, categoryLabels, galleryCardsBefore, mediaTabCount } = await metric();
       await snap(page, { path: outDir + '/' + name + '-' + tag + '.png', fullPage: true });
       await snap(page, { path: outDir + '/' + name + '-' + tag + '-fold.png' });
@@ -105,7 +107,7 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
       if (name === 'landing') Object.assign(row, { welcomeSeen, ownerBarInFold, unchosenProfession, ownerNext });
       if (name === 'dashboard' || name === 'first-click') Object.assign(row, { nextTask, nextHref });
       if (name === 'service-added') Object.assign(row, { nextStepInFold, nextStepTask });
-      if (name === 'bio') Object.assign(row, { bioFieldInFold, bioPlaceholderLen, arrivalSeen, bioRequiredMarks });
+      if (name === 'bio') Object.assign(row, { bioFieldInFold, bioPlaceholderLen, arrivalSeen, bioRequiredMarks, bioHintEmpty: bioHint });
       if (name === 'photo') Object.assign(row, { photoPickerInFold, photoCapture, arrivalSeen });
       if (name === 'photo-saved') Object.assign(row, { nextTask, photoNoticeSeen, doneCount });
       if (name === 'prof') Object.assign(row, { profFieldInFold, arrivalSeen });
@@ -122,12 +124,13 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
         if (categoryLabels.join('|') !== '일상|작업|이력') blocked.push('media: 분류 목록이 기대와 다름');
         if (galleryCardsBefore !== 0) blocked.push('media: 프로필 사진이 작업 사진 목록에 섞임');
       }
-      if (['media', 'docs', 'editor1'].includes(name)) {
+      if (['media', 'editor1'].includes(name)) {
         row.mediaTabCount = mediaTabCount;
         if (mediaTabCount !== (name === 'media' ? 0 : 1)) blocked.push(name + ': 사진·영상 수가 기대와 다름');
       }
       if (name === 'media-saved') Object.assign(row, { nextTask, noticeSeen: workNoticeSeen });
-      if (name === 'docs') Object.assign(row, { docWriteInFold, docWriteBeforeFile, arrivalSeen });
+      if (name === 'editor1') Object.assign(row, { docWriteInFold, docWriteBeforeFile });
+      if (name === 'docs') Object.assign(row, { careerFieldInFold, taskSaveInFold, saveGap, arrivalSeen });
       if (name === 'docs-saved') Object.assign(row, { nextTask, noticeSeen: docNoticeSeen, allDone, allDoneCopyInFold });
       if (name === 'bio-saved') row.nextTask = nextTask;
       if (name === 'first-click') {
@@ -270,7 +273,17 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
       blocked.push('bio: 자기소개 칸 없음');
     } else {
       try {
+        const bioHint = page.locator('[data-editor-info-target=bioHint]');
+        await bioField.fill('짧은 소개 글입니다.', { timeout: 5000 });
+        bio.bioHintShort = await bioHint.textContent({ timeout: 5000 });
         await bioField.fill(bioText, { timeout: 5000 });
+        bio.bioHintDone = await bioHint.textContent({ timeout: 5000 });
+        if ([bio.bioHintEmpty, bio.bioHintShort].some(hint => /20자|공개/.test(hint))) {
+          blocked.push('bio: 할 일 기준(50자)과 다른 안내');
+        } else if (bio.bioHintEmpty !== '50자만 더 쓰면 이 할 일이 끝나요.' ||
+                   bio.bioHintShort !== '39자만 더 쓰면 이 할 일이 끝나요.' || bio.bioHintDone !== '충분해요.') {
+          blocked.push('bio: 남은 글자 수 안내가 기대와 다름');
+        }
         bioTyped++;
         await submitTask('bio');
         bioClicks++;
@@ -382,21 +395,23 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
     if (mediaSaved?.url !== dashboardPath + '?done=photos' || mediaSaved.nextTask !== 'docs' || !mediaSaved.noticeSeen) {
       blocked.push('docs: 할 일에 도착하지 못함');
     } else {
-      const docField = page.locator('#doc_paste_text');
+      const careerField = page.locator('#member_career_note');
       try {
-        const docs = await arrive('docs', docField);
-        if (!docs.docWriteBeforeFile) blocked.push('docs: 바로 적는 칸이 파일 고르기 뒤에 있음');
-        if (!docs.docWriteInFold) blocked.push('docs: 바로 적는 칸이 첫 화면 밖');
-        await docField.fill(docText, { timeout: 5000 });
+        const docs = await arrive('docs', careerField);
+        if (!docs.careerFieldInFold) blocked.push('docs: 경력 칸이 첫 화면 밖');
+        if (vw === 390 && (docs.saveGap === null || docs.saveGap > 60)) {
+          blocked.push('docs: 저장 버튼까지 거리가 60px를 넘거나 측정되지 않음');
+        }
+        await careerField.fill(docText, { timeout: 5000 });
         tailTyped++;
-        await page.getByRole('button', { name: '이 글 올리기' }).click({ timeout: 5000 });
+        await submitTask('docs');
         tailClicks++;
         await waitForDashboard();
         const docsSaved = await shot('docs-saved');
         allDone = docsSaved.allDone;
-        tailGuided = docsSaved.url === dashboardPath + '?done=docs' && !docsSaved.nextTask && allDone;
+        tailGuided = docsSaved.url === dashboardPath && !docsSaved.nextTask && allDone;
         if (!tailGuided || !docsSaved.noticeSeen || !docsSaved.allDoneCopyInFold) {
-          blocked.push('docs-saved: 올린 뒤 마무리 안내로 안 이어짐');
+          blocked.push('docs-saved: 저장 뒤 마무리 안내로 안 이어짐');
         }
       } catch (e) {
         blocked.push('docs: 할 일에 도착하지 못함');
@@ -407,7 +422,9 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
     const editorResponse = await page.goto(base + '/' + slug + '/admin/editor?step=1', {waitUntil: 'networkidle'});
     await shot('editor1', { status: editorResponse.status() });
     const pr = await ap.goto(base + '/' + slug, {waitUntil: 'networkidle'}).catch(() => null);
-    const ready = await ap.evaluate(bioPrefix => ({ bio: document.body.innerText.includes(bioPrefix), service: document.body.innerText.includes('첫 상담 서비스'), contactForm: !!document.querySelector('#contact form'), cta: document.querySelector('a.public-service-action[href="#contact"]')?.textContent.trim() === '이 서비스 문의하기', photo: !!document.querySelector('.public-hero img.public-avatar') }), bioText.slice(0, 10));
+    const ready = await ap.evaluate(({ bioPrefix, careerPrefix }) => ({ career: document.body.innerText.includes(careerPrefix), bio: document.body.innerText.includes(bioPrefix), service: document.body.innerText.includes('첫 상담 서비스'), contactForm: !!document.querySelector('#contact form'), cta: document.querySelector('a.public-service-action[href="#contact"]')?.textContent.trim() === '이 서비스 문의하기', photo: !!document.querySelector('.public-hero img.public-avatar') }), { bioPrefix: bioText.slice(0, 10), careerPrefix: docText.slice(0, 12) });
+    const careerShown = ready.career;
+    if (!careerShown) blocked.push('public: 적은 경력이 고객에게 안 보임');
     await snap(ap, { path: outDir + '/public-' + tag + '-fold.png' });
     await snap(ap, { path: outDir + '/public-' + tag + '.png', fullPage: true });
     const ownerBarLeak = await ap.evaluate(() => !!document.querySelector('[data-owner-bar]'));
@@ -417,7 +434,7 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
     else if (momentsHeading !== '작업 사진') blocked.push('public: 작업 사진 제목이 기대와 다름');
     if (faceCopies !== 1 || !momentsShown) blocked.push('public: 프로필 사진이나 작업 사진이 기대와 다름');
     if (unchosenProfession) blocked.push('public: 고르지 않은 직업이 고객에게 보임');
-    report.push({ step: 'public', tag, status: pr && pr.status(), ready, ownerBarLeak,
+    report.push({ step: 'public', tag, status: pr && pr.status(), ready, careerShown, ownerBarLeak,
       overflowX, unchosenProfession, title, faceCopies, momentsShown, momentsHeading, consoleErrors: publicErrors });
     await anon.close();
     // 6) 승인 대기 회원 로그인

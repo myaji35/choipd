@@ -77,12 +77,14 @@
 
     <div style="display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 40px;" class="editor-grid">
       <%# 좌: 기본 프로필 입력 폼 %>
-      <section class="impd-card" aria-labelledby="basic-info-heading" data-controller="editor-info">
+      <% from_checklist = params[:from] == "checklist" %>
+      <% bio_task = from_checklist && params[:task] == "bio" %>
+      <% career_task = from_checklist && params[:task] == "docs" %>
+      <section class="impd-card" aria-labelledby="basic-info-heading" data-controller="editor-info"<% if bio_task %> data-editor-info-task-value="bio"<% end %>>
         <h2 id="basic-info-heading" class="impd-label">기본 정보</h2>
         <p style="margin-top: 6px; font-size: 13px; color: var(--impd-muted);">(필수)는 자기소개와 이메일 두 칸이에요. 나머지는 나중에 채워도 돼요.</p>
         <%= render "member_admin/editor/profile_photo" %>
         <%= form_with url: slug_admin_editor_update_info_path(slug: @member.slug), method: :patch, local: true, class: "editor-fields", data: { turbo: false, controller: "unsaved-guard" } do %>
-          <% from_checklist = params[:from] == "checklist" %>
           <% if from_checklist %>
             <%= hidden_field_tag :from, "checklist" %>
             <% if MemberAdmin::ChecklistHelper::CHECKLIST_LABELS.key?(params[:task]) %>
@@ -120,7 +122,9 @@
                       placeholder="예: 분당에서 15년째 보험 설계를 하고 있어요. 꼭 필요한 보장만 쉽게 설명해 드리고, 보험금 청구도 끝까지 도와드려요."><%= info.bio %></textarea>
             <%= error_message.call(:bio) %>
             <% bio_count = info.bio.to_s.length %>
-            <% bio_hint = if bio_count < 20
+            <% bio_hint = if bio_task
+              bio_count < 50 ? "#{50 - bio_count}자만 더 쓰면 이 할 일이 끝나요." : "충분해요."
+            elsif bio_count < 20
               "20자를 넘기면 내 페이지를 공개할 수 있어요."
             elsif bio_count < 50
               "공개할 수 있어요. 50자를 넘기면 준비 항목 '자기소개'가 채워져요."
@@ -128,7 +132,7 @@
               "충분해요."
             end %>
             <p id="member_bio_count" class="impd-label-muted" style="margin-top: 6px;"><span data-editor-info-target="bioCount"><%= bio_count %></span> / 200자 · <span data-editor-info-target="bioHint"><%= bio_hint %></span></p>
-            <% if from_checklist && params[:task] == "bio" %>
+            <% if bio_task %>
               <div data-task-save="bio" style="margin-top: 12px;">
                 <button type="submit" class="impd-btn impd-btn-accent" style="height: 48px; padding: 0 20px; font-size: 15px; width: 100%; justify-content: center;">저장하고 다음 할 일로 →</button>
                 <p class="impd-label-muted" style="font-size: 13px; margin-top: 8px; text-align: center;">아래 칸은 지금 안 채워도 돼요. 나중에 채울 수 있어요.</p>
@@ -190,23 +194,21 @@
             <%= error_message.call(:kakao_channel) %>
           </div>
 
-          <div style="margin-top: 14px;">
+          <div id="career-note" class="checklist-target" style="margin-top: 14px;">
             <label for="member_career_note" class="impd-label-muted">경력·이력 <span style="font-weight: 400; color: var(--impd-muted);">(선택)</span></label>
-            <div id="member_career_note_hint" class="impd-label-muted" style="margin-top: 6px;">학력·경력·수상·자격 등을 자유롭게 쓰세요. 정해진 형식은 없습니다.</div>
+            <div id="member_career_note_hint" class="impd-label-muted" style="margin-top: 6px;">언제부터 어떤 일을 했는지, 자격·수상을 생각나는 대로 적어 주세요. 한 줄만 적어도 돼요. 적은 그대로 고객이 내 페이지에서 읽어요.</div>
             <textarea id="member_career_note" name="member[career_note]" rows="6" <%= field_errors.call(:career_note, "member_career_note_hint") %>
-                      placeholder="예시)
-1970년생
-학력 - OO대 신문방송학과 졸업 (1995)
-경력 - KBS PD (1996~2015), 한국환경저널 발행인 (2016~)
-수상 - 방송대상 (2010)
-자격 - 사회복지사 2급"><%= info.career_note %></textarea>
+                      placeholder="예: 2010년부터 보험 설계사로 일하고 있어요.
+우수 설계사상(2019), 손해사정사 자격."><%= info.career_note %></textarea>
             <%= error_message.call(:career_note) %>
           </div>
 
+          <% if career_task %><div data-task-save="docs"><% end %>
           <button type="submit" class="impd-btn impd-btn-accent" style="margin-top: 20px; height: 52px; padding: 0 28px; font-size: 15px; width: 100%; justify-content: center;">
             <%= from_checklist ? "저장하고 다음 할 일로 →" : "정보 저장하고 다음 →" %>
           </button>
           <p class="impd-label-muted" style="font-size: 14px; margin-top: 10px; text-align: center;">저장을 눌러야 내 페이지에 반영돼요.</p>
+          <% if career_task %></div><% end %>
         <% end %>
       </section>
 

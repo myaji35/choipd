@@ -5,7 +5,7 @@ module MemberAdmin::ChecklistHelper
     "profession-region" => "직업과 지역 적기",
     "media" => "작업 사진·사례 올리기",
     "services" => "서비스 1개 넣기",
-    "docs" => "경력을 적은 글 올리기"
+    "docs" => "경력 적기"
   }.freeze
 
   def checklist_task_label

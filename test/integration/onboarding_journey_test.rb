@@ -54,6 +54,34 @@ class OnboardingJourneyTest < ActionDispatch::IntegrationTest
     assert_select ".shared-flash a", text: "기다리는 동안 예시 페이지 보기", count: 0
   end
 
+  test "email signup career task saves a note that anonymous customers can read" do
+    email = "onboarding-career@example.com"
+    post member_signup_path, params: {
+      member: { name: "새 회원", email: email, password: PASSWORD, password_confirmation: PASSWORD, profession: "educator" },
+      terms_agree: "1"
+    }
+    member = Member.find_by!(email: email)
+    member.update!(bio: "고객에게 필요한 상담을 제공해 드려요. " * 3, region: "서울", profile_image: "/icon.png")
+    member.member_services.create!(title: "첫 상담")
+    member.member_photos.create!(category: "daily", image: fixture_file_upload(Rails.root.join("public/icon.png"), "image/png"))
+
+    get public_profile_path(slug: member.slug)
+    career_path = slug_admin_editor_path(slug: member.slug, step: 2, from: "checklist", task: "docs", anchor: "career-note")
+    assert_select "[data-owner-bar] a[data-owner-next=docs][href=?]", career_path, text: "다음 할 일: 경력 적기"
+
+    career = "2010년부터 상담 교육을 하고 있어요."
+    patch slug_admin_editor_update_info_path(slug: member.slug),
+      params: { from: "checklist", task: "docs", member: { career_note: career } }
+    assert_redirected_to slug_admin_dashboard_path(slug: member.slug)
+
+    open_session do |visitor|
+      visitor.get public_profile_path(slug: member.slug)
+      visitor.assert_response :success
+      visitor.assert_select "body", text: /#{Regexp.escape(career)}/
+      visitor.assert_select "[data-owner-bar]", count: 0
+    end
+  end
+
   test "owner with a service sees the bio task and a dashboard link in the top navigation" do
     member = create_member("onboarding-service")
     member.member_services.create!(title: "첫 상담", is_active: 1)

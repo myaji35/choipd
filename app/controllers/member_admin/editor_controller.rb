@@ -28,7 +28,7 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
 
     if @member.update(permitted)
       if params[:from] == "checklist"
-        redirect_to slug_admin_dashboard_path(slug: @member.slug), notice: "내 정보를 저장했어요. 아래 '다음 할 일'을 이어서 해 보세요."
+        redirect_to slug_admin_dashboard_path(slug: @member.slug), notice: checklist_save_notice
       else
         redirect_to slug_admin_editor_path(slug: @member.slug, step: 3), notice: "내 정보를 저장했어요. 이제 스타일을 골라 주세요."
       end
@@ -82,6 +82,29 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
   end
 
   private
+
+  def checklist_save_notice
+    case params[:task]
+    when "bio"
+      count = @member.bio.to_s.length
+      return "저장했어요. 자기소개가 지금 #{count}자예요. #{50 - count}자만 더 쓰면 이 할 일이 끝나요." if count < 50
+    when "profession-region"
+      profession_missing = @member.public_profession_label.blank?
+      region_missing = @member.region.blank?
+      return "저장했어요. 직업과 지역을 적으면 이 할 일이 끝나요." if profession_missing && region_missing
+      return "저장했어요. 지역도 적으면 이 할 일이 끝나요." if region_missing
+      return "저장했어요. 직업도 고르면 이 할 일이 끝나요." if profession_missing
+    when "docs"
+      if @member.career_note.to_s.strip.present?
+        return "경력을 저장했어요. 아래에서 다음에 할 일을 확인해 보세요."
+      end
+      unless @member.member_documents.exists?
+        return "저장했어요. 경력 칸이 비어 있어요. 한 줄만 적어도 이 할 일이 끝나요."
+      end
+    end
+
+    "내 정보를 저장했어요. 아래 '다음 할 일'을 이어서 해 보세요."
+  end
 
   def load_editor
     if @step == 2
