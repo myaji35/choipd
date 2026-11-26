@@ -16,13 +16,14 @@ class OnboardingJourneyTest < ActionDispatch::IntegrationTest
     assert_redirected_to public_profile_path(slug: member.slug)
     follow_redirect!
 
-    assert_select "[data-owner-bar] a[href=?]", slug_admin_dashboard_path(slug: member.slug), text: "내 페이지 채우기"
+    assert_owner_service_task(member)
     assert_select "[role=status]", text: /환영합니다, 새 회원님. 이제 페이지를 편집할 수 있어요./
     assert_select "[data-pending-notice]", count: 0
+    assert_select "[data-pending-prep]", count: 0
     assert_select ".shared-flash a", text: "기다리는 동안 예시 페이지 보기", count: 0
   end
 
-  test "owner with a service sees an edit link and a dashboard link in the top navigation" do
+  test "owner with a service sees the bio task and a dashboard link in the top navigation" do
     member = create_member("onboarding-service")
     member.member_services.create!(title: "첫 상담", is_active: 1)
     log_in(member)
@@ -30,7 +31,8 @@ class OnboardingJourneyTest < ActionDispatch::IntegrationTest
     get public_profile_path(slug: member.slug)
 
     dashboard = slug_admin_dashboard_path(slug: member.slug)
-    assert_select "[data-owner-bar] a[href=?]", dashboard, text: "내 페이지 고치기"
+    bio_path = slug_admin_editor_path(slug: member.slug, step: 2, from: "checklist", task: "bio", anchor: "bio")
+    assert_select "[data-owner-bar] a.owner-bar-action[data-owner-next=bio][href=?]", bio_path, text: "다음 할 일: 자기소개 쓰기"
     assert_select ".impd-topnav-actions a[href=?]", dashboard, text: "내 페이지 관리"
 
     get root_path
@@ -44,12 +46,12 @@ class OnboardingJourneyTest < ActionDispatch::IntegrationTest
 
     get path
     assert_response :success
-    assert_select "[data-owner-bar]", count: 0
+    assert_select "[data-owner-bar], [data-owner-next]", count: 0
 
     log_in(create_member("onboarding-visitor"))
     get path
     assert_response :success
-    assert_select "[data-owner-bar]", count: 0
+    assert_select "[data-owner-bar], [data-owner-next]", count: 0
   end
 
   test "grid profile also shows the owner bar" do
@@ -58,7 +60,7 @@ class OnboardingJourneyTest < ActionDispatch::IntegrationTest
 
     get public_profile_path(slug: member.slug)
 
-    assert_select "[data-owner-bar] a[href=?]", slug_admin_dashboard_path(slug: member.slug), text: "내 페이지 채우기"
+    assert_owner_service_task(member)
   end
 
   test "email signup and login forms disable Turbo" do
@@ -79,6 +81,11 @@ class OnboardingJourneyTest < ActionDispatch::IntegrationTest
 
     example_path = css_select(".impd-topnav-links a").find { |link| link.text == "예시" }["href"]
     assert_select "[data-pending-notice]", text: /승인을 기다리는 중이에요/ do
+      assert_select "[data-pending-prep]" do |prep|
+        ["하는 일 한 가지", "자기소개 두세 줄", "얼굴 사진"].each do |item|
+          assert_includes prep.first.text, item
+        end
+      end
       assert_select "a[href=?]", example_path, text: "기다리는 동안 예시 페이지 보기"
     end
 
@@ -170,10 +177,7 @@ class OnboardingJourneyTest < ActionDispatch::IntegrationTest
   end
 
   test "creating the final checklist item links to the public page" do
-    member = create_member("onboarding-checklist-complete", profile_image: "/icon.png",
-      bio: "고객에게 필요한 상담을 제공해 드려요. " * 3, profession: "educator", region: "서울")
-    member.member_photos.create!(category: "daily", image: fixture_file_upload(Rails.root.join("public/icon.png"), "image/png"))
-    member.member_documents.create!(filename: "경력.txt", category: "career", content_md: "경력 소개")
+    member = create_member_with_checklist_details("onboarding-checklist-complete")
     log_in(member)
 
     post slug_admin_services_path(slug: member.slug), params: { member_service: { title: "첫 상담" } }
@@ -185,7 +189,93 @@ class OnboardingJourneyTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "owner who completed the checklist sees only the edit link in the owner bar" do
+    member = create_member_with_checklist_details("onboarding-owner-complete")
+    member.member_services.create!(title: "첫 상담")
+    log_in(member)
+
+    get public_profile_path(slug: member.slug)
+
+    assert_select "[data-owner-bar]" do
+      assert_select "a", count: 1
+      assert_select "a.owner-bar-action[href=?]", slug_admin_dashboard_path(slug: member.slug), text: "내 페이지 고치기"
+      assert_select ".owner-bar-more, [data-owner-next]", count: 0
+    end
+  end
+
+  test "bio form preserves checklist context only for arrivals from the checklist" do
+    member = create_member("onboarding-bio-form")
+    log_in(member)
+    form_path = slug_admin_editor_update_info_path(slug: member.slug)
+
+    get slug_admin_editor_path(slug: member.slug, step: 2, from: "checklist", task: "bio")
+
+    assert_select "form[action=?]", form_path do
+      assert_select "input[type=hidden][name=from][value=checklist]"
+      assert_select "input[type=hidden][name=task][value=bio]"
+      assert_select "button[type=submit]", text: "저장하고 다음 할 일로 →"
+      assert_select "#member_bio[placeholder]" do |fields|
+        assert_operator fields.first["placeholder"].length, :>=, 50
+      end
+      assert_select "#member_bio_guide"
+    end
+
+    get slug_admin_editor_path(slug: member.slug, step: 2)
+
+    assert_select "form[action=?]", form_path do
+      assert_select "input[type=hidden][name=from], input[type=hidden][name=task]", count: 0
+      assert_select "button[type=submit]", text: "정보 저장하고 다음 →"
+    end
+  end
+
+  test "saving a checklist bio with a known or unknown task returns to the dashboard" do
+    member = create_member("onboarding-bio-save")
+    member.member_services.create!(title: "첫 상담")
+    log_in(member)
+
+    ["bio", "아무거나"].each do |task|
+      patch slug_admin_editor_update_info_path(slug: member.slug),
+        params: { from: "checklist", task: task, member: { bio: "가" * 60 } }
+
+      assert_redirected_to slug_admin_dashboard_path(slug: member.slug)
+      assert_equal "가" * 60, member.reload.bio
+      follow_redirect!
+      assert_select "[role=status]", text: "내 정보를 저장했어요. 아래 '다음 할 일'을 이어서 해 보세요."
+      assert_select "section.dashboard-next[data-next-task=profile-photo]"
+    end
+  end
+
+  test "an invalid checklist bio save keeps the arrival banner and form context" do
+    member = create_member("onboarding-bio-invalid")
+    log_in(member)
+    form_path = slug_admin_editor_update_info_path(slug: member.slug)
+
+    patch form_path, params: { from: "checklist", task: "bio", member: { email: "abc" } }
+
+    assert_response :unprocessable_entity
+    assert_select ".checklist-arrival a", text: "대시보드로 돌아가기 ←"
+    assert_select "form[action=?]", form_path do
+      assert_select "input[type=hidden][name=from][value=checklist]"
+      assert_select "input[type=hidden][name=task][value=bio]"
+      assert_select "button[type=submit]", text: "저장하고 다음 할 일로 →"
+    end
+  end
+
   private
+
+  def assert_owner_service_task(member)
+    service_path = slug_admin_services_path(slug: member.slug, from: "checklist", task: "services", anchor: "new-service")
+    assert_select "[data-owner-bar] a.owner-bar-action[data-owner-next=services][href=?]", service_path, text: "다음 할 일: 서비스 등록하기"
+    assert_select "[data-owner-bar] a.owner-bar-more[href=?]", slug_admin_dashboard_path(slug: member.slug), text: "관리 화면 보기"
+  end
+
+  def create_member_with_checklist_details(slug)
+    member = create_member(slug, profile_image: "/icon.png",
+      bio: "고객에게 필요한 상담을 제공해 드려요. " * 3, profession: "educator", region: "서울")
+    member.member_photos.create!(category: "daily", image: fixture_file_upload(Rails.root.join("public/icon.png"), "image/png"))
+    member.member_documents.create!(filename: "경력.txt", category: "career", content_md: "경력 소개")
+    member
+  end
 
   def create_member(slug, **attributes)
     Member.create!({

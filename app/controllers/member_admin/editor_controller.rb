@@ -27,7 +27,11 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
     end
 
     if @member.update(permitted)
-      redirect_to slug_admin_editor_path(slug: @member.slug, step: 3), notice: "내 정보를 저장했어요. 이제 스타일을 골라 주세요."
+      if params[:from] == "checklist"
+        redirect_to slug_admin_dashboard_path(slug: @member.slug), notice: "내 정보를 저장했어요. 아래 '다음 할 일'을 이어서 해 보세요."
+      else
+        redirect_to slug_admin_editor_path(slug: @member.slug, step: 3), notice: "내 정보를 저장했어요. 이제 스타일을 골라 주세요."
+      end
     else
       @step = 2
       @info_errors = info_error_messages

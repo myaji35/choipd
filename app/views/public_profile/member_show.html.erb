@@ -13,6 +13,7 @@
       .owner-bar { box-sizing: border-box; max-width: 1200px; margin: 0 auto; padding: 12px 20px; background: var(--impd-card); border-bottom: 1px solid var(--impd-rule); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
       .owner-bar p { min-width: 0; font-size: 15px; word-break: keep-all; overflow-wrap: anywhere; margin: 0; flex: 1 1 220px; }
       .owner-bar .owner-bar-action { min-height: 44px; padding: 0 16px; background: var(--impd-accent); color: var(--impd-paper); font-weight: 700; border-radius: 6px; display: inline-flex; align-items: center; white-space: nowrap; }
+      .owner-bar .owner-bar-more { min-height: 44px; display: inline-flex; align-items: center; color: var(--impd-accent); font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
       @media (min-width: 769px) {
         .owner-bar { padding-inline: 40px; }
       }
@@ -20,7 +21,12 @@
   <% end %>
   <aside class="owner-bar" data-owner-bar aria-label="내 페이지 관리 안내">
     <p><strong>내 페이지예요.</strong> 고객에게도 지금 이렇게 보여요. 이 띠는 나에게만 보여요.</p>
-    <%= link_to (owner_has_content ? "내 페이지 고치기" : "내 페이지 채우기"), "/#{@member.slug}/admin/dashboard", class: "owner-bar-action" %>
+    <% if @owner_next_task %>
+      <%= link_to "다음 할 일: #{@owner_next_task[:action]}", @owner_next_task[:path], class: "owner-bar-action", data: { owner_next: @owner_next_task[:key] } %>
+      <%= link_to "관리 화면 보기", "/#{@member.slug}/admin/dashboard", class: "owner-bar-more" %>
+    <% else %>
+      <%= link_to "내 페이지 고치기", "/#{@member.slug}/admin/dashboard", class: "owner-bar-action" %>
+    <% end %>
   </aside>
 <% end %>
 <% if @member.layout_preset == "grid" %>

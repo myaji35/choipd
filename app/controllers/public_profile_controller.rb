@@ -1,9 +1,14 @@
 class PublicProfileController < ApplicationController
+  include MemberAdmin::ProfileChecklist
+
   layout "impd"
 
   def show
     @member = Member.publicly_visible.find_by(slug: params[:slug])
     if @member
+      if member_signed_in? && current_member.id == @member.id
+        @owner_next_task = build_profile_checklist(from_checklist: true).find { |item| !item[:done] }
+      end
       @awards = []  # talent 도메인에서 확장 예정
       @services = @member.member_services.active.sorted
       @faqs = @member.member_faqs.published.sorted

@@ -7,6 +7,7 @@
     <span class="shared-flash-message">
       <%= message %>
       <% if pending_guide %>
+        <span class="shared-flash-prep" data-pending-prep>기다리는 동안 준비해 두면 승인 뒤 바로 채울 수 있어요: 하는 일 한 가지(서비스 이름) · 자기소개 두세 줄 · 얼굴 사진</span>
         <%= link_to "기다리는 동안 예시 페이지 보기", example_profile_path, class: "shared-flash-link" %>
       <% end %>
     </span>

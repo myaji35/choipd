@@ -4,6 +4,7 @@ const { chromium } = require('playwright');
 const [,, base, outDir, runTag] = process.argv;
 const fs = require('fs'); fs.mkdirSync(outDir, {recursive:true});
 const snap = async (p, opts) => { try { await p.screenshot({ timeout: 45000, ...opts }); } catch (e) { console.error('screenshot skipped: ' + opts.path); } };
+const bioText = '온보딩 시험 소개 글입니다. 어떤 분께 무엇을 해 드리는지 두세 줄로 적어 보는 중이에요. 문의는 편하게 주세요.';
 const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
 (async () => {
   const browser = await chromium.launch();
@@ -35,20 +36,32 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
         nextStepTask: document.querySelector('.next-step-title')?.innerText.trim() ?? null,
         welcomeSeen: fold.includes('환영합니다'),
         ownerBarInFold: inFold(document.querySelector('[data-owner-bar] a')),
-        pendingNoticeSeen: inFold(document.querySelector('[data-pending-notice]'))
+        ownerNext: document.querySelector('[data-owner-bar] [data-owner-next]')?.dataset.ownerNext ?? null,
+        bioFieldInFold: inFold(document.querySelector('#member_bio')),
+        bioPlaceholderLen: document.querySelector('#member_bio')?.placeholder.length ?? null,
+        arrivalSeen: !!document.querySelector('.checklist-arrival'),
+        pendingNoticeSeen: inFold(document.querySelector('[data-pending-notice]')),
+        pendingPrepSeen: inFold(document.querySelector('[data-pending-prep]')),
+        pendingNoticeHeight: document.querySelector('[data-pending-notice]')?.getBoundingClientRect().height ?? null
       };
     });
     const shot = async (name, extra = {}) => {
       await page.waitForTimeout(300);
       const { url, overflowX, height, fold, welcomeSeen, ownerBarInFold, unchosenProfession,
-        nextTask, nextHref, nextStepInFold, nextStepTask } = await metric();
+        nextTask, nextHref, nextStepInFold, nextStepTask, ownerNext,
+        bioFieldInFold, bioPlaceholderLen, arrivalSeen } = await metric();
       await snap(page, { path: outDir + '/' + name + '-' + tag + '.png', fullPage: true });
       await snap(page, { path: outDir + '/' + name + '-' + tag + '-fold.png' });
       const row = { step: name, tag, url, overflowX, height, fold, consoleErrors: [...errors], ...extra };
-      if (name === 'landing') Object.assign(row, { welcomeSeen, ownerBarInFold, unchosenProfession });
+      if (name === 'landing') Object.assign(row, { welcomeSeen, ownerBarInFold, unchosenProfession, ownerNext });
       if (name === 'dashboard' || name === 'first-click') Object.assign(row, { nextTask, nextHref });
       if (name === 'service-added') Object.assign(row, { nextStepInFold, nextStepTask });
-      if (name === 'first-click') row.reachedAdmin = /\/admin\//.test(url);
+      if (name === 'bio') Object.assign(row, { bioFieldInFold, bioPlaceholderLen, arrivalSeen });
+      if (name === 'bio-saved') row.nextTask = nextTask;
+      if (name === 'first-click') {
+        row.reachedAdmin = /\/admin\//.test(url);
+        row.directToTask = /\/admin\/services/.test(url);
+      }
       errors.length = 0;
       report.push(row);
       return row;
@@ -76,44 +89,53 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
     if (await page.$('#terms_agree')) { await page.check('#terms_agree'); clicks++; }
     await Promise.all([page.waitForLoadState('networkidle'), page.locator('form').filter({ has: page.locator('#member_email') }).locator('button[type=submit], input[type=submit]').first().click()]); clicks++;
     const landing = await shot('landing');
+    if (landing.ownerNext !== 'services') blocked.push('landing: 띠의 다음 할 일이 서비스가 아님');
     if (landing.unchosenProfession) blocked.push('landing: 고르지 않은 직업이 보임');
     const checkNextTask = row => {
       if (row.nextTask !== 'services' || !row.nextHref?.includes('/admin/services')) {
         blocked.push('dashboard: 다음 할 일이 하는 일(서비스)이 아님');
       }
     };
-    // 3) 처음 쓰는 사람처럼: 도착 화면 첫 화면에서 '편집·관리·시작' 류 링크를 누른다
-    const nav = page.locator('.impd-topnav-actions a, [data-owner-bar] a')
-      .filter({ hasText: /내 페이지/ })
-      .filter({ visible: true }).first();
-    if (await nav.count() && await nav.evaluate(el => {
+    const slug = landing.url.split('/')[1];
+    const dashboardPath = '/' + slug + '/admin/dashboard';
+    const servicesPath = '/' + slug + '/admin/services';
+    // 대시보드 자체의 안내도 확인한 뒤 첫 클릭은 공개 페이지에서 시작한다.
+    const dashboardResponse = await page.goto(base + dashboardPath, {waitUntil: 'networkidle'});
+    checkNextTask(await shot('dashboard', { status: dashboardResponse.status() }));
+    await page.goto(base + '/' + slug, {waitUntil: 'networkidle'});
+
+    const ownerAction = page.locator('[data-owner-bar] a.owner-bar-action');
+    const inFold = async locator => await locator.count() && await locator.evaluate(el => {
       const rect = el.getBoundingClientRect();
-      return rect.top < innerHeight && rect.bottom > 0;
-    })) {
+      return el.checkVisibility({ checkVisibilityCSS: true }) && rect.top < innerHeight && rect.bottom > 0;
+    });
+    const nav = await inFold(ownerAction) ? ownerAction : page.locator('.impd-topnav-actions a')
+      .filter({ hasText: /내 페이지/ }).filter({ visible: true }).first();
+    let directToTask = false;
+    if (await inFold(nav)) {
       const navText = (await nav.innerText()).trim();
       await nav.click();
       await page.waitForFunction(path => location.pathname + location.search !== path, landing.url, { timeout: 5000 }).catch(() => {});
       clicks++;
       const afterNav = await shot('first-click', { navText });
-      checkNextTask(afterNav);
+      directToTask = afterNav.directToTask;
+      if (new URL(page.url()).pathname === dashboardPath) checkNextTask(afterNav);
       if (!afterNav.reachedAdmin) blocked.push('first-click: 눌러도 관리 화면으로 안 감');
     } else blocked.push('landing: 편집으로 가는 길이 첫 화면에 없음');
-    const slug = landing.url.split('/')[1];
-    // 4) 대시보드의 다음 할 일을 따라 서비스로 이동
-    const dashboardResponse = await page.goto(base + '/' + slug + '/admin/dashboard', {waitUntil: 'networkidle'});
-    const dashboard = await shot('dashboard', { status: dashboardResponse.status() });
-    checkNextTask(dashboard);
-    const servicesPath = '/' + slug + '/admin/services';
-    let guided = false;
+
+    let guided = directToTask;
     let servicesResponse;
-    try {
-      await page.locator('.dashboard-next a.impd-btn-accent').click({ timeout: 5000 });
-      clicks++;
-      await page.waitForURL(url => url.pathname === servicesPath, { timeout: 5000 });
-      guided = true;
-    } catch {
-      blocked.push('dashboard: 다음 할 일 버튼으로 서비스 화면에 도착하지 못함');
-      servicesResponse = await page.goto(base + servicesPath, {waitUntil: 'networkidle'});
+    if (!directToTask) {
+      if (new URL(page.url()).pathname !== dashboardPath) await page.goto(base + dashboardPath, {waitUntil: 'networkidle'});
+      try {
+        await page.locator('.dashboard-next a.impd-btn-accent').click({ timeout: 5000 });
+        clicks++;
+        await page.waitForURL(url => url.pathname === servicesPath, { timeout: 5000 });
+        guided = true;
+      } catch {
+        blocked.push('dashboard: 다음 할 일 버튼으로 서비스 화면에 도착하지 못함');
+        servicesResponse = await page.goto(base + servicesPath, {waitUntil: 'networkidle'});
+      }
     }
     await shot('services', { status: servicesResponse?.status() ?? null });
     // 서비스 1개 등록(제목만)
@@ -133,6 +155,37 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
     } catch (e) { blocked.push('services: ' + String(e).slice(0,120)); }
     const saved = await shot('service-added', { svcOk, svcFields });
     if (!saved.nextStepInFold) blocked.push('service-added: 저장 뒤 다음 할 일 안내가 첫 화면에 없음');
+    let bioClicks = 0, bioTyped = 0, bioGuided = false;
+    const bioField = page.locator('#member_bio');
+    try {
+      const bioLink = page.locator('[data-next-step] a.impd-btn-accent');
+      await bioLink.click({ timeout: 5000 });
+      bioClicks++;
+      await bioField.waitFor({ timeout: 5000 }).catch(() => {});
+    } catch {
+      blocked.push('service-added: 자기소개 쓰기 버튼으로 이동하지 못함');
+    }
+    await shot('bio');
+    if (!(await bioField.count())) {
+      blocked.push('bio: 자기소개 칸 없음');
+    } else {
+      try {
+        await bioField.fill(bioText, { timeout: 5000 });
+        bioTyped++;
+        const bioForm = page.locator('form').filter({ has: bioField });
+        await bioForm.locator('button[type=submit]').click({ timeout: 5000 });
+        bioClicks++;
+        await page.waitForURL(url => url.pathname === dashboardPath, { timeout: 5000 }).catch(() => {});
+      } catch (e) {
+        blocked.push('bio: ' + String(e).slice(0, 120));
+      }
+      const bioSaved = await shot('bio-saved');
+      if (bioSaved.url !== dashboardPath || bioSaved.nextTask !== 'profile-photo') {
+        blocked.push('bio-saved: 저장 뒤 다음 할 일로 안 이어짐');
+      } else {
+        bioGuided = bioClicks === 2 && bioTyped === 1;
+      }
+    }
     const editorResponse = await page.goto(base + '/' + slug + '/admin/editor?step=1', {waitUntil: 'networkidle'});
     await shot('editor1', { status: editorResponse.status() });
     // 5) 공개 페이지(방문자 눈): 새 창 비로그인
@@ -142,7 +195,7 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
     ap.on('console', m => { if (m.type() === 'error') publicErrors.push(m.text().slice(0, 200)); });
     ap.on('pageerror', e => publicErrors.push('pageerror: ' + String(e).slice(0, 200)));
     const pr = await ap.goto(base + '/' + slug, {waitUntil: 'networkidle'}).catch(() => null);
-    const ready = await ap.evaluate(() => ({ service: document.body.innerText.includes('첫 상담 서비스'), contactForm: !!document.querySelector('#contact form'), cta: !!document.querySelector('a[href$="#contact"]') }));
+    const ready = await ap.evaluate(bioPrefix => ({ bio: document.body.innerText.includes(bioPrefix), service: document.body.innerText.includes('첫 상담 서비스'), contactForm: !!document.querySelector('#contact form'), cta: !!document.querySelector('a[href$="#contact"]') }), bioText.slice(0, 10));
     await snap(ap, { path: outDir + '/public-' + tag + '-fold.png' });
     await snap(ap, { path: outDir + '/public-' + tag + '.png', fullPage: true });
     const ownerBarLeak = await ap.evaluate(() => !!document.querySelector('[data-owner-bar]'));
@@ -163,13 +216,14 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
       await pg.fill('input[name=email]', 'ux-pending@impd.test'); await pg.fill('input[name=password]', process.env.PENDING_PW);
       await Promise.all([pg.waitForLoadState('networkidle'), pg.locator('form').filter({ has: pg.locator('input[name=password]') }).locator('button[type=submit], input[type=submit]').first().click()]);
       await pg.waitForTimeout(300);
-      const { url, fold, pendingNoticeSeen, overflowX } = await metric(pg);
+      const { url, fold, pendingNoticeSeen, pendingPrepSeen, pendingNoticeHeight, overflowX } = await metric(pg);
       if (!pendingNoticeSeen) blocked.push('pending: 승인 대기 안내가 첫 화면에 없음');
+      if (!pendingPrepSeen) blocked.push('pending: 기다리는 동안 준비할 것 안내 없음');
       await snap(pg, { path: outDir + '/pending-' + tag + '-fold.png' });
-      report.push({ step: 'pending', tag, url, fold, pendingNoticeSeen, overflowX, consoleErrors: pendingErrors });
+      report.push({ step: 'pending', tag, url, fold, pendingNoticeSeen, pendingPrepSeen, pendingNoticeHeight, overflowX, consoleErrors: pendingErrors });
       await pc.close();
     }
-    report.push({ step: 'summary', tag, slug, clicks, typed, signupFields: fields, blocked, ready, svcOk, guided });
+    report.push({ step: 'summary', tag, slug, clicks, typed, bioClicks, bioTyped, bioGuided, signupFields: fields, blocked, ready, svcOk, guided });
     await ctx.close();
   }
   await browser.close();

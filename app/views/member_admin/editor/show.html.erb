@@ -82,6 +82,13 @@
         <p style="margin-top: 6px; font-size: 13px; color: var(--impd-muted);">(필수) 세 칸만 채우면 내 페이지를 공개할 수 있어요. 나머지는 나중에 채워도 돼요.</p>
         <%= render "member_admin/editor/profile_photo" %>
         <%= form_with url: slug_admin_editor_update_info_path(slug: @member.slug), method: :patch, local: true, class: "editor-fields", data: { turbo: false, controller: "unsaved-guard" } do %>
+          <% from_checklist = params[:from] == "checklist" %>
+          <% if from_checklist %>
+            <%= hidden_field_tag :from, "checklist" %>
+            <% if MemberAdmin::ChecklistHelper::CHECKLIST_LABELS.key?(params[:task]) %>
+              <%= hidden_field_tag :task, params[:task] %>
+            <% end %>
+          <% end %>
           <%
             info = @info_draft || @member
             errors = @info_errors || {}
@@ -107,9 +114,10 @@
           <% end %>
           <div id="bio" class="checklist-target" style="margin-top: 16px;">
             <label for="member_bio" class="impd-label-muted">자기소개 <span style="font-weight: 400; color: var(--impd-muted);">(필수)</span></label>
+            <p id="member_bio_guide" class="impd-label-muted" style="margin-top: 6px; font-size: 14px;">어떤 분께 무엇을 해 드리는지 두세 줄(50자 넘게) 적어 주세요. 고객이 내 페이지 맨 위에서 읽어요.</p>
             <textarea id="member_bio" name="member[bio]" rows="6" maxlength="200"
-                      <%= field_errors.call(:bio, "member_bio_count") %> data-editor-info-target="bio" data-action="input->editor-info#updateBioCount"
-                      placeholder="한 줄로 표현할 수 있나요? (예: 스마트폰 하나로 유튜브 채널 만드는 법을 가르치는 강사)"><%= info.bio %></textarea>
+                      <%= field_errors.call(:bio, "member_bio_guide member_bio_count") %> data-editor-info-target="bio" data-action="input->editor-info#updateBioCount"
+                      placeholder="예: 분당에서 15년째 보험 설계를 하고 있어요. 꼭 필요한 보장만 쉽게 설명해 드리고, 보험금 청구도 끝까지 도와드려요."><%= info.bio %></textarea>
             <%= error_message.call(:bio) %>
             <% bio_count = info.bio.to_s.length %>
             <% bio_hint = if bio_count < 20
@@ -182,7 +190,7 @@
           </div>
 
           <button type="submit" class="impd-btn impd-btn-accent" style="margin-top: 20px; height: 52px; padding: 0 28px; font-size: 15px; width: 100%; justify-content: center;">
-            정보 저장하고 다음 →
+            <%= from_checklist ? "저장하고 다음 할 일로 →" : "정보 저장하고 다음 →" %>
           </button>
           <p class="impd-label-muted" style="font-size: 14px; margin-top: 10px; text-align: center;">저장을 눌러야 내 페이지에 반영돼요.</p>
         <% end %>
