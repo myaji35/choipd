@@ -7,7 +7,8 @@ module PublicProfileHelper
   end
 
   def public_share_title(member)
-    member.profession.present? ? "#{member.name} · #{member.profession_label}" : member.name.to_s
+    profession = member.public_profession_label
+    profession.present? ? "#{member.name} · #{profession}" : member.name.to_s
   end
 
   def public_share_description(member, services, limit = 100)

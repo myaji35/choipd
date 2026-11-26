@@ -97,6 +97,14 @@ class Member < ApplicationRecord
     preset_label || PROFESSION_LABELS[raw] || raw
   end
 
+  # 고객에게 보여도 되는 직업 이름. 회원이 고르지 않은 값("custom"·빈 값)이면 nil.
+  def public_profession_label
+    raw = profession.to_s.strip
+    return nil if raw.blank? || raw == "custom"
+
+    profession_label
+  end
+
   def social
     JSON.parse(social_links || "{}") rescue {}
   end

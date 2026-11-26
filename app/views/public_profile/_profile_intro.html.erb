@@ -43,7 +43,10 @@
 <section class="public-member public-hero"><div class="public-member-inner">
   <% if member.profile_image.present? %><img fetchpriority="high" decoding="async" class="public-avatar" src="<%= member.profile_image %>" alt="<%= member.name %> 프로필 사진"><% else %><div class="public-avatar" aria-hidden="true"><%= member.name.to_s.first %></div><% end %>
   <h1><%= member.name %></h1>
-  <p><%= member.profession_label if member.profession.present? %><% if member.region.present? %> <%= lni_icon "map-marker-5" %> <%= member.region %><% end %></p>
+  <% profession = member.public_profession_label %>
+  <% if profession.present? || member.region.present? %>
+    <p><%= profession %><% if member.region.present? %> <%= lni_icon "map-marker-5" %> <%= member.region %><% end %></p>
+  <% end %>
   <% if show_offer %>
     <p class="public-offer"><span class="public-offer-label">하는 일</span> <%= services.first(3).map(&:title).join(" · ") %><% if services.size > 3 %> 외 <%= services.size - 3 %>개<% end %></p>
   <% end %>

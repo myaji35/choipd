@@ -27,6 +27,12 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
         height: document.documentElement.scrollHeight,
         url: location.pathname + location.search,
         fold: fold.slice(0, 700),
+        unchosenProfession: /크리에이터/.test((document.querySelector('.public-hero') || document.body).innerText),
+        title: document.title,
+        nextTask: document.querySelector('.dashboard-next')?.dataset.nextTask ?? null,
+        nextHref: document.querySelector('.dashboard-next a.impd-btn-accent')?.getAttribute('href') ?? null,
+        nextStepInFold: [...document.querySelectorAll('[data-next-step] a')].some(inFold),
+        nextStepTask: document.querySelector('.next-step-title')?.innerText.trim() ?? null,
         welcomeSeen: fold.includes('환영합니다'),
         ownerBarInFold: inFold(document.querySelector('[data-owner-bar] a')),
         pendingNoticeSeen: inFold(document.querySelector('[data-pending-notice]'))
@@ -34,11 +40,14 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
     });
     const shot = async (name, extra = {}) => {
       await page.waitForTimeout(300);
-      const { url, overflowX, height, fold, welcomeSeen, ownerBarInFold } = await metric();
+      const { url, overflowX, height, fold, welcomeSeen, ownerBarInFold, unchosenProfession,
+        nextTask, nextHref, nextStepInFold, nextStepTask } = await metric();
       await snap(page, { path: outDir + '/' + name + '-' + tag + '.png', fullPage: true });
       await snap(page, { path: outDir + '/' + name + '-' + tag + '-fold.png' });
       const row = { step: name, tag, url, overflowX, height, fold, consoleErrors: [...errors], ...extra };
-      if (name === 'landing') Object.assign(row, { welcomeSeen, ownerBarInFold });
+      if (name === 'landing') Object.assign(row, { welcomeSeen, ownerBarInFold, unchosenProfession });
+      if (name === 'dashboard' || name === 'first-click') Object.assign(row, { nextTask, nextHref });
+      if (name === 'service-added') Object.assign(row, { nextStepInFold, nextStepTask });
       if (name === 'first-click') row.reachedAdmin = /\/admin\//.test(url);
       errors.length = 0;
       report.push(row);
@@ -67,6 +76,12 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
     if (await page.$('#terms_agree')) { await page.check('#terms_agree'); clicks++; }
     await Promise.all([page.waitForLoadState('networkidle'), page.locator('form').filter({ has: page.locator('#member_email') }).locator('button[type=submit], input[type=submit]').first().click()]); clicks++;
     const landing = await shot('landing');
+    if (landing.unchosenProfession) blocked.push('landing: 고르지 않은 직업이 보임');
+    const checkNextTask = row => {
+      if (row.nextTask !== 'services' || !row.nextHref?.includes('/admin/services')) {
+        blocked.push('dashboard: 다음 할 일이 하는 일(서비스)이 아님');
+      }
+    };
     // 3) 처음 쓰는 사람처럼: 도착 화면 첫 화면에서 '편집·관리·시작' 류 링크를 누른다
     const nav = page.locator('.impd-topnav-actions a, [data-owner-bar] a')
       .filter({ hasText: /내 페이지/ })
@@ -80,15 +95,27 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
       await page.waitForFunction(path => location.pathname + location.search !== path, landing.url, { timeout: 5000 }).catch(() => {});
       clicks++;
       const afterNav = await shot('first-click', { navText });
+      checkNextTask(afterNav);
       if (!afterNav.reachedAdmin) blocked.push('first-click: 눌러도 관리 화면으로 안 감');
     } else blocked.push('landing: 편집으로 가는 길이 첫 화면에 없음');
     const slug = landing.url.split('/')[1];
-    // 4) 대시보드·에디터·서비스
-    for (const [name, path] of [['dashboard', '/admin/dashboard'], ['editor1', '/admin/editor?step=1'], ['services', '/admin/services']]) {
-      const r = await page.goto(base + '/' + slug + path, {waitUntil: 'networkidle'}).catch(() => null);
-      const row = await shot(name, { status: r && r.status() });
-      if (!r || r.status() >= 400 || /login|auth/.test(row.url)) blocked.push(name + ': ' + (r && r.status()) + ' ' + row.url);
+    // 4) 대시보드의 다음 할 일을 따라 서비스로 이동
+    const dashboardResponse = await page.goto(base + '/' + slug + '/admin/dashboard', {waitUntil: 'networkidle'});
+    const dashboard = await shot('dashboard', { status: dashboardResponse.status() });
+    checkNextTask(dashboard);
+    const servicesPath = '/' + slug + '/admin/services';
+    let guided = false;
+    let servicesResponse;
+    try {
+      await page.locator('.dashboard-next a.impd-btn-accent').click({ timeout: 5000 });
+      clicks++;
+      await page.waitForURL(url => url.pathname === servicesPath, { timeout: 5000 });
+      guided = true;
+    } catch {
+      blocked.push('dashboard: 다음 할 일 버튼으로 서비스 화면에 도착하지 못함');
+      servicesResponse = await page.goto(base + servicesPath, {waitUntil: 'networkidle'});
     }
+    await shot('services', { status: servicesResponse?.status() ?? null });
     // 서비스 1개 등록(제목만)
     let svcOk = false; let svcFields = null;
     try {
@@ -104,7 +131,10 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
         svcOk = true;
       } else blocked.push('services: 서비스 제목 칸 없음');
     } catch (e) { blocked.push('services: ' + String(e).slice(0,120)); }
-    await shot('service-added', { svcOk, svcFields });
+    const saved = await shot('service-added', { svcOk, svcFields });
+    if (!saved.nextStepInFold) blocked.push('service-added: 저장 뒤 다음 할 일 안내가 첫 화면에 없음');
+    const editorResponse = await page.goto(base + '/' + slug + '/admin/editor?step=1', {waitUntil: 'networkidle'});
+    await shot('editor1', { status: editorResponse.status() });
     // 5) 공개 페이지(방문자 눈): 새 창 비로그인
     const anon = await browser.newContext({ viewport: {width: vw, height: vh}, locale: 'ko-KR' });
     const ap = await anon.newPage();
@@ -117,8 +147,10 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
     await snap(ap, { path: outDir + '/public-' + tag + '.png', fullPage: true });
     const ownerBarLeak = await ap.evaluate(() => !!document.querySelector('[data-owner-bar]'));
     if (ownerBarLeak) blocked.push('public: 본인용 띠가 방문자에게 보임');
+    const { overflowX, unchosenProfession, title } = await metric(ap);
+    if (unchosenProfession) blocked.push('public: 고르지 않은 직업이 고객에게 보임');
     report.push({ step: 'public', tag, status: pr && pr.status(), ready, ownerBarLeak,
-      overflowX: (await metric(ap)).overflowX, consoleErrors: publicErrors });
+      overflowX, unchosenProfession, title, consoleErrors: publicErrors });
     await anon.close();
     // 6) 승인 대기 회원 로그인
     if (process.env.PENDING_PW) {
@@ -137,7 +169,7 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
       report.push({ step: 'pending', tag, url, fold, pendingNoticeSeen, overflowX, consoleErrors: pendingErrors });
       await pc.close();
     }
-    report.push({ step: 'summary', tag, slug, clicks, typed, signupFields: fields, blocked, ready, svcOk });
+    report.push({ step: 'summary', tag, slug, clicks, typed, signupFields: fields, blocked, ready, svcOk, guided });
     await ctx.close();
   }
   await browser.close();

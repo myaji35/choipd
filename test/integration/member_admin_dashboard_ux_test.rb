@@ -178,8 +178,38 @@ class MemberAdminDashboardUxTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "서비스부터 등록하고 그다음 자기소개를 쓰도록 안내한다" do
+    member = create_overview_member
+    dashboard = slug_admin_dashboard_path(slug: member.slug)
+
+    get dashboard
+    assert_select "[data-dashboard-lead]", text: /아직 내 페이지에 '하는 일'이 없어요/
+    assert_select "section.dashboard-next[data-next-task=services]" do
+      assert_select 'a.impd-btn-accent[href*="/admin/services"][href*="from=checklist"]', text: "서비스 등록하기"
+    end
+
+    member.member_services.create!(title: "상담")
+    get dashboard
+    assert_select "section.dashboard-next[data-next-task=bio]", text: /자기소개 50자 넘게 쓰기/
+    assert_select "[data-dashboard-lead]", text: "아직 방문이 없어요. 내 페이지 주소를 고객에게 보내 보세요."
+  end
+
+  test "지역과 직접 고른 직업이 모두 있어야 준비 항목이 완료된다" do
+    member = create_overview_member
+    member.update!(profession: "custom", region: "서울")
+    dashboard = slug_admin_dashboard_path(slug: member.slug)
+
+    get dashboard
+    assert_select 'a[href*="task=profession-region"]'
+
+    member.update!(profession: "educator")
+    get dashboard
+    assert_select 'a[href*="task=profession-region"]', count: 0
+  end
+
   test "방문이 없으면 방문 기간과 주소 공유 방법을 보여 준다" do
     member = create_overview_member
+    member.member_services.create!(title: "상담")
 
     get slug_admin_dashboard_path(slug: member.slug)
 

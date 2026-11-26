@@ -122,7 +122,7 @@
 
   <header class="photo-owner">
     <div class="photo-owner-text">
-      <h1 class="photo-owner-name"><%= link_to @member.name, "/#{@member.slug}" %><% if @member.profession.present? %><span> · <%= @member.profession_label %></span><% end %><% if @member.region.present? %><span> · <%= @member.region %></span><% end %></h1>
+      <h1 class="photo-owner-name"><%= link_to @member.name, "/#{@member.slug}" %><% if @member.public_profession_label.present? %><span> · <%= @member.public_profession_label %></span><% end %><% if @member.region.present? %><span> · <%= @member.region %></span><% end %></h1>
       <% if @services.any? %>
         <p class="photo-owner-offer"><span class="photo-owner-label">하는 일</span> <%= @services.first(3).map(&:title).join(" · ") %><% if @services.size > 3 %> 외 <%= @services.size - 3 %>개<% end %></p>
       <% end %>
@@ -160,7 +160,7 @@
       <% end %>
       <p class="photo-caption-byline">
         <%= link_to @member.name, "/#{@member.slug}" %>
-        <% if @member.profession.present? %> · <%= @member.profession_label %><% end %>
+        <% if @member.public_profession_label.present? %> · <%= @member.public_profession_label %><% end %>
         <% if @member.region.present? %> · <%= @member.region %><% end %>
       </p>
     </div>

@@ -161,8 +161,8 @@
         <p class="cs-eyebrow">imPD 검증 회원 · 요약 명함</p>
         <h1 class="cs-name">
           <%= @member.name %>
-          <% if @member.profession.present? %>
-            <span class="italic"><%= @member.profession_label %>.</span>
+          <% if @member.public_profession_label.present? %>
+            <span class="italic"><%= @member.public_profession_label %>.</span>
           <% end %>
         </h1>
       </div>

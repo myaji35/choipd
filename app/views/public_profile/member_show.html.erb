@@ -50,7 +50,7 @@
       "@type" => "Person",
       "name" => @member.name,
       "url" => share_url,
-      "jobTitle" => (@member.profession_label if @member.profession.present?),
+      "jobTitle" => @member.public_profession_label,
       "description" => @member.bio.presence,
       "image" => @member.profile_image.presence,
       "address" => (@member.region.present? ? {

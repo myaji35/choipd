@@ -1,14 +1,18 @@
 class MemberAdmin::ServicesController < MemberAdmin::BaseController
+  include MemberAdmin::ProfileChecklist
+
   before_action :set_service, only: [ :update, :destroy ]
 
   def index
     @services = @member.member_services.sorted
+    @next_task = build_profile_checklist(from_checklist: true).find { |item| !item[:done] } if flash[:next_step]
   end
 
   def create
     service = @member.member_services.new(service_params)
 
     if service.save
+      flash[:next_step] = true
       flash[:saved_item] = "service-#{service.id}"
       redirect_to slug_admin_services_path(slug: @member.slug), notice: "서비스를 저장했어요. 내 페이지 '서비스' 칸에서 볼 수 있어요."
     else

@@ -11,6 +11,22 @@ class MemberTest < ActiveSupport::TestCase
     )
   end
 
+  test "public profession only labels a profession the member chose" do
+    ["custom", nil, "", " "].each do |profession|
+      @member.profession = profession
+      assert_nil @member.public_profession_label
+    end
+
+    @member.profession = "educator"
+    assert_equal @member.profession_label, @member.public_profession_label
+
+    @member.profession = "creator"
+    assert_equal "크리에이터", @member.public_profession_label
+
+    @member.profession = "1인 사업가"
+    assert_equal "1인 사업가", @member.public_profession_label
+  end
+
   test "links an existing member by email and fills the blank profile image" do
     assert_equal @member.id, Member.from_omniauth(@auth).id
     assert_equal @image, @member.reload.profile_image
