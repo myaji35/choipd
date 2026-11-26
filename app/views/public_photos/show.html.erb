@@ -1,5 +1,7 @@
 <% content_for :title, (@photo.caption.presence || "#{@member.name} 사진") %>
-<% content_for :description, (@photo.caption.presence || "imPD · #{@member.name} · #{photo_category_label(@photo.category)}").first(160) %>
+<% content_for :description, @photo.caption.presence&.first(160) || public_share_description(@member, @services, 160) %>
+<% content_for :og_title, @photo.caption.presence || "#{@member.name} · #{photo_category_label(@photo.category)}" %>
+<% content_for :og_description, public_share_description(@member, @services) %>
 
 <% photo_url = url_for(@photo.image) %>
 <% photo_abs = photo_url.start_with?("http") ? photo_url : "#{request.base_url}#{photo_url}" %>
@@ -11,8 +13,6 @@
     page_url  = "#{request.protocol}#{request.host_with_port}/p/#{@member.slug}/#{@photo.id}"
   %>
   <meta property="og:type" content="article">
-  <meta property="og:title" content="<%= @photo.caption.presence || "#{@member.name} · #{photo_category_label(@photo.category)}" %>">
-  <meta property="og:description" content="<%= "imPD · #{@member.name}" %>">
   <meta property="og:url" content="<%= page_url %>">
   <meta property="article:author" content="<%= @member.name %>">
   <meta name="twitter:title" content="<%= @photo.caption.presence || @member.name %>">

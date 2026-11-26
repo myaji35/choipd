@@ -50,6 +50,44 @@ class PublicPhotoVisitorTest < ActionDispatch::IntegrationTest
     assert_select "meta[property='og:title'][content*='DAILY']", count: 0
   end
 
+  test "photo preview shows services while the page description prefers the caption" do
+    @member.member_services.create!(title: "상담", is_active: 1)
+    path = public_photo_path(slug: @member.slug, photo_id: @photo.id)
+
+    get path
+    assert_select 'meta[property="og:description"]', count: 1
+    assert_select 'meta[property="og:description"][content=?]', "하는 일: 상담"
+    assert_select 'meta[name="description"][content=?]', "하는 일: 상담"
+    assert_select "#promo-popup-overlay", count: 0
+    assert_not_includes response.body, "impd-promo.mp4"
+
+    @photo.update!(caption: "사진 설명")
+    get path
+    assert_select 'meta[property="og:description"][content=?]', "하는 일: 상담"
+    assert_select 'meta[name="description"][content=?]', "사진 설명"
+  end
+
+  test "a missing photo or attachment redirects to the member and shows a notice" do
+    @photo.image.detach
+    [ 99_999_999, @photo.id ].each do |photo_id|
+      assert_no_difference [ "AnalyticsEvent.where(event_category: 'photo').count", "ShortLink.count" ] do
+        get public_photo_path(slug: @member.slug, photo_id: photo_id)
+        assert_response :found
+        assert_redirected_to "/#{@member.slug}"
+        follow_redirect!
+        assert_select '[role="status"]', text: /찾으시는 사진은 내려갔어요\./
+        assert_select 'a[href="#contact"]', text: "상담·문의하기"
+      end
+    end
+  end
+
+  test "an unknown member photo URL returns not found without tracking or creating a short link" do
+    assert_no_difference [ "AnalyticsEvent.where(event_category: 'photo').count", "ShortLink.count" ] do
+      get public_photo_path(slug: "no-such-member", photo_id: @photo.id)
+      assert_response :not_found
+    end
+  end
+
   test "로그인한 회원이 볼 때 위 띠는 지금 그대로다" do
     @member.update!(password: "password1234", password_confirmation: "password1234")
     post "/auth/login", params: { email: @member.email, password: "password1234" }

@@ -10,10 +10,13 @@ class PublicPhotosController < ApplicationController
 
   def show
     @member = Member.publicly_visible.find_by(slug: params[:slug])
-    head :not_found and return if @member.blank?
+    raise ActionController::RoutingError.new("Not Found") if @member.blank?
 
     @photo = @member.member_photos.find_by(id: params[:photo_id])
-    head :not_found and return if @photo.blank? || !@photo.image.attached?
+    if @photo.blank? || !@photo.image.attached?
+      redirect_to public_profile_path(slug: @member.slug),
+        notice: "찾으시는 사진은 내려갔어요. #{@member.name}님 페이지로 안내해 드려요." and return
+    end
 
     # 앞/뒤 사진 네비게이션
     siblings = @member.member_photos.ordered.to_a

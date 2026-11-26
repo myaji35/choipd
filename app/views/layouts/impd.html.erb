@@ -200,7 +200,7 @@
     <%= yield(:head) if content_for?(:head) %>
   </head>
   <body>
-    <a class="skip-link" href="#main-content">본문 바로가기</a>
+    <a class="skip-link" href="#main-content"><%= lni_icon "arrow-right" %>본문 바로가기</a>
     <!-- C2 Join Strip — 최상단 검정 bar (비로그인에만) -->
     <% unless member_signed_in? || %w[public_profile public_photos].include?(controller_path) %>
       <div class="impd-joinstrip" style="background: #000; color: #fff; padding: 10px 24px; display: flex; align-items: center; gap: 14px; font-size: 13px; letter-spacing: -0.01em;">
@@ -313,7 +313,7 @@
     <% end %>
 
     <%# 홍보 영상 팝업 (data-promo-popup 트리거 + 첫 방문자 자동 재생) %>
-    <%= render "shared/promo_popup" %>
+    <%= render "shared/promo_popup" unless visitor_page %>
 
     <% unless hide_frap %>
       <% frap_href = member_signed_in? ? "/#{current_member.slug}/admin/dashboard" : member_signup_path %>

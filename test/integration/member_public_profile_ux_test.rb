@@ -6,6 +6,29 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
     @member = Member.create!(name: "테스트 회원", email: "#{token}@example.com", slug: "member-#{token}", status: "approved", profession: "insurance_agent")
   end
 
+  test "public profiles and cards skip the promo for signed-out visitors" do
+    %w[editorial grid].each do |layout|
+      @member.update!(layout_preset: layout)
+      get "/#{@member.slug}"
+      assert_select "#promo-popup-overlay", count: 0
+      assert_not_includes response.body, "impd-promo.mp4"
+    end
+
+    get "/#{@member.slug}/card"
+    assert_select "#promo-popup-overlay", count: 0
+    assert_not_includes response.body, "impd-promo.mp4"
+  end
+
+  test "the promo remains on the homepage and on profiles for signed-in members" do
+    get root_path
+    assert_select "#promo-popup-overlay", count: 1
+
+    @member.update!(password: "password1234", password_confirmation: "password1234")
+    post "/auth/login", params: { email: @member.email, password: "password1234" }
+    get "/#{@member.slug}"
+    assert_select "#promo-popup-overlay", count: 1
+  end
+
   test "both layouts omit empty photos and services and show insurance disclosure" do
     [ "editorial", "grid" ].each do |layout|
       @member.update!(layout_preset: layout)

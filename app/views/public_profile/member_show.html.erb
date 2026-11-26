@@ -1,13 +1,13 @@
-<% content_for :og_title, "#{@member.name} · #{@member.profession_label}" %>
-<% content_for :og_description, truncate(@member.bio.to_s, length: 100) %>
+<% content_for :og_title, public_share_title(@member) %>
+<% content_for :og_description, public_share_description(@member, @services) %>
 <% if @member.profile_image.present? %>
   <% content_for :og_image, URI.join("#{public_base_url}/", @member.profile_image).to_s %>
 <% end %>
 <% if @member.layout_preset == "grid" %>
 <%= render "public_profile/grid_layout", member: @member, services: @services, moments: @moments, portfolio: @portfolio, faqs: @faqs, reviews: @reviews %>
 <% else %>
-<% content_for :title, "#{@member.name} | imPD" %>
-<% content_for :description, @member.bio.to_s.first(160) %>
+<% content_for :title, "#{public_share_title(@member)} | imPD" %>
+<% content_for :description, public_share_description(@member, @services, 160) %>
 
 <%# OG/Twitter 카드 — 카톡/페북/슬랙 공유 시 디지털 명함 이미지 노출. %>
 <% content_for :head do %>
@@ -30,7 +30,7 @@
       "@type" => "Person",
       "name" => @member.name,
       "url" => share_url,
-      "jobTitle" => @member.profession_label,
+      "jobTitle" => (@member.profession_label if @member.profession.present?),
       "description" => @member.bio.presence,
       "image" => @member.profile_image.presence,
       "address" => (@member.region.present? ? {

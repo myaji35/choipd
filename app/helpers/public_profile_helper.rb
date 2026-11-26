@@ -6,6 +6,26 @@ module PublicProfileHelper
     PHOTO_CATEGORY_LABELS[category.to_s] || "사진"
   end
 
+  def public_share_title(member)
+    member.profession.present? ? "#{member.name} · #{member.profession_label}" : member.name.to_s
+  end
+
+  def public_share_description(member, services, limit = 100)
+    bio = member.bio.to_s.squish
+    if services.empty?
+      return bio_excerpt(bio, limit) if bio.present?
+
+      return "#{member.name}님에게 상담·문의를 남길 수 있는 페이지예요."
+    end
+
+    offer = "하는 일: #{services.first(3).map(&:title).join(" · ")}"
+    offer += " 외 #{services.size - 3}개" if services.size > 3
+    remaining = limit - offer.length - " — ".length
+    return "#{offer} — #{bio_excerpt(bio, remaining)}" if bio.present? && remaining >= 20
+
+    offer.truncate(limit, omission: "…")
+  end
+
   # 소개 글을 limit 자 안에서 '문장이 끝나는 곳' 까지만 보여 준다. 글자를 바꾸거나 지어내지 않는다.
   def bio_excerpt(text, limit = 140)
     text = text.to_s.squish
@@ -20,7 +40,7 @@ module PublicProfileHelper
 
       excerpt << separator << sentence
     end
-    excerpt.presence || truncate(text, length: limit, separator: " ", omission: "…")
+    excerpt.presence || text.truncate(limit, separator: " ", omission: "…")
   end
 
   def service_price_text(service)

@@ -7,7 +7,7 @@ class ShortLinksController < ApplicationController
       link.record_click!
       redirect_to link.target_path, status: :moved_permanently, allow_other_host: false
     else
-      redirect_to root_path, status: :not_found, alert: "짧은 링크를 찾을 수 없습니다"
+      raise ActionController::RoutingError.new("Not Found")
     end
   end
 end

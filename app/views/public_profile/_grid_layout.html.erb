@@ -1,8 +1,8 @@
 <% faqs = local_assigns.fetch(:faqs, []) %>
 <% reviews = local_assigns.fetch(:reviews, []) %>
 <% portfolio = local_assigns.fetch(:portfolio, []) %>
-<% content_for :title, "#{member.name} | imPD" %>
-<% content_for :description, member.bio.to_s.first(160) %>
+<% content_for :title, "#{public_share_title(member)} | imPD" %>
+<% content_for :description, public_share_description(member, services, 160) %>
 
 <%
   grid_photos = moments.to_a.select { |photo| photo.image.attached? }.first(6)

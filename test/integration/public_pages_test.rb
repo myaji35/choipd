@@ -21,12 +21,24 @@ class PublicPagesTest < ActionDispatch::IntegrationTest
       slug: "og-#{SecureRandom.hex(4)}", status: "approved", password: "password1234")
     get "/#{member.slug}"
     assert_response :success
-    assert_select 'meta[property="og:title"][content=?]', "#{member.name} · #{member.profession_label}"
+    assert_select 'meta[property="og:title"][content=?]', member.name
     assert_select 'meta[property="og:image"][content*="og-default"]'
+
+    member.update!(profession: "educator")
+    get "/#{member.slug}"
+    assert_select 'meta[property="og:title"][content=?]', "#{member.name} · #{member.profession_label}"
 
     member.update!(profile_image: "https://example.com/profile.jpg")
     get "/#{member.slug}"
     assert_select 'meta[property="og:image"][content=?]', "https://example.com/profile.jpg", count: 1
+  end
+
+  test "static not found page offers a Korean recovery link" do
+    html = Rails.public_path.join("404.html").read
+    [ 'lang="ko"', "찾으시는 페이지가 없어요", 'href="/"', "처음 화면으로" ].each do |text|
+      assert_includes html, text
+    end
+    assert_not_includes html, "The page you were looking for"
   end
 
   test "homepage CTAs reflect member session" do

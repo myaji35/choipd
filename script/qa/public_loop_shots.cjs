@@ -12,11 +12,15 @@ const pages = [
   const browser = await chromium.launch();
   const report = [];
   for (const [vw, vh, tag] of [[1440, 900, 'd'], [390, 844, 'm']]) {
-    const targets = hasGridPhoto ? [...pages, ['gridphoto', '/ux-photo']] : pages;
+    const targets = hasGridPhoto ? [...pages, ['gridphoto', '/ux-photo']] : [...pages];
+    targets.push(['notfound', '/404.html']);
+    if (hasGridPhoto) targets.push(['photogone', '/p/ux-photo/99999999']);
     for (const [name, path] of targets) {
       const ctx = await browser.newContext({ viewport: {width: vw, height: vh}, locale: 'ko-KR', deviceScaleFactor: 1 });
       const page = await ctx.newPage();
       const errors = [];
+      let promoRequests = 0;
+      page.on('request', request => { if (request.url().includes('/promo/')) promoRequests++; });
       page.on('console', m => { if (m.type() === 'error') errors.push(m.text().slice(0,200)); });
       page.on('pageerror', e => errors.push('pageerror: ' + String(e).slice(0,200)));
       const resp = await page.goto(base + path, {waitUntil: 'networkidle'}).catch(() => null);
@@ -31,9 +35,29 @@ const pages = [
         const fold = [...document.querySelectorAll('h1,h2,h3,p,a,button')].filter(vis).filter(el => el.getBoundingClientRect().top < vh && el.getBoundingClientRect().bottom > 0).map(el => (el.innerText||'').trim()).filter(Boolean).join(' | ').slice(0, 600);
         return { sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth, h: document.documentElement.scrollHeight,
           firstCta: first, ctaScroll: first ? Math.max(0, first.top + first.h - vh) : null, submitTop: subTop, submitScroll: subTop != null ? Math.max(0, subTop + 40 - vh) : null,
+          share: {
+            title: document.querySelector('meta[property="og:title"]')?.content ?? null,
+            description: document.querySelector('meta[property="og:description"]')?.content ?? null
+          },
+          promoOverlay: !!document.querySelector('#promo-popup-overlay'),
           h1: h1 ? h1.innerText.trim().slice(0,60) : null, fold };
       }, vh);
+      const promo = { requests: promoRequests, overlay: m.promoOverlay };
       let extra = {};
+      if (name === 'notfound') {
+        extra = await page.evaluate(() => ({
+          homeLinksInFold: [...document.querySelectorAll('a[href="/"]')].filter(link =>
+            link.innerText.trim() === '처음 화면으로' && link.getBoundingClientRect().top < innerHeight &&
+            link.getBoundingClientRect().height > 0).length,
+          englishError: document.body.innerText.includes('The page you were')
+        }));
+      }
+      if (name === 'photogone') {
+        extra = {
+          finalPath: new URL(page.url()).pathname,
+          notice: await page.getByText('찾으시는 사진은 내려갔어요.', { exact: false }).isVisible()
+        };
+      }
       if (name === 'gridphoto') {
         const photoPath = await page.locator('a[href^="/p/ux-photo/"]').first().evaluateAll(links => links[0]?.getAttribute('href'));
         if (photoPath) targets.push(['photo', photoPath]);
@@ -160,7 +184,7 @@ const pages = [
           }
         } catch (e) { flow.error = String(e).slice(0,160); }
       }
-      report.push({ name, tag, status: resp && resp.status(), overflowX: m.sw > m.cw, height: m.h, h1: m.h1, firstCta: m.firstCta, ctaScroll: m.ctaScroll, submitScroll: m.submitScroll, fold: m.fold, reach, svc, badContact, fail, flow, consoleErrors: [...errors], ...extra });
+      report.push({ name, tag, status: resp && resp.status(), share: m.share, promo, overflowX: m.sw > m.cw, height: m.h, h1: m.h1, firstCta: m.firstCta, ctaScroll: m.ctaScroll, submitScroll: m.submitScroll, fold: m.fold, reach, svc, badContact, fail, flow, consoleErrors: [...errors], ...extra });
       await ctx.close();
     }
   }

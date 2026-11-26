@@ -1,8 +1,8 @@
-<% content_for :title, "#{@member.name} | imPD" %>
-<% content_for :description, @member.bio.to_s.first(160).presence || "imPD · #{@member.name}" %>
+<% content_for :title, "#{public_share_title(@member)} | imPD" %>
+<% content_for :description, public_share_description(@member, @services, 160) %>
 
-<% content_for :og_title, "#{@member.name} · #{@member.profession_label}" %>
-<% content_for :og_description, truncate(@member.bio.to_s, length: 100) %>
+<% content_for :og_title, public_share_title(@member) %>
+<% content_for :og_description, public_share_description(@member, @services) %>
 <% if @member.profile_image.present? %><% content_for :og_image, URI.join("#{public_base_url}/", @member.profile_image).to_s %><% end %>
 
 <%
@@ -161,7 +161,9 @@
         <p class="cs-eyebrow">imPD 검증 회원 · 요약 명함</p>
         <h1 class="cs-name">
           <%= @member.name %>
-          <span class="italic"><%= @member.profession_label %>.</span>
+          <% if @member.profession.present? %>
+            <span class="italic"><%= @member.profession_label %>.</span>
+          <% end %>
         </h1>
       </div>
 
