@@ -427,7 +427,125 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "한 줄의 카피보다"
   end
 
+  test "화면 안에서 문의 칸·서비스 칸으로 가는 링크는 화면을 다시 그리지 않는다" do
+    @member.member_services.create!(title: "보장 분석 상담", is_active: 1)
+
+    each_service_layout do |card|
+      assert_select ".public-hero .public-actions a.primary[href='#contact'][data-turbo='false']", text: "상담·문의하기"
+      assert_select "nav.public-sticky a.primary[href='#contact'][data-turbo='false']", text: "문의"
+      assert_select "#{card} a.public-service-action[href='#contact'][data-turbo='false'][data-inquiry-service='보장 분석 상담']"
+      if card == "#classes"
+        assert_select ".public-hero .public-actions a[href='#classes'][data-turbo='false']", text: "서비스 보기"
+      end
+      assert_includes response.body, "scroll-margin-top: 88px"
+    end
+  end
+
+  test "바깥 신청 주소로 가는 서비스 버튼은 그대로다" do
+    @member.member_services.create!(title: "보장 분석 상담", is_active: 1, cta_url: "https://example.com/apply")
+
+    each_service_layout do |card|
+      assert_select "#{card} a.public-service-action[href='https://example.com/apply'][target=_blank]" do |links|
+        assert_nil links.first["data-turbo"]
+      end
+    end
+  end
+
+  test "서비스 값과 단위를 둘 다 보여 준다" do
+    assert_public_service_price "50,000원 · 1회", price: "50,000원", price_label: "1회"
+  end
+
+  test "숫자만 적은 값에는 쉼표와 원을 붙인다" do
+    assert_public_service_price "50,000원", price: "50000"
+  end
+
+  test "값을 글로 적으면 그대로 보여 준다" do
+    assert_public_service_price "무료", price: "무료"
+  end
+
+  test "값을 적지 않은 서비스는 가격 문의라고 적는다" do
+    assert_public_service_price "가격 문의"
+  end
+
+  test "긴 서비스 설명도 끝까지 읽을 수 있다" do
+    long_description = ("상담 준비물을 알려 드려요. " * 20) + "마지막 문장입니다."
+    short_description = "상담에 필요한 자료입니다. " * 6
+    service = @member.member_services.create!(title: "보장 분석 상담", is_active: 1, description: long_description)
+
+    each_service_layout do |card|
+      assert_select "#{card} details.public-service-more summary", text: "설명 끝까지 보기"
+      assert_select "#{card} details.public-service-more p", text: long_description
+      assert_select "#{card} details.public-service-more[open]", count: 0
+    end
+
+    service.update!(description: short_description)
+    each_service_layout do |card|
+      assert_select "#{card} details.public-service-more", count: 0
+      assert_select "#{card} p", text: short_description.strip
+    end
+  end
+
+  test "빈칸만 적은 문의는 저장하지 않고 우리말로 이유를 알려 준다" do
+    assert_rejected_message "          ", "이름·연락처·문의 내용을 모두 적어 주세요."
+    assert_not_includes response.body, "can't be blank"
+  end
+
+  test "너무 짧은 문의는 다섯 글자 이상 적어 달라고 알려 준다" do
+    assert_rejected_message "네", "문의 내용을 다섯 글자 이상 적어 주세요."
+  end
+
+  test "너무 긴 문의는 2,000자까지 보낼 수 있다고 알려 준다" do
+    assert_rejected_message "가" * 2001, "문의 내용은 2,000자까지 보낼 수 있어요."
+  end
+
+  test "앞뒤 빈칸은 떼고 저장한다" do
+    attributes = inquiry_attributes.merge(sender_name: "  김고객  ", sender_email: "  010-1234-5678  ", message: "  상담 부탁드려요  ")
+    assert_difference "MemberInquiry.count", 1 do
+      post member_inquiries_path(slug: @member.slug), params: { member_inquiry: attributes }
+    end
+    inquiry = @member.member_inquiries.sole
+    assert_equal ["김고객", "010-1234-5678", "상담 부탁드려요"], [inquiry.sender_name, inquiry.sender_email, inquiry.message]
+    assert_inquiry_confirmation
+  end
+
+  test "문의 칸에 쓰던 글을 살리는 장치가 있다" do
+    each_service_layout do
+      assert_select "#contact .public-consent-link a[href='/privacy'][target=_blank][rel=noopener]", text: "개인정보처리방침 보기"
+      assert_select "script", text: /impd-inquiry-draft:/ do |scripts|
+        assert_includes scripts.first.text, "sessionStorage"
+        assert_not_includes scripts.first.text, "localStorage"
+      end
+    end
+  end
+
   private
+
+  def each_service_layout
+    { "editorial" => "#classes", "grid" => ".impd-bento article" }.each do |layout, card|
+      @member.update!(layout_preset: layout)
+      get public_profile_path(slug: @member.slug)
+      assert_response :success
+      yield card
+    end
+  end
+
+  def assert_public_service_price(expected, **attributes)
+    @member.member_services.create!(title: "보장 분석 상담", is_active: 1, **attributes)
+    each_service_layout do |card|
+      assert_select "#{card} p", text: expected
+      assert_not_includes response.body, "₩"
+    end
+  end
+
+  def assert_rejected_message(message, alert)
+    assert_no_difference "MemberInquiry.count" do
+      post member_inquiries_path(slug: @member.slug), params: { member_inquiry: inquiry_attributes.merge(message: message) }
+    end
+    assert_response :see_other
+    assert_redirected_to public_profile_path(slug: @member.slug, anchor: "contact")
+    follow_redirect!
+    assert_select "#contact #inquiry-alert[role=alert]", text: alert
+  end
 
   def assert_visitor_topnav
     assert_select ".impd-topnav a[href='/']", text: "imPD"

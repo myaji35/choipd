@@ -99,10 +99,16 @@
           <span class="impd-label-muted" style="display: block; margin-bottom: 10px;"><%= s.is_active.to_i.positive? ? "신청 가능" : "마감" %></span>
           <h3 class="impd-display" style="font-size: 24px; word-break: keep-all; overflow-wrap: anywhere; line-height: 1.25;"><%= s.title %></h3>
           <% if s.description.present? %>
-            <p style="margin-top: 12px; font-size: 14px; color: var(--impd-ink2); line-height: 1.5;"><%= truncate(s.description, length: 80) %></p>
+            <p style="margin-top: 12px; font-size: 14px; color: var(--impd-ink2); line-height: 1.5; white-space: pre-line; overflow-wrap: anywhere; word-break: keep-all;"><%= truncate(s.description, length: 160, separator: " ") %></p>
+            <% if s.description.length > 160 %>
+              <details class="public-service-more">
+                <summary>설명 끝까지 보기</summary>
+                <p><%= s.description %></p>
+              </details>
+            <% end %>
           <% end %>
           <p style="margin-top: 16px; font-family: var(--impd-font-sans); font-weight: 600; font-size: 14px; color: var(--impd-accent);">
-            <%= s.price_label.presence || (s.price.present? ? "₩#{s.price}" : "문의") %>
+            <%= service_price_text(s) %>
           </p>
           <%= render "public_profile/service_action", service: s %>
         </div>

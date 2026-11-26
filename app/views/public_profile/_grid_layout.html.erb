@@ -81,11 +81,17 @@
           <span class="impd-label">서비스</span>
           <h2 class="impd-bento-heading" style="font-size: 26px; margin-top: 12px;"><%= service.title %></h2>
           <% if service.description.present? %>
-            <p style="margin-top: 12px; color: var(--impd-ink2); line-height: 1.6;"><%= truncate(service.description, length: 100) %></p>
+            <p style="margin-top: 12px; color: var(--impd-ink2); line-height: 1.6; white-space: pre-line; overflow-wrap: anywhere; word-break: keep-all;"><%= truncate(service.description, length: 160, separator: " ") %></p>
+            <% if service.description.length > 160 %>
+              <details class="public-service-more">
+                <summary>설명 끝까지 보기</summary>
+                <p><%= service.description %></p>
+              </details>
+            <% end %>
           <% end %>
         </div>
         <div>
-          <p style="margin-top: 18px; font-family: var(--impd-font-sans); font-weight: 600; color: var(--impd-accent);"><%= service.price_label.presence || service.price.presence || "문의" %></p>
+          <p style="margin-top: 18px; font-family: var(--impd-font-sans); font-weight: 600; color: var(--impd-accent);"><%= service_price_text(service) %></p>
           <%= render "public_profile/service_action", service: service %>
         </div>
       </article>

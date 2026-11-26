@@ -31,6 +31,43 @@ const pages = [
       }, vh);
       await page.screenshot({ path: outDir + '/' + name + '-' + tag + '.png', fullPage: true });
       await page.screenshot({ path: outDir + '/' + name + '-' + tag + '-fold.png' });
+      let svc = null;
+      let fail = null;
+      if (name === 'editorial' || name === 'grid') {
+        await page.fill('#member_inquiry_sender_name', '쓰던 이름');
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.locator('a.public-service-action[data-inquiry-service]').first().click();
+        await page.waitForTimeout(800);
+        svc = await page.evaluate(() => ({
+          prefill: document.getElementById('member_inquiry_message').value,
+          keptName: document.getElementById('member_inquiry_sender_name').value === '쓰던 이름',
+          headingClear: document.querySelector('#contact h2').getBoundingClientRect().top >=
+            document.querySelector('.impd-topnav').getBoundingClientRect().bottom,
+          focus: document.activeElement.id
+        }));
+        await page.evaluate(() => sessionStorage.clear());
+        await page.goto(base + path, {waitUntil: 'networkidle'});
+      }
+      if (submit && name === 'editorial' && tag === 'm') {
+        await page.fill('#member_inquiry_sender_name', '쓰던 이름');
+        await page.fill('#member_inquiry_sender_email', '010-0000-0000');
+        await page.fill('#member_inquiry_message', ' '.repeat(10));
+        await page.check('#member_inquiry_consent');
+        await page.click('#contact input[type=submit], #contact button[type=submit]');
+        await page.waitForTimeout(600);
+        fail = await page.evaluate(() => {
+          const alert = document.querySelector('#contact [role=alert]');
+          const rect = alert?.getBoundingClientRect();
+          return {
+            alert: alert?.innerText.trim() ?? null,
+            inView: !!rect && rect.top >= 0 && rect.bottom <= innerHeight,
+            keptName: document.getElementById('member_inquiry_sender_name').value === '쓰던 이름',
+            keptContact: document.getElementById('member_inquiry_sender_email').value === '010-0000-0000'
+          };
+        });
+        await page.evaluate(() => sessionStorage.clear());
+        await page.goto(base + path, {waitUntil: 'networkidle'});
+      }
       let flow = null;
       if (submit && (name === 'editorial' || name === 'grid')) {
         // 실제 문의 흐름: 첫 문의 버튼 클릭 → 이름·연락처·내용 → 동의 → 보내기
@@ -52,9 +89,14 @@ const pages = [
           const st = await page.evaluate(() => { const s = document.querySelector('[role=status]'); if (!s) return null; const r = s.getBoundingClientRect(); return { text: s.innerText.trim().slice(0,60), inView: r.top < innerHeight && r.bottom > 0 }; });
           flow.ok = !!st; flow.notice = st;
           await page.screenshot({ path: outDir + '/' + name + '-' + tag + '-sent.png' });
+          if (flow.ok) {
+            await page.goto(base + path, {waitUntil: 'networkidle'});
+            flow.draftCleared = (await page.inputValue('#member_inquiry_sender_name')) === '' &&
+              (await page.inputValue('#member_inquiry_message')) === '';
+          }
         } catch (e) { flow.error = String(e).slice(0,160); }
       }
-      report.push({ name, tag, status: resp && resp.status(), overflowX: m.sw > m.cw, height: m.h, h1: m.h1, firstCta: m.firstCta, ctaScroll: m.ctaScroll, submitScroll: m.submitScroll, fold: m.fold, flow, consoleErrors: [...errors] });
+      report.push({ name, tag, status: resp && resp.status(), overflowX: m.sw > m.cw, height: m.h, h1: m.h1, firstCta: m.firstCta, ctaScroll: m.ctaScroll, submitScroll: m.submitScroll, fold: m.fold, svc, fail, flow, consoleErrors: [...errors] });
       await ctx.close();
     }
   }

@@ -10,6 +10,9 @@
   kakao = entries.find { |label, url| url.present? && (label.to_s.match?(/kakao|카카오|카톡/i) || url.to_s.match?(%r{(?:pf\.kakao\.com|open\.kakao\.com)}i)) }&.last
 %>
 <style>
+  #contact, #classes { scroll-margin-top: 88px; }
+  .public-service-more summary { min-height: 44px; display: inline-flex; align-items: center; color: var(--impd-accent); font-size: 14px; font-weight: 600; cursor: pointer; }
+  .public-service-more p { margin: 0 0 8px; color: var(--impd-ink2); font-size: 14px; line-height: 1.6; white-space: pre-line; overflow-wrap: anywhere; word-break: keep-all; }
   .public-member { color: var(--impd-ink); font: 16px/1.6 var(--impd-font-sans); word-break: keep-all; overflow-wrap: anywhere; }
   .public-member * { box-sizing: border-box; }
   .public-member-inner { max-width: 1200px; margin: auto; padding: 48px 40px; }
@@ -44,14 +47,14 @@
     <p class="public-offer"><span class="public-offer-label">하는 일</span> <%= services.first(3).map(&:title).join(" · ") %><% if services.size > 3 %> 외 <%= services.size - 3 %>개<% end %></p>
   <% end %>
   <% if member.bio.present? %><p class="public-bio"><%= member.bio %></p><% end %>
-  <div class="public-actions"><a class="primary" href="#contact">상담·문의하기</a><% if member.phone.present? %><a href="tel:<%= member.phone %>">전화</a><% end %><% if kakao %><a href="<%= kakao %>" target="_blank" rel="noopener">카카오톡</a><% end %><% if member.email.present? %><a href="mailto:<%= member.email %>">이메일</a><% end %><% if show_offer %><a href="#classes">서비스 보기</a><% end %></div>
+  <div class="public-actions"><a class="primary" href="#contact" data-turbo="false">상담·문의하기</a><% if member.phone.present? %><a href="tel:<%= member.phone %>">전화</a><% end %><% if kakao %><a href="<%= kakao %>" target="_blank" rel="noopener">카카오톡</a><% end %><% if member.email.present? %><a href="mailto:<%= member.email %>">이메일</a><% end %><% if show_offer %><a href="#classes" data-turbo="false">서비스 보기</a><% end %></div>
   <% photos = moments.to_a.select { |photo| photo.image.attached? && !photo.video? }.first(3) %>
   <% if photos.any? %><div style="display: flex; gap: 8px; margin-top: 24px; overflow: hidden;"><% photos.each do |photo| %><img loading="lazy" decoding="async" src="<%= photo.thumbnail_url || photo.display_url %>" alt="<%= photo.caption.presence || member.name + ' 사진' %>" style="width: 100px; height: 100px; object-fit: cover; border: 4px solid var(--impd-paper);"><% end %></div><% end %>
   <% if brand_ops_public? && ProConsent.has_consent?(owner_id: member.id, type: "socialdoctors_exposure") %>
     <%= link_to "최근 활동 숫자 보기 →", member_brand_ops_path(slug: member.slug), class: "public-activity-link" %>
   <% end %>
 </div></section>
-<nav class="public-sticky public-member" aria-label="빠른 연락"><% if member.phone.present? %><a href="tel:<%= member.phone %>">전화</a><% end %><a class="primary" href="#contact">문의</a><% if kakao %><a href="<%= kakao %>" target="_blank" rel="noopener">카카오</a><% else %><button type="button" onclick="shareMemberPage(this)">공유</button><% end %></nav>
+<nav class="public-sticky public-member" aria-label="빠른 연락"><% if member.phone.present? %><a href="tel:<%= member.phone %>">전화</a><% end %><a class="primary" href="#contact" data-turbo="false">문의</a><% if kakao %><a href="<%= kakao %>" target="_blank" rel="noopener">카카오</a><% else %><button type="button" onclick="shareMemberPage(this)">공유</button><% end %></nav>
 <script>
   async function copyMemberLink(button) { try { await navigator.clipboard.writeText(location.href); button.textContent = '복사했어요'; } catch (_) { const input = document.createElement('textarea'); input.value = location.href; document.body.appendChild(input); input.select(); document.execCommand('copy'); input.remove(); button.textContent = '복사했어요'; } }
   async function shareMemberPage(button) { if (navigator.share) { try { await navigator.share({ title: document.title, url: location.href }); } catch (_) {} } else { await copyMemberLink(button); } }

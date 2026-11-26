@@ -1,4 +1,11 @@
 module PublicProfileHelper
+  def service_price_text(service)
+    price = service.price.to_s.strip
+    unit = service.price_label.to_s.strip
+    price = "#{number_with_delimiter(price.delete(','))}원" if price.match?(/\A\d[\d,]*\z/)
+    [price.presence, unit.presence].compact.join(" · ").presence || "가격 문의"
+  end
+
   def portfolio_media(item)
     url = item.media_url.to_s.strip
     path = url.split(/[?#]/, 2).first.to_s.sub(%r{\A[a-z][a-z0-9+.-]*://[^/]*}i, "")

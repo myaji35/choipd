@@ -13,7 +13,21 @@ class MemberInquiriesController < ApplicationController
       return
     end
 
-    inquiry = member.member_inquiries.create(inquiry_params)
+    attrs = inquiry_params.to_h.transform_values { |value| value.to_s.strip }
+    problem =
+      if attrs.values_at("sender_name", "sender_email", "message").any?(&:blank?)
+        "이름·연락처·문의 내용을 모두 적어 주세요."
+      elsif attrs["message"].length < 5
+        "문의 내용을 다섯 글자 이상 적어 주세요."
+      elsif attrs["message"].length > 2000
+        "문의 내용은 2,000자까지 보낼 수 있어요."
+      end
+    if problem
+      redirect_to public_profile_path(slug: member.slug, anchor: "contact"), alert: problem, status: :see_other
+      return
+    end
+
+    inquiry = member.member_inquiries.create(attrs)
 
     if inquiry.persisted?
       MemberInquiryMailer.notify(inquiry).deliver_later
@@ -21,7 +35,7 @@ class MemberInquiriesController < ApplicationController
       redirect_to public_profile_path(slug: member.slug, anchor: "contact"), status: :see_other
     else
       redirect_to public_profile_path(slug: member.slug, anchor: "contact"),
-                  alert: inquiry.errors.full_messages.join(" · "),
+                  alert: "문의를 보내지 못했어요. 잠시 뒤 다시 보내 주세요.",
                   status: :see_other
     end
   end

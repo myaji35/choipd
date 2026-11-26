@@ -2,6 +2,6 @@
   <% if service.cta_url.to_s.match?(%r{\Ahttps?://}i) %>
     <a class="public-service-action" href="<%= service.cta_url %>" target="_blank" rel="noopener"><%= service.cta_label.presence || "신청하기" %> ↗</a>
   <% else %>
-    <a class="public-service-action" href="#contact" data-inquiry-service="<%= service.title %>"><%= service.cta_label.presence || "이 서비스 문의하기" %></a>
+    <a class="public-service-action" href="#contact" data-turbo="false" data-inquiry-service="<%= service.title %>"><%= service.cta_label.presence || "이 서비스 문의하기" %></a>
   <% end %>
 <% end %>
