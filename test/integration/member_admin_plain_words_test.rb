@@ -39,14 +39,41 @@ class MemberAdminPlainWordsTest < ActionDispatch::IntegrationTest
     assert_no_match "비활성", response.body
   end
 
+  test "서비스의 신청 버튼 설정은 필요할 때만 펼쳐진다" do
+    path = slug_admin_services_path(slug: @member.slug)
+    get path
+
+    assert_select "#new-service details[data-service-more]:not([open])" do
+      assert_select "summary", text: "신청 버튼 바꾸기 (선택)"
+      assert_select "input[name='member_service[cta_label]']"
+      assert_select "input[name='member_service[cta_url]']"
+      assert_select "input[name='member_service[title]'], input[type=submit]", count: 0
+    end
+    assert_select "#new-service input[name='member_service[title]']", count: 1
+    assert_select "#new-service input[type=submit][value='서비스 저장']", count: 1
+    assert_select "#new-service details[data-service-more] + .impd-field-help",
+      text: /그대로 두면 '이 서비스 문의하기' 버튼이/
+
+    post path, params: { member_service: { title: "첫 상담" } }
+    assert_redirected_to path
+    service = @member.member_services.sole
+    assert_equal "첫 상담", service.title
+    assert service.cta_label.blank?
+    assert service.cta_url.blank?
+
+    service.update!(cta_url: "https://example.com/book")
+    get path
+    assert_select "#service-#{service.id} details form details[data-service-more][open]"
+  end
+
   test "내 정보에 필수 칸과 선택 칸을 표시한다" do
     get slug_admin_editor_path(slug: @member.slug, step: 2)
 
     assert_response :ok
-    %w[자기소개 직업 이메일].each do |label|
+    %w[자기소개 이메일].each do |label|
       assert_select "form.editor-fields label", text: "#{label} (필수)", count: 1
     end
-    %w[지역 전화번호].each do |label|
+    %w[직업 지역 전화번호].each do |label|
       assert_select "form.editor-fields label", text: "#{label} (선택)", count: 1
     end
     assert_not_includes response.body, "직업 직접 입력"

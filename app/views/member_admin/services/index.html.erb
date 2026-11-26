@@ -102,6 +102,17 @@
 </div>
 
 <style>
+  details.service-more > summary,
+  .impd-item-actions details.service-more[open] > summary {
+    display: flex; align-items: center; gap: 8px; min-height: 44px; height: auto; width: auto;
+    padding: 0; border: 0; background: transparent; white-space: normal; cursor: pointer;
+    font-size: 14px; font-weight: 600; color: var(--impd-accent);
+  }
+  .impd-item-actions details.service-more > summary::after { content: none; }
+  .service-more > summary::before { content: "▸" / ""; }
+  .service-more[open] > summary::before { content: "▾" / ""; }
+  .service-more[open] > summary + .impd-field { margin-top: 12px; }
+
   .next-step { background: #fff; border: 1px solid var(--impd-rule); border-inline-start: 3px solid var(--impd-accent); padding: 16px 20px; margin-bottom: 24px; }
   .next-step-title { font-size: 20px; font-weight: 700; margin: 8px 0 4px; word-break: keep-all; overflow-wrap: anywhere; }
   .next-step-why { font-size: 14px; color: var(--impd-ink2); margin: 0 0 14px; word-break: keep-all; }

@@ -79,7 +79,7 @@
       <%# 좌: 기본 프로필 입력 폼 %>
       <section class="impd-card" aria-labelledby="basic-info-heading" data-controller="editor-info">
         <h2 id="basic-info-heading" class="impd-label">기본 정보</h2>
-        <p style="margin-top: 6px; font-size: 13px; color: var(--impd-muted);">(필수) 세 칸만 채우면 내 페이지를 공개할 수 있어요. 나머지는 나중에 채워도 돼요.</p>
+        <p style="margin-top: 6px; font-size: 13px; color: var(--impd-muted);">(필수)는 자기소개와 이메일 두 칸이에요. 나머지는 나중에 채워도 돼요.</p>
         <%= render "member_admin/editor/profile_photo" %>
         <%= form_with url: slug_admin_editor_update_info_path(slug: @member.slug), method: :patch, local: true, class: "editor-fields", data: { turbo: false, controller: "unsaved-guard" } do %>
           <% from_checklist = params[:from] == "checklist" %>
@@ -136,7 +136,7 @@
               <% preset_profession = submitted_profession || (Member::PROFESSIONS.include?(info.profession) ? info.profession : "custom") %>
               <% custom_profession = params.dig(:member, :custom_profession) if @info_draft %>
               <% custom_profession ||= info.profession unless Member::PROFESSIONS.include?(info.profession) %>
-              <label for="member_profession" class="impd-label-muted">직업 <span style="font-weight: 400; color: var(--impd-muted);">(필수)</span></label>
+              <label for="member_profession" class="impd-label-muted">직업 <span style="font-weight: 400; color: var(--impd-muted);">(선택)</span></label>
               <select id="member_profession" name="member[profession]" data-editor-info-target="profession" data-action="change->editor-info#toggleProfession" <%= field_errors.call(:profession) %>>
                 <% [["목록에 없어요 (직접 적기)", "custom"], ["보험 설계사", "insurance_agent"], ["공인중개사", "realtor"], ["강사", "educator"], ["작가", "author"], ["자영업자", "shopowner"], ["프리랜서", "freelancer"]].each do |label, value| %>
                   <option value="<%= value %>" <%= "selected" if preset_profession == value %>><%= label %></option>
@@ -144,9 +144,10 @@
               </select>
               <%= error_message.call(:profession) %>
               <div data-editor-info-target="customProfession" style="margin-top: 12px;" <%= "hidden" if preset_profession != "custom" %>>
-                <label for="member_custom_profession" class="impd-label-muted">직업 이름 적기 <span style="font-weight: 400; color: var(--impd-muted);">(필수)</span></label>
-                <input type="text" id="member_custom_profession" name="member[custom_profession]" <%= field_errors.call(:custom_profession) %>
+                <label for="member_custom_profession" class="impd-label-muted">직업 이름 적기 <span style="font-weight: 400; color: var(--impd-muted);">(선택)</span></label>
+                <input type="text" id="member_custom_profession" name="member[custom_profession]" <%= field_errors.call(:custom_profession, "member_custom_profession_help") %>
                        value="<%= custom_profession %>" placeholder="예: 스마트폰 강사">
+                <p id="member_custom_profession_help" class="impd-label-muted" style="margin-top: 6px; font-size: 13px;">비워 두면 내 페이지에 직업이 안 보여요.</p>
                 <%= error_message.call(:custom_profession) %>
               </div>
             </div>

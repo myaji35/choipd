@@ -38,6 +38,12 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
         ownerBarInFold: inFold(document.querySelector('[data-owner-bar] a')),
         ownerNext: document.querySelector('[data-owner-bar] [data-owner-next]')?.dataset.ownerNext ?? null,
         bioFieldInFold: inFold(document.querySelector('#member_bio')),
+        bioRequiredMarks: [...document.querySelectorAll('form.editor-fields label')]
+          .filter(label => label.checkVisibility({ checkVisibilityCSS: true }))
+          .reduce((count, label) => count + (label.innerText.match(/\(필수\)/g) || []).length, 0),
+        photoPickerInFold: inFold(document.querySelector('#profile-photo .profile-photo-picker')),
+        photoCapture: document.querySelector('#profile-photo input[type=file]')?.getAttribute('capture') ?? null,
+        photoNoticeSeen: fold.includes('프로필 사진을 올렸어요'),
         bioPlaceholderLen: document.querySelector('#member_bio')?.placeholder.length ?? null,
         arrivalSeen: !!document.querySelector('.checklist-arrival'),
         pendingNoticeSeen: inFold(document.querySelector('[data-pending-notice]')),
@@ -49,14 +55,17 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
       await page.waitForTimeout(300);
       const { url, overflowX, height, fold, welcomeSeen, ownerBarInFold, unchosenProfession,
         nextTask, nextHref, nextStepInFold, nextStepTask, ownerNext,
-        bioFieldInFold, bioPlaceholderLen, arrivalSeen } = await metric();
+        bioFieldInFold, bioPlaceholderLen, arrivalSeen, bioRequiredMarks,
+        photoPickerInFold, photoCapture, photoNoticeSeen } = await metric();
       await snap(page, { path: outDir + '/' + name + '-' + tag + '.png', fullPage: true });
       await snap(page, { path: outDir + '/' + name + '-' + tag + '-fold.png' });
       const row = { step: name, tag, url, overflowX, height, fold, consoleErrors: [...errors], ...extra };
       if (name === 'landing') Object.assign(row, { welcomeSeen, ownerBarInFold, unchosenProfession, ownerNext });
       if (name === 'dashboard' || name === 'first-click') Object.assign(row, { nextTask, nextHref });
       if (name === 'service-added') Object.assign(row, { nextStepInFold, nextStepTask });
-      if (name === 'bio') Object.assign(row, { bioFieldInFold, bioPlaceholderLen, arrivalSeen });
+      if (name === 'bio') Object.assign(row, { bioFieldInFold, bioPlaceholderLen, arrivalSeen, bioRequiredMarks });
+      if (name === 'photo') Object.assign(row, { photoPickerInFold, photoCapture, arrivalSeen });
+      if (name === 'photo-saved') Object.assign(row, { nextTask, photoNoticeSeen });
       if (name === 'bio-saved') row.nextTask = nextTask;
       if (name === 'first-click') {
         row.reachedAdmin = /\/admin\//.test(url);
@@ -139,21 +148,38 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
     }
     await shot('services', { status: servicesResponse?.status() ?? null });
     // 서비스 1개 등록(제목만)
-    let svcOk = false; let svcFields = null;
+    let svcOk = false; let svcFields = null; let svcSubmitInFold = false;
     try {
-      svcFields = await page.evaluate(() => { const f = [...document.querySelectorAll('form')].find(f => f.querySelector('[name*="title"]')); return f ? [...f.querySelectorAll('input, select, textarea')].filter(el => el.type !== 'hidden' && el.type !== 'submit' && el.getBoundingClientRect().width > 0).length : null; });
+      svcFields = await page.evaluate(() => {
+        const form = document.querySelector('#new-service form');
+        if (!form) return null;
+        return [...form.querySelectorAll('input, select, textarea')].filter(el =>
+          el.type !== 'hidden' && el.type !== 'submit' && !el.closest('details:not([open])') &&
+          el.getBoundingClientRect().width > 0
+        ).length;
+      });
       const title = page.locator('form [name*="[title]"]').first();
       if (await title.count()) {
         if (!(await title.isVisible())) { const opener = page.locator('a, button, summary').filter({ hasText: /서비스 추가|새 서비스|추가하기|만들기/ }).first(); if (await opener.count()) { await opener.click(); clicks++; } }
-        await title.fill('첫 상담 서비스'); typed++;
         const form = page.locator('form').filter({ has: page.locator('[name*="[title]"]') }).first();
-        await Promise.all([page.waitForLoadState('networkidle'), form.locator('button[type=submit], input[type=submit]').first().click()]); clicks++;
+        const submit = form.locator('button[type=submit], input[type=submit]').first();
+        svcSubmitInFold = await submit.evaluate(el => {
+          const rect = el.getBoundingClientRect();
+          return rect.height > 0 && rect.top >= 0 && rect.bottom <= innerHeight;
+        });
+        await title.fill('첫 상담 서비스'); typed++;
+        await Promise.all([page.waitForLoadState('networkidle'), submit.click()]); clicks++;
         const savedTitle = page.getByRole('heading', { name: '첫 상담 서비스', exact: true });
         await savedTitle.waitFor({ state: 'visible', timeout: 5000 });
         svcOk = true;
       } else blocked.push('services: 서비스 제목 칸 없음');
     } catch (e) { blocked.push('services: ' + String(e).slice(0,120)); }
-    const saved = await shot('service-added', { svcOk, svcFields });
+    if (!svcSubmitInFold) blocked.push('services: 저장 버튼이 첫 화면 밖');
+    const saved = await shot('service-added', { svcOk, svcFields, svcSubmitInFold });
+    if (svcOk) {
+      await page.locator('#new-service [data-service-more] summary').first().click();
+      report.push({ step: 'services-open', tag, overflowX: (await metric()).overflowX });
+    }
     if (!saved.nextStepInFold) blocked.push('service-added: 저장 뒤 다음 할 일 안내가 첫 화면에 없음');
     let bioClicks = 0, bioTyped = 0, bioGuided = false;
     const bioField = page.locator('#member_bio');
@@ -165,7 +191,9 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
     } catch {
       blocked.push('service-added: 자기소개 쓰기 버튼으로 이동하지 못함');
     }
-    await shot('bio');
+    const bio = await shot('bio');
+    if (bio.bioRequiredMarks !== 2) blocked.push('bio: 필수 표시가 실제와 다름');
+    let bioSaved;
     if (!(await bioField.count())) {
       blocked.push('bio: 자기소개 칸 없음');
     } else {
@@ -179,11 +207,46 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
       } catch (e) {
         blocked.push('bio: ' + String(e).slice(0, 120));
       }
-      const bioSaved = await shot('bio-saved');
+      bioSaved = await shot('bio-saved');
       if (bioSaved.url !== dashboardPath || bioSaved.nextTask !== 'profile-photo') {
         blocked.push('bio-saved: 저장 뒤 다음 할 일로 안 이어짐');
       } else {
         bioGuided = bioClicks === 2 && bioTyped === 1;
+      }
+    }
+    let photoClicks = 0, photoGuided = false;
+    if (bioSaved?.url !== dashboardPath || bioSaved.nextTask !== 'profile-photo') {
+      blocked.push('photo: 사진 할 일에 도착하지 못함');
+    } else {
+      try {
+        const photoLink = page.locator('.dashboard-next a.impd-btn-accent');
+        const fileInput = page.locator('#profile-photo input[type=file]');
+        await photoLink.click({ timeout: 5000 });
+        photoClicks++;
+        await fileInput.waitFor({ state: 'attached', timeout: 5000 });
+        const photo = await shot('photo');
+        if (photo.photoCapture !== null) blocked.push('photo: 사진 칸이 카메라만 엶');
+
+        const png = await page.evaluate(() => {
+          const canvas = document.createElement('canvas');
+          canvas.width = canvas.height = 64;
+          const drawing = canvas.getContext('2d');
+          drawing.fillStyle = '#52879b';
+          drawing.fillRect(0, 0, canvas.width, canvas.height);
+          return canvas.toDataURL('image/png').split(',')[1];
+        });
+        const buffer = Buffer.from(png, 'base64');
+        await fileInput.setInputFiles({ name: 'face.png', mimeType: 'image/png', buffer });
+        photoClicks++;
+        await page.waitForURL(url => url.pathname === dashboardPath, { timeout: 10000 }).catch(() => {});
+        const photoSaved = await shot('photo-saved');
+        if (photoSaved.url !== dashboardPath || photoSaved.nextTask !== 'profession-region') {
+          blocked.push('photo-saved: 올린 뒤 다음 할 일로 안 이어짐');
+        } else {
+          photoGuided = photoClicks === 2;
+        }
+      } catch (e) {
+        blocked.push('photo: ' + String(e).slice(0, 120));
       }
     }
     const editorResponse = await page.goto(base + '/' + slug + '/admin/editor?step=1', {waitUntil: 'networkidle'});
@@ -195,7 +258,7 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
     ap.on('console', m => { if (m.type() === 'error') publicErrors.push(m.text().slice(0, 200)); });
     ap.on('pageerror', e => publicErrors.push('pageerror: ' + String(e).slice(0, 200)));
     const pr = await ap.goto(base + '/' + slug, {waitUntil: 'networkidle'}).catch(() => null);
-    const ready = await ap.evaluate(bioPrefix => ({ bio: document.body.innerText.includes(bioPrefix), service: document.body.innerText.includes('첫 상담 서비스'), contactForm: !!document.querySelector('#contact form'), cta: !!document.querySelector('a[href$="#contact"]') }), bioText.slice(0, 10));
+    const ready = await ap.evaluate(bioPrefix => ({ bio: document.body.innerText.includes(bioPrefix), service: document.body.innerText.includes('첫 상담 서비스'), contactForm: !!document.querySelector('#contact form'), cta: document.querySelector('a.public-service-action[href="#contact"]')?.textContent.trim() === '이 서비스 문의하기', photo: !!document.querySelector('.public-hero img.public-avatar') }), bioText.slice(0, 10));
     await snap(ap, { path: outDir + '/public-' + tag + '-fold.png' });
     await snap(ap, { path: outDir + '/public-' + tag + '.png', fullPage: true });
     const ownerBarLeak = await ap.evaluate(() => !!document.querySelector('[data-owner-bar]'));
@@ -223,10 +286,10 @@ const pw = 'Onb-' + Math.random().toString(36).slice(2, 12);
       report.push({ step: 'pending', tag, url, fold, pendingNoticeSeen, pendingPrepSeen, pendingNoticeHeight, overflowX, consoleErrors: pendingErrors });
       await pc.close();
     }
-    report.push({ step: 'summary', tag, slug, clicks, typed, bioClicks, bioTyped, bioGuided, signupFields: fields, blocked, ready, svcOk, guided });
+    report.push({ step: 'summary', tag, slug, clicks, typed, bioClicks, bioTyped, bioGuided, photoClicks, photoGuided, svcSubmitInFold, signupFields: fields, blocked, ready, svcOk, guided });
     await ctx.close();
   }
   await browser.close();
   fs.writeFileSync(outDir + '/report.json', JSON.stringify(report, null, 1));
-  console.log(JSON.stringify(report.filter(r => r.step === 'summary' || r.overflowX || (r.consoleErrors && r.consoleErrors.length)).map(r => r.step === 'summary' ? [r.tag, 'slug '+r.slug, 'clicks '+r.clicks, 'typed '+r.typed, 'signupFields '+r.signupFields, 'svc '+r.svcOk, 'ready '+JSON.stringify(r.ready), 'blocked '+r.blocked.length+' '+r.blocked.join('; ')] : [r.step+'-'+r.tag, r.overflowX?'OVERFLOW':'', 'err'+(r.consoleErrors||[]).length])));
+  console.log(JSON.stringify(report.filter(r => r.step === 'summary' || r.overflowX || (r.consoleErrors && r.consoleErrors.length)).map(r => r.step === 'summary' ? [r.tag, 'slug '+r.slug, 'clicks '+r.clicks, 'typed '+r.typed, 'photoClicks '+r.photoClicks, 'photoGuided '+r.photoGuided, 'signupFields '+r.signupFields, 'svc '+r.svcOk, 'ready '+JSON.stringify(r.ready), 'blocked '+r.blocked.length+' '+r.blocked.join('; ')] : [r.step+'-'+r.tag, r.overflowX?'OVERFLOW':'', 'err'+(r.consoleErrors||[]).length])));
 })();

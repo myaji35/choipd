@@ -21,7 +21,12 @@ class MemberAdmin::ProfilePhotosController < MemberAdmin::BaseController
     else
       profile_photo_editor_path
     end
-    redirect_to destination, notice: "프로필 사진을 바꿨어요.", status: :see_other
+    notice = if params[:from] == "checklist"
+      "프로필 사진을 올렸어요. 아래 '다음 할 일'을 이어서 해 보세요."
+    else
+      "프로필 사진을 바꿨어요."
+    end
+    redirect_to destination, notice: notice, status: :see_other
   rescue ActiveRecord::RecordInvalid => error
     message = if error.record.is_a?(MemberPhoto)
       error.record.errors[:image].join(" · ").presence

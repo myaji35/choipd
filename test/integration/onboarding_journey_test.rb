@@ -228,6 +228,36 @@ class OnboardingJourneyTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "bio and email are required while an unchosen profession stays optional" do
+    member = create_member("onboarding-optional-profession", profession: "custom")
+    log_in(member)
+
+    get slug_admin_editor_path(slug: member.slug, step: 2)
+    assert_response :success
+    %w[profession custom_profession].each do |field|
+      assert_select "label[for=member_#{field}]", text: /\(선택\)/
+      assert_select "label[for=member_#{field}]", text: /\(필수\)/, count: 0
+    end
+    %w[bio email].each do |field|
+      assert_select "label[for=member_#{field}]", text: /\(필수\)/
+    end
+    assert_select "#member_custom_profession_help", text: "비워 두면 내 페이지에 직업이 안 보여요."
+    assert_select '#member_custom_profession[aria-describedby~="member_custom_profession_help"]'
+    assert_not_includes response.body, "세 칸만"
+
+    bio = "가" * 60
+    patch slug_admin_editor_update_info_path(slug: member.slug),
+      params: { member: { bio: bio, profession: "custom", custom_profession: "" } }
+    assert_response :redirect
+    assert_equal bio, member.reload.bio
+
+    open_session do |visitor|
+      visitor.get public_profile_path(slug: member.slug)
+      visitor.assert_response :success
+      assert_not_includes visitor.response.body, "크리에이터"
+    end
+  end
+
   test "saving a checklist bio with a known or unknown task returns to the dashboard" do
     member = create_member("onboarding-bio-save")
     member.member_services.create!(title: "첫 상담")

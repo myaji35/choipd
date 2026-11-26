@@ -55,7 +55,9 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
 
     get @editor_path
     assert_select ".checklist-arrival", count: 0
-    assert_select "#profile-photo input[type=file][accept='image/*'][capture=user]", count: 1
+    assert_select "#profile-photo input[type=file][accept='image/*']", count: 1
+    assert_select "#profile-photo input[type=file][capture]", count: 0
+    assert_select '#profile-photo form[data-action="submit->editor-info#submitProfilePhoto"]', count: 1
     assert_select ".profile-photo-choices", count: 0
   end
 
@@ -69,9 +71,28 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
     assert_equal rails_blob_path(photo.image, only_path: true), @member.reload.profile_image
 
     follow_redirect!
-    assert_select "[role=status]", text: /프로필 사진을 바꿨어요/
+    assert_select "[role=status]", text: /프로필 사진을 올렸어요/
+    assert_select "[role=status]", text: /다음 할 일/
     assert_select 'a[href*="task=profile-photo"], a[href*="task=media"]', count: 0
     assert_select 'a[href*="task=bio"]', text: "자기소개 쓰기"
+  end
+
+  test "upload outside the checklist returns to the profile photo editor" do
+    patch @photo_path, params: { image: upload_image }
+
+    assert_redirected_to @editor_path
+    follow_redirect!
+    assert_select "[role=status]", text: "프로필 사진을 바꿨어요."
+  end
+
+  test "profile photo checklist explains how to choose an existing phone photo" do
+    get slug_admin_editor_path(slug: @member.slug, step: 2, from: "checklist", task: "profile-photo")
+
+    assert_response :success
+    assert_select "#profile-photo-hint", text: /휴대폰에 있는 사진을 골라도 돼요/
+    assert_select "#profile-photo form[data-turbo=false]:not([data-action])" do
+      assert_select 'input[type=file][data-action="change->editor-info#uploadProfilePhoto"]', count: 1
+    end
   end
 
   test "invalid upload preserves the existing profile photo and shows a Korean error" do

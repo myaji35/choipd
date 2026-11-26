@@ -1,4 +1,6 @@
 <% context = params[:from] == "checklist" ? { from: "checklist" } : {} %>
+<%# Checklist submissions navigate directly so the dashboard displays the flash notice. %>
+<% photo_submit_action = "submit->editor-info#submitProfilePhoto" unless context.present? %>
 <% photo_path = slug_admin_profile_photo_path(slug: @member.slug, **context) %>
 <section id="profile-photo" class="checklist-target profile-photo" aria-labelledby="profile-photo-heading">
   <h3 id="profile-photo-heading" class="impd-label-muted">프로필 사진</h3>
@@ -11,14 +13,14 @@
     <% else %>
       <span class="profile-photo-preview" aria-hidden="true"><%= @member.name.to_s.first %></span>
     <% end %>
-    <%= form_with url: photo_path, method: :patch, multipart: true, data: { turbo: false, action: "submit->editor-info#submitProfilePhoto" } do |form| %>
+    <%= form_with url: photo_path, method: :patch, multipart: true, data: { turbo: false, action: photo_submit_action } do |form| %>
       <%= form.label :image, class: "impd-btn impd-btn-secondary profile-photo-picker" do %>
         <%= @member.profile_image.present? ? "사진 바꾸기" : "사진 올리기" %>
-        <%= form.file_field :image, accept: "image/*", capture: "user", required: true,
+        <%= form.file_field :image, accept: "image/*", required: true,
               aria: { describedby: "profile-photo-hint" }, data: { action: "change->editor-info#uploadProfilePhoto" } %>
       <% end %>
       <noscript><button type="submit" class="impd-btn impd-btn-primary">저장</button></noscript>
-      <p id="profile-photo-hint">얼굴이 잘 보이는 사진이면 고객이 더 친근하게 느껴요.</p>
+      <p id="profile-photo-hint">지금 찍어도 되고, 휴대폰에 있는 사진을 골라도 돼요. 얼굴이 잘 보이는 사진이면 고객이 더 친근하게 느껴요.</p>
       <p class="profile-photo-reassurance">사진을 올려도 아래에 쓰던 글은 그대로 남아요.</p>
     <% end %>
   </div>
@@ -30,7 +32,7 @@
       <% @profile_photo_choices.each_with_index do |photo, index| %>
         <% label = "#{index + 1}번 사진을 프로필에 사용" %>
         <%= button_to photo_path, method: :patch, params: { photo_id: photo.id },
-              class: "profile-photo-choice", aria: { label: label }, form: { data: { turbo: false, action: "submit->editor-info#submitProfilePhoto" } } do %>
+              class: "profile-photo-choice", aria: { label: label }, form: { data: { turbo: false, action: photo_submit_action } } do %>
           <%= image_tag photo.thumbnail_url, alt: "", loading: "lazy" %>
         <% end %>
       <% end %>
