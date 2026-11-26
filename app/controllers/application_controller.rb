@@ -79,7 +79,7 @@ class ApplicationController < ActionController::Base
 
     case member.status
     when "pending_approval"
-      redirect_to root_path, notice: "#{member.name}님, 관리자 승인 대기 중입니다."
+      redirect_to root_path, notice: pending_approval_notice(member)
     when "rejected"
       redirect_to root_path, alert: "가입이 거절된 계정입니다. 관리자에게 문의해 주세요."
     when "suspended"
@@ -113,4 +113,9 @@ class ApplicationController < ActionController::Base
     false
   end
   helper_method :viewing_as_owner?
+
+  private def pending_approval_notice(member)
+    flash[:pending_guide] = true
+    "#{member.name}님, 가입은 잘 됐어요. 지금은 운영팀 승인을 기다리는 중이에요. 승인되면 이 계정으로 다시 로그인해 내 페이지를 만들 수 있어요."
+  end
 end

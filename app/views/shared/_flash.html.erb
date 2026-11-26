@@ -1,9 +1,15 @@
 <% flash.each do |kind, message| %>
   <% next if message.blank? || !%w[notice success alert info].include?(kind.to_s) %>
   <% type = kind.to_s == "alert" ? "alert" : (kind.to_s == "info" ? "info" : "success") %>
-  <div class="shared-flash shared-flash--<%= type %>" role="<%= type == 'alert' ? 'alert' : 'status' %>">
+  <% pending_guide = kind.to_s == "notice" && flash[:pending_guide] %>
+  <div<%= " data-pending-notice" if pending_guide %> class="shared-flash shared-flash--<%= type %>" role="<%= type == 'alert' ? 'alert' : 'status' %>">
     <%= lni_icon(type == 'alert' ? 'xmark-circle' : 'check-circle-1') %>
-    <span><%= message %></span>
+    <span class="shared-flash-message">
+      <%= message %>
+      <% if pending_guide %>
+        <%= link_to "기다리는 동안 예시 페이지 보기", example_profile_path, class: "shared-flash-link" %>
+      <% end %>
+    </span>
     <button type="button" aria-label="알림 닫기" onclick="this.parentElement.remove()"><%= lni_icon 'xmark' %></button>
   </div>
 <% end %>

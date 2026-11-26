@@ -267,7 +267,8 @@
               <span style="font-family: var(--impd-font-sans); font-size: 13px; color: var(--impd-muted);"><%= truncate(current_member.name.to_s, length: 12) %></span>
               <span style="font-family: var(--impd-font-sans); font-size: 10px; color: var(--impd-ink);"><%= truncate(current_member.email.to_s, length: 24) %></span>
             </div>
-            <%= link_to "내 페이지", "/#{current_member.slug}", class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 14px; font-size: 13px; white-space: nowrap;" %>
+            <% own_public_page = controller_path == "public_profile" && @member.present? && @member.id == current_member.id %>
+            <%= link_to (own_public_page ? "내 페이지 관리" : "내 페이지"), (own_public_page ? "/#{current_member.slug}/admin/dashboard" : "/#{current_member.slug}"), class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 14px; font-size: 13px; white-space: nowrap;" %>
             <%= button_to "로그아웃", member_logout_path, method: :delete, form: { data: { turbo_confirm: "로그아웃하시겠습니까?" }, style: "display: inline-flex; margin: 0;" }, class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 14px; font-size: 13px; white-space: nowrap;" %>
           </div>
         <% elsif !visitor_page %>

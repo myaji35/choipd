@@ -75,7 +75,7 @@ class MemberAccessEnforcementTest < ActionDispatch::IntegrationTest
     google_sign_in(member)
 
     assert_redirected_to root_path
-    assert_includes flash[:notice], "관리자 승인 후 페이지를 편집할 수 있습니다"
+    assert_includes flash[:notice], "승인을 기다리는 중이에요"
     assert_nil request.session[:member_id]
   end
 

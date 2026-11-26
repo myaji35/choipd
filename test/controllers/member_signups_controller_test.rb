@@ -41,6 +41,50 @@ class MemberSignupsControllerTest < ActionDispatch::IntegrationTest
     assert_select "label", text: /직접 입력\/기타/
   end
 
+  test "signup accepts a scalar member query parameter" do
+    get "/auth/signup?member=foo"
+
+    assert_response :ok
+    assert_select "details[data-signup-more]:not([open])"
+  end
+
+  test "signup accepts an array member query parameter" do
+    get member_signup_path, params: { member: ["foo"] }
+
+    assert_response :ok
+    assert_select "details[data-signup-more]:not([open])"
+  end
+
+  test "optional signup fields are collapsed and required controls remain outside" do
+    get member_signup_path
+
+    assert_select "details[data-signup-more]" do
+      assert_select "#member_slug"
+      assert_select "#member_region"
+      assert_select "input[name='member[profession]']"
+      assert_select "#identity_probe_consent"
+      assert_select "#terms_agree, button[type=submit]", count: 0
+    end
+    assert_select "details[data-signup-more][open]", count: 0
+    assert_select "form[action=?] #terms_agree", member_signup_path
+    assert_select "form[action=?] button[type=submit]", member_signup_path
+  end
+
+  test "optional signup fields open with a slug error" do
+    post member_signup_path, params: valid_params(slug: "한글 주소", region: nil)
+
+    assert_response :unprocessable_entity
+    assert_select "details[data-signup-more][open] #member_slug_error"
+  end
+
+  test "selected profession stays visible after a short password error" do
+    post member_signup_path, params: valid_params(slug: nil, region: nil, profession: "educator",
+      password: "short", password_confirmation: "short")
+
+    assert_response :unprocessable_entity
+    assert_select "details[data-signup-more][open] input[name='member[profession]'][value=educator][checked]"
+  end
+
   test "signup accepts the selected profession" do
     params = valid_params(profession: "educator")
     post "/auth/signup", params: params

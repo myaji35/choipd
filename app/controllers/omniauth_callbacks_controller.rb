@@ -45,7 +45,7 @@ class OmniauthCallbacksController < ApplicationController
     elsif member.can_sign_in?
       redirect_to "/#{member.slug}/admin/dashboard", notice: "다시 오신 걸 환영합니다, #{member.name}님."
     elsif member.pending? && !member.withdrawn?
-      redirect_to root_path, notice: "환영합니다, #{member.name}님! 관리자 승인 후 페이지를 편집할 수 있습니다."
+      redirect_to root_path, notice: pending_approval_notice(member)
     else
       reject_unapproved_member(member)
     end

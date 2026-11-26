@@ -675,13 +675,13 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "로그인한 회원이 볼 때는 위 띠가 지금 그대로다" do
+  test "본인이 볼 때는 위 띠에서 내 페이지 관리로 이동한다" do
     @member.update!(password: "password1234", password_confirmation: "password1234")
     post "/auth/login", params: { email: @member.email, password: "password1234" }
     get public_profile_path(slug: @member.slug)
 
     assert_select "nav.impd-topnav-visitor", count: 0
-    assert_select ".impd-topnav a", text: "내 페이지"
+    assert_select ".impd-topnav a[href=?]", slug_admin_dashboard_path(slug: @member.slug), text: "내 페이지 관리"
   end
 
   test "답장받을 수 없는 연락처는 저장하지 않고 이유를 알려 준다" do

@@ -133,7 +133,7 @@
         <%= button_to "Google로 계속하기", "/auth/google_oauth2", method: :post, data: { turbo: false }, class: "oauth-btn" %>
         <div class="auth-divider">또는 이메일로 로그인</div>
       <% end %>
-      <%= form_with url: member ? login_member_post_path(slug: member.slug) : member_login_path, method: :post, local: true, class: "login-form" do |f| %>
+      <%= form_with url: member ? login_member_post_path(slug: member.slug) : member_login_path, method: :post, local: true, data: { turbo: false }, class: "login-form" do |f| %>
         <% unless member %>
           <%= f.label :email, "이메일", class: "field-label" %>
           <%= f.email_field :email, value: params[:email], required: true, autocomplete: "email", inputmode: "email", class: "field-input" %>
