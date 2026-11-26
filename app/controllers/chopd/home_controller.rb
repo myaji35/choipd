@@ -1,24 +1,37 @@
 class Chopd::HomeController < Chopd::BaseController
+  include MemberCardData
   layout "impd"
 
   def index
-    @hero_images = HeroImage.active
-    @latest_courses = Course.published.recent.limit(6)
-    @latest_posts = Post.published.recent.limit(3)
+    available = Member.for_tenant.publicly_visible
+    recommended = available.order(FEATURED_FIRST, featured_order: :asc)
+    @featured_members = recommended.order(created_at: :desc).limit(6).to_a
+    @profession_groups = profession_groups(available)
+    @member_count = @profession_groups.sum { |group| group[:count] }
+    @example_slugs_present = available.where(slug: helpers.example_member_slugs).index_by(&:slug)
+    load_recent_activity(available)
 
-    # 우수 회원 갤러리: 승인된 회원들의 최근 사진
-    @featured_moments = MemberPhoto
-      .joins(:member)
-      .merge(Member.publicly_visible)
-      .includes(:member, image_attachment: :blob)
-      .order(uploaded_at: :desc)
-      .limit(10)
+    @flow_members = recommended.where("#{PROFILE_FILLED} OR #{CAREER_FILLED}")
+      .order(Arel.sql("CASE WHEN #{CAREER_FILLED} THEN 0 ELSE 1 END"),
+        Arel.sql("CASE WHEN COALESCE(TRIM(profile_image), '') != '' THEN 0 ELSE 1 END"), created_at: :desc)
+      .limit(12).to_a
+    load_member_card_data(@flow_members + @featured_members)
+  end
 
-    # §05 "imPD를 쓰는 사람들" — 승인된 실제 회원. is_featured 우선 + 최근 가입 순.
-    # 최PD 포함한 실제 slug로 각 카드 클릭 시 공개 페이지로 이동 가능.
-    @member_count = Member.for_tenant.publicly_visible.count
-    @featured_members = Member.for_tenant.publicly_visible
-      .order(Arel.sql("CASE WHEN is_featured = 1 THEN 0 ELSE 1 END"), featured_order: :asc, created_at: :desc)
-      .limit(6)
+  private
+
+  def load_recent_activity(available)
+    photos = MemberPhoto.joins(:member).merge(available)
+    posts = MemberPost.published.joins(:member).merge(available)
+    recent_media = photos.with_attached_image.includes(:member).order(uploaded_at: :desc, id: :desc).limit(30).to_a
+    @featured_moments = gallery_media(recent_media, recent_media.map(&:member).index_by(&:id)).first(10)
+    @recent_member_posts = posts.includes(:member).recent.limit(4).to_a
+
+    now = Time.current
+    recent = 7.days.ago(now)..now
+    @recent_photo_count = photos.joins(image_attachment: :blob)
+      .where(active_storage_blobs: { content_type: MemberPhoto::IMAGE_TYPES }, uploaded_at: recent).count
+    @recent_post_count = posts.where(published_at: recent).count
+    @latest_activity_at = [@featured_moments.first&.uploaded_at, @recent_member_posts.first&.published_at].compact.max
   end
 end

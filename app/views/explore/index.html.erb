@@ -2,72 +2,71 @@
 <% content_for :description, "직업군과 지역으로 imPD의 공개 프로필을 찾아보세요." %>
 <% content_for :head do %>
   <link rel="canonical" href="<%= public_base_url %><%= explore_path %>">
+  <%= stylesheet_link_tag "impd_explore", "data-turbo-track": "reload" %>
 <% end %>
 
-<style>
-  .explore-wrap { width: min(1120px, calc(100% - 48px)); margin: 0 auto; padding: 72px 0 96px; }
-  .explore-title { color: var(--impd-green); font-size: clamp(36px, 6vw, 64px); word-break: keep-all; }
-  .explore-subtitle { margin-top: 14px; color: var(--impd-muted); font-size: 17px; line-height: 1.7; }
-  .explore-filters { margin-top: 44px; padding: 24px; background: var(--impd-card); border-radius: 12px; box-shadow: var(--impd-shadow-card); }
-  .explore-filter-row { display: flex; align-items: flex-start; gap: 18px; }
-  .explore-filter-row + .explore-filter-row { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--impd-rule); }
-  .explore-filter-label { flex: 0 0 58px; padding-top: 8px; color: var(--impd-muted); font-size: 12px; font-weight: 700; }
-  .explore-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .explore-chip { display: inline-flex; align-items: center; min-height: 40px; gap: 4px; padding: 7px 14px; border: 1px solid var(--impd-rule); border-radius: 50px; background: var(--impd-card); color: var(--impd-ink2); font-size: 13px; font-weight: 600; }
-  .explore-chip:hover { border-color: var(--impd-green-accent); color: var(--impd-green-accent); }
-  .explore-chip.is-active { border-color: var(--impd-green-accent); background: var(--impd-green-accent); color: var(--impd-on-dark); }
-  .explore-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 34px; }
-  .explore-empty { grid-column: 1 / -1; padding: 64px 24px; background: var(--impd-card); border-radius: 12px; color: var(--impd-muted); font-size: 16px; text-align: center; box-shadow: var(--impd-shadow-card); }
-  @media (max-width: 899px) { .explore-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 599px) {
-    .explore-wrap { width: min(100% - 32px, 1120px); padding: 48px 0 72px; }
-    .explore-filters { padding: 18px; }
-    .explore-filter-row { display: block; }
-    .explore-filter-label { display: block; padding: 0 0 10px; }
-    .explore-grid { grid-template-columns: 1fr; }
-  }
-</style>
-
-<section class="explore-wrap">
-  <header>
+<section class="explore-wrap impd-wrap">
+  <header class="impd-enter">
     <p class="impd-label">회원 둘러보기</p>
     <h1 class="impd-display explore-title">imPD를 쓰는 사람들</h1>
-    <% if @total_count.positive? %><p class="explore-subtitle">지금 <%= @total_count %>명이 페이지를 운영 중이에요</p><% end %>
+    <% if @total_count.positive? %><p class="explore-subtitle">지금 <%= public_member_number(@total_count) %>명이 페이지를 운영 중이에요</p><% end %>
   </header>
 
   <div class="explore-filters" aria-label="회원 필터">
     <div class="explore-filter-row">
-      <span class="explore-filter-label">직업군</span>
+      <span class="explore-filter-label">분야</span>
       <div class="explore-chips">
-        <%= link_to "전체", explore_path(region: @current_region.presence), class: ["explore-chip", ("is-active" if @current_profession.blank?)], aria: { pressed: @current_profession.blank? } %>
-        <% @professions.each do |profession| %>
-          <% label, icon, = member_profession_details(profession) %>
-          <%= link_to explore_path(profession: profession, region: @current_region.presence), class: ["explore-chip", ("is-active" if @current_profession == profession)], aria: { pressed: @current_profession == profession } do %>
-            <%= lni_icon icon, size: 14 %> <%= label %>
+        <%= link_to explore_path(region: @current_region), class: ["explore-chip", ("is-active" unless @selected_profession)], aria: { pressed: !@selected_profession } do %>
+          전체 <span class="impd-chip-count"><%= @total_count %></span>
+        <% end %>
+        <% @profession_groups.each do |group| %>
+          <% active = @selected_profession == group %>
+          <%= link_to explore_path(profession: group[:key], region: @current_region), class: ["explore-chip", ("is-active" if active)], aria: { pressed: active } do %>
+            <%= lni_icon group[:icon], size: 14 %> <%= group[:label] %> <span class="impd-chip-count"><%= group[:count] %></span>
           <% end %>
         <% end %>
       </div>
     </div>
-    <div class="explore-filter-row">
-      <span class="explore-filter-label">지역</span>
-      <div class="explore-chips">
-        <%= link_to "전체", explore_path(profession: @current_profession.presence), class: ["explore-chip", ("is-active" if @current_region.blank?)], aria: { pressed: @current_region.blank? } %>
-        <% @regions.each do |region| %>
-          <%= link_to region, explore_path(profession: @current_profession.presence, region: region), class: ["explore-chip", ("is-active" if @current_region == region)], aria: { pressed: @current_region == region } %>
-        <% end %>
+    <% if @regions.size > 1 %>
+      <div class="explore-filter-row">
+        <span class="explore-filter-label">지역</span>
+        <div class="explore-chips">
+          <%= link_to explore_path(profession: @current_profession), class: ["explore-chip", ("is-active" unless @current_region)], aria: { pressed: !@current_region } do %>
+            전체 <span class="impd-chip-count"><%= @total_count %></span>
+          <% end %>
+          <% @regions.each do |region, count| %>
+            <% active = @current_region == region %>
+            <%= link_to explore_path(profession: @current_profession, region: region), class: ["explore-chip", ("is-active" if active)], aria: { pressed: active } do %>
+              <%= region %> <span class="impd-chip-count"><%= count %></span>
+            <% end %>
+          <% end %>
+        </div>
       </div>
-    </div>
+    <% end %>
   </div>
 
+  <% if @selected_profession || @current_region %>
+    <div class="explore-result-heading">
+      <p><%= [@selected_profession&.fetch(:label), @current_region].compact.join(" · ") %> — <%= @members.size %>명<%= " · 60명까지 보여요" if @more_members %></p>
+      <%= link_to "필터 초기화", explore_path, class: "impd-link" %>
+    </div>
+  <% end %>
   <div class="explore-grid">
     <% if @members.any? %>
       <% @members.each do |member| %>
-        <%= render "shared/member_card", c: { name: member.name.to_s, role: member.profession, region: member.region, bio: member.bio, image: member.profile_image, slug: member.slug } %>
+        <%= render "shared/member_card", member: member, cover: @cover_photo_by_member[member.id],
+          service: @first_service_by_member[member.id]&.title %>
       <% end %>
     <% else %>
-      <%= render "shared/empty_state", icon: "user-4", title: "조건에 맞는 회원이 없어요", text: "필터를 바꿔보세요.", action: link_to("필터 초기화", explore_path, class: "impd-btn impd-btn-secondary") %>
+      <%= render "shared/empty_state", icon: "user-4", title: "조건에 맞는 회원이 없어요", text: "필터를 바꿔보세요.",
+        action: (link_to("필터 초기화", explore_path, class: "impd-btn impd-btn-secondary") unless @selected_profession || @current_region) %>
     <% end %>
   </div>
+  <% if brand_ops_public? %>
+    <section class="explore-growth">
+      <h2 class="impd-section-title">함께 자라는 imPD</h2>
+      <p>회원들의 활동과 브랜드 이야기를 살펴보세요.</p>
+      <a href="/growth" class="impd-link">imPD 성장 이야기 보기 →</a>
+    </section>
+  <% end %>
 </section>
-
-<% if brand_ops_public? %><section style="max-width:1100px;margin:40px auto;padding:24px 20px;"><h2>함께 자라는 imPD</h2><p style="margin:10px 0;">회원들의 활동과 브랜드 이야기를 살펴보세요.</p><a href="/growth" style="display:inline-block;padding:12px 0;color:#00754A;">imPD 성장 이야기 보기 →</a></section><% end %>

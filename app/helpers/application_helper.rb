@@ -1,4 +1,15 @@
 module ApplicationHelper
+  def example_member_slugs
+    %w[na-seolgye yujin-studio].freeze
+  end
+
+  def public_member_number(count)
+    return count if count < 10
+
+    tag.span(count, class: "impd-count-up", style: "--count-width: #{count.to_s.length}ch",
+      data: { controller: "count-up", action: "turbo:before-cache@document->count-up#finish" })
+  end
+
   def example_profile_path
     @example_profile_path ||= begin
       members = Member.for_tenant.publicly_visible.where.not(slug: [ nil, "" ])

@@ -1,19 +1,26 @@
 class ExploreController < ApplicationController
+  include MemberCardData
   layout "impd"
 
   def index
     available = Member.publicly_visible
-    @total_count = available.count
-    @professions = available.distinct.pluck(:profession).compact
-    @regions = available.where.not(region: [ nil, "" ]).distinct.pluck(:region).sort
-    base = available
-    base = base.where(profession: params[:profession]) if params[:profession].present? && Member::PROFESSIONS.include?(params[:profession])
-    base = base.where(region: params[:region]) if params[:region].present?
+    @profession_groups = profession_groups(available)
+    @total_count = @profession_groups.sum { |group| group[:count] }
+    @regions = available.where.not(region: [nil, ""]).group(:region).count.sort.to_h
+    @current_region = params[:region].presence
+    @selected_profession = @profession_groups.find do |group|
+      params[:profession].present? && (group[:key] == params[:profession] || group[:values].include?(params[:profession]))
+    end
+    @current_profession = @selected_profession&.fetch(:key)
 
-    @members = base
-      .order(Arel.sql("CASE WHEN is_featured = 1 THEN 0 ELSE 1 END"), featured_order: :asc, created_at: :desc)
-      .limit(60)
-    @current_profession = params[:profession]
-    @current_region = params[:region]
+    base = available
+    base = base.where(profession: @selected_profession[:values]) if @selected_profession
+    base = base.where(region: @current_region) if @current_region
+    @members = base.order(FEATURED_FIRST, featured_order: :asc)
+      .order(Arel.sql("CASE WHEN #{PROFILE_FILLED} THEN 0 ELSE 1 END"), created_at: :desc)
+      .limit(61).to_a
+    @more_members = @members.size > 60
+    @members = @members.first(60)
+    load_member_card_data(@members)
   end
 end

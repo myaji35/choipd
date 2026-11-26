@@ -1,0 +1,22 @@
+<div class="impd-flow" data-controller="member-flow"
+     data-action="resize@window->member-flow#resize visibilitychange@document->member-flow#visibility turbo:before-cache@document->member-flow#reset">
+  <% if @flow_members.size >= 6 %>
+    <div class="impd-flow-window" data-member-flow-target="window">
+      <% @flow_members.each_slice((@flow_members.size + 1) / 2).each do |column| %>
+        <div class="impd-flow-track" data-member-flow-target="track">
+          <% column.each_with_index do |member, index| %>
+            <%= render "shared/member_card", member: member, flow: true, loading: (index < 2 ? "eager" : "lazy"),
+              cover: @cover_photo_by_member[member.id], service: @first_service_by_member[member.id]&.title %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render "hero_phone_preview" %>
+  <% end %>
+  <button type="button" class="impd-flow-pause" aria-pressed="false" aria-label="회원 흐름 멈추기"
+          data-member-flow-target="pause" data-action="member-flow#toggle" hidden>
+    <%= lni_icon "pause", size: 16 %><%= lni_icon "play", size: 16 %>
+    <span>멈춤</span>
+  </button>
+</div>

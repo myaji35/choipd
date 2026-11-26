@@ -1,19 +1,42 @@
-<% label, icon, tint = member_profession_details(c[:role]) %>
-<% home_card = local_assigns.fetch(:home_card, false) %>
-        <%= content_tag(c[:example] ? :div : :a, href: c[:example] ? nil : "/#{c[:slug]}", aria: c[:example] ? nil : { label: "#{c[:name]} 페이지 보기" }, class: ("impd-c2-card impd-home-member" if home_card), style: (unless home_card then "background: var(--impd-card); border: 1px #{c[:example] ? 'dashed' : 'solid'} var(--impd-rule); border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.06); padding: 20px; color: var(--impd-ink); text-decoration: none; display: flex; flex-direction: column; gap: 12px; min-width: 0;" end)) do %>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <% if c[:image].present? %>
-              <%= image_tag c[:image], alt: c[:name], loading: "lazy", decoding: "async", width: 48, height: 48, style: "width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" %>
-            <% else %>
-              <div style="width: 48px; height: 48px; border-radius: 50%; background: <%= home_card ? "var(--impd-ceramic)" : tint %>; color: var(--impd-green-house); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: <%= home_card ? 600 : 700 %>; flex-shrink: 0;"><%= c[:name].first %></div>
-            <% end %>
-            <div style="min-width: 0; flex: 1;">
-              <div class="member-card-name" style="<%= "font-size: 17px; font-weight: 700;" unless home_card %>"><%= c[:name] %></div>
-              <div style="font-size: 13px; color: var(--impd-muted); display: flex; align-items: center; gap: 4px;"><%= lni_icon icon, size: 14 %> <%= label %></div>
-            </div>
-            <% if c[:example] %><span style="font-size: <%= home_card ? "var(--impd-size-label)" : "12px" %>; color: var(--impd-muted); border: 1px solid var(--impd-rule); border-radius: 999px; padding: 3px 8px;">예시</span><% end %>
-          </div>
-          <% if c[:region].present? %><div style="font-size: 13px; color: var(--impd-muted); display: flex; align-items: center; gap: 4px;"><%= lni_icon "map-marker-5", size: 13 %> <%= c[:region] %></div><% end %>
-          <% if c[:bio].present? %><div style="font-size: <%= home_card ? "var(--impd-size-body)" : "14px" %>; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= truncate(c[:bio], length: 60) %></div><% end %>
-          <% unless c[:example] %><div style="margin-top: auto; font-size: 14px; font-weight: <%= home_card ? 600 : 700 %>; color: var(--impd-green-house); display: flex; align-items: center; gap: 4px;">페이지 보기 <%= lni_icon "arrow-right", size: 14 %></div><% end %>
-        <% end %>
+<%
+  member = local_assigns[:member]
+  c = member ? { name: member.name.to_s, role: member.profession, region: member.region,
+    bio: member.bio, image: member.profile_image, slug: member.slug, career: member.career_note } : local_assigns.fetch(:c)
+  flow = local_assigns.fetch(:flow, false)
+  loading = local_assigns.fetch(:loading, "lazy")
+  label, icon = member_profession_details(c[:role])
+  cover = local_assigns[:cover]
+  defer_images = local_assigns.fetch(:defer_images, false)
+  service = local_assigns[:service]
+  career = c[:career].to_s.strip.lines.first&.strip
+  example = c[:example] || example_member_slugs.include?(c[:slug])
+%>
+<%= content_tag(c[:example] ? :div : :a, href: member&.display_url,
+    aria: (member && { label: "#{c[:name]} 페이지 보기" }),
+    class: class_names("impd-member-card impd-home-member", "impd-flow-card": flow, "is-example": example)) do %>
+  <% if cover %>
+    <div class="impd-member-cover">
+      <%= member_card_image cover.thumbnail_url, defer: defer_images || (flow && loading == "lazy"), alt: "#{c[:name]}의 작업 사진", loading: loading, decoding: "async", width: 480, height: 320 %>
+    </div>
+  <% elsif flow %>
+    <div class="impd-member-cover impd-flow-initial" aria-hidden="true"><%= c[:name].first %></div>
+  <% end %>
+  <% if example %><span class="impd-member-badge">예시</span><% end %>
+  <div class="impd-member-identity">
+    <% if c[:image].present? %>
+      <%= member_card_image c[:image], defer: defer_images || (flow && (cover || loading == "lazy")), alt: "", class: "impd-member-avatar", loading: (cover && flow ? "lazy" : loading),
+        decoding: "async", width: flow ? 40 : 48, height: flow ? 40 : 48 %>
+    <% else %>
+      <span class="impd-member-avatar" aria-hidden="true"><%= c[:name].first %></span>
+    <% end %>
+    <div>
+      <div class="member-card-name"><%= c[:name] %></div>
+      <div class="impd-member-meta"><%= lni_icon icon, size: 14 %> <%= label %></div>
+    </div>
+  </div>
+  <% if c[:region].present? %><div class="impd-member-meta"><%= lni_icon "map-marker-5", size: 14 %> <%= c[:region] %></div><% end %>
+  <% if c[:bio].present? %><p class="impd-member-bio"><%= c[:bio] %></p><% end %>
+  <% if career.present? %><div class="impd-member-detail"><span>지금까지</span><span><%= truncate(career, length: 60) %></span></div><% end %>
+  <% if service.present? %><div class="impd-member-detail"><span>지금</span><span><%= service %></span></div><% end %>
+  <% unless flow || c[:example] %><div class="impd-member-more">페이지 보기 <%= lni_icon "arrow-right", size: 14 %></div><% end %>
+<% end %>

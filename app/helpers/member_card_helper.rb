@@ -11,4 +11,11 @@ module MemberCardHelper
     }
     details.fetch(role.to_s, [ "크리에이터", "user-4", "#edf0ed" ])
   end
+
+  def member_card_image(source, defer: false, **attributes)
+    image = image_tag(source, **attributes)
+    return image unless defer
+
+    tag.img(**attributes, data: { src: image_path(source) }) + tag.noscript(image)
+  end
 end
