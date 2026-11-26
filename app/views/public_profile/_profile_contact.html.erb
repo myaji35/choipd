@@ -54,7 +54,7 @@
       <% end %>
     <% end %>
   </section>
-  <section class="public-member-inner"><h2>디지털 명함</h2><img src="/qr/<%= member.slug %>.svg" alt="<%= member.name %> QR 코드" width="160" height="160"><div class="public-actions"><a href="/qr/<%= member.slug %>.svg" download="<%= member.slug %>-qr.svg" aria-label="QR 저장">QR 저장</a><button type="button" aria-label="링크 복사" onclick="copyMemberLink(this)">링크 복사</button><a href="/card/<%= member.slug %>.svg" aria-label="명함 보기">명함 보기</a></div></section>
+  <section class="public-member-inner"><h2>디지털 명함</h2><p style="color: var(--impd-ink2); margin: 4px 0 12px;">이 페이지 주소예요. 저장해 두거나 필요한 분께 전해 주세요.</p><img src="/qr/<%= member.slug %>.svg" alt="<%= member.name %> QR 코드" width="160" height="160"><div class="public-actions"><a href="/qr/<%= member.slug %>.svg" download="<%= member.slug %>-qr.svg" aria-label="QR 저장">QR 저장</a><button type="button" aria-label="링크 복사" onclick="copyMemberLink(this)">링크 복사</button><a href="<%= public_profile_card_path(slug: member.slug) %>" aria-label="명함 보기">명함 보기</a></div></section>
 </div>
 <script>
   (() => {

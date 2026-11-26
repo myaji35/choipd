@@ -9,10 +9,15 @@ const pages = [
   const gridPhotoResponse = await fetch(base + '/ux-photo', { redirect: 'manual' }).catch(() => null);
   const hasGridPhoto = gridPhotoResponse?.status === 200;
   await gridPhotoResponse?.body?.cancel();
+  const brandPath = '/kang-seung-sig/brand';
+  const brandResponse = await fetch(base + brandPath, { redirect: 'manual' }).catch(() => null);
+  const hasBrand = brandResponse?.status === 200;
+  await brandResponse?.body?.cancel();
   const browser = await chromium.launch();
   const report = [];
   for (const [vw, vh, tag] of [[1440, 900, 'd'], [390, 844, 'm']]) {
     const targets = hasGridPhoto ? [...pages, ['gridphoto', '/ux-photo']] : [...pages];
+    if (hasBrand) targets.push(['brand', brandPath]);
     targets.push(['notfound', '/404.html']);
     if (hasGridPhoto) targets.push(['photogone', '/p/ux-photo/99999999']);
     for (const [name, path] of targets) {
@@ -76,6 +81,24 @@ const pages = [
               frap: !!document.querySelector('.impd-frap')
             },
             cta: { href: cta?.getAttribute('href') ?? null, inFold: !!cta && cta.getBoundingClientRect().bottom <= innerHeight }
+          };
+        });
+      }
+      if (['editorial', 'grid', 'sparse', 'gridphoto'].includes(name)) {
+        extra.cardLink = await page.locator('a[aria-label="명함 보기"]').evaluateAll(links =>
+          links[0]?.getAttribute('href') ?? null);
+      }
+      if (name === 'brand') {
+        extra = await page.evaluate(() => {
+          const inquiries = document.querySelectorAll('a[href$="/kang-seung-sig#contact"]');
+          const firstInquiry = inquiries[0];
+          const rect = firstInquiry?.getBoundingClientRect();
+          const signup = [...document.querySelectorAll('a')].find(link =>
+            link.innerText.trim() === '나도 이렇게 운영하기');
+          return {
+            inquiry: { count: inquiries.length, firstTop: rect?.top ?? null, inFold: !!rect && rect.bottom <= innerHeight },
+            signupBeforeInquiry: !!(signup && firstInquiry &&
+              (signup.compareDocumentPosition(firstInquiry) & Node.DOCUMENT_POSITION_FOLLOWING))
           };
         });
       }

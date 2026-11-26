@@ -78,6 +78,65 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
     end
   end
 
+  %w[editorial grid].each do |layout|
+    test "#{layout} digital card links to the card page and keeps the QR download" do
+      @member.update!(layout_preset: layout)
+      get "/#{@member.slug}"
+
+      card_link = assert_select 'a[aria-label="명함 보기"][href=?]', "/#{@member.slug}/card", count: 1
+      assert_select 'a[href$=".svg"][aria-label="명함 보기"]', count: 0
+      assert_includes response.body, "이 페이지 주소예요."
+      assert_select "a[download][href=?]", "/qr/#{@member.slug}.svg", text: "QR 저장"
+
+      get card_link.first["href"]
+      assert_response :success
+      assert_select "a[href=?]", "/#{@member.slug}#contact", text: "상담·문의하기"
+    end
+  end
+
+  test "긴 소식은 펼쳐서 끝까지 읽을 수 있다" do
+    @member.update!(layout_preset: "editorial")
+    ending = "신청은 문의 칸으로 남겨 주세요"
+    content = ("수업 일정을 안내합니다. " * 30).first(300 - ending.length) + ending
+    @member.member_posts.create!(title: "모집 안내", content: content, is_published: 1)
+    get "/#{@member.slug}"
+
+    assert_select "#posts details summary", text: "글 끝까지 보기", count: 1
+    assert_select "#posts details p", text: /#{Regexp.escape(ending)}/
+  end
+
+  test "짧은 소식은 펼칠 필요 없이 끝까지 보인다" do
+    @member.update!(layout_preset: "editorial")
+    content = ("수업 일정을 안내합니다. " * 5).first(49) + "."
+    @member.member_posts.create!(title: "수업 안내", content: content, is_published: 1)
+    get "/#{@member.slug}"
+
+    assert_select "#posts details", count: 0
+    assert_select "#posts p", text: content
+  end
+
+  test "미리보기와 펼친 소식 본문에서 HTML을 이스케이프한다" do
+    @member.update!(layout_preset: "editorial")
+    script_tag = "<script>alert(1)</script>"
+    content = "#{script_tag} #{"수업 일정을 안내합니다. " * 20}#{script_tag}"
+    @member.member_posts.create!(title: "수업 안내", content: content, is_published: 1)
+    get "/#{@member.slug}"
+
+    assert_select "#posts script", count: 0
+    assert_select "#posts details p", text: content
+    assert_not_includes response.body, script_tag
+    assert_includes response.body, "&lt;script&gt;alert(1)&lt;/script&gt;"
+  end
+
+  test "카드 모음형에는 공개 소식이 있어도 소식 칸이 없다" do
+    @member.update!(layout_preset: "grid")
+    @member.member_posts.create!(title: "수업 안내", content: "수업 일정을 안내합니다.", is_published: 1)
+    get "/#{@member.slug}"
+
+    assert_response :success
+    assert_select "#posts", count: 0
+  end
+
   test "inquiry requires consent and accepts a phone contact" do
     attributes = { sender_name: "방문자", sender_email: "010-1234-5678", message: "상담을 요청합니다" }
     assert_no_difference "MemberInquiry.count" do

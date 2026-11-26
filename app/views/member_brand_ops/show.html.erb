@@ -5,7 +5,13 @@
 <div style="max-width:1000px;margin:auto;padding:56px 20px;">
   <header>
   <% if brand_ops_public? %><%= link_to growth_path, class: "ops-media-chip ops-growth-chip" do %><%= lni_icon "bar-chart-4" %> imPD 전체 운영 현황 보기<% end %><% end %>
-  <p style="color:#00754A;"><%= @member.profession_label %></p><h1 class="impd-display" style="font-size:clamp(32px,5vw,52px);margin:12px 0;"><%= @member.name %></h1><% recent = @series.last(4) %><% months = [(@now.to_date.year * 12 + @now.to_date.month) - (@member.created_at.to_date.year * 12 + @member.created_at.to_date.month) + 1, 1].max %><p><% unless @imported %>imPD에서 <%= months %>개월째 운영 중 · <% end %>최근 4주 방문 <%= BrandOps::Display.count_with_unit(recent.sum { |row| row[:visits].to_i }, "회") %> · 게시 <%= BrandOps::Display.count_with_unit(recent.sum { |row| row[:posts].to_i }, "건") %></p><% if @brand && @brand.name != @member.name %><p><%= @brand.name %></p><% end %><p>이 브랜드는 이렇게 운영돼요</p><%= link_to "프로필 보기", "/#{@member.slug}", class: "ops-profile-link" %>
+  <p style="color:#00754A;"><%= @member.profession_label %></p><h1 class="impd-display" style="font-size:clamp(32px,5vw,52px);margin:12px 0;"><%= @member.name %></h1><% recent = @series.last(4) %><% months = [(@now.to_date.year * 12 + @now.to_date.month) - (@member.created_at.to_date.year * 12 + @member.created_at.to_date.month) + 1, 1].max %><p><% unless @imported %>imPD에서 <%= months %>개월째 운영 중 · <% end %>최근 4주 방문 <%= BrandOps::Display.count_with_unit(recent.sum { |row| row[:visits].to_i }, "회") %> · 게시 <%= BrandOps::Display.count_with_unit(recent.sum { |row| row[:posts].to_i }, "건") %></p><% if @brand && @brand.name != @member.name %><p><%= @brand.name %></p><% end %><p>이 브랜드는 이렇게 운영돼요</p>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:16px;">
+      <% unless current_member&.id == @member.id %>
+        <%= link_to "이 분께 문의하기", "/#{@member.slug}#contact", class: "impd-btn impd-btn-primary", style: "min-height:48px;" %>
+      <% end %>
+      <%= link_to "프로필 보기", "/#{@member.slug}", class: "ops-profile-link", style: "margin-top:0;" %>
+    </div>
   </header>
   <section class="impd-card" style="margin:32px 0;"><h2>이렇게 운영하고 있어요</h2><ul style="list-style:none;padding:0;line-height:2;"><% items = ["공개 페이지 운영", ("SocialDoctors 노출 동의" if @exposure), ("정기 게시" if recent.sum { |row| row[:posts].to_i }.positive?), ("문의 받기 열림" if @member.withdrawn_at.nil?)] %><% items.compact.each do |item| %><li><%= lni_icon "check" %> <%= item %></li><% end %></ul></section>
   <section class="impd-card" style="margin:32px 0;"><h2>최근 12주 활동</h2><p>최근 4주 활동</p><div class="ops-activity-grid"><% %i[visits inquiries posts sns_posts].zip(["방문", "문의 건수", "게시", "SNS 발행"]).each do |key, label| %><section class="impd-card"><p><%= label %></p><strong><%= BrandOps::Display.count_with_unit(@series.last(4).sum { |row| row[key].to_i }, key == :visits ? "회" : "건") %></strong></section><% end %></div><% public_series = @series.map { |row| row.merge(publications: row[:posts].to_i + row[:sns_posts].to_i) } %><%= ops_line_chart public_series, keys: %i[visits publications], labels: ["방문", "게시+SNS 발행"], protected_counts: true %><p style="line-height:1.7;">1~2건은 3건 미만으로 표시합니다. 로봇·운영자·본인 방문을 제외했어요. 집계 시점: <%= @now.in_time_zone("Asia/Seoul").strftime("%Y.%m.%d %H:%M") %> (한국 시간)</p><%= render "brand_ops/counting_details", platform: false %></section>
@@ -19,9 +25,11 @@
     <% if current_member&.id == @member.id %>
       <%= link_to "내 브랜드 관리로 가기", "/#{@member.slug}/admin/brand", class: "impd-btn impd-btn-primary" %>
     <% else %>
+      <div style="margin-bottom:12px;">
+        <%= link_to "이 분께 문의하기", "/#{@member.slug}#contact", class: "impd-btn impd-btn-secondary" %>
+      </div>
       <%= link_to "나도 이렇게 운영하기", member_signup_path, class: "impd-btn impd-btn-primary" %>
       <p style="margin:8px 0;">첫 페이지 제작 무료</p>
-      <%= link_to "이 분께 문의하기", "/#{@member.slug}#contact", class: "impd-btn impd-btn-secondary" %>
     <% end %>
   </section><% if brand_ops_public? %><p style="margin-top:24px;"><%= link_to "imPD 성장 이야기", growth_path, style: "color:#00754A;" %></p><% end %>
 </div>

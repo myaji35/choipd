@@ -95,6 +95,27 @@ class BrandOpsTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "비밀 문의 내용"
     assert_not_includes response.body, "private@example.com"
   end
+  test "visitor finds the inquiry button at the top of the brand page" do
+    ProConsent.create!(owner_id: @member.id, consent_type: "socialdoctors_exposure", consented: true)
+    get "/ops-page/brand"
+
+    assert_response :success
+    assert_select "header a.impd-btn-primary[href=?]", "/ops-page#contact", text: "이 분께 문의하기"
+    assert_select "a[href=?]", "/ops-page#contact", count: 2
+    assert_select "a.impd-btn-primary", text: "나도 이렇게 운영하기"
+    assert_operator response.body.index("이 분께 문의하기"), :<, response.body.index("나도 이렇게 운영하기")
+  end
+
+  test "owner does not get an inquiry button in the brand page header" do
+    ProConsent.create!(owner_id: @member.id, consent_type: "socialdoctors_exposure", consented: true)
+    post "/auth/login", params: { email: @member.email, password: "password1234" }
+    get "/ops-page/brand"
+
+    assert_response :success
+    assert_select "header a", text: "이 분께 문의하기", count: 0
+    assert_select "a[href=?]", "/ops-page", text: "프로필 보기"
+  end
+
   test "count with unit protects small counts" do
     %w[건 회].each do |unit|
       assert_equal "0#{unit}", BrandOps::Display.count_with_unit(0, unit)

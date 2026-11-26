@@ -599,7 +599,13 @@
           <div>
             <h4 class="impd-display" style="font-size: 22px;"><%= p.title %></h4>
             <% if p.content.present? %>
-              <p style="margin-top: 8px; color: var(--impd-ink2); font-size: 14px;"><%= truncate(p.content.to_s, length: 140) %></p>
+              <p style="margin-top: 8px; color: var(--impd-ink2); font-size: 14px; white-space: pre-line; overflow-wrap: anywhere; word-break: keep-all;"><%= truncate(p.content.to_s, length: 140, separator: " ") %></p>
+              <% if p.content.length > 140 %>
+                <details class="public-service-more">
+                  <summary>글 끝까지 보기</summary>
+                  <p><%= p.content %></p>
+                </details>
+              <% end %>
             <% end %>
           </div>
         </div>
