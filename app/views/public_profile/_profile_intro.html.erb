@@ -1,4 +1,5 @@
 <%
+  show_offer = local_assigns.fetch(:show_offer, false) && services.any?
   entries = case member.social
   when Hash
     member.social.map { |key, value| [key.to_s, value.is_a?(Hash) ? (value["url"] || value[:url]) : value] }
@@ -19,6 +20,8 @@
   .public-actions .primary, .public-sticky .primary { background: var(--impd-accent); color: var(--impd-paper); }
   .public-sticky { display: none; }
   .public-hero .public-member-inner { padding-bottom: 24px; }
+  .public-offer { margin-top: 8px; font-size: 17px; font-weight: 600; line-height: 1.5; max-width: 62ch; }
+  .public-offer-label { display: inline-block; margin-right: 8px; padding: 2px 8px; border: 1px solid var(--impd-accent); border-radius: 4px; color: var(--impd-accent); font-size: 13px; font-weight: 600; }
   .public-bio { max-width: 62ch; margin-top: 12px; white-space: pre-line; line-height: 1.7; }
   .public-activity-link { display: inline-flex; align-items: center; min-height: 44px; margin-top: 12px; color: var(--impd-accent); text-decoration: underline; text-underline-offset: 3px; }
   .public-service-action { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 16px; margin-top: 16px; border: 1px solid var(--impd-accent); color: var(--impd-accent); background: transparent; font-size: 15px; font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
@@ -37,8 +40,11 @@
   <% if member.profile_image.present? %><img fetchpriority="high" decoding="async" class="public-avatar" src="<%= member.profile_image %>" alt="<%= member.name %> 프로필 사진"><% else %><div class="public-avatar" aria-hidden="true"><%= member.name.to_s.first %></div><% end %>
   <h1><%= member.name %></h1>
   <p><%= member.profession_label if member.profession.present? %><% if member.region.present? %> <%= lni_icon "map-marker-5" %> <%= member.region %><% end %></p>
+  <% if show_offer %>
+    <p class="public-offer"><span class="public-offer-label">하는 일</span> <%= services.first(3).map(&:title).join(" · ") %><% if services.size > 3 %> 외 <%= services.size - 3 %>개<% end %></p>
+  <% end %>
   <% if member.bio.present? %><p class="public-bio"><%= member.bio %></p><% end %>
-  <div class="public-actions"><a class="primary" href="#contact">상담·문의하기</a><% if member.phone.present? %><a href="tel:<%= member.phone %>">전화</a><% end %><% if kakao %><a href="<%= kakao %>" target="_blank" rel="noopener">카카오톡</a><% end %><% if member.email.present? %><a href="mailto:<%= member.email %>">이메일</a><% end %></div>
+  <div class="public-actions"><a class="primary" href="#contact">상담·문의하기</a><% if member.phone.present? %><a href="tel:<%= member.phone %>">전화</a><% end %><% if kakao %><a href="<%= kakao %>" target="_blank" rel="noopener">카카오톡</a><% end %><% if member.email.present? %><a href="mailto:<%= member.email %>">이메일</a><% end %><% if show_offer %><a href="#classes">서비스 보기</a><% end %></div>
   <% photos = moments.to_a.select { |photo| photo.image.attached? && !photo.video? }.first(3) %>
   <% if photos.any? %><div style="display: flex; gap: 8px; margin-top: 24px; overflow: hidden;"><% photos.each do |photo| %><img loading="lazy" decoding="async" src="<%= photo.thumbnail_url || photo.display_url %>" alt="<%= photo.caption.presence || member.name + ' 사진' %>" style="width: 100px; height: 100px; object-fit: cover; border: 4px solid var(--impd-paper);"><% end %></div><% end %>
   <% if brand_ops_public? && ProConsent.has_consent?(owner_id: member.id, type: "socialdoctors_exposure") %>

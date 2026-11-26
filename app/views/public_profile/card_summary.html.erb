@@ -38,6 +38,7 @@
     border: 1px solid var(--impd-ink);
     padding: 28px 24px;
     position: relative;
+    word-break: keep-all; overflow-wrap: anywhere;
   }
   .cs-eyebrow {
     font-family: var(--impd-font-mono);
@@ -77,15 +78,24 @@
     letter-spacing: -0.1px;
   }
 
-  .cs-contacts { display: flex; flex-direction: column; gap: 6px; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--impd-rule); }
+  .cs-inquiry {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 100%; height: 48px; margin-top: auto;
+    background: var(--impd-accent); color: var(--impd-paper);
+    font-family: var(--impd-font-sans); font-size: 15px; font-weight: 700;
+    text-decoration: none;
+  }
+
+  .cs-contacts { display: flex; flex-direction: column; gap: 6px; margin-top: 0; padding-top: 14px; border-top: 1px solid var(--impd-rule); }
   .cs-contact-btn {
     display: inline-flex; align-items: center; justify-content: space-between;
-    height: 42px; padding: 0 14px;
+    min-height: 44px; padding: 0 14px; gap: 8px;
     font-family: var(--impd-font-sans); font-size: 13px; font-weight: 600;
     color: var(--impd-ink); background: var(--impd-card);
     border: 1px solid var(--impd-ink); text-decoration: none;
     transition: all .15s;
   }
+  .cs-contact-btn span:last-child { min-width: 0; overflow-wrap: anywhere; text-align: right; }
   .cs-contact-btn:hover { background: var(--impd-ink); color: var(--impd-paper); }
   .cs-contact-btn .label { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; opacity: 0.55; font-weight: 500; }
 
@@ -93,8 +103,9 @@
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     width: 100%; height: 48px;
     margin-top: 12px;
-    background: var(--impd-ink);
-    color: var(--impd-paper);
+    background: transparent;
+    color: var(--impd-ink);
+    border: 1px solid var(--impd-ink);
     font-family: var(--impd-font-sans); font-size: 14px; font-weight: 700; letter-spacing: -0.2px;
     text-decoration: none;
     transition: all .15s;
@@ -173,6 +184,8 @@
           <% end %>
         </div>
       <% end %>
+
+      <a href="<%= public_profile_path(slug: @member.slug, anchor: "contact") %>" class="cs-inquiry">상담·문의하기</a>
 
       <div class="cs-contacts">
         <% if @member.email.present? %>

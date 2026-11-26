@@ -138,4 +138,121 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
     assert_select "#contact textarea#member_inquiry_message[placeholder]"
     assert_select "#contact input#member_inquiry_sender_name"
   end
+
+  test "문의를 보내면 문의 칸으로 돌아와 보냈다는 안내만 보인다" do
+    @member.update!(layout_preset: "editorial")
+    assert_difference "MemberInquiry.count", 1 do
+      post member_inquiries_path(slug: @member.slug), params: { member_inquiry: inquiry_attributes }
+    end
+
+    assert_inquiry_confirmation
+    get public_profile_path(slug: @member.slug, anchor: "contact")
+    assert_select "#contact form"
+    assert_select "#inquiry-sent", count: 0
+  end
+
+  test "카드 모음형에서도 보냈다는 안내만 보인다" do
+    @member.update!(layout_preset: "grid")
+    post member_inquiries_path(slug: @member.slug), params: { member_inquiry: inquiry_attributes }
+
+    assert_inquiry_confirmation
+  end
+
+  test "동의가 없으면 문의 칸으로 돌아와 이유를 알려 준다" do
+    assert_no_difference "MemberInquiry.count" do
+      post member_inquiries_path(slug: @member.slug), params: { member_inquiry: inquiry_attributes.except(:consent) }
+    end
+
+    assert_redirected_to public_profile_path(slug: @member.slug, anchor: "contact")
+    follow_redirect!
+    assert_select "#contact [role=alert]", text: "개인정보 전달에 동의해 주세요."
+  end
+
+  test "honeypot 이 채워지면 저장하지 않고 같은 안내를 보여 준다" do
+    assert_no_difference "MemberInquiry.count" do
+      post member_inquiries_path(slug: @member.slug), params: { website: "x", member_inquiry: inquiry_attributes }
+    end
+
+    assert_inquiry_confirmation
+  end
+
+  test "저장할 수 없는 문의는 문의 칸에서 다시 입력할 수 있다" do
+    assert_no_difference "MemberInquiry.count" do
+      post member_inquiries_path(slug: @member.slug), params: { member_inquiry: inquiry_attributes.merge(message: "") }
+    end
+
+    assert_redirected_to public_profile_path(slug: @member.slug, anchor: "contact")
+    follow_redirect!
+    assert_select "#contact [role=alert]"
+    assert_select "#contact form"
+  end
+
+  test "요약 명함에서 바로 문의 칸으로 갈 수 있다" do
+    get public_profile_card_path(slug: @member.slug)
+
+    assert_response :ok
+    assert_select ".cs-left a.cs-inquiry[href='/#{@member.slug}#contact']", text: "상담·문의하기"
+    assert_select "a.cs-full[href='/#{@member.slug}']", text: /전체 프로필 보기/
+    assert_operator response.body.index('class="cs-inquiry"'), :<, response.body.index('class="cs-full"')
+  end
+
+  test "길게 읽는 형 첫머리에 하는 일을 보여 준다" do
+    @member.update!(layout_preset: "editorial")
+    @member.member_services.create!(title: "보장 분석 상담", is_active: 1, sort_order: 0)
+    @member.member_services.create!(title: "보험금 청구 도움", is_active: 1, sort_order: 1)
+    @member.member_portfolio_items.create!(title: "상담 사례", media_url: "https://example.com/photo.jpg")
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select ".public-hero p.public-offer", text: /하는 일\s*보장 분석 상담 · 보험금 청구 도움/
+    assert_select ".public-hero .public-actions a[href='#classes']", text: "서비스 보기"
+    assert_operator response.body.index('id="classes"'), :<, response.body.index('id="contact"')
+    assert_operator response.body.index('id="classes"'), :<, response.body.index('id="gallery"')
+  end
+
+  test "서비스가 넷 이상이면 셋만 적고 나머지는 개수로 표시한다" do
+    @member.update!(layout_preset: "editorial")
+    (1..5).each do |order|
+      @member.member_services.create!(title: "서비스 #{order}", is_active: 1, sort_order: order)
+    end
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select ".public-offer", text: "하는 일 서비스 1 · 서비스 2 · 서비스 3 외 2개"
+  end
+
+  test "서비스가 없으면 하는 일 줄과 서비스 보기 버튼이 없다" do
+    @member.update!(layout_preset: "editorial")
+    get public_profile_path(slug: @member.slug)
+
+    assert_select ".public-offer", count: 0
+    assert_select ".public-actions a[href='#classes']", count: 0
+  end
+
+  test "카드 모음형 첫머리에는 하는 일 줄을 겹쳐 넣지 않는다" do
+    @member.update!(layout_preset: "grid")
+    @member.member_services.create!(title: "상담", is_active: 1)
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select ".public-offer", count: 0
+    assert_select ".impd-bento article a.public-service-action"
+  end
+
+  private
+
+  def inquiry_attributes
+    { sender_name: "방문자", sender_email: "010-1234-5678", message: "상담을 요청합니다", consent: "1" }
+  end
+
+  def assert_inquiry_confirmation
+    assert_response :see_other
+    assert_redirected_to public_profile_path(slug: @member.slug, anchor: "contact")
+    follow_redirect!
+
+    assert_select "#contact #inquiry-sent[role=status]", text: /보냈어요\. 보통 24시간 안에 답장이 와요\./
+    assert_select "#contact form", count: 0
+    assert_select ".shared-flash", count: 0
+    assert_select "#inquiry-sent a[href$='#contact']", text: "다른 문의 더 보내기"
+  end
 end

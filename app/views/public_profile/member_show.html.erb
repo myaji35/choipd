@@ -80,7 +80,32 @@
   }
 </style>
 
-<%= render "public_profile/profile_intro", member: @member, services: @services, moments: @moments %>
+<%= render "public_profile/profile_intro", member: @member, services: @services, moments: @moments, show_offer: true %>
+
+<!-- ── C Services (수업/상품) ───────────────────────── -->
+<% if @services.any? %>
+  <section class="impd-wrap impd-section" id="classes">
+    <div class="impd-section-header">
+      <span class="impd-display impd-stat-num">서비스</span>
+      <span class="impd-label-muted">서비스 <%= @services.size %>개</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
+      <% @services.first(6).each_with_index do |s, i| %>
+        <div style="background: <%= ["#fbf8f1", "#f5f1e7", "#fbf8f1"][i % 3] %>; border: 1px solid var(--impd-rule); padding: 24px; position: relative; min-height: 180px;">
+          <span class="impd-label-muted" style="display: block; margin-bottom: 10px;"><%= s.is_active.to_i.positive? ? "신청 가능" : "마감" %></span>
+          <h3 class="impd-display" style="font-size: 24px; word-break: keep-all; overflow-wrap: anywhere; line-height: 1.25;"><%= s.title %></h3>
+          <% if s.description.present? %>
+            <p style="margin-top: 12px; font-size: 14px; color: var(--impd-ink2); line-height: 1.5;"><%= truncate(s.description, length: 80) %></p>
+          <% end %>
+          <p style="margin-top: 16px; font-family: var(--impd-font-sans); font-weight: 600; font-size: 14px; color: var(--impd-accent);">
+            <%= s.price_label.presence || (s.price.present? ? "₩#{s.price}" : "문의") %>
+          </p>
+          <%= render "public_profile/service_action", service: s %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>
 
 <%
   # 갤러리 우선순위:
@@ -469,31 +494,6 @@
       50%      { opacity: 0.4; transform: scale(0.6); }
     }
   </style>
-<% end %>
-
-<!-- ── C Services (수업/상품) ───────────────────────── -->
-<% if @services.any? %>
-  <section class="impd-wrap impd-section" id="classes">
-    <div class="impd-section-header">
-      <span class="impd-display impd-stat-num">서비스</span>
-      <span class="impd-label-muted">서비스 <%= @services.size %>개</span>
-    </div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
-      <% @services.first(6).each_with_index do |s, i| %>
-        <div style="background: <%= ["#fbf8f1", "#f5f1e7", "#fbf8f1"][i % 3] %>; border: 1px solid var(--impd-rule); padding: 24px; position: relative; min-height: 180px;">
-          <span class="impd-label-muted" style="display: block; margin-bottom: 10px;"><%= s.is_active.to_i.positive? ? "신청 가능" : "마감" %></span>
-          <h3 class="impd-display" style="font-size: 24px; word-break: keep-all; overflow-wrap: anywhere; line-height: 1.25;"><%= s.title %></h3>
-          <% if s.description.present? %>
-            <p style="margin-top: 12px; font-size: 14px; color: var(--impd-ink2); line-height: 1.5;"><%= truncate(s.description, length: 80) %></p>
-          <% end %>
-          <p style="margin-top: 16px; font-family: var(--impd-font-sans); font-weight: 600; font-size: 14px; color: var(--impd-accent);">
-            <%= s.price_label.presence || (s.price.present? ? "₩#{s.price}" : "문의") %>
-          </p>
-          <%= render "public_profile/service_action", service: s %>
-        </div>
-      <% end %>
-    </div>
-  </section>
 <% end %>
 
 <!-- ── C-2 FAQ ──────────────────────────────────────── -->
