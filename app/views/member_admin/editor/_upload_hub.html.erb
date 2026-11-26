@@ -1,6 +1,7 @@
 <%# 단일 업로드 허브 — 자료·사진·영상을 하나의 카드 UI에서 탭으로 전환 %>
-<% photo_categories = MemberPhoto::CATEGORIES %>
-<% photos = member.member_photos.ordered.limit(24) %>
+<% gallery = member.gallery_photos %>
+<% photo_count = gallery.count %>
+<% photos = gallery.ordered.limit(24) %>
 <% initial_tab = params[:tab] == "media" ? "media" : "docs" %>
 
 <section data-controller="upload-hub"
@@ -19,7 +20,7 @@
             style="flex: 1; padding: 18px 20px; background: <%= initial_tab == "media" ? "var(--impd-ink)" : "transparent" %>; color: <%= initial_tab == "media" ? "var(--impd-paper)" : "var(--impd-ink)" %>; border: 0; cursor: pointer; text-align: left;">
       <div class="impd-label" style="margin-bottom: 4px;">사진·영상</div>
       <div style="font-family: var(--impd-font-display); font-weight: 800; font-size: 18px; letter-spacing: -0.4px;">일상·작업·후기 장면</div>
-      <div style="font-size: 13px; color: var(--impd-muted); margin-top: 6px;">사진·영상 <%= member.member_photos.count %>개</div>
+      <div style="font-size: 13px; color: var(--impd-muted); margin-top: 6px;">사진·영상 <%= photo_count %>개</div>
     </button>
   </div>
 
@@ -31,22 +32,27 @@
 
   <div id="media" class="checklist-target" data-upload-hub-target="panel" data-panel-id="media"
        style="padding: 28px 24px;" <%= "hidden" unless initial_tab == "media" %>>
-    <%= render "member_admin/editor/photo_dropzone", member: member, categories: photo_categories %>
+    <%= render "member_admin/editor/photo_dropzone", member: member %>
 
-    <% if photos.any? %>
+    <% profile_photo_note = tag.p("프로필 사진은 여기에 안 보여요. 2단계 '정보 확인'에서 바꿀 수 있어요.",
+      data: { profile_photo_note: true }, style: "font-size: 13px; color: var(--impd-muted); margin: 10px 0;") if member.profile_photo_record.present? %>
+    <% if photo_count.positive? %>
       <div style="margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--impd-rule);">
         <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px;">
-          <span class="impd-label-muted">갤러리 · <%= member.member_photos.count %>장</span>
-          <% if member.member_photos.count > 24 %>
+          <span class="impd-label-muted">갤러리 · <%= photo_count %>장</span>
+          <% if photo_count > 24 %>
             <span style="font-size: 11px; color: var(--impd-muted);">최근 24개</span>
           <% end %>
         </div>
+        <%= profile_photo_note %>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px;">
           <% photos.each do |photo| %>
             <%= render "member_admin/editor/photo_card", photo: photo, member: member %>
           <% end %>
         </div>
       </div>
+    <% else %>
+      <%= profile_photo_note %>
     <% end %>
   </div>
 </section>

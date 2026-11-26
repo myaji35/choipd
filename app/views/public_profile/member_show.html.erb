@@ -155,9 +155,10 @@
   photo_pool.each do |photo|
     break if gallery_tiles.size >= 8
     next unless photo.image.attached?
+    daily_photo = photo.category.blank? || PublicProfileHelper::DAILY_PHOTO_CATEGORIES.include?(photo.category)
     gallery_tiles << {
       kind: :moment,
-      title: photo.caption.presence || @member.name + "의 일상",
+      title: photo.caption.presence || @member.name + (daily_photo ? "의 일상" : "의 사진"),
       category: photo_category_label(photo.category),
       media_url: photo.video? ? photo.display_url : (photo.thumbnail_url || photo.display_url),
       link_url: nil,
@@ -232,7 +233,7 @@
 <% if @moments.present? && @moments.any? %>
   <section class="impd-wrap impd-section" id="moments">
     <div class="impd-section-header">
-      <h2 class="impd-display impd-stat-num">일상 장면</h2>
+      <h2 class="impd-display impd-stat-num"><%= moments_heading(@moments.to_a) %></h2>
       <span class="impd-label-muted">사진 <%= @member.gallery_photos.count %>개</span>
     </div>
 
@@ -266,7 +267,7 @@
             <img loading="lazy" decoding="async" src="<%= photo.thumbnail_url %>"
                  data-fallback="<%= photo.display_url %>"
                  onerror="if(this.dataset.fallback && this.src !== this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}"
-                 alt="<%= photo.caption || @member.name %> 일상"
+                 alt="<%= photo.caption.presence || @member.name %> 사진"
                  class="impd-media-cover">
           <% end %>
           <% if photo.caption.present? %>

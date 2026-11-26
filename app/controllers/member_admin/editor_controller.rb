@@ -92,7 +92,7 @@ class MemberAdmin::EditorController < MemberAdmin::BaseController
     @documents = @member.member_documents.order(uploaded_at: :desc)
     @portfolio_count = @member.member_portfolio_items.count
     @services_count  = @member.member_services.count
-    @photos_count    = @member.member_photos.count
+    @photos_count    = @member.gallery_photos.count
     @skills          = @member.member_skills.includes(:skill).joins(:skill).order(weight: :desc).limit(12)
     @doc_count       = @documents.size
     @presets         = ThemePreset::THEME_PRESETS

@@ -13,6 +13,8 @@ class MemberAdminEditorFlowTest < ActionDispatch::IntegrationTest
     get slug_admin_editor_path(slug: @member.slug, step: 1)
 
     assert_response :ok
+    upload_hub = response.body[/<section data-controller="upload-hub"[^>]*>.*?<\/section>/m]
+    assert_match(/<div id="media"[^>]*>.*<\/div>\s*<\/section>\z/m, upload_hub.to_s)
     assert_select "a.impd-btn-primary[href='?step=2']", text: "다음 →"
     assert_includes response.body, "올린 파일은 바로 저장돼요"
     assert_select "ul.editor-file-rules li", count: 3

@@ -2,6 +2,24 @@ module PublicProfileHelper
   PHOTO_CATEGORY_LABELS = { "daily" => "일상", "workshop" => "작품", "product" => "작품", "press" => "이력", "people" => "일상" }.freeze
 
   # 사진 분류를 방문 고객이 읽는 우리말로. 모르는 값·빈 값은 "사진".
+  WORK_PHOTO_CATEGORIES = %w[workshop product].freeze
+  DAILY_PHOTO_CATEGORIES = %w[daily people].freeze
+
+  def moments_heading(photos)
+    categories = photos.map { |photo| photo.category.to_s }.uniq
+    return "작업 사진" if categories.any? && categories.all? { |c| WORK_PHOTO_CATEGORIES.include?(c) }
+    return "일상 장면" if categories.all? { |c| c.blank? || DAILY_PHOTO_CATEGORIES.include?(c) }
+
+    "사진"
+  end
+
+  def member_photo_category_options(current = nil)
+    options = [ [ "일상", "daily" ], [ "작업", "workshop" ], [ "이력", "press" ] ]
+    current = current.to_s
+    options << [ photo_category_label(current), current ] if %w[product people].include?(current)
+    options
+  end
+
   def photo_category_label(category)
     PHOTO_CATEGORY_LABELS[category.to_s] || "사진"
   end

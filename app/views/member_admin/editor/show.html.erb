@@ -4,7 +4,7 @@
   <%= render "member_admin/shared/checklist_arrival" %>
   <!-- 4단계 progress rail — 모두 클릭 가능. 각 단계별 완료 상태 표시. -->
   <%
-    step1_done = @photos_count.to_i > 0 || @doc_count.to_i > 0
+    step1_done = @doc_count.to_i > 0 || @member.member_photos.exists?
     style_name = ThemePreset.find(@member.theme_preset)&.dig(:name)
     step4_done = @member.published_at.present?
 
@@ -128,6 +128,12 @@
               "충분해요."
             end %>
             <p id="member_bio_count" class="impd-label-muted" style="margin-top: 6px;"><span data-editor-info-target="bioCount"><%= bio_count %></span> / 200자 · <span data-editor-info-target="bioHint"><%= bio_hint %></span></p>
+            <% if from_checklist && params[:task] == "bio" %>
+              <div data-task-save="bio" style="margin-top: 12px;">
+                <button type="submit" class="impd-btn impd-btn-accent" style="height: 48px; padding: 0 20px; font-size: 15px; width: 100%; justify-content: center;">저장하고 다음 할 일로 →</button>
+                <p class="impd-label-muted" style="font-size: 13px; margin-top: 8px; text-align: center;">아래 칸은 지금 안 채워도 돼요. 나중에 채울 수 있어요.</p>
+              </div>
+            <% end %>
           </div>
 
           <div id="profession-region" class="checklist-target editor-pair" style="margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
@@ -157,6 +163,13 @@
               <%= error_message.call(:region) %>
             </div>
           </div>
+
+          <% if from_checklist && params[:task] == "profession-region" %>
+            <div data-task-save="profession-region" style="margin-top: 12px;">
+              <button type="submit" class="impd-btn impd-btn-accent" style="height: 48px; padding: 0 20px; font-size: 15px; width: 100%; justify-content: center;">저장하고 다음 할 일로 →</button>
+              <p class="impd-label-muted" style="font-size: 13px; margin-top: 8px; text-align: center;">아래 칸은 지금 안 채워도 돼요. 나중에 채울 수 있어요.</p>
+            </div>
+          <% end %>
 
           <div class="editor-pair" style="margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
             <div>

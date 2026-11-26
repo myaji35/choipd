@@ -554,6 +554,20 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
     assert_select ".impd-bento article a.public-service-action", count: 6
   end
 
+  test "공개 페이지의 사진 제목이 작업 사진과 섞인 사진을 구분한다" do
+    @member.update!(layout_preset: "editorial")
+    @member.member_photos.create!(category: "workshop", image: fixture_file_upload(Rails.root.join("public/icon.png"), "image/png"))
+
+    get public_profile_path(slug: @member.slug)
+    assert_select "#moments h2", text: "작업 사진"
+    assert_select "#moments img[alt=?]", "#{@member.name} 사진"
+    assert_not_includes response.body, "일상 장면"
+
+    @member.member_photos.create!(category: "daily", image: fixture_file_upload(Rails.root.join("public/icon.png"), "image/png"))
+    get public_profile_path(slug: @member.slug)
+    assert_select "#moments h2", text: "사진"
+  end
+
   test "일상 장면 칸에 회원이 쓰지 않은 소개 문장을 넣지 않는다" do
     @member.update!(layout_preset: "editorial")
     @member.member_photos.create!(category: "daily", image: fixture_file_upload(Rails.root.join("public/icon.png"), "image/png"))

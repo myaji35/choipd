@@ -10,6 +10,85 @@ class MemberAdminChecklistTest < ActionDispatch::IntegrationTest
     @editor_path = slug_admin_editor_path(slug: @member.slug, step: 2, anchor: "profile-photo")
   end
 
+  test "work photo checklist selects work and regular uploads select daily" do
+    path = slug_admin_editor_path(slug: @member.slug, step: 1, tab: "media")
+
+    get path, params: { from: "checklist", task: "media" }
+    assert_select "select[data-photo-upload-category] option[selected][value=workshop]", count: 1
+    assert_select "select[data-photo-upload-category] option", count: 3 do |options|
+      assert_equal %w[일상 작업 이력], options.map(&:text)
+    end
+
+    get path
+    assert_select "select[data-photo-upload-category] option[selected][value=daily]", count: 1
+
+    get path, params: { from: "checklist", task: "docs" }
+    assert_select "select[data-photo-upload-category] option[selected][value=daily]", count: 1
+  end
+
+  test "checklist save buttons follow their own fields" do
+    path = slug_admin_editor_path(slug: @member.slug, step: 2)
+
+    get path, params: { from: "checklist", task: "bio" }
+    assert_select "#bio [data-task-save=bio] button[type=submit]", count: 1
+    assert_select "[data-task-save=profession-region]", count: 0
+    assert_operator response.body.index('data-task-save="bio"'), :<, response.body.index('id="profession-region"')
+
+    get path, params: { from: "checklist", task: "profession-region" }
+    assert_select "#profession-region + [data-task-save=profession-region] button[type=submit]", count: 1
+    assert_select "[data-task-save=bio]", count: 0
+    save_position = response.body.index('data-task-save="profession-region"')
+    assert_operator response.body.index('id="member_region"'), :<, save_position
+    assert_operator save_position, :<, response.body.index('name="member[email]"')
+
+    get path, params: { from: "checklist", task: "profile-photo" }
+    assert_select "[data-task-save]", count: 0
+
+    get path, params: { task: "bio" }
+    assert_select "[data-task-save]", count: 0
+  end
+
+  test "failed checklist save keeps the task button and hidden fields" do
+    patch slug_admin_editor_update_info_path(slug: @member.slug),
+      params: { from: "checklist", task: "bio", member: { bio: "소개", email: "" } }
+
+    assert_response :unprocessable_entity
+    assert_select "form.editor-fields" do
+      assert_select "input[type=hidden][name=from][value=checklist]"
+      assert_select "input[type=hidden][name=task][value=bio]"
+      assert_select "[data-task-save=bio] button[type=submit]", count: 1
+    end
+  end
+
+  test "media gallery excludes the profile photo from cards and counts" do
+    patch @photo_path, params: { image: upload_image }
+    path = slug_admin_editor_path(slug: @member.slug, step: 1, tab: "media")
+
+    get path
+    assert_select "[data-controller=member-photo-card]", count: 0
+    assert_select "[data-tab-id=media] div", text: "사진·영상 0개"
+    assert_select "[data-profile-photo-note]", count: 1
+
+    get @editor_path
+    assert_select '[aria-labelledby="editor-added-materials-title"] li span', text: "사진·영상 0개"
+
+    photo = create_photo(@member)
+    get path
+    assert_select "[data-controller=member-photo-card]", count: 1
+    assert_select "[data-member-photo-card-id-value=?]", photo.id.to_s
+    assert_select "[data-tab-id=media] div", text: "사진·영상 1개"
+    assert_select "span", text: "갤러리 · 1장"
+    assert_select "[data-profile-photo-note]", count: 1
+  end
+
+  test "media gallery lists photos without a profile photo note when none is selected" do
+    create_photo(@member)
+    get slug_admin_editor_path(slug: @member.slug, step: 1, tab: "media")
+
+    assert_select "[data-controller=member-photo-card]", count: 1
+    assert_select "[data-profile-photo-note]", count: 0
+  end
+
   test "each dashboard action opens its destination and shows a return link" do
     get @dashboard_path
     assert_response :success

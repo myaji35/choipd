@@ -25,12 +25,11 @@
   <% end %>
 
   <figcaption style="padding: 10px; background: var(--impd-paper); color: var(--impd-ink);">
-    <span data-category-chip style="border-radius: 999px; background: var(--impd-card); color: var(--impd-ink); padding: 5px 10px; font-size: 13px;"><%= { "daily" => "일상", "workshop" => "작품", "product" => "작품", "press" => "이력", "people" => "일상" }[photo.category] || "일상" %></span>
+    <% category_options = member_photo_category_options(photo.category) %>
+    <span data-category-chip style="border-radius: 999px; background: var(--impd-card); color: var(--impd-ink); padding: 5px 10px; font-size: 13px;"><%= category_options.find { |_, value| value == photo.category }&.first || "일상" %></span>
     <label>분류 바꾸기
       <select data-action="change->member-photo-card#updateCategory" style="width: 100%;">
-        <% MemberPhoto::CATEGORIES.each do |cat| %>
-          <option value="<%= cat %>" <%= "selected" if photo.category == cat %>><%= { "daily" => "일상", "workshop" => "작품", "product" => "작품", "press" => "이력", "people" => "일상" }[cat] %></option>
-        <% end %>
+        <%= options_for_select(category_options, photo.category) %>
       </select>
     </label>
     <button type="button" data-action="click->member-photo-card#destroy" style="width: 100%; margin-top: 6px;">빼기</button>

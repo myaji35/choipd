@@ -50,15 +50,14 @@
   </div>
 
   <%# 하단: 분류 셀렉트 + 진행 %>
-  <div style="position: relative; display: flex; align-items: center; gap: 14px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--impd-rule);">
-    <span class="impd-label-muted">분류</span>
-    <select data-member-photo-uploader-target="category"
-            style="padding: 4px 10px; background: var(--impd-card);">
-      <% categories.each do |cat| %>
-        <option value="<%= cat %>"><%= { "daily" => "일상", "workshop" => "작품", "product" => "작품", "press" => "이력", "people" => "일상" }[cat] %></option>
-      <% end %>
+  <div style="position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--impd-rule);">
+    <% default_category = checklist_upload && params[:task] == "media" ? "workshop" : "daily" %>
+    <label for="photo_upload_category" class="impd-label-muted">분류</label>
+    <select id="photo_upload_category" data-photo-upload-category data-member-photo-uploader-target="category"
+            style="min-height: 44px; padding: 8px 12px; font-size: 16px; background: var(--impd-card);">
+      <%= options_for_select(member_photo_category_options, default_category) %>
     </select>
-    <span style="flex: 1; font-size: 13px; color: var(--impd-muted);">사진 25MB까지 · 영상 100MB까지</span>
+    <span style="font-size: 13px; color: var(--impd-muted);">일하는 모습·결과물은 '작업', 평소 모습은 '일상'을 골라 주세요.</span>
   </div>
 
   <div data-member-photo-uploader-target="progress" style="display: none; margin-top: 14px;">
