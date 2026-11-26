@@ -31,6 +31,21 @@ class PublicPagesTest < ActionDispatch::IntegrationTest
     assert_select 'link[href*="fonts.googleapis.com"], link[href*="fonts.gstatic.com"], link[href*="cdn.jsdelivr.net"]', count: 0
   end
 
+  test "homepage presents responsive staged photos and discloses their source" do
+    get root_path
+
+    assert_select '#hero img[data-source="ai-generated"][alt][srcset][fetchpriority="high"]', count: 1
+    assert_select 'img[fetchpriority="high"]', count: 1
+    assert_select "#hero + #people + #activities" do
+      assert_select ".impd-label", text: "이렇게 활동합니다"
+      assert_select "h2", text: "오래 해 온 일을, 이제 영상과 페이지로"
+      assert_select 'figure img[data-source="ai-generated"][alt][loading="lazy"]', count: 8
+      assert_select "figure figcaption", count: 8
+    end
+    assert_select '#archive img[data-source="ai-generated"][alt][loading="lazy"]', count: 1
+    assert_select "footer p", text: "첫 화면 사진은 이해를 돕기 위한 연출 이미지입니다."
+  end
+
   test "homepage counts all public members beyond the featured cards" do
     7.times do |index|
       Member.create!(name: "공개 회원 #{index}", email: "taste-home-#{index}@example.com",
@@ -141,27 +156,26 @@ class PublicPagesTest < ActionDispatch::IntegrationTest
       assert_no_match(/최범희 PD 퍼스널 브랜드 플랫폼/, response.body)
     end
   end
-  test "hero switches from the example to real public member pages and counts at ten" do
+  test "people section switches from the example to eligible public member pages" do
     members = 5.times.map { |index| public_card_member(index) }
     get root_path
-    assert_select ".hero-phone", count: 1
-    assert_select ".hero-phone-qr, .impd-flow-card, .impd-hero-fact .impd-count-up", count: 0
+    assert_select "#people .hero-phone", count: 1
+    assert_select "#people .hero-phone-qr, #people .impd-flow-card, #hero .impd-flow", count: 0
 
     members << public_card_member(5, slug: "na-seolgye", bio: nil)
     get root_path
-    assert_select ".hero-phone-qr img[src='/qr/na-seolgye.svg']", count: 1
+    assert_select "#people .hero-phone-qr img[src='/qr/na-seolgye.svg']", count: 1
     members.last.update!(career_note: "직접 기록한 작업 경력")
     get root_path
-    assert_select ".hero-phone", count: 0
-    assert_select ".impd-flow-pause", count: 1
-    assert_select ".impd-hero-fact .impd-count-up", count: 0
-    assert_equal members.map(&:display_url).sort, css_select(".impd-flow a.impd-flow-card").map { |card| card["href"] }.sort
+    assert_select "#people .hero-phone", count: 0
+    assert_select "#people .impd-flow-pause", count: 1
+    assert_equal members.map(&:display_url).sort, css_select("#people .impd-flow a.impd-flow-card").map { |card| card["href"] }.sort
     assert_select ".impd-flow-card[href='/na-seolgye'] .impd-member-badge", text: "예시"
 
     (6...10).each { |index| public_card_member(index, profession: "educator") }
     get root_path
     count = Member.for_tenant.publicly_visible.count
-    assert_select ".impd-hero-fact .impd-count-up", text: count.to_s
+    assert_select "#people .impd-member-count", text: "지금 #{count}명이 운영 중"
     assert_select ".impd-profession-pill[href*='realtor']", count: 0
     assert_equal count, css_select(".impd-profession-pill .impd-chip-count").sum { |chip| chip.text.to_i }
   end

@@ -24,7 +24,7 @@
         </div>
         <% if sample_member %>
           <div class="hero-phone-qr">
-            <%= image_tag "/qr/#{sample_member.slug}.svg", size: "48x48", alt: "" %>
+            <%= image_tag "/qr/#{sample_member.slug}.svg", size: "48x48", loading: "lazy", alt: "" %>
             <span>명함 QR</span>
           </div>
         <% end %>

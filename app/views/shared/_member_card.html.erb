@@ -16,7 +16,7 @@
     class: class_names("impd-member-card impd-home-member", "impd-flow-card": flow, "is-example": example)) do %>
   <% if cover %>
     <div class="impd-member-cover">
-      <%= member_card_image cover.thumbnail_url, defer: defer_images || (flow && loading == "lazy"), alt: "#{c[:name]}의 작업 사진", loading: loading, decoding: "async", width: 480, height: 320 %>
+      <%= member_card_image cover.thumbnail_url, defer: defer_images, alt: "#{c[:name]}의 작업 사진", loading: loading, decoding: "async", width: 480, height: 320 %>
     </div>
   <% elsif flow %>
     <div class="impd-member-cover impd-flow-initial" aria-hidden="true"><%= c[:name].first %></div>
@@ -24,7 +24,7 @@
   <% if example %><span class="impd-member-badge">예시</span><% end %>
   <div class="impd-member-identity">
     <% if c[:image].present? %>
-      <%= member_card_image c[:image], defer: defer_images || (flow && (cover || loading == "lazy")), alt: "", class: "impd-member-avatar", loading: (cover && flow ? "lazy" : loading),
+      <%= member_card_image c[:image], defer: defer_images || (flow && cover), alt: "", class: "impd-member-avatar", loading: (cover && flow ? "lazy" : loading),
         decoding: "async", width: flow ? 40 : 48, height: flow ? 40 : 48 %>
     <% else %>
       <span class="impd-member-avatar" aria-hidden="true"><%= c[:name].first %></span>

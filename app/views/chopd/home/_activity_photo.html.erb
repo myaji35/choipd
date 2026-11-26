@@ -1,0 +1,6 @@
+<% hero = local_assigns.fetch(:hero, false) %>
+<img class="impd-home-photo" src="/images/home/<%= name %>-800.webp"
+     srcset="/images/home/<%= name %>-800.webp 800w, /images/home/<%= name %>-1600.webp 1600w"
+     sizes="<%= sizes %>" width="800" height="450" decoding="async"
+     <% if hero %>fetchpriority="high"<% else %>loading="lazy"<% end %>
+     data-source="ai-generated" alt="<%= alt %>">
