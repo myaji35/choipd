@@ -17,7 +17,7 @@ class ExampleProfileLinkTest < ActionDispatch::IntegrationTest
     assert_select "nav.impd-topnav-links a[href=?]", profile_path, text: "예시", count: 1
     assert_select "#impd-mobile-menu nav a[href=?]", profile_path, text: "예시", count: 1
     assert_select ".impd-hero-actions a[href=?]", profile_path, text: /예시 보기/, count: 1
-    assert_select "a[href=?]", profile_path, text: "예시 먼저 보기", count: 1
+    assert_select "#close a[href=?]", profile_path, text: "예시 보기", count: 1
 
     get profile_path
     assert_response :ok
@@ -31,5 +31,7 @@ class ExampleProfileLinkTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "nav.impd-topnav-links a[href=?]", explore_path, text: "예시", count: 1
     assert_select "#impd-mobile-menu nav a[href=?]", explore_path, text: "예시", count: 1
+    assert_select "#people .impd-member-count", count: 0
+    assert_select "#people .impd-member-grid > div", count: 3
   end
 end

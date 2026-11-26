@@ -1,40 +1,6 @@
-<style>
-  .hero-phone-preview { display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
-  .hero-phone-link { display: block; color: inherit; text-decoration: none; border-radius: 36px; }
-  .hero-phone-link:focus-visible { outline: 3px solid var(--impd-green); outline-offset: 6px; }
-  .hero-phone { box-sizing: border-box; width: 300px; aspect-ratio: 9 / 19.5; padding: 9px; border-radius: 36px; background: #1a1a1a; box-shadow: 0 18px 35px rgba(0, 0, 0, .16); transform: rotate(-4deg); }
-  .hero-phone-screen { box-sizing: border-box; height: 100%; overflow: hidden; position: relative; border-radius: 28px; background: var(--impd-card); color: var(--impd-ink); font-family: var(--impd-font-sans); padding: 30px 18px 16px; text-align: center; font-size: 11px; line-height: 1.4; }
-  .hero-phone-badge { position: absolute; top: 14px; right: 14px; border-radius: 50px; padding: 3px 9px; background: var(--impd-paper); color: var(--impd-ink2); font-weight: 700; }
-  .hero-phone-avatar { width: 60px; height: 60px; margin: 14px auto 8px; display: grid; place-items: center; border-radius: 50%; background: #00754A; color: white; font-size: 24px; font-weight: 700; }
-  .hero-phone-name { font-size: 20px; font-weight: 800; }
-  .hero-phone-role, .hero-phone-bio { color: var(--impd-ink2); }
-  .hero-phone-bio { margin: 10px 0 12px; white-space: nowrap; }
-  .hero-phone-actions { display: grid; gap: 6px; }
-  .hero-phone-action { padding: 8px; border: 1px solid #00754A; border-radius: 7px; color: #00754A; font-weight: 700; }
-  .hero-phone-action-primary { background: #00754A; color: white; }
-  .hero-phone-chips { display: flex; justify-content: center; gap: 4px; margin: 12px 0; white-space: nowrap; }
-  .hero-phone-chip { padding: 4px 6px; border-radius: 50px; background: var(--impd-paper); color: var(--impd-ink2); }
-  .hero-phone-review { padding: 10px; border: 1px solid var(--impd-rule); border-radius: 9px; text-align: left; }
-  .hero-phone-review strong { display: block; margin-bottom: 3px; }
-  .hero-phone-review p { margin: 0; color: var(--impd-muted); }
-  .hero-phone-qr { width: 35px; height: 35px; margin: 12px auto 3px; border: 4px solid white; outline: 1px solid var(--impd-rule); background: repeating-conic-gradient(#1a1a1a 0 25%, white 0 50%) 0 0 / 10px 10px; }
-  .hero-phone-qr-caption { color: var(--impd-muted); }
-  .hero-phone-services { margin-top: 10px; padding: 7px 10px; border: 1px solid var(--impd-rule); border-radius: 9px; text-align: left; }
-  .hero-phone-services-title { display: block; margin-bottom: 2px; }
-  .hero-phone-service { display: flex; align-items: center; justify-content: space-between; padding: 3px 0; }
-  .hero-phone-service + .hero-phone-service { border-top: 1px solid var(--impd-rule); }
-  .hero-phone-service-chevron { color: var(--impd-muted); font-size: 14px; line-height: 1; }
-  .hero-phone-footer { position: absolute; right: 0; bottom: 0; left: 0; display: flex; gap: 6px; padding: 8px 18px; border-top: 1px solid var(--impd-rule); background: var(--impd-card); }
-  .hero-phone-footer-action { flex: 1; padding: 5px; border: 1px solid #00754A; border-radius: 7px; color: #00754A; font-weight: 700; }
-  .hero-phone-footer-action:last-child { background: #00754A; color: white; }
-  .hero-phone-caption { margin: 22px 0 0; color: var(--impd-muted); font-size: 13px; text-align: center; }
-  @media (max-width: 767px) { .hero-phone { width: 260px; transform: none; } .hero-phone-screen { padding-top: 19px; } .hero-phone-avatar { width: 50px; height: 50px; margin-top: 10px; } .hero-phone-bio { margin: 6px 0 8px; } .hero-phone-action { padding: 5px; } .hero-phone-chips { margin: 8px 0; } .hero-phone-review { padding: 7px; } .hero-phone-qr { margin-top: 7px; } }
-  @media (max-width: 767px) { .hero-phone-services { margin-top: 5px; padding: 4px 8px; } .hero-phone-service { padding: 1px 0; } }
-</style>
-
 <div class="hero-phone-preview">
   <% sample_member = Member.publicly_visible.find_by(slug: "na-seolgye") %>
-  <%= content_tag(sample_member ? :a : :div, class: sample_member ? "hero-phone-link" : nil, href: sample_member ? "/na-seolgye" : nil, aria: sample_member ? { label: "예시 페이지 보기" } : nil) do %>
+  <%= content_tag(sample_member ? :a : :div, class: "hero-phone-link", href: sample_member ? "/na-seolgye" : nil, aria: sample_member ? { label: "예시 페이지 보기" } : nil) do %>
     <div class="hero-phone">
       <div class="hero-phone-screen">
         <span class="hero-phone-badge">예시</span>
@@ -49,16 +15,16 @@
         <div class="hero-phone-chips">
           <span class="hero-phone-chip">손해보험</span><span class="hero-phone-chip">생명보험</span><span class="hero-phone-chip">가족 보장 설계</span>
         </div>
-        <div class="hero-phone-review">
-          <strong>고객 후기 예시</strong>
-          <p>어려운 보장을 알기 쉽게 설명해 주셨어요.<br>우리 가족에게 필요한 내용을 찾았어요.</p>
-        </div>
-        <div class="hero-phone-qr" aria-hidden="true"></div>
-        <div class="hero-phone-qr-caption">명함 QR</div>
         <div class="hero-phone-services">
           <strong class="hero-phone-services-title">서비스</strong>
           <div class="hero-phone-service"><span>가족 보장 점검 · 무료</span><%= lni_icon "arrow-right", class: "hero-phone-service-chevron" %></div>
           <div class="hero-phone-service"><span>보험금 청구 도움 · 무료</span><%= lni_icon "arrow-right", class: "hero-phone-service-chevron" %></div>
+        </div>
+        <div class="hero-phone-qr">
+          <% if sample_member %>
+            <%= image_tag "/qr/#{sample_member.slug}.svg", size: "48x48", alt: "" %>
+          <% end %>
+          <span>명함 QR</span>
         </div>
         <div class="hero-phone-footer">
           <span class="hero-phone-footer-action">전화</span>
@@ -67,5 +33,4 @@
       </div>
     </div>
   <% end %>
-  <p class="hero-phone-caption">가입하고 5분이면 이런 페이지가 생겨요</p>
 </div>

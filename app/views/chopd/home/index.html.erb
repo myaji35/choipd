@@ -1,193 +1,95 @@
 <% content_for :title, "imPD — 1인 사업자·크리에이터의 홍보 페이지" %>
 <% content_for :description, "SNS 사진, 자격증, 그동안 쌓은 경력과 고객 후기 — 갖고 있는 그대로 올리기만 하세요. imPD가 정리해 믿음직한 홍보 페이지로 만들어 드립니다." %>
 
-<style>
-  body { background: var(--impd-paper); color: var(--impd-ink); }
-  .impd-wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
-  .impd-section { padding: 80px 0; }
-  .impd-home-hero { padding: 80px 40px 40px; }
-  .impd-hero-headline { margin: 0; font-family: var(--impd-font-display); font-weight: 800; font-size: var(--impd-size-display); letter-spacing: -4.5px; line-height: 0.9; }
-  .impd-hero-headline > span, .impd-hero-headline [data-impd-rotator-target="word"] { display: block; }
-  .impd-hero-actions { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
-  .impd-hero-actions .impd-btn { height: 54px; padding: 0 22px; font-size: 16px; }
-  .impd-section-header { flex-wrap: wrap; gap: 12px; }
-  .impd-section-header > .impd-display { font-size: var(--impd-size-h2); flex: 1 1 280px; min-width: 0; }
-  .impd-stats-grid, .impd-steps-grid, .impd-types-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
-  .impd-stats-grid { border-top: 1px solid var(--impd-ink); }
-  .impd-stats-grid > div + div, .impd-steps-grid > div + div, .impd-examples-grid > div + div { border-left: 1px solid var(--impd-rule); }
-  .impd-types-grid { border-top: 1px solid var(--impd-rule); border-left: 1px solid var(--impd-rule); }
-  .impd-member-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-  .impd-professions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
-  .impd-profession-pill { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border: 1px solid var(--impd-rule); border-radius: 999px; background: #fff; color: var(--impd-ink); font-size: 15px; font-weight: 600; text-decoration: none; transition: border-color 150ms ease, transform 150ms ease; }
-  .impd-profession-pill:hover { border-color: var(--impd-green); transform: translateY(-2px); }
-  .impd-faq { max-width: 860px; margin: 0 auto; }
-  .impd-faq h2 { margin: 0 0 24px; font-size: var(--impd-size-h2); }
-  .impd-faq details { border-top: 1px solid var(--impd-rule); }
-  .impd-faq details:last-child { border-bottom: 1px solid var(--impd-rule); }
-  .impd-faq summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 56px; padding: 16px 0; cursor: pointer; font-size: 17px; font-weight: 700; list-style: none; }
-  .impd-faq summary::-webkit-details-marker { display: none; }
-  .impd-faq summary:focus-visible { outline: 2px solid var(--impd-green); outline-offset: 3px; }
-  .impd-faq summary .lni { flex-shrink: 0; transition: transform 150ms ease; }
-  .impd-faq details[open] summary .lni { transform: rotate(180deg); }
-  .impd-faq p { margin: 0; padding: 0 0 20px; color: var(--impd-ink2); font-size: 15px; line-height: 1.7; }
-  .impd-home-footer { background: transparent; border-top: 1px solid var(--impd-rule); padding: 40px 40px 48px; display: flex; justify-content: space-between; gap: 24px 40px; flex-wrap: wrap; font-family: var(--impd-font-sans); font-size: 14px; color: var(--impd-muted); }
-  .impd-home-footer p { margin: 8px 0 0; }
-  .impd-home-footer nav { display: flex; flex-wrap: wrap; align-content: start; gap: 0 20px; }
-  .impd-home-footer nav a { display: inline-flex; align-items: center; min-height: 44px; color: inherit; text-decoration: none; }
-  .impd-home-footer nav a:hover { text-decoration: underline; }
-  @media (prefers-reduced-motion: reduce) { .impd-faq summary .lni { transition: none; } }
-  @media (max-width: 599px) { .impd-professions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .impd-profession-pill { padding: 0 10px; } }
-  @media (max-width: 899px) { .impd-types-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 899px) { .impd-member-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 599px) { .impd-member-grid { grid-template-columns: 1fr; } }
-  @media (max-width: 768px) {
-    /* 섹션들이 인라인 style 로 padding 을 지정해 이 규칙을 이긴다.
-       좌우만 !important 로 되돌려 375px 뷰포트 가로 오버플로(22px)를 막는다. */
-    .impd-wrap { padding-left: 20px !important; padding-right: 20px !important; }
-    .impd-section { padding: 48px 0; }
-  }
-  @media (max-width: 599px) {
-    .impd-home-hero { padding-top: 40px; }
-    .impd-hero-headline { letter-spacing: -2px; }
-    .impd-hero-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 24px; }
-    .impd-hero-actions .impd-btn { height: 48px; padding: 0 10px; }
-    .impd-hero-actions .impd-btn-primary { grid-column: 1 / -1; height: 56px; }
-    .impd-home-footer { padding: 40px 20px 48px; }
-    .impd-stats-grid, .impd-steps-grid, .impd-types-grid { grid-template-columns: 1fr; }
-    .impd-stats-grid > div + div, .impd-steps-grid > div + div, .impd-examples-grid > div + div { border-left: 0; border-top: 1px solid var(--impd-rule); }
-  }
-</style>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "impd_home", "data-turbo-track": "reload" %>
+<% end %>
 
-<div style="background: var(--impd-paper); color: var(--impd-ink); font-family: var(--impd-font-sans);">
+<%
+  primary_label = member_signed_in? ? "내 페이지 관리" : "내 페이지 만들기"
+  primary_path = member_signed_in? ? "/#{current_member.slug}/admin/dashboard" : member_signup_path
+  secondary_label = member_signed_in? ? "내 페이지 보기" : "예시 보기"
+  secondary_path = member_signed_in? ? "/#{current_member.slug}" : example_profile_path
+  primary_icon = member_signed_in? ? "pencil-1" : "arrow-right"
+%>
 
-  <!-- ── HERO 01 (좌우 2컬럼 + 회원 페이지 미리보기) ───────────────────────── -->
-  <section class="impd-wrap impd-home-hero">
-    <div class="impd-label" style="margin-bottom: 28px;">업로드만 하세요. 나머지는 저희가.</div>
-
-    <div class="impd-hero-grid" style="display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 60px; align-items: start;">
-      <!-- 좌: 헤드라인 + 본문 + CTA -->
+<div class="impd-home">
+  <section id="hero" class="impd-home-hero" aria-labelledby="home-title">
+    <div class="impd-wrap impd-hero-grid impd-fade-in">
       <div>
-        <h1 class="impd-fade-in impd-hero-headline" data-controller="impd-rotator"
-            aria-label="당신은 사장님입니다. 사진 몇 장, 자격증 하나면 완성됩니다.">
-          <span>당신은</span>
-          <span style="height: 1em; overflow: hidden; position: relative;">
-            <span data-impd-rotator-target="word" aria-live="off" style="color: var(--impd-accent); font-style: italic;">사장님입니다.</span>
-          </span>
-          <span>사진 몇 장,</span>
-          <span><span style="color: var(--impd-accent);">자격증 하나</span>면</span>
-          <span>완성됩니다.</span>
-        </h1>
-
-        <p style="margin-top: 36px; font-size: 16px; line-height: 1.6; color: var(--impd-ink2); max-width: 480px;">
-          SNS 사진, 자격증, 그동안 쌓은 경력과 고객 후기 — 갖고 있는 그대로 올리기만 하세요. imPD가 정리해 믿음직한 홍보 페이지로 만들어 드립니다.
-        </p>
-
+        <h1 id="home-title" class="impd-hero">1인 사업자·크리에이터의 홍보 페이지</h1>
+        <p class="impd-home-lead">SNS 사진, 자격증, 경력, 고객 후기를 가진 그대로 올리세요. imPD가 정리해 홍보 페이지로 만들어 드립니다.</p>
         <div class="impd-hero-actions">
-          <%= link_to(member_signed_in? ? "/#{current_member.slug}/admin/dashboard" : member_signup_path, class: "impd-btn impd-btn-primary") do %><%= member_signed_in? ? "내 페이지 관리" : "내 페이지 만들기" %> <%= lni_icon(member_signed_in? ? "pencil-1" : "arrow-right") %><% end %>
-          <%= link_to(member_signed_in? ? "/#{current_member.slug}" : example_profile_path, class: "impd-btn impd-btn-secondary") do %><%= member_signed_in? ? "내 페이지 보기" : "예시 보기" %> <%= lni_icon "arrow-right" %><% end %>
-          <%= link_to promo_watch_path,
-              class: "impd-btn impd-btn-secondary",
-              style: "display: inline-flex; align-items: center; gap: 8px;",
-              data: { "promo-popup": true } do %>
-            <%= lni_icon "play", size: 16 %>
-            홍보 영상 <span style="font-family: var(--impd-font-mono); font-size: 12px; color: var(--impd-muted); letter-spacing: 1px;">30s</span>
+          <%= link_to primary_path, class: "impd-btn impd-btn-primary", data: { home_actions_target: "primary" } do %>
+            <%= primary_label %> <%= lni_icon primary_icon %>
+          <% end %>
+          <%= link_to secondary_path, class: "impd-btn impd-btn-secondary" do %>
+            <%= secondary_label %> <%= lni_icon "arrow-right" %>
           <% end %>
         </div>
+        <p class="impd-small impd-hero-fact">월 0원 · 카드 등록 없이 시작</p>
       </div>
-
       <%= render "hero_phone_preview" %>
     </div>
-
-    <style>
-      @media (max-width: 768px) {
-        .impd-hero-grid { grid-template-columns: 1fr !important; }
-      }
-    </style>
   </section>
 
-  <!-- ── 3가지 약속 ───────────────────────── -->
-  <section class="impd-wrap" style="padding: 40px 40px 32px;">
-    <div class="impd-stats-grid">
-      <% [
-        ["0원", "무료로 시작", "카드 등록 없이 바로 만들어요"],
-        ["5분", "첫 페이지 완성", "가진 자료를 올리면 정리는 저희가"],
-        ["0%", "수수료 없음", "문의·예약은 고객과 직접 연결돼요"]
-      ].each_with_index do |(num, label, sub), i| %>
-        <div style="padding: 24px 20px;">
-          <div class="impd-display" style="font-size: 44px; letter-spacing: -0.03em; color: var(--impd-green);"><%= num %></div>
-          <div style="margin-top: 6px; font-size: 15px; font-weight: 700; color: var(--impd-ink);"><%= label %></div>
-          <div style="font-size: 13px; color: var(--impd-muted); margin-top: 2px; font-family: var(--impd-font-sans);"><%= sub %></div>
-        </div>
-      <% end %>
-    </div>
-  </section>
-
-  <!-- ── 직업별 페이지 ───────────────────────── -->
-  <section class="impd-wrap" style="padding: 16px 40px 32px;">
-    <h2 style="font-size: 24px; font-weight: 700; margin: 0;">내 직업으로 먼저 보기</h2>
-    <p style="font-size: 15px; color: var(--impd-ink2); margin: 8px 0 0;">같은 일을 하는 분들의 페이지를 먼저 둘러보세요.</p>
-    <div class="impd-professions">
-      <% [
-        ["보험설계사", "insurance_agent", "shield-2-check"],
-        ["동네 가게 사장님", "shopowner", "cart-1"],
-        ["1인 크리에이터", "freelancer", "camera-1"],
-        ["강사·코치", "educator", "book-1"],
-        ["공인중개사", "realtor", "home-2"],
-        ["작가", "author", "pencil-1"]
-      ].each do |label, code, icon| %>
-        <%= link_to explore_path(profession: code), class: "impd-profession-pill" do %>
-          <%= lni_icon icon, size: 18 %> <%= label %>
+  <section id="how" class="impd-home-section impd-home-ceramic" aria-labelledby="how-title">
+    <div class="impd-wrap">
+      <h2 id="how-title" class="impd-section-title">자료를 올리면 페이지가 됩니다</h2>
+      <div class="impd-home-grid impd-home-stats">
+        <% [
+          ["0원", "무료로 시작", "카드 등록 없이 바로 만들어요"],
+          ["5분", "첫 페이지 완성", "가진 자료를 올리면 정리는 저희가"],
+          ["0%", "수수료 없음", "문의·예약은 고객과 직접 연결돼요"]
+        ].each do |number, label, description| %>
+          <div>
+            <p class="impd-stat-num"><%= number %></p>
+            <p class="impd-home-strong"><%= label %></p>
+            <p><%= description %></p>
+          </div>
         <% end %>
+      </div>
+      <ol class="impd-home-grid impd-home-steps">
+        <% [
+          ["01", "업로드", "사진·자격증·이력서·SNS 링크, 무엇이든 올려 주세요."],
+          ["02", "자동 정리", "AI가 카테고리별로 분류하고 핵심 정보를 추출합니다."],
+          ["03", "페이지 완성", "잡지처럼 다듬어진 당신만의 홍보 페이지가 열립니다."]
+        ].each do |number, title, description| %>
+          <li class="impd-c2-card">
+            <span class="impd-label"><%= number %></span>
+            <h3 class="impd-subtitle"><%= title %></h3>
+            <p><%= description %></p>
+          </li>
+        <% end %>
+      </ol>
+      <%= link_to promo_watch_path, class: "impd-link impd-home-more", data: { promo_popup: true } do %>
+        <%= lni_icon "play", size: 16 %> 홍보 영상 보기 (30초)
       <% end %>
     </div>
   </section>
 
-  <!-- ── 02 3-step pitch ───────────────────────── -->
-  <section class="impd-wrap impd-section">
-    <div class="impd-section-header">
-      <span class="impd-display">자료를 올리면, 페이지가 됩니다.</span>
-      <span class="impd-label-muted">3단계</span>
-    </div>
-    <div class="impd-steps-grid">
-      <% [
-        ["01", "업로드", "사진·자격증·이력서·SNS 링크 — 무엇이든 올려 주세요."],
-        ["02", "자동 정리", "AI가 카테고리별로 분류하고 핵심 정보를 추출합니다."],
-        ["03", "페이지 완성", "잡지처럼 다듬어진 당신만의 홍보 페이지가 열립니다."]
-      ].each_with_index do |(num, title, desc), i| %>
-        <div style="padding: 32px 24px;">
-          <div class="impd-label" style="color: var(--impd-accent);"><%= num %></div>
-          <h3 class="impd-display" style="font-size: var(--impd-size-h3); margin: 12px 0 16px;"><%= title %></h3>
-          <p style="font-size: 15px; line-height: 1.55; color: var(--impd-ink2);"><%= desc %></p>
-        </div>
-      <% end %>
-    </div>
-  </section>
-
-  <!-- ── 03 자료 종류 그리드 ───────────────────────── -->
-  <section class="impd-wrap impd-section">
-    <div class="impd-section-header">
-      <span class="impd-display">이런 자료들이 페이지가 됩니다.</span>
-      <span class="impd-label-muted">6가지</span>
-    </div>
-    <div class="impd-types-grid">
-      <% [
-        ["camera-1", "현장 사진", "갤러리 그리드"],
-        ["book-1", "수료증·자격증", "달란트 배지"],
-        ["camera-movie-1", "유튜브·SNS", "포트폴리오 임베드"],
-        ["pencil-1", "강의 이력", "타임라인"],
-        ["star-fat", "고객 후기", "테스티모니얼"],
-        ["briefcase-1", "프로젝트", "케이스 스터디"]
-      ].each do |icon, title, result| %>
-        <div style="padding: 24px; border-right: 1px solid var(--impd-rule); border-bottom: 1px solid var(--impd-rule);">
-          <div style="font-size: 32px; margin-bottom: 12px;"><%= lni_icon icon, size: 32 %></div>
-          <h4 class="impd-display" style="font-size: 20px;"><%= title %></h4>
-          <p class="impd-label-muted" style="margin-top: 8px;"><%= lni_icon "arrow-right" %> <%= result %></p>
-        </div>
-      <% end %>
+  <section id="sources" class="impd-home-section" aria-labelledby="sources-title">
+    <div class="impd-wrap">
+      <h2 id="sources-title" class="impd-section-title">페이지가 되는 자료 6가지</h2>
+      <div class="impd-home-grid">
+        <% [
+          ["camera-1", "현장 사진", "사진 갤러리"],
+          ["book-1", "수료증·자격증", "달란트 배지"],
+          ["camera-movie-1", "유튜브·SNS", "영상·SNS 모음"],
+          ["pencil-1", "강의 이력", "경력 연표"],
+          ["star-fat", "고객 후기", "후기 모음"],
+          ["briefcase-1", "프로젝트", "작업 사례"]
+        ].each do |icon, title, result| %>
+          <article class="impd-c2-card impd-home-source">
+            <%= lni_icon icon, size: 24 %>
+            <h3 class="impd-subtitle"><%= title %></h3>
+            <p><%= lni_icon "arrow-right" %> <%= result %></p>
+          </article>
+        <% end %>
+      </div>
     </div>
   </section>
 
-  <!-- ── 05 Creators (실제 회원 카드 + 클릭 시 공개 페이지로 이동) ───── -->
   <%
     fallback_cards = [
       { name: "보험설계사 예시", role: "insurance_agent", region: "분당", bio: "가족 보장을 쉽게 설명해 드려요", example: true },
@@ -200,211 +102,178 @@
     examples = fallback_cards.first([3 - real_cards.size, 0].max)
     cards = real_cards + examples
   %>
-  <section class="impd-wrap impd-section">
-    <div class="impd-section-header">
-      <span class="impd-display">imPD를 쓰는 사람들.</span>
-      <% if real_cards.any? %><span class="impd-label-muted">지금 <%= real_cards.size %>명이 운영 중</span><% end %>
-    </div>
-    <div class="impd-member-grid">
-      <% cards.each do |c| %>
-        <%= render "shared/member_card", c: c %>
+  <section id="people" class="impd-home-section impd-home-ceramic" aria-labelledby="people-title">
+    <div class="impd-wrap">
+      <h2 id="people-title" class="impd-section-title">imPD를 쓰는 사람들</h2>
+      <% if @member_count.positive? %>
+        <p class="impd-label impd-member-count">지금 <%= @member_count %>명이 운영 중</p>
       <% end %>
-    </div>
-    <% if examples.any? %>
-      <p style="margin-top: 16px; font-size: 12px; color: var(--impd-muted); text-align: right;">예시 카드는 실제 회원이 아니에요. 운영 중인 카드를 누르면 회원 페이지로 이동합니다.</p>
-    <% end %>
-  </section>
-
-  <!-- ── 05.5 Real Moments (회원들이 올린 실제 장면) ──────────── -->
-  <% if @featured_moments.present? && @featured_moments.any? %>
-    <%# full-bleed 배경: 부모 overflow-x: hidden과 호환되도록 wrapper 내부에서 처리 %>
-    <div style="background: var(--impd-card); border-top: 1px solid var(--impd-rule); border-bottom: 1px solid var(--impd-rule); margin: 40px 0;">
-      <section class="impd-wrap" style="padding-top: 64px; padding-bottom: 64px;">
-        <div class="impd-section-header">
-          <span class="impd-display">실제 페이지에서 살아있는 장면들.</span>
-          <span class="impd-label-muted"><%= @featured_moments.size %> MOMENTS</span>
-        </div>
-        <p style="font-family: var(--impd-font-sans); font-size: 17px; color: var(--impd-ink2); line-height: 1.55; max-width: 58ch; margin-bottom: 28px;">
-          템플릿이 아니라 진짜 순간들. imPD 회원들이 <span style="color: var(--impd-accent-2);">직접 올린 사진과 영상</span>이
-          자동으로 정리된 결과물입니다.
-        </p>
-
-        <%# 마스타헤드 마퀴 — 최대 10장 %>
-        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
-        <% @featured_moments.first(10).each_with_index do |photo, i| %>
-          <% next unless photo.image.attached? %>
-          <% link = "/" + photo.member.slug.to_s %>
-          <% aspect = (i.zero? || i == 5) ? "3/4" : "1/1" %>
-          <a href="<%= link %>" style="display: block; text-decoration: none; position: relative; aspect-ratio: <%= aspect %>; overflow: hidden; background: var(--impd-ink); border: 1px solid var(--impd-rule); grid-row: span <%= (i.zero? || i == 5) ? 2 : 1 %>;">
-            <% if photo.video? %>
-              <video src="<%= photo.display_url %>"
-                     style="width: 100%; height: 100%; object-fit: cover; display: block; background: #000;"
-                     preload="metadata" muted playsinline loop
-                     onmouseover="this.play()" onmouseout="this.pause(); this.currentTime=0;"></video>
-            <% else %>
-              <img loading="lazy" decoding="async" src="<%= photo.thumbnail_url %>"
-                   data-fallback="<%= photo.display_url %>"
-                   onerror="if(this.dataset.fallback && this.src !== this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}"
-                   alt="<%= photo.member.name %>의 <%= photo.category %>"
-                   style="width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 400ms ease;"
-                   onmouseover="this.style.transform='scale(1.04)'"
-                   onmouseout="this.style.transform='scale(1)'">
-            <% end %>
-            <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 10px 12px; background: linear-gradient(to top, rgba(15,13,11,0.85), transparent); color: #fff;">
-              <div style="font-family: var(--impd-font-mono); font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; opacity: 0.75;">
-                <%= photo.category %> · <%= photo.member.name %>
-              </div>
-            </div>
-          </a>
+      <div class="impd-professions">
+        <% [
+          ["보험설계사", "insurance_agent", "shield-2-check"],
+          ["동네 가게 사장님", "shopowner", "cart-1"],
+          ["1인 크리에이터", "freelancer", "camera-1"],
+          ["강사·코치", "educator", "book-1"],
+          ["공인중개사", "realtor", "home-2"],
+          ["작가", "author", "pencil-1"]
+        ].each do |label, code, icon| %>
+          <%= link_to explore_path(profession: code), class: "impd-profession-pill" do %>
+            <%= lni_icon icon, size: 18 %> <%= label %>
+          <% end %>
         <% end %>
       </div>
-
-        <div style="margin-top: 28px; display: flex; align-items: center; justify-content: center; gap: 14px;">
-          <a href="#signup" class="impd-btn impd-btn-primary">내 페이지 만들기 <%= lni_icon "arrow-right" %></a>
-          <span style="font-family: var(--impd-font-mono); font-size: 11px; color: var(--impd-muted);">업로드 한 번 · 정리 자동</span>
-        </div>
-      </section>
-    </div>
-  <% end %>
-
-  <!-- ── 활용 예시 ───────────────────────── -->
-  <section class="impd-wrap impd-section">
-    <div class="impd-section-header">
-      <span class="impd-label">활용 예시</span>
-      <span class="impd-display">이런 분들이 imPD로 시작합니다.</span>
-    </div>
-    <div class="impd-examples-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 0; border-top: 1px solid var(--impd-rule);">
-      <% [
-        ["보험설계사", "상담 분야와 자격을 한 페이지에 정리하고, 명함 QR로 고객이 바로 상담을 신청해요.", "na-seolgye"],
-        ["1인 크리에이터", "작업물·채널·협업 문의를 한곳에 모아, 브랜드 담당자에게 링크 하나로 보내요.", "yujin-studio"],
-        ["동네 가게 사장님", "가게 소개·메뉴·후기를 정리하고, 지역 주민에게 Townin 전단지로 알려요.", nil]
-      ].each_with_index do |(title, description, slug), i| %>
-        <div style="padding: 40px 32px;">
-          <span class="impd-label" style="display: inline-block; border: 1px solid var(--impd-rule); padding: 4px 10px;">예시</span>
-          <h3 class="impd-display" style="font-size: var(--impd-size-h3); margin: 24px 0 12px;"><%= title %></h3>
-          <p style="font-size: 16px; line-height: 1.4; color: var(--impd-ink);"><%= description %></p>
-          <% if slug && Member.publicly_visible.exists?(slug: slug) %>
-            <a href="/<%= slug %>" style="display: inline-block; margin-top: 24px;">예시 페이지 보기 <%= lni_icon "arrow-right" %></a>
-          <% end %>
-        </div>
+      <div class="impd-home-grid impd-member-grid">
+        <% cards.each do |c| %>
+          <%= render "shared/member_card", c: c, home_card: true %>
+        <% end %>
+      </div>
+      <% if examples.any? %>
+        <p class="impd-home-note">예시 카드는 실제 회원이 아니에요. 운영 중인 카드를 누르면 회원 페이지로 이동합니다.</p>
       <% end %>
     </div>
   </section>
 
-  <!-- ── 07 Reward Feature Band (C2 Starbucks-style dark green) ───────────────────────── -->
-  <section id="pricing" class="impd-c2-band impd-stripe" style="padding: 80px 40px;">
-    <div style="max-width: 1200px; margin: 0 auto;">
-      <div class="impd-label" style="margin-bottom: 18px;">imPD 리워드</div>
-      <h2 class="impd-display" style="font-size: clamp(36px, 5vw, 56px); color: var(--impd-on-dark); max-width: 860px; margin-bottom: 12px;">
-        오래 쓸수록 더 예뻐지는 페이지.
-      </h2>
-      <p style="color: var(--impd-on-dark-soft); font-size: 16px; line-height: 1.6; max-width: 720px;">
-        첫 페이지를 연 순간부터 방문 수·후기·수료증이 쌓입니다. imPD는 그 기록을 <span class="impd-serif" style="color: var(--impd-gold);">성장 기록</span>으로 페이지에 차곡차곡 쌓아 드려요.
-      </p>
+  <% moments = @featured_moments.select { |photo| photo.image.attached? } %>
+  <% if moments.any? %>
+    <section id="moments" class="impd-home-section" aria-labelledby="moments-title">
+      <div class="impd-wrap">
+        <h2 id="moments-title" class="impd-section-title">회원들이 올린 사진과 영상</h2>
+        <p class="impd-home-intro">imPD 회원들이 직접 올린 사진과 영상입니다.</p>
+        <p class="impd-label"><%= moments.size %>장</p>
+        <div class="impd-moments-grid">
+          <% moments.each_with_index do |photo, index| %>
+            <% media_label = "#{photo.member.name}의 #{photo.category}" %>
+            <%= link_to "/#{photo.member.slug}", class: class_names("impd-moment", "impd-moment-tall": [0, 5].include?(index)),
+                aria: (photo.video? ? { label: "#{media_label} 영상" } : nil) do %>
+              <% if photo.video? %>
+                <video src="<%= photo.display_url %>" class="impd-media-cover" aria-label="<%= media_label %> 영상"
+                       preload="metadata" muted playsinline
+                       data-action="pointerenter->home-actions#playPreview pointerleave->home-actions#resetPreview"></video>
+              <% else %>
+                <img loading="lazy" decoding="async" src="<%= photo.thumbnail_url %>"
+                     data-fallback="<%= photo.display_url %>"
+                     onerror="if (this.dataset.fallback) { this.src = this.dataset.fallback; this.dataset.fallback = ''; }"
+                     alt="<%= media_label %>" class="impd-media-cover">
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+  <% end %>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 40px;">
+  <section id="examples" class="impd-home-section" aria-labelledby="examples-title">
+    <div class="impd-wrap">
+      <h2 id="examples-title" class="impd-section-title">직업별 활용 예시</h2>
+      <div class="impd-home-grid">
+        <% [
+          ["보험설계사", "상담 분야와 자격을 한 페이지에 정리하고, 명함 QR로 고객이 바로 상담을 신청해요.", "na-seolgye"],
+          ["1인 크리에이터", "작업물·채널·협업 문의를 한곳에 모아, 브랜드 담당자에게 링크 하나로 보내요.", "yujin-studio"],
+          ["동네 가게 사장님", "가게 소개·메뉴·후기를 정리하고, 지역 주민에게 Townin 전단지로 알려요.", nil]
+        ].each do |title, description, slug| %>
+          <article class="impd-c2-card">
+            <h3 class="impd-subtitle"><%= title %></h3>
+            <p><%= description %></p>
+            <% if slug && Member.publicly_visible.exists?(slug: slug) %>
+              <%= link_to "/#{slug}", class: "impd-link impd-home-more" do %>
+                예시 페이지 보기 <%= lni_icon "arrow-right" %>
+              <% end %>
+            <% end %>
+          </article>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing" class="impd-home-section impd-home-ceramic" aria-labelledby="pricing-title">
+    <div class="impd-wrap">
+      <h2 id="pricing-title" class="impd-section-title">요금제</h2>
+      <p class="impd-home-intro">무료 요금제는 월 0원입니다. 유료 요금제는 준비 중이에요. 열리면 알려 드려요.</p>
+      <p class="impd-home-intro">첫 페이지를 연 순간부터 방문 수·후기·수료증이 쌓입니다. imPD는 그 기록을 성장 기록으로 페이지에 차곡차곡 쌓아 드려요.</p>
+      <div class="impd-home-grid impd-pricing-grid">
         <% [
           ["FREE", "누구나 무료", "0원 / 월", ["공개 페이지 1개", "QR · 디지털 명함", "방문자 분석", "AI 자동 정리 · 3회"], false],
           ["PRO", "1인 사업가 기본", "9,900원 / 월", ["무제한 갤러리", "AI 자동 정리 · 무제한", "맞춤 도메인", "후기·예약 수집", "리워드 골드 배지"], true],
           ["STUDIO", "공방 · 소수팀", "29,000원 / 월", ["Pro 전부 +", "최대 5인 공동 편집", "클래스 예약·결제", "월간 성과 리포트"], false],
         ].each do |tag, title, price, features, highlight| %>
-          <div style="background: <%= highlight ? 'var(--impd-gold-light)' : 'var(--impd-card)' %>; color: var(--impd-ink); border-radius: 12px; padding: 28px 24px; box-shadow: var(--impd-shadow-card); position: relative; <%= 'outline: 2px solid var(--impd-gold);' if highlight %>">
-            <div class="impd-label" style="color: <%= highlight ? '#8a6a2f' : 'var(--impd-green)' %>;"><%= tag %><% if tag != "FREE" %> <span style="display: inline-block; border: 1px solid currentColor; border-radius: 50px; padding: 3px 8px; font-size: 12px; letter-spacing: 0;">준비 중</span><% end %></div>
-            <div class="impd-display" style="font-size: 22px; margin: 8px 0 4px; color: var(--impd-green);"><%= title %></div>
-            <% amount, unit = price.split(' / ', 2) %>
-            <div class="impd-display" style="color: var(--impd-ink); margin-bottom: 20px;"><span style="font-size: 32px; font-weight: 800; color: var(--impd-ink);"><%= amount %></span> <span style="font-size: 15px; color: var(--impd-muted);">/ <%= unit %></span></div>
-            <ul style="list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-direction: column; gap: 10px;">
-              <% features.each do |f| %>
-                <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--impd-ink);">
-                  <%= lni_icon "check", size: 16, style: "margin-top: 2px; color: #{highlight ? '#cba258' : '#00754A'}" %>
-                  <span><%= f %></span>
-                </li>
+          <article class="impd-c2-card <%= "impd-plan-highlight" if highlight %>">
+            <p class="impd-label"><%= tag %><% if tag != "FREE" %> <span class="impd-plan-status">준비 중</span><% end %></p>
+            <h3 class="impd-subtitle"><%= title %></h3>
+            <% amount, unit = price.split(" / ", 2) %>
+            <p class="impd-plan-price"><span class="impd-stat-num"><%= amount %></span> / <%= unit %></p>
+            <ul class="impd-plan-features">
+              <% features.each do |feature| %>
+                <li><%= lni_icon "check", size: 16 %><span><%= feature %></span></li>
               <% end %>
             </ul>
-            <%= link_to(tag == "FREE" && member_signed_in? ? "/#{current_member.slug}/admin/dashboard" : member_signup_path,
-                class: "impd-btn #{tag == 'FREE' ? 'impd-btn-primary' : 'impd-btn-outlined'}",
-                style: "width: 100%;") do %><%= tag == "FREE" ? (member_signed_in? ? "내 페이지 관리" : "무료로 시작하기") : "무료로 먼저 시작" %><% end %>
-          </div>
+            <% if tag == "FREE" %>
+              <%= link_to primary_label, primary_path, class: "impd-btn impd-btn-primary" %>
+            <% end %>
+          </article>
         <% end %>
       </div>
-      <p style="color: var(--impd-on-dark-soft); font-size: 14px; margin-top: 20px;">유료 요금제는 준비 중이에요. 지금은 무료로 시작하고, 열리면 알려 드려요.</p>
     </div>
   </section>
 
-  <section id="faq" class="impd-wrap impd-section" aria-labelledby="faq-title">
-    <div class="impd-faq">
-      <h2 id="faq-title" class="impd-display">자주 묻는 질문</h2>
-      <% [
-        ["정말 무료로 시작할 수 있나요?", "네. 무료 요금제는 월 0원이며 가입할 때 카드 정보를 입력하지 않습니다."],
-        ["내 페이지 주소는 어떻게 되나요?", "공개 페이지 주소는 #{public_host}/내 주소 형식입니다. 가입할 때 주소를 직접 입력하거나 비워 두어 자동으로 만들 수 있어요."],
-        ["언제든 탈퇴할 수 있나요?", "회원 관리 화면에서 탈퇴할 수 있어요. 탈퇴하면 공개 페이지가 닫히고 개인정보는 익명화되며 업로드한 문서와 사진은 삭제됩니다. 거래·후기·문의 기록은 남습니다."],
-        ["외부 노출과 광고는 어떻게 동의하나요?", "회원 관리의 노출·광고 동의 화면에서 선택하고 철회할 수 있어요. SocialDoctors 브랜드 노출 정보에는 이메일과 전화번호가 포함되지 않습니다."],
-        ["보험설계사도 쓸 수 있나요?", "네. 가입할 때 직업으로 보험설계사를 선택할 수 있어요."],
-        ["사진이나 자료가 없어도 가입할 수 있나요?", "네. 이메일 가입에는 이름, 이메일, 비밀번호와 비밀번호 확인, 이용약관 및 개인정보처리방침 동의가 필요해요. 사진이나 자료는 가입 필수 항목이 아닙니다."]
-      ].each do |question, answer| %>
-        <details>
-          <summary><%= question %><%= lni_icon "chevron-down", size: 20 %></summary>
-          <p><%= answer %></p>
-        </details>
-      <% end %>
-    </div>
-  </section>
-
-  <!-- ── 09 Final CTA — C2 house green band ───────────────────────── -->
-  <section class="impd-wrap impd-section">
-    <div class="impd-stripe" style="background: var(--impd-green-house); color: var(--impd-on-dark); padding: 80px 60px; position: relative; overflow: hidden; border-radius: 12px;">
-      <div class="impd-label" style="color: #dfc49d; margin-bottom: 24px;">시작하기</div>
-      <h2 class="impd-display" style="font-size: clamp(44px, 7vw, 88px); color: var(--impd-on-dark); max-width: 900px;">
-        지금 가지고 있는<br>
-        <span class="impd-serif" style="color: var(--impd-gold);">자료 한 장</span>으로<br>
-        시작하세요.
-      </h2>
-      <div style="margin-top: 48px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-        <%= link_to(member_signed_in? ? "/#{current_member.slug}/admin/dashboard" : member_signup_path, class: "impd-btn impd-btn-primary impd-btn-lg") do %><%= member_signed_in? ? "내 페이지 관리" : "내 페이지 만들기" %> <%= lni_icon(member_signed_in? ? "pencil-1" : "arrow-right") %><% end %>
-        <%= link_to(member_signed_in? ? "내 페이지 보기" : "예시 먼저 보기", member_signed_in? ? "/#{current_member.slug}" : example_profile_path,
-            class: "impd-btn", style: "background: transparent; color: var(--impd-on-dark); border: 1px solid var(--impd-on-dark);") %>
-        <span class="impd-label-muted" style="color: var(--impd-on-dark-soft);">카드 등록 불필요 · 언제든 비공개</span>
+  <section id="faq" class="impd-home-section" aria-labelledby="faq-title">
+    <div class="impd-wrap">
+      <h2 id="faq-title" class="impd-section-title">자주 묻는 질문</h2>
+      <div class="impd-faq">
+        <% [
+          ["정말 무료로 시작할 수 있나요?", "네. 무료 요금제는 월 0원이며 가입할 때 카드 정보를 입력하지 않습니다."],
+          ["내 페이지 주소는 어떻게 되나요?", "공개 페이지 주소는 #{public_host}/내 주소 형식입니다. 가입할 때 주소를 직접 입력하거나 비워 두어 자동으로 만들 수 있어요."],
+          ["언제든 탈퇴할 수 있나요?", "회원 관리 화면에서 탈퇴할 수 있어요. 탈퇴하면 공개 페이지가 닫히고 개인정보는 익명화되며 업로드한 문서와 사진은 삭제됩니다. 거래·후기·문의 기록은 남습니다."],
+          ["외부 노출과 광고는 어떻게 동의하나요?", "회원 관리의 노출·광고 동의 화면에서 선택하고 철회할 수 있어요. SocialDoctors 브랜드 노출 정보에는 이메일과 전화번호가 포함되지 않습니다."],
+          ["보험설계사도 쓸 수 있나요?", "네. 가입할 때 직업으로 보험설계사를 선택할 수 있어요."],
+          ["사진이나 자료가 없어도 가입할 수 있나요?", "네. 이메일 가입에는 이름, 이메일, 비밀번호와 비밀번호 확인, 이용약관 및 개인정보처리방침 동의가 필요해요. 사진이나 자료는 가입 필수 항목이 아닙니다."]
+        ].each do |question, answer| %>
+          <details>
+            <summary><%= question %><%= lni_icon "chevron-down", size: 20 %></summary>
+            <p><%= answer %></p>
+          </details>
+        <% end %>
       </div>
     </div>
   </section>
 
-  <!-- ── Footer ───────────────────────── -->
-  <footer class="impd-home-footer">
-    <div>
-      <span class="impd-display" style="font-size: 16px; text-transform: none; color: var(--impd-ink);">
-        imPD<span style="color: var(--impd-accent);">.</span>
-      </span>
-      <p>혼자 일하는 사람을 위한 홍보 페이지</p>
-      <p>운영: 주식회사 가가호호</p>
+  <% if brand_ops_public? %>
+    <section id="growth" class="impd-home-section impd-home-growth" aria-labelledby="growth-title">
+      <div class="impd-wrap">
+        <h2 id="growth-title" class="impd-section-title">함께 자라는 imPD</h2>
+        <p>회원들의 활동과 브랜드 이야기를 살펴보세요.</p>
+        <a href="/growth" class="impd-link">imPD 성장 이야기 보기 →</a>
+      </div>
+    </section>
+  <% end %>
+
+  <section id="close" class="impd-home-section impd-home-close" aria-labelledby="close-title">
+    <div class="impd-wrap">
+      <h2 id="close-title" class="impd-section-title">지금 가지고 있는 자료 한 장으로 시작하세요</h2>
+      <div class="impd-home-actions">
+        <%= link_to primary_path, class: "impd-btn impd-btn-primary" do %>
+          <%= primary_label %> <%= lni_icon primary_icon %>
+        <% end %>
+        <%= link_to secondary_label, secondary_path, class: "impd-btn impd-btn-secondary" %>
+      </div>
+      <p class="impd-small">카드 등록 불필요 · 언제든 비공개</p>
     </div>
-    <nav aria-label="푸터 메뉴">
-      <%= link_to "둘러보기", explore_path %>
-      <%= link_to "가격", "/#pricing" %>
-      <%= link_to "자주 묻는 질문", "/#faq" %>
-      <%= link_to "문의하기", new_inquiry_path %>
-      <%= link_to "이용약관", terms_path %>
-      <%= link_to "개인정보처리방침", privacy_path, style: "font-weight: 700;" %>
-    </nav>
+  </section>
+
+  <footer class="impd-home-footer">
+    <div class="impd-wrap impd-home-footer-inner">
+      <div>
+        <strong>imPD.</strong>
+        <p>혼자 일하는 사람을 위한 홍보 페이지</p>
+        <p>운영: 주식회사 가가호호</p>
+      </div>
+      <nav aria-label="푸터 메뉴">
+        <%= link_to "둘러보기", explore_path %>
+        <%= link_to "가격", "/#pricing" %>
+        <%= link_to "자주 묻는 질문", "/#faq" %>
+        <%= link_to "문의하기", new_inquiry_path %>
+        <%= link_to "이용약관", terms_path %>
+        <%= link_to "개인정보처리방침", privacy_path %>
+      </nav>
+    </div>
   </footer>
 </div>
-
-<script>
-  // 회전 단어 (Stimulus 대체로 inline)
-  (function() {
-    const target = document.querySelector('[data-impd-rotator-target="word"]');
-    if (!target) return;
-    const words = ['사장님', '크리에이터', '보험설계사', '강사', '공방장', '코치', '프리랜서', '작가'];
-    let i = 0;
-    setInterval(() => {
-      i = (i + 1) % words.length;
-      target.style.transition = 'opacity 200ms';
-      target.style.opacity = '0';
-      setTimeout(() => {
-        target.textContent = words[i] + '입니다.';
-        target.style.opacity = '1';
-      }, 220);
-    }, 1800);
-  })();
-</script>
-
-<% if brand_ops_public? %><section style="max-width:1100px;margin:40px auto;padding:24px 20px;"><h2>함께 자라는 imPD</h2><p style="margin:10px 0;">회원들의 활동과 브랜드 이야기를 살펴보세요.</p><a href="/growth" style="display:inline-block;padding:12px 0;color:#00754A;">imPD 성장 이야기 보기 →</a></section><% end %>

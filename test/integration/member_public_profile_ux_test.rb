@@ -900,7 +900,9 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
   test "reduced motion disables smooth scrolling on public pages" do
     get public_profile_path(slug: @member.slug)
 
-    assert_match(/@media \(prefers-reduced-motion: reduce\)\s*\{\s*html\s*\{\s*scroll-behavior: auto/, response.body)
+    assert_select 'html.impd-shell link[rel=stylesheet][href*="impd_system"]', count: 1
+    css = Rails.root.join("app/assets/stylesheets/impd_system.css").read
+    assert_match(/@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.impd-shell\s*\{\s*scroll-behavior: auto/, css)
   end
 
   private

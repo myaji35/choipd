@@ -11,16 +11,16 @@
     background-image: linear-gradient(to right, rgba(15,13,11,0.06) 1px, transparent 1px);
     background-size: 80px 100%; pointer-events: none; opacity: 0.5;
   }
-  .auth-brand { font-family: var(--impd-font-display, 'Inter Tight', system-ui); font-weight: 800; font-size: 36px; letter-spacing: -1.6px; color: var(--impd-ink, #0f0d0b); margin: 0; position: relative; }
+  .auth-brand { font-family: var(--impd-font-display, 'Inter Tight', system-ui); font-weight: 600; font-size: 36px; letter-spacing: -1.6px; color: var(--impd-ink, #0f0d0b); margin: 0; position: relative; }
   .auth-brand .dot { color: var(--impd-accent, #00754A); }
-  .auth-strap { font-family: var(--impd-font-mono, 'JetBrains Mono', monospace); font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-accent, #00754A); margin-top: 4px; position: relative; }
+  .auth-strap { font-family: var(--impd-font-mono); font-size: var(--impd-size-label); letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-accent, #00754A); margin-top: 4px; position: relative; }
 
   .auth-form-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 480px; width: 100%; position: relative; padding-top: 48px; }
 
   .auth-head { border-top: 1px solid var(--impd-ink, #0f0d0b); padding-top: 20px; margin-bottom: 28px; }
   .auth-section { font-family: var(--impd-font-sans, sans-serif); font-size: 13px; color: var(--impd-accent, #00754A); margin-bottom: 8px; }
-  .auth-headline { font-family: var(--impd-font-display, 'Inter Tight'); font-weight: 800; font-size: 44px; letter-spacing: -1.8px; line-height: 1.15; word-break: keep-all; margin: 0; }
-  .auth-headline .serif { font-family: var(--impd-font-serif, 'Noto Serif KR', serif); font-style: italic; font-weight: 400; color: var(--impd-accent, #00754A); }
+  .auth-headline { font-family: var(--impd-font-display, 'Inter Tight'); font-weight: 600; font-size: 44px; letter-spacing: -1.8px; line-height: 1.15; word-break: keep-all; margin: 0; }
+  .auth-headline .serif { font-family: var(--impd-font-serif, 'Noto Serif KR', serif); font-style: normal; font-weight: 400; color: var(--impd-accent, #00754A); }
   .auth-sub { margin-top: 16px; font-size: 14px; color: rgba(15,13,11,0.65); line-height: 1.6; }
 
   .auth-alert { background: rgba(179,38,30,0.08); border-left: 2px solid #B3261E; color: #B3261E; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; }
@@ -30,7 +30,7 @@
   .field-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
   .field-label { font-family: var(--impd-font-sans, sans-serif); font-size: 13px; color: rgba(15,13,11,0.65); }
   .field-req { color: #B3261E; margin-left: 4px; }
-  .field-hint { font-size: 11px; color: rgba(15,13,11,0.55); margin-top: 2px; }
+  .field-hint { font-size: var(--impd-size-label); color: rgba(15,13,11,0.55); margin-top: 2px; }
   .field-err { font-size: 13px; color: #B3261E; margin-top: 2px; }
 
   .field-input {
@@ -68,17 +68,7 @@
     outline: none;
   }
 
-  .submit-btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    width: 100%; height: 52px;
-    background: var(--impd-ink, #0f0d0b); color: var(--impd-paper, #efece4);
-    border: 1px solid var(--impd-ink, #0f0d0b);
-    font-family: var(--impd-font-sans, 'Pretendard Variable');
-    font-size: 14px; font-weight: 600; letter-spacing: -0.2px;
-    cursor: pointer; transition: background 150ms ease;
-    margin-top: 8px;
-  }
-  .submit-btn:hover { background: var(--impd-accent, #00754A); border-color: var(--impd-accent, #00754A); }
+  .submit-btn { width: 100%; margin-top: var(--impd-s-2); }
 
   [data-google-pending-hint], .signup-more .field-hint { font-size: 13px; }
   .signup-more > summary { min-height: 48px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--impd-accent); border-top: 1px solid rgba(15,13,11,0.15); border-bottom: 1px solid rgba(15,13,11,0.15); margin: 8px 0 12px; }
@@ -89,35 +79,34 @@
   .auth-divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; font-family: var(--impd-font-sans, sans-serif); font-size: 13px; color: rgba(15,13,11,0.65); }
   .auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: rgba(15,13,11,0.15); }
 
-  .oauth-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 0 22px; height: 52px; background: #fff; color: var(--impd-ink, #0f0d0b); border: 1px solid var(--impd-ink, #0f0d0b); border-radius: 0; font-family: var(--impd-font-sans, 'Pretendard Variable'); font-size: 14px; font-weight: 600; letter-spacing: -0.2px; cursor: pointer; transition: background 150ms ease; }
-  .oauth-btn:hover { background: var(--impd-card, #fbf8f1); }
+  .oauth-btn { width: 100%; }
 
-  .auth-fine { margin-top: 16px; font-size: 11px; color: var(--impd-muted, rgba(15,13,11,0.55)); line-height: 1.6; }
-  .auth-alt { margin-top: 20px; padding: 14px 16px; background: #fff; border: 1px solid var(--impd-rule, rgba(15,13,11,0.15)); font-size: 12px; color: rgba(15,13,11,0.75); line-height: 1.6; }
+  .auth-fine { margin-top: 16px; font-size: var(--impd-size-label); color: var(--impd-muted, rgba(15,13,11,0.55)); line-height: 1.6; }
+  .auth-alt { margin-top: 20px; padding: 14px 16px; background: #fff; border: 1px solid var(--impd-rule, rgba(15,13,11,0.15)); font-size: var(--impd-size-label); color: rgba(15,13,11,0.75); line-height: 1.6; }
   .auth-alt strong { color: var(--impd-ink, #0f0d0b); }
   .auth-alt a { color: var(--impd-accent, #00754A); text-decoration: underline; }
 
   .probe-consent { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; background: #fff; border: 1px solid var(--impd-rule, rgba(15,13,11,0.15)); margin: 8px 0 4px; cursor: pointer; }
   .probe-consent input[type=checkbox] { flex-shrink: 0; margin-top: 3px; width: 16px; height: 16px; accent-color: var(--impd-accent, #00754A); }
   .probe-consent strong { display: block; font-size: 13px; font-weight: 600; color: var(--impd-ink, #0f0d0b); margin-bottom: 4px; letter-spacing: -0.1px; }
-  .probe-consent p { margin: 0; font-size: 11px; color: rgba(15,13,11,0.6); line-height: 1.55; }
-  .probe-consent .probe-tag { display: inline-block; margin-left: 6px; padding: 1px 6px; font-family: var(--impd-font-mono, 'JetBrains Mono', monospace); font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-accent, #00754A); border: 1px solid var(--impd-accent, #00754A); }
+  .probe-consent p { margin: 0; font-size: var(--impd-size-label); color: rgba(15,13,11,0.6); line-height: 1.55; }
+  .probe-consent .probe-tag { display: inline-block; margin-left: 6px; padding: 1px 6px; font-family: var(--impd-font-mono); font-size: var(--impd-size-label); letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-accent, #00754A); border: 1px solid var(--impd-accent, #00754A); }
 
   .terms-consent { display: flex; gap: 12px; align-items: flex-start; margin: 12px 0 4px; padding: 14px 16px; background: #fff; border: 1px solid var(--impd-rule, rgba(15,13,11,0.15)); font-size: 13px; line-height: 1.65; color: var(--impd-ink, #0f0d0b); cursor: pointer; }
   .terms-consent input[type=checkbox] { flex-shrink: 0; width: 16px; height: 16px; margin-top: 3px; accent-color: var(--impd-accent, #00754A); }
   .terms-consent a { color: var(--impd-accent, #00754A); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
 
-  .auth-foot { margin-top: auto; padding-top: 32px; display: flex; align-items: center; justify-content: space-between; font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(15,13,11,0.45); position: relative; }
+  .auth-foot { margin-top: auto; padding-top: 32px; display: flex; align-items: center; justify-content: space-between; font-family: var(--impd-font-mono); font-size: var(--impd-size-label); letter-spacing: 1.2px; text-transform: uppercase; color: rgba(15,13,11,0.45); position: relative; }
   .auth-foot a { color: inherit; text-decoration: none; }
   .auth-foot a:hover { color: var(--impd-accent, #00754A); }
 
-  .auth-poster { background: var(--impd-ink, #0f0d0b); color: var(--impd-paper, #efece4); padding: 56px 48px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+  .auth-poster { background: #0f0d0b; color: #efece4; padding: 56px 48px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
   .auth-poster::before { content: ""; position: absolute; inset: 0; background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.04) 0 3px, transparent 3px 10px); pointer-events: none; }
-  .auth-poster-label { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; color: rgba(255,255,255,0.55); position: relative; }
-  .auth-poster-title { font-family: var(--impd-font-display, 'Inter Tight'); font-weight: 800; font-size: clamp(44px, 5.5vw, 72px); letter-spacing: -2.6px; line-height: 0.95; position: relative; margin-top: 40px; }
-  .auth-poster-title .serif { font-family: var(--impd-font-serif, 'Noto Serif KR', serif); font-style: italic; font-weight: 400; color: var(--impd-accent-2, #CBA258); }
-  .auth-poster-sub { margin-top: 20px; font-family: var(--impd-font-serif, 'Noto Serif KR', serif); font-style: italic; font-size: 18px; line-height: 1.5; color: rgba(255,255,255,0.75); max-width: 32ch; position: relative; }
-  .auth-poster-meta { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,0.45); display: flex; justify-content: space-between; position: relative; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.15); }
+  .auth-poster-label { font-family: var(--impd-font-mono); font-size: var(--impd-size-label); letter-spacing: 1.6px; text-transform: uppercase; color: rgba(255,255,255,0.55); position: relative; }
+  .auth-poster-title { font-family: var(--impd-font-display, 'Inter Tight'); font-weight: 600; font-size: clamp(44px, 5.5vw, 72px); letter-spacing: -2.6px; line-height: 0.95; position: relative; margin-top: 40px; }
+  .auth-poster-title .serif { font-family: var(--impd-font-serif, 'Noto Serif KR', serif); font-style: normal; font-weight: 400; color: var(--impd-accent-2, #CBA258); }
+  .auth-poster-sub { margin-top: 20px; font-family: var(--impd-font-serif, 'Noto Serif KR', serif); font-style: normal; font-size: 18px; line-height: 1.5; color: rgba(255,255,255,0.75); max-width: 32ch; position: relative; }
+  .auth-poster-meta { font-family: var(--impd-font-mono); font-size: var(--impd-size-label); letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,0.45); display: flex; justify-content: space-between; position: relative; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.15); }
   @media (max-width: 600px) {
     body > main:has(> .auth-shell) { margin-top: 24px; }
     .auth-form-col { padding: 24px 20px; }
@@ -162,7 +151,7 @@
       <% if google_oauth_enabled? %>
         
 
-        <%= button_to "/auth/google_oauth2", method: :post, data: { turbo: false }, class: "oauth-btn" do %>
+        <%= button_to "/auth/google_oauth2", method: :post, data: { turbo: false }, class: "impd-btn impd-btn-secondary oauth-btn" do %>
           <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
             <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
             <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -286,7 +275,7 @@
           <span><%= link_to "이용약관", terms_path, target: "_blank", rel: "noopener noreferrer" %>과 <%= link_to "개인정보처리방침", privacy_path, target: "_blank", rel: "noopener noreferrer" %>에 동의합니다 (필수)</span>
         </label>
 
-        <button type="submit" class="submit-btn">이메일로 가입하기 →</button>
+        <button type="submit" class="impd-btn impd-btn-primary submit-btn">이메일로 가입하기 →</button>
       <% end %>
       <script>
         document.getElementById('member-signup-form').addEventListener('invalid', (event) => {

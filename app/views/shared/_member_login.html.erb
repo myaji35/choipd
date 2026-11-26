@@ -10,16 +10,16 @@
     background-image: linear-gradient(to right, rgba(15,13,11,0.06) 1px, transparent 1px);
     background-size: 80px 100%; pointer-events: none; opacity: 0.5;
   }
-  .auth-brand { font-family: var(--impd-font-display, 'Inter Tight', system-ui); font-weight: 800; font-size: 36px; letter-spacing: -1.6px; color: var(--impd-ink, #0f0d0b); margin: 0; position: relative; }
+  .auth-brand { font-family: var(--impd-font-display, 'Inter Tight', system-ui); font-weight: 600; font-size: 36px; letter-spacing: -1.6px; color: var(--impd-ink, #0f0d0b); margin: 0; position: relative; }
   .auth-brand .dot { color: var(--impd-accent, #00754A); }
-  .auth-strap { font-family: var(--impd-font-mono, 'JetBrains Mono', monospace); font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-accent, #00754A); margin-top: 4px; position: relative; }
+  .auth-strap { font-family: var(--impd-font-mono); font-size: var(--impd-size-label); letter-spacing: 1.4px; text-transform: uppercase; color: var(--impd-accent, #00754A); margin-top: 4px; position: relative; }
 
   .auth-form-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 480px; width: 100%; position: relative; padding-top: 48px; }
 
   .auth-head { border-top: 1px solid var(--impd-ink, #0f0d0b); padding-top: 20px; margin-bottom: 28px; }
   .auth-section { font-family: var(--impd-font-sans, sans-serif); font-size: 13px; color: var(--impd-accent, #00754A); margin-bottom: 8px; }
-  .auth-headline { font-family: var(--impd-font-display, 'Inter Tight'); font-weight: 800; font-size: 44px; letter-spacing: -1.8px; line-height: 1.15; word-break: keep-all; margin: 0; }
-  .auth-headline .serif { font-family: var(--impd-font-serif, 'Noto Serif KR', serif); font-style: italic; font-weight: 400; color: var(--impd-accent, #00754A); }
+  .auth-headline { font-family: var(--impd-font-display, 'Inter Tight'); font-weight: 600; font-size: 44px; letter-spacing: -1.8px; line-height: 1.15; word-break: keep-all; margin: 0; }
+  .auth-headline .serif { font-family: var(--impd-font-serif, 'Noto Serif KR', serif); font-style: normal; font-weight: 400; color: var(--impd-accent, #00754A); }
   .auth-sub { margin-top: 16px; font-size: 14px; color: rgba(15,13,11,0.65); line-height: 1.6; }
 
   .auth-alert { background: rgba(179,38,30,0.08); border-left: 2px solid #B3261E; color: #B3261E; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; }
@@ -29,7 +29,7 @@
   .field-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
   .field-label { font-family: var(--impd-font-sans, sans-serif); font-size: 13px; color: rgba(15,13,11,0.65); }
   .field-req { color: #B3261E; margin-left: 4px; }
-  .field-hint { font-size: 11px; color: rgba(15,13,11,0.55); margin-top: 2px; }
+  .field-hint { font-size: var(--impd-size-label); color: rgba(15,13,11,0.55); margin-top: 2px; }
   .field-err { font-size: 13px; color: #B3261E; margin-top: 2px; }
 
   .field-input {
@@ -68,50 +68,39 @@
     outline: none;
   }
 
-  .submit-btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    width: 100%; height: 52px;
-    background: var(--impd-ink, #0f0d0b); color: var(--impd-paper, #efece4);
-    border: 1px solid var(--impd-ink, #0f0d0b);
-    font-family: var(--impd-font-sans, 'Pretendard Variable');
-    font-size: 14px; font-weight: 600; letter-spacing: -0.2px;
-    cursor: pointer; transition: background 150ms ease;
-    margin-top: 8px;
-  }
-  .submit-btn:hover { background: var(--impd-accent, #00754A); border-color: var(--impd-accent, #00754A); }
+  .submit-btn { width: 100%; margin-top: var(--impd-s-2); }
 
   .auth-divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; font-family: var(--impd-font-sans, sans-serif); font-size: 13px; color: rgba(15,13,11,0.65); }
   .auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: rgba(15,13,11,0.15); }
 
-  .oauth-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 0 22px; height: 52px; background: #fff; color: var(--impd-ink, #0f0d0b); border: 1px solid var(--impd-ink, #0f0d0b); border-radius: 0; font-family: var(--impd-font-sans, 'Pretendard Variable'); font-size: 14px; font-weight: 600; letter-spacing: -0.2px; cursor: pointer; transition: background 150ms ease; }
-  .oauth-btn:hover { background: var(--impd-card, #fbf8f1); }
+  .oauth-btn { width: 100%; }
 
-  .auth-fine { margin-top: 16px; font-size: 11px; color: var(--impd-muted, rgba(15,13,11,0.55)); line-height: 1.6; }
-  .auth-alt { margin-top: 20px; padding: 14px 16px; background: #fff; border: 1px solid var(--impd-rule, rgba(15,13,11,0.15)); font-size: 12px; color: rgba(15,13,11,0.75); line-height: 1.6; }
+  .auth-fine { margin-top: 16px; font-size: var(--impd-size-label); color: var(--impd-muted, rgba(15,13,11,0.55)); line-height: 1.6; }
+  .auth-alt { margin-top: 20px; padding: 14px 16px; background: #fff; border: 1px solid var(--impd-rule, rgba(15,13,11,0.15)); font-size: var(--impd-size-label); color: rgba(15,13,11,0.75); line-height: 1.6; }
   .auth-alt strong { color: var(--impd-ink, #0f0d0b); }
   .auth-alt a { color: var(--impd-accent, #00754A); text-decoration: underline; }
 
   .probe-consent { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; background: #fff; border: 1px solid var(--impd-rule, rgba(15,13,11,0.15)); margin: 8px 0 4px; cursor: pointer; }
   .probe-consent input[type=checkbox] { flex-shrink: 0; margin-top: 3px; width: 16px; height: 16px; accent-color: var(--impd-accent, #00754A); }
   .probe-consent strong { display: block; font-size: 13px; font-weight: 600; color: var(--impd-ink, #0f0d0b); margin-bottom: 4px; letter-spacing: -0.1px; }
-  .probe-consent p { margin: 0; font-size: 11px; color: rgba(15,13,11,0.6); line-height: 1.55; }
-  .probe-consent .probe-tag { display: inline-block; margin-left: 6px; padding: 1px 6px; font-family: var(--impd-font-mono, 'JetBrains Mono', monospace); font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-accent, #00754A); border: 1px solid var(--impd-accent, #00754A); }
+  .probe-consent p { margin: 0; font-size: var(--impd-size-label); color: rgba(15,13,11,0.6); line-height: 1.55; }
+  .probe-consent .probe-tag { display: inline-block; margin-left: 6px; padding: 1px 6px; font-family: var(--impd-font-mono); font-size: var(--impd-size-label); letter-spacing: 1.2px; text-transform: uppercase; color: var(--impd-accent, #00754A); border: 1px solid var(--impd-accent, #00754A); }
 
   .terms-consent { display: flex; gap: 12px; align-items: flex-start; margin: 12px 0 4px; padding: 14px 16px; background: #fff; border: 1px solid var(--impd-rule, rgba(15,13,11,0.15)); font-size: 13px; line-height: 1.65; color: var(--impd-ink, #0f0d0b); cursor: pointer; }
   .terms-consent input[type=checkbox] { flex-shrink: 0; width: 16px; height: 16px; margin-top: 3px; accent-color: var(--impd-accent, #00754A); }
   .terms-consent a { color: var(--impd-accent, #00754A); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
 
-  .auth-foot { margin-top: auto; padding-top: 32px; display: flex; align-items: center; justify-content: space-between; font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(15,13,11,0.45); position: relative; }
+  .auth-foot { margin-top: auto; padding-top: 32px; display: flex; align-items: center; justify-content: space-between; font-family: var(--impd-font-mono); font-size: var(--impd-size-label); letter-spacing: 1.2px; text-transform: uppercase; color: rgba(15,13,11,0.45); position: relative; }
   .auth-foot a { color: inherit; text-decoration: none; }
   .auth-foot a:hover { color: var(--impd-accent, #00754A); }
 
-  .auth-poster { background: var(--impd-ink, #0f0d0b); color: var(--impd-paper, #efece4); padding: 56px 48px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+  .auth-poster { background: #0f0d0b; color: #efece4; padding: 56px 48px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
   .auth-poster::before { content: ""; position: absolute; inset: 0; background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.04) 0 3px, transparent 3px 10px); pointer-events: none; }
-  .auth-poster-label { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; color: rgba(255,255,255,0.55); position: relative; }
-  .auth-poster-title { font-family: var(--impd-font-display, 'Inter Tight'); font-weight: 800; font-size: clamp(44px, 5.5vw, 72px); letter-spacing: -2.6px; line-height: 0.95; position: relative; margin-top: 40px; }
-  .auth-poster-title .serif { font-family: var(--impd-font-serif, 'Noto Serif KR', serif); font-style: italic; font-weight: 400; color: var(--impd-accent-2, #CBA258); }
-  .auth-poster-sub { margin-top: 20px; font-family: var(--impd-font-serif, 'Noto Serif KR', serif); font-style: italic; font-size: 18px; line-height: 1.5; color: rgba(255,255,255,0.75); max-width: 32ch; position: relative; }
-  .auth-poster-meta { font-family: var(--impd-font-mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,0.45); display: flex; justify-content: space-between; position: relative; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.15); }
+  .auth-poster-label { font-family: var(--impd-font-mono); font-size: var(--impd-size-label); letter-spacing: 1.6px; text-transform: uppercase; color: rgba(255,255,255,0.55); position: relative; }
+  .auth-poster-title { font-family: var(--impd-font-display, 'Inter Tight'); font-weight: 600; font-size: clamp(44px, 5.5vw, 72px); letter-spacing: -2.6px; line-height: 0.95; position: relative; margin-top: 40px; }
+  .auth-poster-title .serif { font-family: var(--impd-font-serif, 'Noto Serif KR', serif); font-style: normal; font-weight: 400; color: var(--impd-accent-2, #CBA258); }
+  .auth-poster-sub { margin-top: 20px; font-family: var(--impd-font-serif, 'Noto Serif KR', serif); font-style: normal; font-size: 18px; line-height: 1.5; color: rgba(255,255,255,0.75); max-width: 32ch; position: relative; }
+  .auth-poster-meta { font-family: var(--impd-font-mono); font-size: var(--impd-size-label); letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,0.45); display: flex; justify-content: space-between; position: relative; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.15); }
 </style>
 <style>
   .login-form { display: flex; flex-direction: column; gap: 12px; }
@@ -130,7 +119,7 @@
       <% if alert.present? %><div class="auth-alert"><%= lni_icon "xmark-circle" %> <%= alert %></div><% end %>
       <% if notice.present? %><div class="auth-notice"><%= lni_icon "check-circle-1" %> <%= notice %></div><% end %>
       <% if google_oauth_enabled? %>
-        <%= button_to "Google로 계속하기", "/auth/google_oauth2", method: :post, data: { turbo: false }, class: "oauth-btn" %>
+        <%= button_to "Google로 계속하기", "/auth/google_oauth2", method: :post, data: { turbo: false }, class: "impd-btn impd-btn-secondary oauth-btn" %>
         <div class="auth-divider">또는 이메일로 로그인</div>
       <% end %>
       <%= form_with url: member ? login_member_post_path(slug: member.slug) : member_login_path, method: :post, local: true, data: { turbo: false }, class: "login-form" do |f| %>
@@ -143,7 +132,7 @@
           <%= f.password_field :password, required: true, autocomplete: "current-password", id: "login_password", class: "field-input" %>
           <button type="button" class="password-toggle" aria-label="비밀번호 보기" aria-pressed="false" onclick="const field = document.getElementById('login_password'); const showing = field.type === 'password'; field.type = showing ? 'text' : 'password'; this.setAttribute('aria-pressed', showing); this.setAttribute('aria-label', showing ? '비밀번호 숨기기' : '비밀번호 보기');"><%= lni_icon "eye" %></button>
         </div>
-        <button type="submit" class="submit-btn">로그인 →</button>
+        <button type="submit" class="impd-btn impd-btn-primary submit-btn">로그인 →</button>
       <% end %>
       <p class="login-link"><%= link_to "비밀번호를 잊으셨나요? 문의하기로 알려 주세요", new_inquiry_path %></p>
       <div class="auth-alt">아직 회원이 아니신가요? <%= link_to "무료로 시작하기", member_signup_path %></div>

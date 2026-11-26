@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html class="impd-application">
   <head>
+    <link rel="stylesheet" href="/fonts/impd-fonts.css?v=1">
     <%= stylesheet_link_tag "lineicons", "data-turbo-track": "reload" %>
     <title><%= content_for(:title) || "Choi Pd Rails" %></title>
     <%= render "shared/og_image", og_title: (content_for?(:title) ? yield(:title) : "imPD") %>

@@ -16,6 +16,7 @@ class Chopd::HomeController < Chopd::BaseController
 
     # §05 "imPD를 쓰는 사람들" — 승인된 실제 회원. is_featured 우선 + 최근 가입 순.
     # 최PD 포함한 실제 slug로 각 카드 클릭 시 공개 페이지로 이동 가능.
+    @member_count = Member.for_tenant.publicly_visible.count
     @featured_members = Member.for_tenant.publicly_visible
       .order(Arel.sql("CASE WHEN is_featured = 1 THEN 0 ELSE 1 END"), featured_order: :asc, created_at: :desc)
       .limit(6)

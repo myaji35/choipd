@@ -16,6 +16,37 @@ class PublicPagesTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", privacy_path, text: "개인정보처리방침", count: 1
   end
 
+  test "homepage puts one offer in the hero and keeps the video and pricing in their sections" do
+    get root_path
+
+    assert_select "h1", text: "1인 사업자·크리에이터의 홍보 페이지", count: 1
+    assert_select ".impd-hero-actions a", count: 2
+    assert_select ".impd-topnav-actions a[href=?]", member_signup_path, text: "내 페이지 만들기"
+    assert_select "#how a[data-promo-popup][href=?]", promo_watch_path, text: "홍보 영상 보기 (30초)"
+    assert_select "#pricing a[href=?]", member_signup_path, text: "내 페이지 만들기", count: 1
+    assert_select "#faq summary", count: 6
+    assert_select '.impd-joinstrip, a[href="#signup"], .hero-phone-review, .hero-phone-caption', count: 0
+    assert_select ".impd-frap-home", count: 1
+    assert_select 'link[href="/fonts/impd-fonts.css?v=1"]', count: 1
+    assert_select 'link[href*="fonts.googleapis.com"], link[href*="fonts.gstatic.com"], link[href*="cdn.jsdelivr.net"]', count: 0
+  end
+
+  test "homepage counts all public members beyond the featured cards" do
+    7.times do |index|
+      Member.create!(name: "공개 회원 #{index}", email: "taste-home-#{index}@example.com",
+        slug: "taste-home-#{index}", status: "approved", password: "password1234")
+    end
+    Member.create!(name: "비공개 회원", email: "taste-private@example.com",
+      slug: "taste-private", status: "pending_approval", password: "password1234")
+
+    get root_path
+
+    count = Member.for_tenant.publicly_visible.count
+    assert_operator count, :>, 6
+    assert_select "#people .impd-member-count", text: "지금 #{count}명이 운영 중"
+    assert_select "#people .impd-member-grid > a", count: 6
+  end
+
   test "member page has a profile share title" do
     member = Member.create!(name: "공유 회원", email: "og-#{SecureRandom.hex(4)}@example.com",
       slug: "og-#{SecureRandom.hex(4)}", status: "approved", password: "password1234")
