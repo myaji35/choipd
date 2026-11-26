@@ -239,7 +239,103 @@ class MemberPublicProfileUxTest < ActionDispatch::IntegrationTest
     assert_select ".impd-bento article a.public-service-action"
   end
 
+  test "웹사이트 주소로 올린 사례는 그림 대신 누를 수 있는 링크 타일로 보여 준다" do
+    @member.member_portfolio_items.create!(title: "동네 가게 홍보", media_url: "https://example.com", media_type: "link")
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select "#gallery figure a.impd-case-link[href='https://example.com'][target=_blank][rel=noopener]"
+    assert_select "#gallery img[src='https://example.com']", count: 0
+    assert_select "#gallery figure figcaption .impd-case-go", text: /example\.com 보러 가기/
+    assert_select "#gallery .impd-section-header .impd-label-muted", text: "1개"
+  end
+
+  test "media_type 이 비어 있어도 그림 주소가 아니면 링크 타일이다" do
+    @member.member_portfolio_items.create!(title: "동네 가게 홍보", media_url: "https://example.com/work", media_type: nil)
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select "#gallery a.impd-case-link[href='https://example.com/work']"
+    assert_select "#gallery img", count: 0
+  end
+
+  test "그림 주소로 올린 사례는 지금처럼 그림으로 보여 준다" do
+    @member.member_portfolio_items.create!(title: "동네 가게 홍보", media_url: "https://example.com/photo.jpg")
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select "#gallery img[src='https://example.com/photo.jpg']"
+    assert_select "#gallery a.impd-case-link", count: 0
+    assert_select "#gallery .impd-section-header .impd-label-muted", text: "사진 1개"
+  end
+
+  test "안전하지 않은 주소는 사례 링크로 쓰지 않는다" do
+    @member.member_portfolio_items.create!(title: "동네 가게 홍보", media_url: "javascript:alert(1)", media_type: "link")
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select "#gallery a", count: 0
+    assert_select "#gallery img", count: 0
+    assert_select "#gallery .impd-case-go", count: 0
+    assert_select "#gallery .impd-photo-title", text: "동네 가게 홍보"
+  end
+
+  test "카드 모음형에도 링크 사례를 보여 준다" do
+    @member.update!(layout_preset: "grid")
+
+    get public_profile_path(slug: @member.slug)
+    assert_select ".impd-bento-case", count: 0
+
+    @member.member_portfolio_items.create!(title: "동네 가게 홍보", media_url: "https://example.com", media_type: "link")
+    @member.member_portfolio_items.create!(title: "홍보 사진", media_url: "https://example.com/photo.jpg")
+
+    get public_profile_path(slug: @member.slug)
+
+    assert_select ".impd-bento a.impd-bento-case", count: 1
+    assert_select ".impd-bento a.impd-bento-case[href='https://example.com'][target=_blank][rel=noopener]", text: /동네 가게 홍보.*보러 가기/m
+  end
+
+  test "문의 칸에 오면 하단 띠를 치우는 장치가 있다" do
+    [ "editorial", "grid" ].each do |layout|
+      @member.update!(layout_preset: layout)
+      get public_profile_path(slug: @member.slug)
+
+      assert_select "nav.public-sticky a.primary[href='#contact']", text: "문의"
+      assert_includes response.body, ".public-sticky.is-away { display: none; }"
+      assert_includes response.body, "classList.toggle('is-away'"
+    end
+  end
+
+  test "방문 고객에게는 imPD 플랫폼 메뉴를 보여 주지 않는다" do
+    [ "editorial", "grid" ].each do |layout|
+      @member.update!(layout_preset: layout)
+      get public_profile_path(slug: @member.slug)
+      assert_visitor_topnav
+    end
+
+    get public_profile_card_path(slug: @member.slug)
+    assert_visitor_topnav
+  end
+
+  test "다른 화면의 상단 메뉴는 그대로다" do
+    [ root_path, explore_path ].each do |path|
+      get path
+
+      assert_select "nav.impd-topnav-links a", text: "둘러보기"
+      assert_select "#impd-mobile-menu"
+    end
+  end
+
   private
+
+  def assert_visitor_topnav
+    assert_select ".impd-topnav a[href='/']", text: "imPD"
+    assert_select "nav.impd-topnav-links", count: 0
+    assert_select "#impd-mobile-menu", count: 0
+    assert_select ".impd-nav-toggle", count: 0
+    assert_select ".impd-topnav a", text: "로그인", count: 0
+    assert_select ".impd-topnav a", text: "회원가입", count: 0
+  end
 
   def inquiry_attributes
     { sender_name: "방문자", sender_email: "010-1234-5678", message: "상담을 요청합니다", consent: "1" }

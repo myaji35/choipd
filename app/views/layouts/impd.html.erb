@@ -212,6 +212,7 @@
 
     <!-- imPD TopNav — C2 whisper-soft shadow -->
     <% nav_links = [["홈", root_path, request.path == "/"], ["둘러보기", explore_path, request.path.start_with?("/explore")], ["예시", example_profile_path, false], ["가격", root_path(anchor: "pricing"), false], ["도움말", root_path(anchor: "faq"), false]] %>
+    <% visitor_page = controller_path == "public_profile" && @member.present? && !member_signed_in? %>
     <style>
       .impd-topnav { position: sticky; top: 0; z-index: 20; background: var(--impd-card); box-shadow: var(--impd-shadow-nav); }
       .impd-topnav-bar { padding: 18px 24px; display: flex; align-items: center; gap: 20px; }
@@ -223,6 +224,7 @@
       .impd-nav-toggle, .impd-mobile-panel { display: none; }
       @media (max-width: 768px) {
         .impd-topnav-bar { padding: 12px 16px; gap: 12px; }
+        .impd-topnav-bar:has(> a:only-child) { min-height: 68px; }
         .impd-topnav-links, .impd-topnav-actions { display: none; }
         .impd-nav-toggle { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-left: auto; border: 0; background: transparent; color: var(--impd-ink); cursor: pointer; }
         .impd-mobile-panel:not([hidden]) { display: block; padding: 0 16px 16px; }
@@ -231,16 +233,18 @@
         .impd-mobile-actions .impd-btn { width: 100%; min-height: 48px; font-size: 16px; }
       }
     </style>
-    <div class="impd-topnav" data-controller="impd-nav" data-action="keydown.esc@window->impd-nav#close">
+    <div class="impd-topnav"<% unless visitor_page %> data-controller="impd-nav" data-action="keydown.esc@window->impd-nav#close"<% end %>>
       <div class="impd-topnav-bar">
         <%= link_to root_path, style: "font-family: var(--impd-font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; color: var(--impd-green); white-space: nowrap;" do %>
           imPD
         <% end %>
+        <% unless visitor_page %>
         <nav class="impd-topnav-links" aria-label="주요 메뉴">
           <% nav_links.each do |label, path, active| %>
             <%= link_to label, path, class: "impd-nav-link", aria: { current: ("page" if active) } %>
           <% end %>
         </nav>
+        <% end %>
         <% if member_signed_in? %>
           <div class="impd-topnav-actions">
             <div class="impd-topnav-identity" title="<%= current_member.email %>">
@@ -250,17 +254,20 @@
             <%= link_to "내 페이지", "/#{current_member.slug}", class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 14px; font-size: 13px; white-space: nowrap;" %>
             <%= button_to "로그아웃", member_logout_path, method: :delete, form: { data: { turbo_confirm: "로그아웃하시겠습니까?" }, style: "display: inline-flex; margin: 0;" }, class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 14px; font-size: 13px; white-space: nowrap;" %>
           </div>
-        <% else %>
+        <% elsif !visitor_page %>
           <div class="impd-topnav-actions">
             <%= link_to "회원가입", member_signup_path, style: "font-size: 13px; color: var(--impd-muted); white-space: nowrap;" %>
             <%= link_to "로그인", member_login_path, class: "impd-btn impd-btn-secondary", style: "height: 36px; padding: 0 14px; font-size: 13px; white-space: nowrap;" %>
           </div>
         <% end %>
+        <% unless visitor_page %>
         <button type="button" class="impd-nav-toggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="impd-mobile-menu" data-impd-nav-target="button" data-action="impd-nav#toggle">
           <span data-impd-nav-target="menuIcon"><%= lni_icon "menu-hamburger-1", size: 24 %></span>
           <span data-impd-nav-target="closeIcon" hidden><%= lni_icon "xmark", size: 24 %></span>
         </button>
+        <% end %>
       </div>
+      <% unless visitor_page %>
       <div id="impd-mobile-menu" class="impd-mobile-panel" data-impd-nav-target="panel" data-action="click->impd-nav#closeOnLink" hidden>
         <nav aria-label="모바일 주요 메뉴">
           <% nav_links.each do |label, path, active| %>
@@ -277,6 +284,7 @@
           <% end %>
         </div>
       </div>
+      <% end %>
     </div>
 
     <%= render "shared/flash" unless action_name == "new" && %w[member_auth member_sessions].include?(controller_path) %>

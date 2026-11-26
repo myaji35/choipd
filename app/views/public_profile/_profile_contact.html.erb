@@ -63,4 +63,14 @@
       });
     });
   });
+
+  (() => {
+    const bar = document.querySelector('.public-sticky');
+    const contact = document.getElementById('contact');
+    if (!bar || !contact || !('IntersectionObserver' in window)) return;
+    // 문의 칸이 화면 아래 1/4 선 위로 올라오면 띠를 치우고, 벗어나면 다시 보여 준다.
+    new IntersectionObserver(([entry]) => {
+      bar.classList.toggle('is-away', entry.isIntersecting);
+    }, { rootMargin: '0px 0px -25% 0px' }).observe(contact);
+  })();
 </script>
