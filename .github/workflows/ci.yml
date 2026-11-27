@@ -100,10 +100,23 @@ jobs:
             log/test.log
           retention-days: 7
 
+  secret_scan:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Scan for secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   # main 브랜치에 푸시되고 모든 검증 통과 시 자동 Kamal 배포
   deploy:
     runs-on: ubuntu-24.04
-    needs: [scan_ruby, scan_js, lint, test]
+    needs: [scan_ruby, scan_js, lint, test, secret_scan]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: production
     steps:
